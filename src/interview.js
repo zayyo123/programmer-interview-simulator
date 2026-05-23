@@ -294,6 +294,7 @@ export function createReport(session) {
       score: evaluation.score,
       confidence: describeAnswerConfidence(evaluation, entry.attempts || 1, levelProfile),
       interviewerVerdict: createInterviewerVerdict(entry.question, evaluation, entry.attempts || 1, levelProfile),
+      passBarSignal: createPassBarSignal(entry.question, evaluation, entry.attempts || 1, levelProfile),
       strengths: evaluation.strengths,
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
@@ -344,6 +345,7 @@ export function createReport(session) {
       hireSignal: createHiringSignal(answersByQuestion, levelProfile, interviewPatterns),
       competencySummary: summarizeCompetencySignals(answersByQuestion, levelProfile),
       competencyBreakdown: createCompetencyBreakdown(answersByQuestion, levelProfile),
+      panelDecision: createPanelDecision(answersByQuestion, levelProfile, interviewPatterns),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
       practiceSummary: createPracticeSummary(answersByQuestion, coachPriorities, interviewPatterns),
@@ -751,6 +753,52 @@ function createInterviewerVerdict(question, evaluation, attempts, levelProfile =
   };
 }
 
+function createPassBarSignal(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
+  const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  });
+  const firstGap = missingMustHave[0];
+  const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
+
+  if (evaluation.score >= levelProfile.minScoreToMoveNext + 12 && !missingMustHave.length && !evaluation.redFlags.length) {
+    return {
+      level: 'strong',
+      label: '过线动作已经具备',
+      detail: '这题已经具备真实面试里的过线密度，首轮回答就能把核心点、解释和说服力一起立住。'
+    };
+  }
+
+  if (repeatedPressure) {
+    return {
+      level: 'risk',
+      label: '卡在连续追问后仍不过线',
+      detail: `这题被连续追问后仍停留在“${describeFollowUpCategory(evaluation.followUpCategory)}”。想过线，必须先把“${createImmediateFix(question, evaluation)}”补成首轮就能说出的内容。`
+    };
+  }
+
+  if (firstGap) {
+    return {
+      level: 'watch',
+      label: '离过线差一个核心点',
+      detail: `如果这是正式面试，这题最需要先补的是“${firstGap}”。把它答实，再补一句“${createImmediateFix(question, evaluation)}”，通过率会明显提升。`
+    };
+  }
+
+  if (evaluation.followUpCategory !== 'complete') {
+    return {
+      level: 'watch',
+      label: '主线有了，但过线说服力不够',
+      detail: `这题不是完全不会，而是还差临门一脚。面试官想听到的是“${createImmediateFix(question, evaluation)}”，否则会继续怀疑稳定性。`
+    };
+  }
+
+  return {
+    level: 'watch',
+    label: '已经接近过线',
+    detail: '这题已经接近真实面试通过线，下一步重点是把表达压缩得更利落，并补强结果、取舍或案例锚点。'
+  };
+}
+
 function estimateScore(answersByQuestion) {
   if (!answersByQuestion.length) return 0;
   const total = answersByQuestion.reduce((sum, item) => sum + item.score, 0);
@@ -1042,6 +1090,68 @@ function createHiringSignal(answersByQuestion, levelProfile = getLevelExpectatio
     label: '需要继续观察',
     level: 'borderline',
     detail
+  };
+}
+
+function createPanelDecision(answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
+  if (!answersByQuestion.length) {
+    return {
+      label: '暂无结论',
+      level: 'borderline',
+      detail: '还没有足够作答，无法模拟面试小组的综合结论。'
+    };
+  }
+
+  const score = estimateScore(answersByQuestion);
+  const strongVerdicts = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'strong').length;
+  const riskVerdicts = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk').length;
+  const repeatedFollowUps = answersByQuestion.filter((item) => item.followUpCount >= 2).length;
+  const unansweredBar = answersByQuestion.filter((item) => item.passBarSignal?.level === 'risk').length;
+  const nearBar = answersByQuestion.filter((item) => item.passBarSignal?.level === 'watch').length;
+  const primaryPattern = interviewPatterns.primary;
+
+  if (
+    score >= levelProfile.minScoreToMoveNext + 8
+    && riskVerdicts === 0
+    && strongVerdicts >= Math.max(2, Math.ceil(answersByQuestion.length / 2))
+  ) {
+    return {
+      label: '建议通过或进入下一轮',
+      level: 'strong',
+      detail: '从模拟面试官视角看，回答整体已经比较稳，更多是在验证上限而不是补基础。'
+    };
+  }
+
+  if (
+    riskVerdicts >= Math.max(2, Math.ceil(answersByQuestion.length / 2))
+    || unansweredBar >= Math.max(2, Math.ceil(answersByQuestion.length / 2))
+    || score < levelProfile.minScoreToMoveNext - 8
+  ) {
+    const patternTail = primaryPattern
+      ? `最影响结论的是“${primaryPattern.label}”。`
+      : '多道题都需要靠追问补主线，整体稳定性不够。';
+    return {
+      label: '建议暂不通过',
+      level: 'risk',
+      detail: `如果这是正式面试，小组大概率会给出偏保守结论。${patternTail}`
+    };
+  }
+
+  if (repeatedFollowUps >= 2 || nearBar >= Math.ceil(answersByQuestion.length / 2)) {
+    const patternTail = primaryPattern
+      ? `继续观察时会重点确认“${primaryPattern.label}”是不是共性短板。`
+      : '需要更多题目来确认这是不是单题波动还是稳定问题。';
+    return {
+      label: '建议继续观察',
+      level: 'watch',
+      detail: `当前更像“有基础但还不够稳”的候选人。${patternTail}`
+    };
+  }
+
+  return {
+    label: '结论偏中性',
+    level: 'watch',
+    detail: '主线基本具备，但亮点题还不够多，且还需要证明深挖后的稳定性。'
   };
 }
 

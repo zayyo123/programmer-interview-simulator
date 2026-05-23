@@ -244,6 +244,10 @@ function renderReport(report) {
     {
       label: 'Interview signal',
       value: overview.hireSignal?.label || '-'
+    },
+    {
+      label: 'Panel decision',
+      value: overview.panelDecision?.label || '-'
     }
   ].map((item) => `
       <div class="snapshot-stat">
@@ -282,6 +286,11 @@ function renderReport(report) {
           <span class="pill ${getVerdictChipClass(item.interviewerVerdict)}">${escapeHtml(item.interviewerVerdict?.label || 'N/A')}</span>
         </div>
         <p>${escapeHtml(item.interviewerVerdict?.detail || 'No interviewer verdict available.')}</p>
+        <div class="section-label">Pass-bar guidance</div>
+        <div class="meta-row">
+          <span class="pill ${getPassBarChipClass(item.passBarSignal)}">${escapeHtml(item.passBarSignal?.label || 'N/A')}</span>
+        </div>
+        <p>${escapeHtml(item.passBarSignal?.detail || 'No pass-bar guidance available.')}</p>
         <div class="section-label">Resume grounding</div>
         <div class="meta-row">
           <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || 'N/A')}</span>
@@ -331,6 +340,11 @@ function renderReport(report) {
       <p>${escapeHtml(overview.summary || 'N/A')}</p>
       <div class="section-label">Interviewer impression</div>
       <p>${escapeHtml(overview.interviewerImpression || 'N/A')}</p>
+      <div class="section-label">Panel decision</div>
+      <div class="meta-row">
+        <span class="pill ${getPanelDecisionChipClass(overview.panelDecision)}">${escapeHtml(overview.panelDecision?.label || 'N/A')}</span>
+      </div>
+      <p>${escapeHtml(overview.panelDecision?.detail || 'No panel decision available.')}</p>
       <div class="section-label">Competency summary</div>
       <p>${escapeHtml(overview.competencySummary || 'N/A')}</p>
       <div class="section-label">Competency breakdown</div>
@@ -466,4 +480,18 @@ function getCompetencyLevelText(level) {
     watch: 'Watch',
     risk: 'Below bar'
   }[level] || 'Watch';
+}
+
+function getPassBarChipClass(signal) {
+  if (!signal) return '';
+  if (signal.level === 'strong') return 'green';
+  if (signal.level === 'risk') return 'amber';
+  return '';
+}
+
+function getPanelDecisionChipClass(signal) {
+  if (!signal) return '';
+  if (signal.level === 'strong') return 'green';
+  if (signal.level === 'risk') return 'amber';
+  return '';
 }
