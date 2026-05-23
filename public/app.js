@@ -230,6 +230,7 @@ function renderReport(report) {
     const strengths = renderList(item.strengths, 'No clear strength captured.');
     const weaknesses = renderList(item.weaknesses, 'No major weakness captured.');
     const redFlags = renderList(item.redFlags, 'No obvious red flag.');
+    const retryBlueprint = renderRetryBlueprint(item.retryBlueprint);
 
     return `
       <article class="report-card">
@@ -279,6 +280,8 @@ function renderReport(report) {
         <p>${escapeHtml(item.nextFollowUp || 'N/A')}</p>
         <div class="section-label">Coach tip</div>
         <p>${escapeHtml(item.coachTip || 'N/A')}</p>
+        <div class="section-label">Retry blueprint</div>
+        ${retryBlueprint}
         <div class="section-label">Improved answer</div>
         <p>${escapeHtml(item.improvedUserAnswer || 'N/A')}</p>
         <div class="section-label">Practice drill</div>
@@ -326,6 +329,35 @@ function renderList(items, fallback) {
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
+function renderRetryBlueprint(blueprint) {
+  if (!blueprint) {
+    return '<p>No retry blueprint available.</p>';
+  }
+
+  const rows = [
+    ['Opening line', blueprint.openingLine],
+    ['Answer structure', blueprint.structure],
+    ['Keep this anchor', blueprint.anchor],
+    ['What to add', blueprint.addEvidence],
+    ['Trap to avoid', blueprint.avoidTrap]
+  ].filter(([, value]) => value);
+
+  if (!rows.length) {
+    return '<p>No retry blueprint available.</p>';
+  }
+
+  return `
+    <div class="retry-blueprint">
+      ${rows.map(([label, value]) => `
+        <div class="retry-row">
+          <strong>${escapeHtml(label)}</strong>
+          <p>${escapeHtml(value)}</p>
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 function formatTime(value) {

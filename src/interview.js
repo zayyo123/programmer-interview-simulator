@@ -291,6 +291,7 @@ export function createReport(session) {
         entry.attempts || 1,
         levelProfile
       ),
+      retryBlueprint: createRetryBlueprint(entry.question, evaluation, levelProfile),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
       nextFollowUp: buildSuggestedFollowUp(entry.question, evaluation, {
         followUpCount,
@@ -539,6 +540,28 @@ function improveAnswer(answer, question, evaluation) {
     : '';
 
   return `${opening}${question.excellentAnswer}${supplement}`;
+}
+
+function createRetryBlueprint(question, evaluation, levelProfile = getLevelExpectation('middle')) {
+  const framework = buildAnswerFramework(question, evaluation) || `按“${levelProfile.focus}”重组回答`;
+  const firstMissing = question.scoringRubric?.mustHave?.find((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  }) || question.keywords?.find((item) => !evaluation.hitKeywords.includes(item)) || '';
+  const strongestHit = evaluation.rubricHits.mustHave[0] || evaluation.hitKeywords[0] || '';
+  const openingLine = createRetryOpeningLine(question, evaluation, firstMissing);
+  const anchor = strongestHit
+    ? `保留你已经提到的“${strongestHit}”，但不要只停在名词层。`
+    : `先把这题讲成面试官能继续追问的完整主线。`;
+  const addEvidence = createRetryEvidencePrompt(question, evaluation, firstMissing);
+  const avoidTrap = createRetryTrapWarning(evaluation);
+
+  return {
+    openingLine,
+    structure: framework,
+    anchor,
+    addEvidence,
+    avoidTrap
+  };
 }
 
 function createInterviewerVerdict(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
@@ -1137,6 +1160,74 @@ function createImmediateFix(question, evaluation) {
   };
 
   return fallback[evaluation.followUpCategory] || question.followUps?.[0] || '把刚才最虚的那一段讲具体。';
+}
+
+function createRetryOpeningLine(question, evaluation, firstMissing) {
+  if (question.type === 'project') {
+    return firstMissing
+      ? `如果重答这题，第一句先把“${firstMissing}”和你的职责一起讲出来。`
+      : '如果重答这题，第一句先交代项目背景、你的职责和这题要展开的关键问题。';
+  }
+
+  if (question.type === 'system-design') {
+    return '如果重答这题，第一句先给系统主链路，不要先堆组件名。';
+  }
+
+  if (question.type === 'algorithm') {
+    return '如果重答这题，第一句先给解法思路和复杂度，再展开数据结构与边界。';
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return '如果重答这题，第一句先说你的判断顺序，再讲你会如何一步步缩小范围。';
+  }
+
+  return firstMissing
+    ? `如果重答这题，第一句先把“${firstMissing}”讲清楚，再补原理和场景。`
+    : '如果重答这题，第一句先给结论，再补原理和场景。';
+}
+
+function createRetryEvidencePrompt(question, evaluation, firstMissing) {
+  if (evaluation.followUpCategory === 'ownership') {
+    return '第二段直接换成你亲手负责的一次判断、修改或排障动作，避免一直站在团队视角。';
+  }
+
+  if (evaluation.followUpCategory === 'tradeoff') {
+    return '第二段补一个备选方案，对比为什么没选、代价是什么、边界在哪里。';
+  }
+
+  if (evaluation.followUpCategory === 'impact') {
+    return '第二段补改动前后指标、验证方式和上线后的观察结果。';
+  }
+
+  if (evaluation.followUpCategory === 'evidence') {
+    return '第二段直接换成一次真实项目或线上场景，按“问题 -> 动作 -> 结果”讲。';
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return '第二段补真实排查顺序：先看什么信号，再怎么缩小范围，最后如何验证根因。';
+  }
+
+  if (firstMissing) {
+    return `第二段优先补“${firstMissing}”对应的真实细节，不要只补概念。`;
+  }
+
+  return '第二段补一个真实场景、实现细节或结果，让回答更像自己做过。';
+}
+
+function createRetryTrapWarning(evaluation) {
+  if (evaluation.redFlags.length) {
+    return `这次最该避免的面试官警惕点是：${evaluation.redFlags[0]}。`;
+  }
+
+  return {
+    core: '不要继续泛讲主线，缺的核心点必须直接答实。',
+    ownership: '不要再说“我们做了什么”，直接说你负责的判断和动作。',
+    tradeoff: '不要只报结论，必须把为什么这样选讲出来。',
+    evidence: '不要继续抽象总结，必须落回一次真实场景。',
+    impact: '不要只说“有优化”，必须给结果和验证方式。',
+    detail: '不要停在概念层，必须补实现细节、边界或排查顺序。',
+    complete: '不要为了显得完整而发散，保持主线紧凑。'
+  }[evaluation.followUpCategory] || '不要继续泛答，直接把最虚的一段讲具体。';
 }
 
 function buildAnswerFramework(question, evaluation) {
