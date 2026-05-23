@@ -25,7 +25,7 @@ setupForm.addEventListener('submit', async (event) => {
   };
 
   setBusy(true);
-  statusText.textContent = '正在初始化面试...';
+  statusText.textContent = 'Starting the interview...';
 
   try {
     const data = await requestJson('/api/interviews', {
@@ -37,15 +37,15 @@ setupForm.addEventListener('submit', async (event) => {
     providerText.textContent = data.provider || 'mock';
     renderMessages(data.messages || []);
     reportEl.className = 'report empty-state';
-    reportEl.innerHTML = '<p>面试进行中，结束后这里会生成复盘报告。</p>';
-    statusText.textContent = '面试已开始，按真实面试方式回答当前问题。';
+    reportEl.innerHTML = '<p>The interview is in progress. Finish the session to generate coaching feedback.</p>';
+    statusText.textContent = 'Interview started. Answer as if you were in a real technical screen.';
     answerInput.value = '';
     answerInput.disabled = false;
     answerSubmitButton.disabled = false;
     finishButton.disabled = false;
     answerInput.focus();
   } catch (error) {
-    statusText.textContent = `启动失败：${error.message}`;
+    statusText.textContent = `Failed to start the interview: ${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -57,12 +57,12 @@ answerForm.addEventListener('submit', async (event) => {
 
   const answer = answerInput.value.trim();
   if (!answer) {
-    statusText.textContent = '请先输入回答内容。';
+    statusText.textContent = 'Enter an answer before sending.';
     return;
   }
 
   setBusy(true);
-  statusText.textContent = '面试官正在追问...';
+  statusText.textContent = 'The interviewer is responding...';
 
   try {
     const data = await requestJson(`/api/interviews/${sessionId}/answer`, {
@@ -73,12 +73,12 @@ answerForm.addEventListener('submit', async (event) => {
     providerText.textContent = data.provider || 'mock';
     renderMessages(data.messages || []);
     statusText.textContent = data.currentQuestion
-      ? '继续回答当前问题或下一个问题。'
-      : '题目已经完成，可以结束面试生成报告。';
+      ? 'Keep going. The interviewer may still be probing the same topic.'
+      : 'All planned questions are covered. You can finish to generate the report.';
     answerInput.value = '';
     answerInput.focus();
   } catch (error) {
-    statusText.textContent = `提交失败：${error.message}`;
+    statusText.textContent = `Failed to submit the answer: ${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -88,7 +88,7 @@ finishButton.addEventListener('click', async () => {
   if (busy || !sessionId) return;
 
   setBusy(true);
-  statusText.textContent = '正在生成复盘报告...';
+  statusText.textContent = 'Building the coaching report...';
 
   try {
     const data = await requestJson(`/api/interviews/${sessionId}/finish`, {
@@ -100,9 +100,9 @@ finishButton.addEventListener('click', async () => {
     answerInput.disabled = true;
     answerSubmitButton.disabled = true;
     finishButton.disabled = true;
-    statusText.textContent = '复盘报告已生成，可直接查看本次训练结果。';
+    statusText.textContent = 'Report ready. Review the coach snapshot and the question-by-question gaps.';
   } catch (error) {
-    statusText.textContent = `生成报告失败：${error.message}`;
+    statusText.textContent = `Failed to build the report: ${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -135,13 +135,13 @@ async function requestJson(url, options = {}) {
 function renderMessages(messages) {
   if (!messages.length) {
     messagesEl.className = 'messages empty-state';
-    messagesEl.innerHTML = '<p>面试开始后，这里会显示完整对话。</p>';
+    messagesEl.innerHTML = '<p>The full interview transcript will appear here.</p>';
     return;
   }
 
   messagesEl.className = 'messages';
   messagesEl.innerHTML = messages.map((message) => {
-    const roleLabel = message.role === 'candidate' ? '候选人' : 'AI 面试官';
+    const roleLabel = message.role === 'candidate' ? 'Candidate' : 'Interviewer';
     const provider = message.provider ? ` | ${message.provider}` : '';
     const timestamp = message.createdAt ? formatTime(message.createdAt) : '';
 
@@ -162,7 +162,7 @@ function renderMessages(messages) {
 function renderReport(report) {
   if (!report) {
     reportEl.className = 'report empty-state';
-    reportEl.innerHTML = '<p>暂无报告数据。</p>';
+    reportEl.innerHTML = '<p>No report data is available.</p>';
     return;
   }
 
@@ -174,121 +174,130 @@ function renderReport(report) {
         <div class="priority-item">
           <div class="priority-rank">${index + 1}</div>
           <div class="priority-body">
-            <strong>${escapeHtml(item.title || '训练重点')}</strong>
+            <strong>${escapeHtml(item.title || 'Priority area')}</strong>
             <p>${escapeHtml(item.detail || '')}</p>
           </div>
         </div>
       `).join('')
-    : '<p>完成更多回答后会生成优先补强顺序。</p>';
+    : '<p>Add more interview answers to generate a stronger coaching priority list.</p>';
 
   const weakAreaHtml = weakAreas.length
     ? weakAreas.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
-    : '<span class="pill">暂无明显薄弱方向</span>';
+    : '<span class="pill">No obvious weak area yet</span>';
 
   const nextPracticeHtml = nextPractice.length
     ? nextPractice.map((item) => `
         <article class="practice-item">
-          <strong>${escapeHtml(item.title || '下一步练习')}</strong>
+          <strong>${escapeHtml(item.title || 'Next drill')}</strong>
           <p>${escapeHtml(item.detail || '')}</p>
         </article>
       `).join('')
-    : '<p>继续完成更多面试题后会生成下一步训练建议。</p>';
+    : '<p>Complete more answers to generate targeted next-practice recommendations.</p>';
+
+  const snapshotStats = [
+    {
+      label: 'Overall score',
+      value: overview.score ?? '-'
+    },
+    {
+      label: 'Answered',
+      value: `${overview.answeredQuestions ?? 0}/${overview.totalQuestions ?? 0}`
+    },
+    {
+      label: 'Readiness',
+      value: overview.readiness || '-'
+    },
+    {
+      label: 'Interview signal',
+      value: overview.hireSignal?.label || '-'
+    }
+  ].map((item) => `
+      <div class="snapshot-stat">
+        <span>${escapeHtml(item.label)}</span>
+        <strong>${escapeHtml(item.value)}</strong>
+      </div>
+    `).join('');
 
   const questionsHtml = (report.questions || []).map((item, index) => {
-    const strengths = renderList(item.strengths, '暂无明显亮点。');
-    const weaknesses = renderList(item.weaknesses, '暂无明显短板。');
-    const redFlags = renderList(item.redFlags, '暂无明显红旗信号。');
+    const strengths = renderList(item.strengths, 'No clear strength captured.');
+    const weaknesses = renderList(item.weaknesses, 'No major weakness captured.');
+    const redFlags = renderList(item.redFlags, 'No obvious red flag.');
 
     return `
       <article class="report-card">
-        <h3>问题 ${index + 1} · ${escapeHtml(item.category || '未分类')}</h3>
+        <h3>Question ${index + 1} | ${escapeHtml(item.category || 'Uncategorized')}</h3>
         <p>${escapeHtml(item.question || '')}</p>
         <div class="meta-row">
-          <span class="pill">${escapeHtml(`得分 ${item.score ?? '-'}`)}</span>
-          <span class="pill">${escapeHtml(`回答次数 ${item.attempts ?? 1}`)}</span>
-          <span class="pill">${escapeHtml(`追问次数 ${item.followUpCount ?? 0}`)}</span>
+          <span class="pill">${escapeHtml(`Score ${item.score ?? '-'}`)}</span>
+          <span class="pill">${escapeHtml(`Attempts ${item.attempts ?? 1}`)}</span>
+          <span class="pill">${escapeHtml(`Follow-ups ${item.followUpCount ?? 0}`)}</span>
         </div>
-        <div class="section-label">回答总结</div>
-        <p>${escapeHtml(item.userAnswerSummary || item.userAnswer || '暂无')}</p>
-        <div class="section-label">参考答案</div>
-        <p>${escapeHtml(item.referenceAnswer || '暂无')}</p>
-        <div class="section-label">优秀回答示例</div>
-        <p>${escapeHtml(item.excellentAnswer || '暂无')}</p>
-        <div class="section-label">差距分析</div>
-        <p>${escapeHtml(item.gapAnalysis || '暂无')}</p>
-        <div class="section-label">面试官结论</div>
+        <div class="section-label">Your answer summary</div>
+        <p>${escapeHtml(item.userAnswerSummary || item.userAnswer || 'N/A')}</p>
+        <div class="section-label">Reference answer</div>
+        <p>${escapeHtml(item.referenceAnswer || 'N/A')}</p>
+        <div class="section-label">Strong interview answer example</div>
+        <p>${escapeHtml(item.excellentAnswer || 'N/A')}</p>
+        <div class="section-label">Gap analysis</div>
+        <p>${escapeHtml(item.gapAnalysis || 'N/A')}</p>
+        <div class="section-label">Interviewer verdict</div>
         <div class="meta-row">
-          <span class="pill ${getVerdictChipClass(item.interviewerVerdict)}">${escapeHtml(item.interviewerVerdict?.label || '暂无')}</span>
+          <span class="pill ${getVerdictChipClass(item.interviewerVerdict)}">${escapeHtml(item.interviewerVerdict?.label || 'N/A')}</span>
         </div>
-        <p>${escapeHtml(item.interviewerVerdict?.detail || '暂无面试官结论。')}</p>
-        <div class="section-label">简历绑定判断</div>
+        <p>${escapeHtml(item.interviewerVerdict?.detail || 'No interviewer verdict available.')}</p>
+        <div class="section-label">Resume grounding</div>
         <div class="meta-row">
-          <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || '暂无')}</span>
+          <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || 'N/A')}</span>
         </div>
-        <p>${escapeHtml(item.resumeSupport?.detail || '暂无简历绑定判断。')}</p>
-        <div class="section-label">亮点</div>
+        <p>${escapeHtml(item.resumeSupport?.detail || 'No resume grounding analysis available.')}</p>
+        <div class="section-label">Strengths</div>
         ${strengths}
-        <div class="section-label">问题</div>
+        <div class="section-label">Weak spots</div>
         ${weaknesses}
-        <div class="section-label">风险信号</div>
+        <div class="section-label">Risk signals</div>
         ${redFlags}
-        <div class="section-label">面试官可能的判断</div>
-        <p>${escapeHtml(item.interviewerSignal || '暂无')}</p>
-        <div class="section-label">追问目标</div>
-        <p>${escapeHtml(item.followUpObjective || '暂无')}</p>
-        <div class="section-label">下一步追问焦点</div>
-        <p>${escapeHtml(item.nextFollowUp || '暂无')}</p>
-        <div class="section-label">训练建议</div>
-        <p>${escapeHtml(item.coachTip || '暂无')}</p>
-        <div class="section-label">改写后的更优回答</div>
-        <p>${escapeHtml(item.improvedUserAnswer || '暂无')}</p>
-        <div class="section-label">专项练习</div>
-        <p>${escapeHtml(item.practiceDrill || '暂无')}</p>
+        <div class="section-label">Likely interviewer takeaway</div>
+        <p>${escapeHtml(item.interviewerSignal || 'N/A')}</p>
+        <div class="section-label">Follow-up objective</div>
+        <p>${escapeHtml(item.followUpObjective || 'N/A')}</p>
+        <div class="section-label">Most likely next follow-up</div>
+        <p>${escapeHtml(item.nextFollowUp || 'N/A')}</p>
+        <div class="section-label">Coach tip</div>
+        <p>${escapeHtml(item.coachTip || 'N/A')}</p>
+        <div class="section-label">Improved answer</div>
+        <p>${escapeHtml(item.improvedUserAnswer || 'N/A')}</p>
+        <div class="section-label">Practice drill</div>
+        <p>${escapeHtml(item.practiceDrill || 'N/A')}</p>
       </article>
     `;
   }).join('');
 
   reportEl.className = 'report';
   reportEl.innerHTML = `
-    <article class="report-card">
-      <h3>整体表现</h3>
-      <div class="meta-row">
-        <span class="pill">${escapeHtml(overview.role || '未设置岗位')}</span>
-        <span class="pill">${escapeHtml(overview.level || '未设置级别')}</span>
-        <span class="pill">${escapeHtml(overview.style || '未设置风格')}</span>
-        <span class="pill">${escapeHtml(`总分 ${overview.score ?? '-'}`)}</span>
-      </div>
-      <div class="section-label">准备度</div>
-      <p>${escapeHtml(overview.readiness || '暂无')}</p>
-      <div class="section-label">整体总结</div>
-      <p>${escapeHtml(overview.summary || '暂无')}</p>
-      <div class="section-label">面试官整体印象</div>
-      <p>${escapeHtml(overview.interviewerImpression || '暂无')}</p>
-      <div class="section-label">通过信号</div>
-      <div class="meta-row">
-        <span class="pill ${getVerdictChipClass(overview.hireSignal)}">${escapeHtml(overview.hireSignal?.label || '暂无')}</span>
-      </div>
-      <p>${escapeHtml(overview.hireSignal?.detail || '暂无通过信号判断。')}</p>
-      <div class="section-label">训练重点</div>
-      <p>${escapeHtml(overview.coachingFocus || '完成更多回答后会生成训练重点。')}</p>
-      <div class="section-label">真实面试风险</div>
-      <p>${escapeHtml(overview.riskSummary || '完成更多回答后会生成风险判断。')}</p>
-      <div class="section-label">简历绑定情况</div>
-      <div class="meta-row">
-        <span class="pill ${getResumeChipClass(overview.resumeSummary ? { status: 'grounded' } : null)}">${escapeHtml(overview.resumeSummary ? '已加入简历背景' : '未提供简历')}</span>
-      </div>
-      <p>${escapeHtml(overview.resumeCoverage || '暂无简历绑定评估。')}</p>
-      <p>${escapeHtml(overview.resumeGrounding || '暂无简历绑定判断。')}</p>
-      <div class="section-label">级别要求</div>
-      <p>${escapeHtml(overview.levelExpectation || '暂无')}</p>
-      <div class="section-label">优先补强顺序</div>
+    <article class="report-card snapshot-card">
+      <h3>Coach snapshot</h3>
+      <div class="snapshot-grid">${snapshotStats}</div>
+      <div class="section-label">Overall summary</div>
+      <p>${escapeHtml(overview.summary || 'N/A')}</p>
+      <div class="section-label">Interviewer impression</div>
+      <p>${escapeHtml(overview.interviewerImpression || 'N/A')}</p>
+      <div class="section-label">Coaching focus</div>
+      <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
+      <div class="section-label">Real interview risk</div>
+      <p>${escapeHtml(overview.riskSummary || 'Add more answers to estimate interview risk.')}</p>
+      <div class="section-label">Resume grounding coverage</div>
+      <p>${escapeHtml(overview.resumeCoverage || 'N/A')}</p>
+      <p>${escapeHtml(overview.resumeGrounding || 'N/A')}</p>
+      <div class="section-label">Level expectation</div>
+      <p>${escapeHtml(overview.levelExpectation || 'N/A')}</p>
+      <div class="section-label">Top coaching priorities</div>
       <div class="priority-list">${coachPriorityHtml}</div>
-      <div class="section-label">薄弱方向</div>
+      <div class="section-label">Weak areas</div>
       <div class="meta-row">${weakAreaHtml}</div>
     </article>
     ${questionsHtml}
     <article class="report-card">
-      <h3>下一步练习建议</h3>
+      <h3>Next practice</h3>
       ${nextPracticeHtml}
     </article>
   `;
@@ -305,7 +314,7 @@ function renderList(items, fallback) {
 function formatTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleTimeString('zh-CN', {
+  return date.toLocaleTimeString('en-US', {
     hour: '2-digit',
     minute: '2-digit'
   });
