@@ -355,7 +355,9 @@ function evaluateAnswer(answer, question, context = {}) {
         hasStructure: true,
         hasMetrics: false,
         hasTradeoff: false,
-        hasExample: false
+        hasExample: false,
+        hasOwnership: false,
+        hasDiagnosisFlow: false
       }
     };
   }
@@ -367,6 +369,12 @@ function evaluateAnswer(answer, question, context = {}) {
   const goodToHaveHits = rubric.goodToHave.filter((item) => matchesConcept(answer, item));
   const communication = communicationHints(answer);
   const redFlags = detectRedFlags(answer, question, rubric, communication);
+  const requiresOwnership = question.type === 'project';
+  const requiresEvidence = ['project', 'system-design'].includes(question.type);
+  const requiresTradeoff = levelProfile !== levelExpectations.junior && question.type !== 'algorithm';
+  const requiresDiagnosisFlow = question.type === 'knowledge'
+    && question.difficulty >= 3
+    && question.keywords.some((keyword) => matchesConcept(keyword, '先定位'));
   const fillerCount = fillerWords.reduce((count, word) => count + countOccurrences(answer, word), 0);
   const concisePenalty = answer.trim().length < Math.max(40, levelProfile.preferredAnswerLength - 40) ? 12 : 0;
   const fillerPenalty = fillerCount >= 6 ? 6 : 0;
@@ -388,11 +396,26 @@ function evaluateAnswer(answer, question, context = {}) {
   ].filter(Boolean).length * 5;
   const depthPenalty = (context.followUpCount || 0) >= 2 && mustHaveHits.length < rubric.mustHave.length ? 4 : 0;
   const levelPenalty = calculateLevelPenalty(question, communication, levelProfile);
-  const rawScore = clamp(keywordScore + mustHaveScore + goodToHaveScore + communicationScore - concisePenalty - fillerPenalty - redFlagPenalty - levelPenalty, 0, 100);
+  const realismPenalty = [
+    requiresOwnership && !communication.hasOwnership ? 8 : 0,
+    requiresEvidence && !communication.hasExample ? 6 : 0,
+    requiresTradeoff && !communication.hasTradeoff ? 4 : 0,
+    requiresDiagnosisFlow && !communication.hasDiagnosisFlow ? 6 : 0
+  ].reduce((sum, value) => sum + value, 0);
+  const rawScore = clamp(
+    keywordScore + mustHaveScore + goodToHaveScore + communicationScore
+      - concisePenalty - fillerPenalty - redFlagPenalty - levelPenalty - realismPenalty,
+    0,
+    100
+  );
   const score = clamp(rawScore - depthPenalty, 0, 100);
   const followUpCategory = classifyFollowUpCategory(question, rubric, mustHaveHits, missingKeywords, communication);
   const readyToMoveNext = mustHaveHits.length >= Math.max(1, Math.ceil(rubric.mustHave.length * levelProfile.minMustHaveRatio))
     && (hitKeywords.length >= Math.min(levelProfile.minKeywordHits, question.keywords.length) || answer.trim().length >= levelProfile.preferredAnswerLength)
+    && (!requiresOwnership || communication.hasOwnership)
+    && (!requiresEvidence || communication.hasExample)
+    && (!requiresTradeoff || communication.hasTradeoff)
+    && (!requiresDiagnosisFlow || communication.hasDiagnosisFlow)
     && score >= levelProfile.minScoreToMoveNext;
 
   return {
@@ -917,6 +940,8 @@ function collectWeaknesses(question, rubric, communication, missingKeywords) {
   if (missingKeywords.length) weaknesses.push(`缺少关键词：${missingKeywords.join('、')}`);
   if (missingMustHave.length) weaknesses.push(`需要更明确点出：${missingMustHave.join('、')}`);
   if (!communication.hasStructure) weaknesses.push('回答结构松散');
+  if (question.type === 'project' && !communication.hasOwnership) weaknesses.push('个人贡献和判断不够具体');
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !communication.hasDiagnosisFlow) weaknesses.push('缺少排查顺序或判断路径');
   if (!communication.hasTradeoff && question.type !== 'algorithm') weaknesses.push('没有展开取舍或原因');
   if (!communication.hasMetrics && ['project', 'system-design'].includes(question.type)) weaknesses.push('缺少量化结果');
 
@@ -936,6 +961,14 @@ function detectRedFlags(answer, question, rubric, communication) {
     flags.push('整体停留在团队视角，个人贡献不清晰');
   }
 
+  if (question.type === 'project' && !communication.hasOwnership) {
+    flags.push('项目题缺少个人判断和亲手负责的动作');
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !communication.hasDiagnosisFlow) {
+    flags.push('高阶排障题没有体现先后排查顺序');
+  }
+
   if (question.type !== 'algorithm' && !communication.hasTradeoff && answer.trim().length >= 80) {
     flags.push('有结论但没讲为什么这样做以及代价');
   }
@@ -952,7 +985,9 @@ function communicationHints(answer) {
     hasStructure: /首先|然后|最后|一方面|另一方面|先|再|总结/.test(answer),
     hasMetrics: /\d+|百分之|ms|秒|qps|tps|延迟|吞吐|成功率|耗时/.test(answer),
     hasTradeoff: /因为|所以|权衡|取舍|代价|收益|风险|边界/.test(answer),
-    hasExample: /比如|例如|项目|线上|生产|场景|案例|当时/.test(answer)
+    hasExample: /比如|例如|项目|线上|生产|场景|案例|当时/.test(answer),
+    hasOwnership: /我负责|我主要|我做|我写|我处理|我排查|我推动|我设计|我改了|我加了/.test(answer),
+    hasDiagnosisFlow: /先|然后|再|接着|最后|第一步|第二步|第三步|先确认|先看|再看|最后看/.test(answer)
   };
 }
 
@@ -1188,8 +1223,16 @@ function createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, co
     return '别只讲团队方案，明确说你自己负责哪部分、做了什么判断、落了什么代码或方案。';
   }
 
+  if (followUpCategory === 'evidence') {
+    return '不要只给抽象总结，直接补一个你自己做过的真实场景，讲清问题、动作和结果。';
+  }
+
   if (!communication.hasTradeoff && question.type !== 'algorithm') {
     return '补充你为什么这么设计，以及方案的收益和代价。';
+  }
+
+  if (!communication.hasDiagnosisFlow && question.type === 'knowledge' && question.difficulty >= 3) {
+    return '按排查顺序重讲，先说你会先确认什么，再说如何逐步缩小范围。';
   }
 
   if (!communication.hasMetrics && ['project', 'system-design'].includes(question.type)) {
@@ -1339,7 +1382,9 @@ function classifyFollowUpCategory(question, rubric, mustHaveHits, missingKeyword
   const missingMustHave = rubric.mustHave.filter((item) => !mustHaveHits.includes(item));
 
   if (missingMustHave.length) return 'core';
-  if (question.type === 'project' && !communication.hasExample) return 'ownership';
+  if (question.type === 'project' && !communication.hasOwnership) return 'ownership';
+  if (question.type === 'project' && !communication.hasExample) return 'evidence';
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !communication.hasDiagnosisFlow) return 'detail';
   if (!communication.hasTradeoff && question.type !== 'algorithm') return 'tradeoff';
   if (!communication.hasExample && question.type !== 'knowledge') return 'evidence';
   if (!communication.hasMetrics && ['project', 'system-design'].includes(question.type)) return 'impact';
