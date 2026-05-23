@@ -184,6 +184,7 @@ function renderReport(report) {
           <div class="priority-body">
             <strong>${escapeHtml(item.title || 'Priority area')}</strong>
             <p>${escapeHtml(item.detail || '')}</p>
+            <p>${escapeHtml(item.rebuildPrompt ? `Re-answer prompt: ${item.rebuildPrompt}` : '')}</p>
           </div>
         </div>
       `).join('')
@@ -231,6 +232,7 @@ function renderReport(report) {
     const weaknesses = renderList(item.weaknesses, 'No major weakness captured.');
     const redFlags = renderList(item.redFlags, 'No obvious red flag.');
     const retryBlueprint = renderRetryBlueprint(item.retryBlueprint);
+    const answerRebuildPlan = renderAnswerRebuildPlan(item.answerRebuildPlan);
 
     return `
       <article class="report-card">
@@ -282,6 +284,8 @@ function renderReport(report) {
         <p>${escapeHtml(item.coachTip || 'N/A')}</p>
         <div class="section-label">Retry blueprint</div>
         ${retryBlueprint}
+        <div class="section-label">Re-answer plan</div>
+        ${answerRebuildPlan}
         <div class="section-label">Improved answer</div>
         <p>${escapeHtml(item.improvedUserAnswer || 'N/A')}</p>
         <div class="section-label">Practice drill</div>
@@ -329,6 +333,22 @@ function renderList(items, fallback) {
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+}
+
+function renderAnswerRebuildPlan(plan) {
+  if (!plan) {
+    return '<p>No re-answer plan available.</p>';
+  }
+
+  return [
+    `<p>${escapeHtml(plan.opening || 'N/A')}</p>`,
+    `<p>${escapeHtml(plan.structure || 'N/A')}</p>`,
+    renderList(plan.checkpoints, 'No concrete rebuild checkpoints generated.'),
+    `<p>${escapeHtml(plan.emphasis || '')}</p>`,
+    `<p>${escapeHtml(plan.closing || '')}</p>`,
+    `<p>${escapeHtml(plan.rehearsalPrompt ? `Rehearsal prompt: ${plan.rehearsalPrompt}` : '')}</p>`,
+    `<p>${escapeHtml(plan.avoid ? `Avoid: ${plan.avoid}` : '')}</p>`
+  ].join('');
 }
 
 function renderRetryBlueprint(blueprint) {

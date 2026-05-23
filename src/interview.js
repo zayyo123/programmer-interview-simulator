@@ -292,6 +292,7 @@ export function createReport(session) {
         levelProfile
       ),
       retryBlueprint: createRetryBlueprint(entry.question, evaluation, levelProfile),
+      answerRebuildPlan: createAnswerRebuildPlan(entry.question, evaluation, levelProfile),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
       nextFollowUp: buildSuggestedFollowUp(entry.question, evaluation, {
         followUpCount,
@@ -564,6 +565,69 @@ function createRetryBlueprint(question, evaluation, levelProfile = getLevelExpec
   };
 }
 
+function createAnswerRebuildPlan(question, evaluation, levelProfile = getLevelExpectation('middle')) {
+  const missingMustHave = (question.scoringRubric?.mustHave || []).filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  });
+  const missingGoodToHave = (question.scoringRubric?.goodToHave || []).filter((item) => {
+    return !evaluation.rubricHits.goodToHave.includes(item);
+  });
+  const checkpoints = [];
+
+  if (missingMustHave.length) {
+    checkpoints.push(`先补核心点：${missingMustHave.slice(0, 2).join('、')}`);
+  }
+
+  if (!evaluation.communication.hasOwnership && question.type === 'project') {
+    checkpoints.push('把团队动作收窄到你亲手负责的判断、实现和结果。');
+  }
+
+  if (!evaluation.communication.hasDiagnosisFlow && question.type === 'knowledge' && question.difficulty >= 3) {
+    checkpoints.push('按排查顺序重讲，先说先看什么，再说如何逐步缩小范围。');
+  }
+
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') {
+    checkpoints.push('补一句为什么这样做，以及不用别的方案的代价。');
+  }
+
+  if (!evaluation.communication.hasExample && question.type !== 'knowledge') {
+    checkpoints.push('补一个真实场景，说明当时输入条件、动作和结果。');
+  }
+
+  if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) {
+    checkpoints.push('补结果指标，至少给出一个上线后观察到的收益或风险指标。');
+  }
+
+  if (!checkpoints.length && missingGoodToHave.length) {
+    checkpoints.push(`把回答再往上抬一档：补 ${missingGoodToHave.slice(0, 2).join('、')}`);
+  }
+
+  if (!checkpoints.length) {
+    checkpoints.push('主线已基本完整，重点压缩表达并准备应对下一轮深挖。');
+  }
+
+  const rehearsalPrompt = createImmediateFix(question, evaluation);
+  const strongestHit = evaluation.rubricHits.mustHave[0] || evaluation.hitKeywords[0] || '';
+
+  return {
+    opening: createRetryOpeningLine(
+      question,
+      evaluation,
+      missingMustHave[0] || question.keywords?.find((item) => !evaluation.hitKeywords.includes(item)) || ''
+    ),
+    structure: buildAnswerFramework(question, evaluation) || `按“${levelProfile.focus}”重讲这题`,
+    checkpoints,
+    emphasis: strongestHit
+      ? `保留你已经答到的“${strongestHit}”，但后面一定接具体机制、判断或结果。`
+      : '先把这题讲成一条能被追问但不显得空泛的主线。',
+    rehearsalPrompt,
+    closing: ['project', 'system-design'].includes(question.type)
+      ? '结尾收在“结果如何验证、后续还会怎么优化”上。'
+      : '结尾收在“适用边界、取舍或复杂度”上。',
+    avoid: createRetryTrapWarning(evaluation)
+  };
+}
+
 function createInterviewerVerdict(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
   const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
     return !evaluation.rubricHits.mustHave.includes(item);
@@ -721,12 +785,13 @@ function createCoachPriorities(answersByQuestion) {
       signal: item.followUpSignal,
       interviewerSignal: item.interviewerSignal,
       drill: item.practiceDrill,
+      rebuildPrompt: item.answerRebuildPlan?.rehearsalPrompt || '',
       target: createImmediateFix(item.question, {
         followUpCategory: item.followUpCategory,
         followUpFocus: item.nextFollowUp,
         weaknesses: item.weaknesses
       }),
-      detail: `先修 ${describeFollowUpCategory(item.followUpCategory)}，再按这题的优秀答案重讲一遍。`
+      detail: `先修 ${describeFollowUpCategory(item.followUpCategory)}；下一次重答时优先做到：${item.answerRebuildPlan?.checkpoints?.[0] || '把主线讲完整'}。`
     }));
 }
 
