@@ -278,6 +278,12 @@ export function createReport(session) {
       gapAnalysis: createGapAnalysis(entry.question, evaluation),
       resumeSupport: createResumeSupport(entry.question, entry.answer, session.config.resume),
       interviewerSignal: createInterviewerSignal(entry.question, evaluation, entry.attempts || 1),
+      interviewerCompetencySignal: createInterviewerCompetencySignal(
+        entry.question,
+        evaluation,
+        entry.attempts || 1,
+        levelProfile
+      ),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
       nextFollowUp: buildSuggestedFollowUp(entry.question, evaluation, {
         followUpCount,
@@ -306,6 +312,7 @@ export function createReport(session) {
       summary: createOverallSummary(session, answersByQuestion, levelProfile, interviewPatterns),
       interviewerImpression: createInterviewerImpression(session, answersByQuestion, levelProfile, interviewPatterns),
       hireSignal: createHiringSignal(answersByQuestion, levelProfile, interviewPatterns),
+      competencySummary: summarizeCompetencySignals(answersByQuestion, levelProfile),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
       resumeSummary,
@@ -1000,6 +1007,68 @@ function createInterviewerSignal(question, evaluation, attempts) {
   return '这题的主线已经比较完整，风险主要在继续深挖时的细节密度。';
 }
 
+function createInterviewerCompetencySignal(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
+  const dimensions = [];
+
+  if (question.type === 'project') {
+    dimensions.push(
+      evaluation.followUpCategory === 'ownership' || !evaluation.communication.hasExample
+        ? 'ownership 不够实'
+        : 'ownership 基本可信'
+    );
+  }
+
+  if (question.type !== 'algorithm') {
+    dimensions.push(
+      evaluation.communication.hasTradeoff
+        ? '有一定取舍意识'
+        : '方案判断偏弱'
+    );
+  }
+
+  if (['project', 'system-design'].includes(question.type)) {
+    dimensions.push(
+      evaluation.communication.hasMetrics
+        ? '能用结果支撑结论'
+        : '结果量化不足'
+    );
+  }
+
+  if (attempts >= 3 && evaluation.followUpCategory !== 'complete') {
+    return {
+      label: '追问后稳定性风险高',
+      level: 'risk',
+      detail: `连续追问后仍卡在“${describeFollowUpCategory(evaluation.followUpCategory)}”，面试官更可能判断你知道概念，但还没形成稳定可复述的能力。`,
+      dimensions
+    };
+  }
+
+  if (evaluation.score >= levelProfile.minScoreToMoveNext + 10 && evaluation.communication.hasStructure) {
+    return {
+      label: '具备继续深挖价值',
+      level: 'strong',
+      detail: `这题会让面试官倾向于继续往更深层问，因为你已经表现出 ${dimensions.slice(0, 2).join('、') || '较好的主线和表达稳定性'}。`,
+      dimensions
+    };
+  }
+
+  if (evaluation.followUpCategory === 'complete') {
+    return {
+      label: '基础能力可感知',
+      level: 'watch',
+      detail: `这题已经能让面试官感知到基础能力，但如果想拿到更高评价，还需要继续补强 ${dimensions.filter((item) => /偏弱|不足|不够/.test(item)).join('、') || '细节密度和追问稳定性'}。`,
+      dimensions
+    };
+  }
+
+  return {
+    label: '能力信号还不够稳',
+    level: 'risk',
+    detail: `当前更像是“知道一些点”，但面试官还无法稳定判断你的 ${dimensions.filter((item) => !/基本可信|有一定|能用/.test(item)).join('、') || '细节深度和真实经验'} 是否达标。`,
+    dimensions
+  };
+}
+
 function createPracticeDrill(question, evaluation) {
   const focus = evaluation.followUpFocus || question.followUps?.[0] || '把关键细节讲具体';
   const firstMissing = evaluation.weaknesses[0] || '把回答组织得更像真实面试口述';
@@ -1078,6 +1147,29 @@ function scoreCoachPriority(item) {
   if ((item.followUpCount || 0) >= 2) score += 4;
 
   return score;
+}
+
+function summarizeCompetencySignals(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
+  if (!answersByQuestion.length) {
+    return '没有有效作答时，系统还无法模拟面试官对能力维度的稳定判断。';
+  }
+
+  const riskSignals = answersByQuestion.filter((item) => item.interviewerCompetencySignal?.level === 'risk');
+  const strongSignals = answersByQuestion.filter((item) => item.interviewerCompetencySignal?.level === 'strong');
+  const recurringDimensions = riskSignals
+    .flatMap((item) => item.interviewerCompetencySignal?.dimensions || [])
+    .filter((item) => /偏弱|不足|不够/.test(item));
+  const recurring = [...new Set(recurringDimensions)].slice(0, 3);
+
+  if (strongSignals.length >= Math.ceil(answersByQuestion.length / 2) && !riskSignals.length) {
+    return `从面试官视角看，你已经能较稳定地给出 ${levelProfile.labels[0]} 对应的能力信号，尤其是 ${[...new Set(strongSignals.flatMap((item) => item.interviewerCompetencySignal?.dimensions || []))].slice(0, 3).join('、')}。`;
+  }
+
+  if (riskSignals.length >= Math.ceil(answersByQuestion.length / 2)) {
+    return `当前最影响评价的不是单题不会，而是能力信号不够稳。面试官更可能担心你在 ${recurring.join('、') || 'ownership、方案判断和结果证明'} 上经不起连续追问。`;
+  }
+
+  return `你已经能给出一部分可用信号，但整体还处在“可继续观察”区间。下一步优先把 ${recurring.join('、') || 'ownership、取舍 reasoning 和结果量化'} 讲得更像自己真正做过。`;
 }
 
 function createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, communication, followUpCategory) {

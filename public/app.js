@@ -258,6 +258,11 @@ function renderReport(report) {
         ${redFlags}
         <div class="section-label">Likely interviewer takeaway</div>
         <p>${escapeHtml(item.interviewerSignal || 'N/A')}</p>
+        <div class="section-label">Competency signal</div>
+        <div class="meta-row">
+          <span class="pill ${getCompetencyChipClass(item.interviewerCompetencySignal)}">${escapeHtml(item.interviewerCompetencySignal?.label || 'N/A')}</span>
+        </div>
+        <p>${escapeHtml(item.interviewerCompetencySignal?.detail || 'No competency signal available.')}</p>
         <div class="section-label">Follow-up objective</div>
         <p>${escapeHtml(item.followUpObjective || 'N/A')}</p>
         <div class="section-label">Most likely next follow-up</div>
@@ -281,6 +286,8 @@ function renderReport(report) {
       <p>${escapeHtml(overview.summary || 'N/A')}</p>
       <div class="section-label">Interviewer impression</div>
       <p>${escapeHtml(overview.interviewerImpression || 'N/A')}</p>
+      <div class="section-label">Competency summary</div>
+      <p>${escapeHtml(overview.competencySummary || 'N/A')}</p>
       <div class="section-label">Coaching focus</div>
       <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
       <div class="section-label">Real interview risk</div>
@@ -340,5 +347,12 @@ function getVerdictChipClass(verdict) {
   if (!verdict) return '';
   if (verdict.level === 'strong') return 'green';
   if (verdict.level === 'risk') return 'amber';
+  return '';
+}
+
+function getCompetencyChipClass(signal) {
+  if (!signal) return '';
+  if (signal.level === 'strong') return 'green';
+  if (signal.level === 'risk') return 'amber';
   return '';
 }
