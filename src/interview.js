@@ -1364,10 +1364,11 @@ function sharesInterviewTrack(role, roles) {
 
 function scoreQuestionFit(item, { preferredCategory, preferredType, targetDifficulty, selectedCategories, resumeSignals = createEmptyResumeSignals() }) {
   let score = 0;
+  const shouldEncourageCategoryVariety = item.type !== 'project' || selectedCategories.size === 0;
 
   if (preferredCategory && item.category === preferredCategory) score += 50;
   if (preferredType && item.type === preferredType) score += 20;
-  if (!selectedCategories.has(item.category)) score += 12;
+  if (!selectedCategories.has(item.category) && shouldEncourageCategoryVariety) score += 12;
   score -= Math.abs((item.difficulty || 2) - targetDifficulty) * 6;
   score += scoreResumeQuestionMatch(item, resumeSignals);
 
