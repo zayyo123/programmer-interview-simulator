@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>程序员模拟面试</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <h1>程序员模拟面试</h1>
+            <p>开场、追问、复盘和参考答案一站完成</p>
+          </div>
+        </div>
+
+        <form id="setupForm" class="setup-form">
+          <label>
+            <span>岗位方向</span>
+            <select name="role">
+              <option value="java">Java 后端</option>
+              <option value="backend">后端开发</option>
+              <option value="frontend">前端开发</option>
+              <option value="fullstack">全栈开发</option>
+              <option value="go">Go 后端</option>
+              <option value="python">Python 后端</option>
+            </select>
+          </label>
+
+          <label>
+            <span>级别</span>
+            <select name="level">
+              <option value="junior">初级</option>
+              <option value="middle" selected>中级</option>
+              <option value="senior">高级</option>
+            </select>
+          </label>
+
+          <label>
+            <span>面试风格</span>
+            <select name="style">
+              <option value="normal">正常</option>
+              <option value="pressure">压力</option>
+              <option value="coaching">引导</option>
+            </select>
+          </label>
+
+          <label>
+            <span>题目数量</span>
+            <input name="questionCount" type="number" min="3" max="6" value="5" />
+          </label>
+
+          <label class="wide">
+            <span>简历 / 项目经历</span>
+            <textarea name="resume" rows="6" placeholder="例如：做过订单系统，使用 Spring Boot、MySQL、Redis、RabbitMQ，负责库存扣减和消息补偿。"></textarea>
+          </label>
+
+          <button type="submit" class="primary-button">开始模拟面试</button>
+        </form>
+
+        <div class="provider-note">
+          <strong>AI Provider</strong>
+          <span id="providerText">未开始</span>
+        </div>
+      </section>
+
+      <section class="interview-panel">
+        <div class="panel-header">
+          <div>
+            <h2>面试对话</h2>
+            <p id="statusText">选择配置后开始，未配置 API 时会使用本地 Mock 面试官。</p>
+          </div>
+          <button id="finishButton" class="ghost-button" disabled>结束并生成报告</button>
+        </div>
+
+        <div id="messages" class="messages empty-state">
+          <p>面试开始后，AI 面试官会先开场并提出第一个问题。</p>
+        </div>
+
+        <form id="answerForm" class="answer-form">
+          <textarea id="answerInput" rows="4" placeholder="在这里输入你的回答..." disabled></textarea>
+          <button type="submit" class="primary-button" disabled>提交回答</button>
+        </form>
+      </section>
+
+      <section class="report-panel">
+        <div class="panel-header">
+          <div>
+            <h2>复盘报告</h2>
+            <p>面试结束后展示每道题参考答案、差距分析和优化版本。</p>
+          </div>
+        </div>
+        <div id="report" class="report empty-state">
+          <p>完成一次模拟后，这里会生成复盘内容。</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>

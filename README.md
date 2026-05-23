@@ -42,6 +42,77 @@ Each interview report should include:
 - Weak knowledge areas
 - Next practice recommendations
 
-## Repository Status
+## Current MVP
 
-This repository starts as a product and architecture draft. Implementation can begin with the text interview MVP.
+The repository now includes a zero-dependency Node.js MVP:
+
+- Local web UI for interview configuration and answering questions
+- Built-in programmer interview question bank
+- Dynamic interview opening by role, level, and style
+- Follow-up or next-question flow
+- Post-interview report with reference answers, gap analysis, and improved answers
+- Switchable AI providers: Gemini, OpenRouter, Ollama, or local mock mode
+
+## Quick Start
+
+```bash
+npm run dev
+```
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+No package installation is required for the current MVP.
+
+## Free AI Options
+
+The app works without an API key by using local mock mode:
+
+```env
+AI_PROVIDER=mock
+```
+
+To try free or low-cost AI providers, copy `.env.example` to `.env` and configure one provider.
+
+Gemini free tier:
+
+```env
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your_google_ai_studio_key
+GEMINI_MODEL=gemini-1.5-flash
+```
+
+OpenRouter free models:
+
+```env
+AI_PROVIDER=openrouter
+OPENROUTER_API_KEY=your_openrouter_key
+OPENROUTER_MODEL=openrouter/auto
+```
+
+Local Ollama:
+
+```env
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:7b
+```
+
+If `AI_PROVIDER` is omitted or set to `auto`, the server uses the first configured provider in this order:
+
+```text
+Gemini -> OpenRouter -> Ollama -> Mock
+```
+
+## Project Structure
+
+```text
+src/server.js       HTTP server and API routes
+src/interview.js    interview plan, opening, flow, and report logic
+src/questions.js    built-in question bank and reference answers
+src/ai.js           Gemini, OpenRouter, Ollama, and mock provider adapter
+public/             browser UI
+```
