@@ -465,10 +465,13 @@ function createGapAnalysis(question, evaluation) {
   if (evaluation.redFlags.length) communicationGaps.push(`面试官容易警惕这些风险信号：${evaluation.redFlags.join('、')}`);
 
   const parts = [];
-  if (missingMustHave.length) parts.push(`还需要补强的核心点：${missingMustHave.join('、')}`);
-  if (missingGoodToHave.length) parts.push(`还能继续拉开差距的点：${missingGoodToHave.join('、')}`);
-  if (communicationGaps.length) parts.push(`表达层面建议：${communicationGaps.join('、')}`);
-  if (evaluation.followUpCategory !== 'complete') parts.push(`当前最像真实面试追问的缺口：${describeFollowUpCategory(evaluation.followUpCategory)}`);
+  if (missingMustHave.length) parts.push(`这题先丢分在核心点没答实：${missingMustHave.join('、')}`);
+  if (missingGoodToHave.length) parts.push(`如果想把这题从“能答”拉到“能打”，继续补：${missingGoodToHave.join('、')}`);
+  if (communicationGaps.length) parts.push(`表达上最影响说服力的是：${communicationGaps.join('、')}`);
+  if (evaluation.followUpCategory !== 'complete') {
+    parts.push(`真实面试里最可能被继续追问的是：${describeFollowUpCategory(evaluation.followUpCategory)}`);
+    parts.push(`下一句就该补：${createImmediateFix(question, evaluation)}`);
+  }
 
   return parts.length
     ? `${parts.join('；')}。`
@@ -495,8 +498,9 @@ function improveAnswer(answer, question, evaluation) {
   const opening = evaluation.communication.hasStructure
     ? '可以继续把这段回答压缩成更像面试口述的版本：'
     : '建议按“结论 -> 原理/方案 -> 场景/结果”的顺序重组回答：';
-  const supplement = evaluation.followUpFocus
-    ? ` 补充时尤其注意：${evaluation.followUpFocus}`
+  const framework = buildAnswerFramework(question, evaluation);
+  const supplement = framework
+    ? ` 你可以直接按这个框架重讲：${framework}`
     : '';
 
   return `${opening}${question.excellentAnswer}${supplement}`;
@@ -560,7 +564,11 @@ function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = su
     return {
       title: `重练 ${item.category}`,
       goal: item.interviewerSignal,
-      action: `围绕“${item.question}”补齐 ${item.nextFollowUp}`
+      action: `围绕“${item.question}”做一次 90 秒重答，先补 ${createImmediateFix(item.question, {
+        followUpCategory: item.followUpCategory,
+        followUpFocus: item.nextFollowUp,
+        weaknesses: item.weaknesses
+      })}`
     };
   });
 
@@ -595,7 +603,7 @@ function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = su
   suggestions.push({
     title: `专项复习 ${[...new Set(weakAreas)].join('、')}`,
     goal: '把零散知识点串成可被追问的完整主线。',
-    action: '把核心概念、原理、场景和边界问题串起来。'
+    action: '每个薄弱主题至少准备一版“定义/原理 -> 场景 -> 取舍/边界 -> 结果”的口述答案。'
   });
   return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
@@ -649,12 +657,18 @@ function createCoachPriorities(answersByQuestion) {
     })
     .slice(0, 3)
     .map((item) => ({
+      title: `${item.category} 需要补强`,
       question: item.question,
       category: item.category,
       signal: item.followUpSignal,
       interviewerSignal: item.interviewerSignal,
       drill: item.practiceDrill,
-      target: item.nextFollowUp
+      target: createImmediateFix(item.question, {
+        followUpCategory: item.followUpCategory,
+        followUpFocus: item.nextFollowUp,
+        weaknesses: item.weaknesses
+      }),
+      detail: `先修 ${describeFollowUpCategory(item.followUpCategory)}，再按这题的优秀答案重讲一遍。`
     }));
 }
 
@@ -676,13 +690,13 @@ function createOverallSummary(session, answersByQuestion, levelProfile = getLeve
     const patternLine = interviewPatterns.primary
       ? `面试官最容易形成的判断是“${interviewPatterns.primary.interviewerView}”。`
       : '面试官会继续通过追问确认你是否真的掌握到可落地的细节。';
-    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。${patternLine}`;
+    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。建议先把最低分的两题各重讲 3 遍，练到首轮就能把核心点答实。${patternLine}`;
   }
 
   const patternLead = interviewPatterns.primary
     ? `当前最明显的模式是${interviewPatterns.primary.label}。`
     : '当前主要问题集中在追问稳定性。';
-  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。${patternLead}`;
+  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。下一轮训练重点不是刷更多题，而是把已答题练成首轮就站得住。${patternLead}`;
 }
 
 function createInterviewerImpression(session, answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
@@ -998,7 +1012,51 @@ function createPracticeDrill(question, evaluation) {
     detail: '补实现细节和边界'
   }[evaluation.followUpCategory] || '做一次追问演练';
 
-  return `下次练这题时，先用 90 秒讲完主线，再围绕“${focus}”做一次“${drillMode}”练习，重点修正“${firstMissing}”。`;
+  return `下次练这题时，先用 90 秒讲完主线，再围绕“${focus}”做一次“${drillMode}”练习；最后强制自己补一句“${createImmediateFix(question, evaluation)}”，重点修正“${firstMissing}”。`;
+}
+
+function createImmediateFix(question, evaluation) {
+  if (evaluation.followUpFocus) return evaluation.followUpFocus;
+
+  const fallback = {
+    core: `把 ${question.scoringRubric?.mustHave?.[0] || '核心考点'} 直接说具体，不要只停在概念上。`,
+    ownership: '直接收窄到你亲手负责的部分，讲清你的判断、动作和结果。',
+    tradeoff: '明确说为什么选这个方案、不选什么，以及代价和边界。',
+    evidence: '换成一个你自己做过的真实项目场景来讲。',
+    impact: '补改动前后指标、验证方式和线上结果。',
+    detail: '补实现细节、边界情况和排查过程。'
+  };
+
+  return fallback[evaluation.followUpCategory] || question.followUps?.[0] || '把刚才最虚的那一段讲具体。';
+}
+
+function buildAnswerFramework(question, evaluation) {
+  const steps = [];
+
+  if (question.type === 'project') {
+    steps.push('先交代项目背景和你的职责');
+    steps.push('再说关键方案或你做的判断');
+    if (!evaluation.communication.hasTradeoff) steps.push('补为什么这样选');
+    if (!evaluation.communication.hasMetrics) steps.push('补结果指标和复盘');
+    return steps.join('；');
+  }
+
+  if (question.type === 'system-design') {
+    steps.push('先讲主链路');
+    steps.push('再讲核心数据/状态怎么保证');
+    steps.push('最后补容量、异常和取舍');
+    return steps.join('；');
+  }
+
+  if (question.type === 'algorithm') {
+    return '先给思路，再说关键数据结构和遍历顺序，最后补复杂度与边界';
+  }
+
+  steps.push('先给定义或结论');
+  steps.push('再解释原理');
+  if (!evaluation.communication.hasExample) steps.push('最后补一个真实场景或排查案例');
+  if (!evaluation.communication.hasTradeoff && question.type !== 'knowledge') steps.push('顺手补方案取舍');
+  return steps.join('；');
 }
 
 function dedupePracticeSuggestions(items) {
