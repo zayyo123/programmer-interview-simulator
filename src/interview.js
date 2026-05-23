@@ -26,6 +26,36 @@ const roleStageBlueprints = {
   python: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm']
 };
 
+const levelExpectations = {
+  junior: {
+    minScoreToMoveNext: 62,
+    minMustHaveRatio: 0.5,
+    minKeywordHits: 2,
+    preferredAnswerLength: 80,
+    labels: ['能把基础主线讲清楚', '能说出自己做过的内容'],
+    focus: '先把背景、职责、原理和结果讲顺',
+    riskThreshold: '基础题如果连续追问两轮还答不稳，容易被判断为经验偏浅'
+  },
+  middle: {
+    minScoreToMoveNext: 68,
+    minMustHaveRatio: 0.6,
+    minKeywordHits: 3,
+    preferredAnswerLength: 120,
+    labels: ['主线完整', '能解释取舍和落地方式'],
+    focus: '补强取舍、边界和场景化表达',
+    riskThreshold: '一旦追到实现细节和取舍，稳定性会直接影响通过率'
+  },
+  senior: {
+    minScoreToMoveNext: 74,
+    minMustHaveRatio: 0.75,
+    minKeywordHits: 4,
+    preferredAnswerLength: 150,
+    labels: ['不只会结论，还能讲判断过程', '能说明指标、风险和治理'],
+    focus: '回答里要带上判断顺序、权衡和结果证据',
+    riskThreshold: '如果缺少定位顺序、取舍或指标，面试官会直接下调级别判断'
+  }
+};
+
 export function createInterviewPlan(config) {
   const role = config.role || 'backend';
   const level = config.level || 'middle';
@@ -130,7 +160,9 @@ export function buildInterviewPrompt({ session, answer }) {
   const question = getCurrentQuestion(session);
   const nextQuestion = session.plan[session.currentIndex + 1];
   const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
-  const evaluation = evaluateAnswer(effectiveAnswer, question);
+  const evaluation = evaluateAnswer(effectiveAnswer, question, {
+    level: session.config.level
+  });
   const history = session.messages
     .slice(-8)
     .map((message) => `${message.role === 'candidate' ? '候选人' : '面试官'}：${message.content}`)
@@ -180,10 +212,17 @@ export function createFallbackInterviewerReply({ session, answer }) {
   const answerEntry = session.answers.find((entry) => entry.question.id === question.id);
   const effectiveAnswer = answerEntry?.answer || answer;
   const evaluation = evaluateAnswer(effectiveAnswer, question, {
-    followUpCount: answerEntry?.followUpCount || 0
+    followUpCount: answerEntry?.followUpCount || 0,
+    level: session.config.level
   });
   if (!evaluation.readyToMoveNext) {
-    return createFollowUpReply(question, evaluation, session.config.style, answerEntry?.followUpCount || 0);
+    return createFollowUpReply(
+      question,
+      evaluation,
+      session.config.style,
+      answerEntry?.followUpCount || 0,
+      session.config.level
+    );
   }
 
   const nextQuestion = session.plan[session.currentIndex + 1];
@@ -198,16 +237,20 @@ export function maybeAdvanceQuestion(session, answer) {
   const question = getCurrentQuestion(session);
   if (!question) return;
   const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
-  if (!shouldMoveToNextQuestion(effectiveAnswer, question)) return;
+  if (!evaluateAnswer(effectiveAnswer, question, { level: session.config.level }).readyToMoveNext) return;
   if (session.currentIndex < session.plan.length - 1) {
     session.currentIndex += 1;
   }
 }
 
 export function createReport(session) {
+  const levelProfile = getLevelExpectation(session.config.level);
   const answersByQuestion = session.answers.map((entry) => {
     const followUpCount = entry.followUpCount || Math.max(0, (entry.attempts || 1) - 1);
-    const evaluation = evaluateAnswer(entry.answer, entry.question, { followUpCount });
+    const evaluation = evaluateAnswer(entry.answer, entry.question, {
+      followUpCount,
+      level: session.config.level
+    });
 
     return {
       question: entry.question.question,
@@ -219,17 +262,21 @@ export function createReport(session) {
       referenceAnswer: entry.question.referenceAnswer,
       excellentAnswer: entry.question.excellentAnswer,
       score: evaluation.score,
-      confidence: describeAnswerConfidence(evaluation, entry.attempts || 1),
+      confidence: describeAnswerConfidence(evaluation, entry.attempts || 1, levelProfile),
       strengths: evaluation.strengths,
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
       followUpCategory: evaluation.followUpCategory,
       followUpSignal: createFollowUpSignal(evaluation, entry.attempts || 1),
-      coachTip: createCoachTip(entry.question, evaluation),
+      coachTip: createCoachTip(entry.question, evaluation, levelProfile),
       gapAnalysis: createGapAnalysis(entry.question, evaluation),
       interviewerSignal: createInterviewerSignal(entry.question, evaluation, entry.attempts || 1),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
-      nextFollowUp: evaluation.followUpFocus || '这一题可以继续围绕实现细节、边界情况和方案取舍做深挖。',
+      nextFollowUp: buildSuggestedFollowUp(entry.question, evaluation, {
+        followUpCount,
+        level: session.config.level,
+        style: session.config.style
+      }) || '这一题可以继续围绕实现细节、边界情况和方案取舍做深挖。',
       practiceDrill: createPracticeDrill(entry.question, evaluation)
     };
   });
@@ -247,10 +294,11 @@ export function createReport(session) {
       answeredQuestions: session.answers.length,
       totalQuestions: session.plan.length,
       score: estimateScore(answersByQuestion),
-      readiness: describeReadiness(answersByQuestion),
-      summary: createOverallSummary(session, answersByQuestion),
-      coachingFocus: createCoachingFocus(answersByQuestion),
-      riskSummary: createRiskSummary(answersByQuestion),
+      readiness: describeReadiness(answersByQuestion, levelProfile),
+      summary: createOverallSummary(session, answersByQuestion, levelProfile),
+      coachingFocus: createCoachingFocus(answersByQuestion, levelProfile),
+      riskSummary: createRiskSummary(answersByQuestion, levelProfile),
+      levelExpectation: createLevelExpectationSummary(levelProfile),
       coachPriorities
     },
     questions: answersByQuestion,
@@ -260,6 +308,7 @@ export function createReport(session) {
 }
 
 function evaluateAnswer(answer, question, context = {}) {
+  const levelProfile = getLevelExpectation(context.level);
   if (!question) {
     return {
       score: 100,
@@ -275,6 +324,7 @@ function evaluateAnswer(answer, question, context = {}) {
         mustHave: [],
         goodToHave: []
       },
+      levelProfile,
       communication: {
         hasStructure: true,
         hasMetrics: false,
@@ -292,7 +342,7 @@ function evaluateAnswer(answer, question, context = {}) {
   const communication = communicationHints(answer);
   const redFlags = detectRedFlags(answer, question, rubric, communication);
   const fillerCount = fillerWords.reduce((count, word) => count + countOccurrences(answer, word), 0);
-  const concisePenalty = answer.trim().length < 40 ? 12 : 0;
+  const concisePenalty = answer.trim().length < Math.max(40, levelProfile.preferredAnswerLength - 40) ? 12 : 0;
   const fillerPenalty = fillerCount >= 6 ? 6 : 0;
   const redFlagPenalty = Math.min(12, redFlags.length * 4);
   const keywordScore = question.keywords.length
@@ -311,12 +361,13 @@ function evaluateAnswer(answer, question, context = {}) {
     communication.hasExample
   ].filter(Boolean).length * 5;
   const depthPenalty = (context.followUpCount || 0) >= 2 && mustHaveHits.length < rubric.mustHave.length ? 4 : 0;
-  const rawScore = clamp(keywordScore + mustHaveScore + goodToHaveScore + communicationScore - concisePenalty - fillerPenalty - redFlagPenalty, 0, 100);
+  const levelPenalty = calculateLevelPenalty(question, communication, levelProfile);
+  const rawScore = clamp(keywordScore + mustHaveScore + goodToHaveScore + communicationScore - concisePenalty - fillerPenalty - redFlagPenalty - levelPenalty, 0, 100);
   const score = clamp(rawScore - depthPenalty, 0, 100);
   const followUpCategory = classifyFollowUpCategory(question, rubric, mustHaveHits, missingKeywords, communication);
-  const readyToMoveNext = mustHaveHits.length >= Math.max(1, Math.ceil(rubric.mustHave.length * 0.6))
-    && (hitKeywords.length >= Math.min(3, question.keywords.length) || answer.trim().length >= 120)
-    && score >= 68;
+  const readyToMoveNext = mustHaveHits.length >= Math.max(1, Math.ceil(rubric.mustHave.length * levelProfile.minMustHaveRatio))
+    && (hitKeywords.length >= Math.min(levelProfile.minKeywordHits, question.keywords.length) || answer.trim().length >= levelProfile.preferredAnswerLength)
+    && score >= levelProfile.minScoreToMoveNext;
 
   return {
     score,
@@ -332,11 +383,12 @@ function evaluateAnswer(answer, question, context = {}) {
       mustHave: mustHaveHits,
       goodToHave: goodToHaveHits
     },
+    levelProfile,
     communication
   };
 }
 
-function createFollowUpReply(question, evaluation, style, followUpCount = 0) {
+function createFollowUpReply(question, evaluation, style, followUpCount = 0, level = 'middle') {
   const prefix = {
     normal: '我想继续确认一个关键点：',
     pressure: '这个回答还不够落地，我继续追问：',
@@ -346,7 +398,11 @@ function createFollowUpReply(question, evaluation, style, followUpCount = 0) {
   const escalation = followUpCount >= 2
     ? '这已经是这题的连续追问了，别再讲概念，直接讲你做过的判断、细节和结果。'
     : '';
-  const suggestedFollowUp = selectFollowUp(question, evaluation, followUpCount);
+  const suggestedFollowUp = buildSuggestedFollowUp(question, evaluation, {
+    followUpCount,
+    level,
+    style
+  });
   return `${prefix}${escalation}${suggestedFollowUp}`;
 }
 
@@ -469,7 +525,7 @@ function createNextPractice(answersByQuestion, weakAreas) {
   return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
 
-function createCoachTip(question, evaluation) {
+function createCoachTip(question, evaluation, levelProfile = getLevelExpectation('middle')) {
   if (evaluation.redFlags.length) {
     return `先修正这些明显风险信号：${evaluation.redFlags.join('、')}`;
   }
@@ -486,7 +542,7 @@ function createCoachTip(question, evaluation) {
     return '补充结果指标，把改动前后的延迟、成功率、吞吐或人工成本变化讲出来。';
   }
 
-  return `围绕“${question.category}”先收敛主线，再主动补一个场景或取舍细节。`;
+  return `按“${levelProfile.focus}”这个标准，围绕“${question.category}”先收敛主线，再主动补一个场景或取舍细节。`;
 }
 
 function createCoachPriorities(answersByQuestion) {
@@ -509,7 +565,7 @@ function createCoachPriorities(answersByQuestion) {
     }));
 }
 
-function createOverallSummary(session, answersByQuestion) {
+function createOverallSummary(session, answersByQuestion, levelProfile = getLevelExpectation('middle')) {
   if (!answersByQuestion.length) {
     return '本轮没有有效回答，建议先完成一次完整模拟再看复盘。';
   }
@@ -517,28 +573,29 @@ function createOverallSummary(session, answersByQuestion) {
   const strongCount = answersByQuestion.filter((item) => item.score >= 80).length;
   const weakCount = answersByQuestion.filter((item) => item.score < 70).length;
   const role = roleLabels[session.config.role] || session.config.role;
+  const level = levelLabels[session.config.level] || session.config.level;
 
   if (strongCount === answersByQuestion.length) {
-    return `这轮 ${role} 面试回答整体比较完整，已经接近真实面试中可继续深挖的水平。`;
+    return `这轮 ${level}${role} 面试回答整体比较完整，已经达到“${levelProfile.labels[0]}”的预期，并接近可继续深挖的水平。`;
   }
 
   if (weakCount >= Math.ceil(answersByQuestion.length / 2)) {
-    return `这轮 ${role} 面试里基础主线还不够稳定，尤其需要补强回答结构、关键原理和场景化表达。`;
+    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。`;
   }
 
-  return `这轮 ${role} 面试的基础是有的，但稳定性一般，容易在追问时暴露细节、取舍和场景表达不足。`;
+  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。`;
 }
 
-function createCoachingFocus(answersByQuestion) {
+function createCoachingFocus(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
   if (!answersByQuestion.length) return '先完成一轮完整作答，再根据复盘安排训练。';
 
   const highestRisk = [...answersByQuestion]
     .sort((a, b) => a.score - b.score || b.attempts - a.attempts)[0];
 
-  return `当前最该优先修的，是 ${highestRisk.category} 题里的“${highestRisk.nextFollowUp}”这类追问。`;
+  return `当前最该优先修的，是 ${highestRisk.category} 题里的“${highestRisk.nextFollowUp}”这类追问。先按“${levelProfile.focus}”的标准重练。`;
 }
 
-function createRiskSummary(answersByQuestion) {
+function createRiskSummary(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
   if (!answersByQuestion.length) return '暂无风险判断。';
 
   const repeated = answersByQuestion.filter((item) => item.attempts >= 2).length;
@@ -553,14 +610,15 @@ function createRiskSummary(answersByQuestion) {
     return '当前主要风险不是完全不会，而是被追问两层后容易暴露主线不稳、细节不足。';
   }
 
-  return '当前主要风险集中在少数题目的深挖稳定性，基础回答已经具备。';
+  return `当前主要风险集中在少数题目的深挖稳定性。对于这个级别，${levelProfile.riskThreshold}。`;
 }
 
-function describeReadiness(answersByQuestion) {
+function describeReadiness(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
   const average = estimateScore(answersByQuestion);
-  if (average >= 85) return '接近真实面试通过线';
-  if (average >= 75) return '具备基础竞争力，但追问稳定性不足';
-  if (average >= 60) return '主线初步具备，需要系统补强';
+  const passLine = levelProfile.minScoreToMoveNext + 12;
+  if (average >= passLine) return '接近真实面试通过线';
+  if (average >= levelProfile.minScoreToMoveNext + 4) return '具备基础竞争力，但追问稳定性不足';
+  if (average >= levelProfile.minScoreToMoveNext - 8) return '主线初步具备，需要系统补强';
   return '距离真实面试要求还有明显差距';
 }
 
@@ -627,8 +685,11 @@ function communicationHints(answer) {
   };
 }
 
-function describeAnswerConfidence(evaluation, attempts) {
-  if (evaluation.score >= 82 && attempts <= 1) {
+function describeAnswerConfidence(evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
+  const strongLine = levelProfile.minScoreToMoveNext + 14;
+  const mediumLine = levelProfile.minScoreToMoveNext;
+
+  if (evaluation.score >= strongLine && attempts <= 1) {
     return {
       level: 'high',
       label: '高把握',
@@ -636,7 +697,7 @@ function describeAnswerConfidence(evaluation, attempts) {
     };
   }
 
-  if (evaluation.score >= 68) {
+  if (evaluation.score >= mediumLine) {
     return {
       level: 'medium',
       label: '中等把握',
@@ -734,7 +795,30 @@ function createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, co
   return question.followUps?.[0] || '';
 }
 
-function selectFollowUp(question, evaluation, followUpCount = 0) {
+function buildSuggestedFollowUp(question, evaluation, context = {}) {
+  const followUpCount = context.followUpCount || 0;
+  const levelProfile = getLevelExpectation(context.level);
+  const bankedFollowUp = selectFollowUp(question, evaluation, context);
+  const basePrompt = bankedFollowUp || evaluation.followUpFocus || question.followUps?.[0] || '你再展开一下刚才的方案和关键细节。';
+
+  if (followUpCount >= 2) {
+    const repeatedPrompt = createRepeatedFollowUpPrompt(question, evaluation, levelProfile);
+    if (repeatedPrompt) return repeatedPrompt;
+  }
+
+  if (evaluation.followUpCategory === 'impact' && levelProfile === levelExpectations.senior) {
+    return `不要只给结论，直接补你拿什么指标判断方案有效，以及上线后怎么观察风险和收益。`;
+  }
+
+  if (evaluation.followUpCategory === 'tradeoff' && levelProfile !== levelExpectations.junior) {
+    return `别停留在结论，直接讲你当时怎么比较方案、为什么这么选，以及代价是什么。`;
+  }
+
+  return basePrompt;
+}
+
+function selectFollowUp(question, evaluation, context = {}) {
+  const followUpCount = context.followUpCount || 0;
   if (followUpCount >= 2 && evaluation.followUpCategory === 'evidence') {
     return '不要泛泛而谈，直接举一个你亲自处理过的线上或项目场景，按背景、动作、结果讲清楚。';
   }
@@ -746,9 +830,49 @@ function selectFollowUp(question, evaluation, followUpCount = 0) {
   const directFocus = evaluation.followUpFocus;
   if (directFocus) return directFocus;
 
+  const preferredFollowUp = pickFollowUpFromBank(question, evaluation.followUpCategory);
+  if (preferredFollowUp) return preferredFollowUp;
+
   return question.followUps.find((item) => {
     return !evaluation.hitKeywords.some((keyword) => item.includes(keyword));
   }) || question.followUps[0] || '你再展开一下刚才的方案和关键细节。';
+}
+
+function createRepeatedFollowUpPrompt(question, evaluation, levelProfile) {
+  if (evaluation.followUpCategory === 'core') {
+    return `这题已经追问两轮了，直接按“结论 -> 原理 -> 你的处理方式”重答，至少把 ${question.scoringRubric.mustHave[0] || '核心考点'} 讲实。`;
+  }
+
+  if (evaluation.followUpCategory === 'ownership') {
+    return '别再讲团队怎么做，直接收窄到你亲手负责的一块，说清你的判断、改动和结果。';
+  }
+
+  if (evaluation.followUpCategory === 'impact') {
+    return '不要只说做了优化，直接给出前后指标、线上变化，或者你实际怎么验证效果。';
+  }
+
+  if (evaluation.followUpCategory === 'detail') {
+    return `不要再泛讲主线，按这个级别的要求补细节：${levelProfile.focus}。`;
+  }
+
+  return '';
+}
+
+function pickFollowUpFromBank(question, category) {
+  const followUps = question.followUps || [];
+  if (!followUps.length) return '';
+
+  const matchers = {
+    core: [/什么|原理|如何|怎么/, /核心|关键|负责/],
+    ownership: [/个人|你自己|负责|贡献|写的核心逻辑/],
+    tradeoff: [/改进|优先|为什么|选|取舍/],
+    evidence: [/场景|当时|线上|案例|做过/],
+    impact: [/结果|效果|指标|增长|改进/],
+    detail: [/如何|怎么|细节|排查|处理/]
+  };
+
+  const patterns = matchers[category] || [];
+  return followUps.find((item) => patterns.some((pattern) => pattern.test(item))) || followUps[0];
 }
 
 function classifyFollowUpCategory(question, rubric, mustHaveHits, missingKeywords, communication) {
@@ -785,6 +909,29 @@ function createFollowUpSignal(evaluation, attempts) {
   }
 
   return `如果真实面试官继续深挖，最可能卡在“${describeFollowUpCategory(evaluation.followUpCategory)}”。`;
+}
+
+function getLevelExpectation(level) {
+  return levelExpectations[level] || levelExpectations.middle;
+}
+
+function calculateLevelPenalty(question, communication, levelProfile) {
+  let penalty = 0;
+
+  if (levelProfile === levelExpectations.senior) {
+    if (!communication.hasTradeoff && question.type !== 'algorithm') penalty += 6;
+    if (!communication.hasMetrics && ['project', 'system-design'].includes(question.type)) penalty += 4;
+    if (!communication.hasExample && question.type !== 'knowledge') penalty += 3;
+  } else if (levelProfile === levelExpectations.middle) {
+    if (!communication.hasTradeoff && question.type !== 'algorithm') penalty += 3;
+    if (!communication.hasExample && question.type === 'project') penalty += 2;
+  }
+
+  return penalty;
+}
+
+function createLevelExpectationSummary(levelProfile) {
+  return `当前级别更看重：${levelProfile.labels.join('、')}。`;
 }
 
 function normalizeText(value) {

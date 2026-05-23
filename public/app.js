@@ -136,6 +136,8 @@ function renderReport(report) {
       </div>
       <div class="section-label">整体判断</div>
       <p>${escapeHtml(overview.summary || '完成更多回答后会生成整体判断。')}</p>
+      <div class="section-label">当前级别期待</div>
+      <p>${escapeHtml(overview.levelExpectation || '完成更多回答后会生成当前级别的回答标准。')}</p>
       <div class="section-label">教练重点</div>
       <p>${escapeHtml(overview.coachingFocus || '完成更多回答后会生成训练重点。')}</p>
       <div class="section-label">真实面试风险</div>
