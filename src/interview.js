@@ -166,10 +166,14 @@ export function createReport(session) {
       referenceAnswer: entry.question.referenceAnswer,
       excellentAnswer: entry.question.excellentAnswer,
       score: evaluation.score,
+      confidence: describeAnswerConfidence(evaluation, entry.attempts || 1),
       strengths: evaluation.strengths,
+      weaknesses: evaluation.weaknesses,
       gapAnalysis: createGapAnalysis(entry.question, evaluation),
+      interviewerSignal: createInterviewerSignal(entry.question, evaluation, entry.attempts || 1),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
-      nextFollowUp: evaluation.followUpFocus || '这一题可以继续围绕实现细节、边界情况和方案取舍做深挖。'
+      nextFollowUp: evaluation.followUpFocus || '这一题可以继续围绕实现细节、边界情况和方案取舍做深挖。',
+      practiceDrill: createPracticeDrill(entry.question, evaluation)
     };
   });
 
@@ -186,7 +190,9 @@ export function createReport(session) {
       totalQuestions: session.plan.length,
       score: estimateScore(answersByQuestion),
       readiness: describeReadiness(answersByQuestion),
-      summary: createOverallSummary(session, answersByQuestion)
+      summary: createOverallSummary(session, answersByQuestion),
+      coachingFocus: createCoachingFocus(answersByQuestion),
+      riskSummary: createRiskSummary(answersByQuestion)
     },
     questions: answersByQuestion,
     weakAreas: [...new Set(weakAreas)],
@@ -217,12 +223,11 @@ function evaluateAnswer(answer, question) {
     };
   }
 
-  const normalized = normalizeText(answer);
   const rubric = question.scoringRubric || { mustHave: [], goodToHave: [], redFlags: [] };
-  const hitKeywords = question.keywords.filter((keyword) => normalized.includes(normalizeText(keyword)));
-  const missingKeywords = question.keywords.filter((keyword) => !normalized.includes(normalizeText(keyword)));
-  const mustHaveHits = rubric.mustHave.filter((item) => normalized.includes(normalizeText(item)));
-  const goodToHaveHits = rubric.goodToHave.filter((item) => normalized.includes(normalizeText(item)));
+  const hitKeywords = question.keywords.filter((keyword) => matchesConcept(answer, keyword));
+  const missingKeywords = question.keywords.filter((keyword) => !matchesConcept(answer, keyword));
+  const mustHaveHits = rubric.mustHave.filter((item) => matchesConcept(answer, item));
+  const goodToHaveHits = rubric.goodToHave.filter((item) => matchesConcept(answer, item));
   const communication = {
     hasStructure: /首先|然后|最后|一方面|另一方面|先|再|总结/.test(answer),
     hasMetrics: /\d+|百分之|ms|秒|qps|tps|延迟|吞吐|成功率|耗时/.test(answer),
@@ -367,17 +372,33 @@ function estimateScore(answersByQuestion) {
 function createNextPractice(answersByQuestion, weakAreas) {
   const lowest = [...answersByQuestion].sort((a, b) => a.score - b.score).slice(0, 2);
   const suggestions = lowest.map((item) => {
-    return `重练 ${item.category}：围绕“${item.question}”补齐 ${item.nextFollowUp}`;
+    return {
+      title: `重练 ${item.category}`,
+      goal: item.interviewerSignal,
+      action: `围绕“${item.question}”补齐 ${item.nextFollowUp}`
+    };
   });
 
   if (!weakAreas.length) {
-    suggestions.push('继续提高回答密度，把项目题练到 2 分钟内讲清背景、职责、方案、结果和复盘。');
-    suggestions.push('增加压力面追问练习，重点训练边界情况、定位过程和技术取舍。');
+    suggestions.push({
+      title: '压缩项目表达',
+      goal: '把完整经历压缩成真实面试里的高密度口述。',
+      action: '继续提高回答密度，把项目题练到 2 分钟内讲清背景、职责、方案、结果和复盘。'
+    });
+    suggestions.push({
+      title: '增加压力追问',
+      goal: '避免一被深挖就只剩概念和结论。',
+      action: '重点训练边界情况、定位过程和技术取舍。'
+    });
     return suggestions.slice(0, 3);
   }
 
-  suggestions.push(`专项复习 ${[...new Set(weakAreas)].join('、')}，把核心概念、原理、场景和边界问题串起来。`);
-  return [...new Set(suggestions)].slice(0, 3);
+  suggestions.push({
+    title: `专项复习 ${[...new Set(weakAreas)].join('、')}`,
+    goal: '把零散知识点串成可被追问的完整主线。',
+    action: '把核心概念、原理、场景和边界问题串起来。'
+  });
+  return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
 
 function createOverallSummary(session, answersByQuestion) {
@@ -398,6 +419,28 @@ function createOverallSummary(session, answersByQuestion) {
   }
 
   return `这轮 ${role} 面试的基础是有的，但稳定性一般，容易在追问时暴露细节、取舍和场景表达不足。`;
+}
+
+function createCoachingFocus(answersByQuestion) {
+  if (!answersByQuestion.length) return '先完成一轮完整作答，再根据复盘安排训练。';
+
+  const highestRisk = [...answersByQuestion]
+    .sort((a, b) => a.score - b.score || b.attempts - a.attempts)[0];
+
+  return `当前最该优先修的，是 ${highestRisk.category} 题里的“${highestRisk.nextFollowUp}”这类追问。`;
+}
+
+function createRiskSummary(answersByQuestion) {
+  if (!answersByQuestion.length) return '暂无风险判断。';
+
+  const repeated = answersByQuestion.filter((item) => item.attempts >= 2).length;
+  const lowConfidence = answersByQuestion.filter((item) => item.confidence.level !== 'high').length;
+
+  if (repeated >= 2 || lowConfidence >= Math.ceil(answersByQuestion.length / 2)) {
+    return '当前主要风险不是完全不会，而是被追问两层后容易暴露主线不稳、细节不足。';
+  }
+
+  return '当前主要风险集中在少数题目的深挖稳定性，基础回答已经具备。';
 }
 
 function describeReadiness(answersByQuestion) {
@@ -425,8 +468,8 @@ function collectStrengths(question, mustHaveHits, goodToHaveHits, communication)
 function collectWeaknesses(question, rubric, communication, missingKeywords) {
   const weaknesses = [];
   const missingMustHave = rubric.mustHave.filter((item) => {
-    return !normalizeTextArray(question.keywords).includes(normalizeText(item))
-      || missingKeywords.some((keyword) => normalizeText(keyword).includes(normalizeText(item)));
+    return missingKeywords.some((keyword) => normalizeText(keyword).includes(normalizeText(item)))
+      || (!question.keywords.some((keyword) => matchesConcept(item, keyword)) && !matchesConcept(question.question, item));
   });
 
   if (missingKeywords.length) weaknesses.push(`缺少关键词：${missingKeywords.join('、')}`);
@@ -436,6 +479,73 @@ function collectWeaknesses(question, rubric, communication, missingKeywords) {
   if (!communication.hasMetrics && ['project', 'system-design'].includes(question.type)) weaknesses.push('缺少量化结果');
 
   return weaknesses;
+}
+
+function describeAnswerConfidence(evaluation, attempts) {
+  if (evaluation.score >= 82 && attempts <= 1) {
+    return {
+      level: 'high',
+      label: '高把握',
+      detail: '首轮回答已经能撑住真实面试里的继续深挖。'
+    };
+  }
+
+  if (evaluation.score >= 68) {
+    return {
+      level: 'medium',
+      label: '中等把握',
+      detail: attempts > 1
+        ? '补充后主线基本成立，但还不够像一次成型的面试回答。'
+        : '主线有了，但再追问一层仍可能出现细节断点。'
+    };
+  }
+
+  return {
+    level: 'low',
+    label: '低把握',
+    detail: '这题还停留在零散点状回答，真实面试里风险较高。'
+  };
+}
+
+function createInterviewerSignal(question, evaluation, attempts) {
+  const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  });
+
+  if (missingMustHave.length) {
+    return `面试官大概率会继续追问你是否真的掌握 ${missingMustHave[0]}。`;
+  }
+
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') {
+    return '面试官会怀疑你知道结论，但没有经历过方案比较和取舍。';
+  }
+
+  if (!evaluation.communication.hasExample && question.type !== 'knowledge') {
+    return '面试官会继续确认你是否做过真实场景，而不只是背过答案。';
+  }
+
+  if (attempts >= 2) {
+    return '这题需要多轮补充才能讲顺，真实面试里会被判断为稳定性一般。';
+  }
+
+  return '这题的主线已经比较完整，风险主要在继续深挖时的细节密度。';
+}
+
+function createPracticeDrill(question, evaluation) {
+  const focus = evaluation.followUpFocus || question.followUps?.[0] || '把关键细节讲具体';
+  const firstMissing = evaluation.weaknesses[0] || '把回答组织得更像真实面试口述';
+
+  return `下次练这题时，先用 90 秒讲完主线，再单独针对“${focus}”做一次追问演练，重点修正“${firstMissing}”。`;
+}
+
+function dedupePracticeSuggestions(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = `${item.title}|${item.goal}|${item.action}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, communication) {
@@ -469,11 +579,16 @@ function selectFollowUp(question, evaluation) {
 }
 
 function normalizeText(value) {
-  return String(value || '').toLowerCase().replace(/\s+/g, '');
+  return String(value || '')
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[，。、“”‘’：；？！,.:"';!?()（）]/g, '');
 }
 
-function normalizeTextArray(values) {
-  return values.map((item) => normalizeText(item));
+function matchesConcept(answer, concept) {
+  const normalizedAnswer = normalizeText(answer);
+  const candidates = [concept, ...(conceptAliases[concept] || [])].map((item) => normalizeText(item));
+  return candidates.some((candidate) => candidate && normalizedAnswer.includes(candidate));
 }
 
 function countOccurrences(text, token) {
@@ -484,3 +599,56 @@ function countOccurrences(text, token) {
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
+
+const conceptAliases = {
+  项目背景: ['背景', '业务背景', '业务目标', '目标', '为什么做', '提升'],
+  个人职责: ['职责', '负责', '我负责', '我主要负责', '我主要做', '我参与'],
+  职责: ['负责', '我负责', '我主要负责', '我主要做', '我参与'],
+  技术栈: ['技术', 'springboot', 'spring', 'mysql', 'redis', 'rabbitmq', 'mq', 'react', 'vue', 'node', 'go', 'python'],
+  关键问题: ['关键问题', '问题', '难点', '挑战', '瓶颈', '关键难点', '一致性'],
+  问题: ['难点', '挑战', '瓶颈', '关键难点', '一致性'],
+  结果: ['结果', '效果', '收益', '提升', '降低', '减少', '指标', '成功率'],
+  指标结果: ['指标', '量化', '提升', '降低', '减少', '耗时', '成功率', '异常订单'],
+  取舍原因: ['取舍', '为什么', '原因', '权衡', '因为', '所以', '代价'],
+  复盘改进: ['改进', '复盘', '后续优化', '后来'],
+  内存: ['内存数据库', '内存读写'],
+  'I/O 多路复用': ['io多路复用', '多路复用', 'epoll', 'select', 'poll'],
+  单线程模型: ['单线程', '避免锁', '锁竞争', '上下文切换'],
+  单线程: ['单线程模型', '避免锁', '锁竞争'],
+  数据结构: ['hash', 'skiplist', 'quicklist', '跳表', '压缩列表'],
+  数据结构优化: ['数据结构', 'skiplist', 'quicklist', '跳表', 'hash'],
+  协议简单: ['resp', '协议'],
+  'B+ 树': ['b+树', 'b树', '树结构'],
+  减少扫描范围: ['减少扫描', '少扫', '定位范围', '避免全表扫描'],
+  减少扫描: ['减少扫描范围', '避免全表扫描'],
+  有序: ['排序', '范围查询'],
+  回表: ['二级索引回表', '回到主键索引'],
+  聚簇索引: ['主键索引', '聚集索引'],
+  覆盖索引: ['覆盖', '不回表'],
+  数组: ['桶数组', 'table'],
+  链表: ['链地址', '拉链法'],
+  哈希冲突: ['hash冲突', '冲突'],
+  红黑树: ['树化', 'treeify'],
+  扩容: ['resize', '翻倍'],
+  性能指标: ['fcp', 'lcp', 'ttfb', '指标', 'lighthouse'],
+  先定位: ['定位', '排查', '分析'],
+  网络: ['network', '瀑布图', '请求'],
+  资源体积: ['包体积', 'js体积', 'css体积', '图片压缩'],
+  渲染: ['主线程', '长任务', '阻塞'],
+  缓存: ['cache', 'cdn'],
+  代码分割: ['codesplit', '按需加载'],
+  图片优化: ['图片压缩', '懒加载', 'webp'],
+  短码生成: ['短码', 'base62', '发号器'],
+  访问重定向: ['重定向', '301', '302'],
+  存储映射: ['映射', '存储', '长链接'],
+  短码唯一: ['唯一', '冲突'],
+  高可用: ['容灾', '多副本', '降级'],
+  统计: ['访问统计', '埋点'],
+  限流: ['限流', '风控'],
+  哈希表: ['map', 'hashmap', '字典'],
+  一次遍历: ['遍历一次', '一遍'],
+  差值: ['target-x', '补数', '另一个数'],
+  时间复杂度: ['o(n)', '复杂度'],
+  空间复杂度: ['o(n)', '额外空间'],
+  重复数字处理: ['重复数字', '重复']
+};

@@ -12,7 +12,8 @@ import {
   createOpening,
   createReport,
   getCurrentQuestion,
-  maybeAdvanceQuestion
+  maybeAdvanceQuestion,
+  recordAnswerForCurrentQuestion
 } from './interview.js';
 
 const config = loadConfig();
@@ -54,14 +55,7 @@ const server = createServer(async (request, response) => {
       const answer = String(body.answer || '').trim();
       if (!answer) return sendJson(response, 400, { error: 'Answer is required' });
 
-      const question = getCurrentQuestion(session);
-      if (question) {
-        session.answers.push({
-          question,
-          answer,
-          createdAt: new Date().toISOString()
-        });
-      }
+      recordAnswerForCurrentQuestion(session, answer);
 
       session.messages.push({
         role: 'candidate',

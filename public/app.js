@@ -121,6 +121,10 @@ function renderReport(report) {
       </div>
       <div class="section-label">整体判断</div>
       <p>${escapeHtml(overview.summary || '完成更多回答后会生成整体判断。')}</p>
+      <div class="section-label">教练重点</div>
+      <p>${escapeHtml(overview.coachingFocus || '完成更多回答后会生成训练重点。')}</p>
+      <div class="section-label">真实面试风险</div>
+      <p>${escapeHtml(overview.riskSummary || '完成更多回答后会生成风险判断。')}</p>
       <div class="section-label">薄弱方向</div>
       <div class="meta-row">${weakAreas}</div>
     </article>
@@ -131,19 +135,29 @@ function renderReport(report) {
         <div class="meta-row">
           <span class="pill">${escapeHtml(item.category)}</span>
           <span class="pill green">本题 ${item.score}/100</span>
+          <span class="pill">作答 ${item.attempts || 1} 轮</span>
+          <span class="pill ${item.confidence?.level === 'high' ? 'green' : item.confidence?.level === 'low' ? 'amber' : ''}">${escapeHtml(item.confidence?.label || '待评估')}</span>
         </div>
         <div class="section-label">你的回答摘要</div>
         <p>${escapeHtml(item.userAnswerSummary)}</p>
+        <div class="section-label">把握度判断</div>
+        <p>${escapeHtml(item.confidence?.detail || '暂无把握度判断。')}</p>
         <div class="section-label">表现亮点</div>
         ${renderList(item.strengths)}
+        <div class="section-label">主要缺口</div>
+        ${renderList(item.weaknesses)}
         <div class="section-label">参考答案</div>
         <p>${escapeHtml(item.referenceAnswer)}</p>
         <div class="section-label">面试版优秀回答</div>
         <p>${escapeHtml(item.excellentAnswer)}</p>
         <div class="section-label">差距分析</div>
         <p>${escapeHtml(item.gapAnalysis)}</p>
+        <div class="section-label">面试官可能的判断</div>
+        <p>${escapeHtml(item.interviewerSignal)}</p>
         <div class="section-label">下一步追问焦点</div>
         <p>${escapeHtml(item.nextFollowUp)}</p>
+        <div class="section-label">针对性练法</div>
+        <p>${escapeHtml(item.practiceDrill)}</p>
         <div class="section-label">优化后的表达</div>
         <p>${escapeHtml(item.improvedUserAnswer)}</p>
       </article>
@@ -151,7 +165,13 @@ function renderReport(report) {
 
     <article class="report-card">
       <h3>下一次练习建议</h3>
-      ${report.nextPractice.map((item) => `<p>${escapeHtml(item)}</p>`).join('')}
+      ${report.nextPractice.map((item) => `
+        <div class="practice-item">
+          <strong>${escapeHtml(item.title)}</strong>
+          <p>${escapeHtml(item.goal)}</p>
+          <p>${escapeHtml(item.action)}</p>
+        </div>
+      `).join('')}
     </article>
   `;
 }
