@@ -240,6 +240,94 @@ export const questionBank = [
       goodToHave: ['幂等', '补偿', '监控', '降级'],
       redFlags: ['只讲抢购接口', '没有一致性思路', '没有风控和限流']
     }
+  },
+  {
+    id: 'python_001',
+    category: 'Python',
+    roles: ['python', 'backend', 'fullstack'],
+    levels: ['junior', 'middle', 'senior'],
+    type: 'knowledge',
+    difficulty: 2,
+    question: 'Python 里生成器和普通列表相比，适合用在什么场景？你会怎么解释它的价值？',
+    keywords: ['惰性计算', '迭代器', '内存占用', 'yield', '流式处理'],
+    referenceAnswer: '回答这题的重点是说明生成器不是语法技巧，而是用来按需产出数据、降低内存占用并保持可迭代接口的一种手段。通常会结合 yield、迭代器协议和大数据量或流式处理场景来说明。',
+    excellentAnswer: '我会先从使用场景讲。普通列表会一次性把所有结果放进内存，适合数据量可控、需要反复随机访问的场景；生成器更适合大批量数据、分页拉取或流式处理，因为它基于 yield 按需产出，每次 next 才继续往下执行。它本质上实现了迭代器协议，所以 for 循环可以直接消费。价值主要在于节省内存、让处理链路更流式，但代价是通常只能顺序遍历一次，不适合频繁回看历史结果。',
+    followUps: [
+      '如果要处理一个超大日志文件，你会怎么用生成器组织读取和过滤？',
+      '生成器为什么通常只能遍历一次？',
+      '什么场景下你反而不会用生成器？'
+    ],
+    scoringRubric: {
+      mustHave: ['yield', '惰性计算', '内存占用'],
+      goodToHave: ['迭代器', '流式处理', '取舍'],
+      redFlags: ['只说语法长得不一样', '只说更快但讲不清原因', '完全不提内存和场景']
+    }
+  },
+  {
+    id: 'python_002',
+    category: 'Python',
+    roles: ['python', 'backend', 'fullstack'],
+    levels: ['middle', 'senior'],
+    type: 'knowledge',
+    difficulty: 3,
+    question: '如果一个 Python 服务 CPU 打满、吞吐上不去，你会怎么判断是 GIL、代码热点还是架构问题？',
+    keywords: ['先定位', 'GIL', 'profiling', '多进程', 'I/O 密集'],
+    referenceAnswer: '高级 Python 排障题重点在于先区分问题类型，再决定优化方向。需要先确认是 CPU 密集还是 I/O 密集，再看 profiling 结果、线程模型、GIL 影响和是否要改成多进程或拆服务。',
+    excellentAnswer: '我会先确认瓶颈到底在 CPU、I/O 还是外部依赖，不会一上来就把问题归因到 GIL。先看监控和 profiling，找到热点函数、请求类型和是否单机普遍打满。如果是 I/O 密集但线程吞吐仍低，要看是不是有锁竞争、连接池或下游阻塞；如果是纯 Python CPU 密集逻辑，多线程通常会被 GIL 限制，这时更适合多进程、任务队列，或者把热点逻辑下沉到 C 扩展、NumPy 这类能释放 GIL 的实现。最后再判断是不是架构层的问题，比如单个进程承担了过多同步计算，应该拆成异步链路或独立计算服务。',
+    followUps: [
+      '你会怎么用 profiling 快速找到热点代码？',
+      '什么情况下多线程仍然适合 Python 服务？',
+      '如果你怀疑是下游 I/O 拖慢了整体吞吐，会先看什么指标？'
+    ],
+    scoringRubric: {
+      mustHave: ['先定位', 'GIL', 'profiling'],
+      goodToHave: ['多进程', 'I/O 密集', '架构拆分'],
+      redFlags: ['把所有性能问题都归因到 GIL', '没有定位顺序', '只会说加机器']
+    }
+  },
+  {
+    id: 'go_001',
+    category: 'Go',
+    roles: ['go', 'backend', 'fullstack'],
+    levels: ['junior', 'middle', 'senior'],
+    type: 'knowledge',
+    difficulty: 2,
+    question: 'Go 的 goroutine 为什么适合做高并发服务？它和线程相比关键差别是什么？',
+    keywords: ['轻量级', '调度器', '栈扩缩容', 'M:N', '通信'],
+    referenceAnswer: '回答这题的重点不是只说 goroutine 很轻，而是解释它背后的调度模型、栈管理和通信方式。比较好的回答会提到 Go runtime 调度器、M:N 模型、栈可扩缩和 channel/同步原语。',
+    excellentAnswer: 'goroutine 适合高并发，核心在于它不是直接映射成一个系统线程，而是由 Go runtime 做 M:N 调度。相比线程，goroutine 初始栈更小，而且能按需扩缩，所以单机可以承载更多并发任务。调度器会把 goroutine 分配到多个内核线程上运行，减少线程创建和切换成本。再加上 channel、context 这些机制，能更清晰地组织并发协作。当然它也不是没有代价，如果 goroutine 泄漏、阻塞点太多或者共享内存同步混乱，照样会把服务拖慢。',
+    followUps: [
+      'goroutine 泄漏通常会怎么出现？',
+      '如果 channel 和 mutex 都能解决问题，你怎么做取舍？',
+      'Go 调度器里的 M、P、G 你会怎么快速解释？'
+    ],
+    scoringRubric: {
+      mustHave: ['轻量级', '调度器', 'M:N'],
+      goodToHave: ['栈扩缩容', 'channel', '取舍'],
+      redFlags: ['只说 goroutine 就是线程', '完全不提调度模型', '只会背概念不讲场景']
+    }
+  },
+  {
+    id: 'go_002',
+    category: 'Go',
+    roles: ['go', 'backend', 'fullstack'],
+    levels: ['middle', 'senior'],
+    type: 'knowledge',
+    difficulty: 3,
+    question: '如果一个 Go 服务出现 goroutine 数量持续上涨、延迟抖动，你会怎么排查？',
+    keywords: ['先定位', 'pprof', '阻塞', '泄漏', '上下文取消'],
+    referenceAnswer: '这类 Go 排障题重点在于是否有系统化的定位思路。通常会从 goroutine 数量、pprof、阻塞位置、资源释放和 context 传递几个方面拆开说明。',
+    excellentAnswer: '我会先确认 goroutine 上涨是瞬时流量带来的正常波动，还是请求结束后也回不去。先看 runtime 和业务监控，比如 goroutine 数、延迟、QPS、错误率，再抓 goroutine profile 和 block profile，看大量协程卡在什么位置，是 channel 等待、锁竞争、网络调用还是定时任务没退出。如果怀疑泄漏，我会重点看有没有消费端退出但生产端还在写 channel、没有 context cancel、ticker 没 stop、重试协程无上限这些常见问题。定位到热点后，再决定是修退出逻辑、缩小临界区还是把阻塞操作改成异步或限流。',
+    followUps: [
+      '你会怎么从 goroutine dump 判断是不是 channel 阻塞？',
+      'context 在这里主要帮你解决什么问题？',
+      '如果是定时任务不断堆积，你会怎么止血？'
+    ],
+    scoringRubric: {
+      mustHave: ['先定位', 'pprof', '泄漏'],
+      goodToHave: ['阻塞', '上下文取消', '止血'],
+      redFlags: ['一上来就重启服务', '不会看 profile', '没有退出和资源释放意识']
+    }
   }
 ];
 
