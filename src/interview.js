@@ -140,15 +140,22 @@ export function recordAnswerForCurrentQuestion(session, answer) {
       answer: normalizedAnswer,
       attempts: 1,
       followUpCount: 0,
+      stagnantFollowUpCount: 0,
+      attemptHistory: [normalizedAnswer],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     });
     return;
   }
 
+  const progress = measureAnswerProgress(question, currentEntry.answer, normalizedAnswer);
   currentEntry.answer = mergeAnswerAttempts(currentEntry.answer, normalizedAnswer);
   currentEntry.attempts += 1;
   currentEntry.followUpCount = Math.max(0, currentEntry.attempts - 1);
+  currentEntry.stagnantFollowUpCount = progress.isStagnant
+    ? (currentEntry.stagnantFollowUpCount || 0) + 1
+    : 0;
+  currentEntry.attemptHistory = [...(currentEntry.attemptHistory || []), normalizedAnswer].slice(-4);
   currentEntry.updatedAt = new Date().toISOString();
 }
 
@@ -230,7 +237,8 @@ export function createFallbackInterviewerReply({ session, answer }) {
       session.config.level,
       {
         answer: effectiveAnswer,
-        resume: session.config.resume
+        resume: session.config.resume,
+        stagnantFollowUpCount: answerEntry?.stagnantFollowUpCount || 0
       }
     );
   }
@@ -303,6 +311,7 @@ export function createReport(session) {
         entry.attempts || 1,
         levelProfile
       ),
+      coachChecklist: createCoachChecklist(entry.question, evaluation, levelProfile),
       retryBlueprint: createRetryBlueprint(entry.question, evaluation, levelProfile),
       answerRebuildPlan: createAnswerRebuildPlan(entry.question, evaluation, levelProfile),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
@@ -337,6 +346,7 @@ export function createReport(session) {
       competencyBreakdown: createCompetencyBreakdown(answersByQuestion, levelProfile),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
+      practiceSummary: createPracticeSummary(answersByQuestion, coachPriorities, interviewPatterns),
       resumeSummary,
       resumeCoverage: createResumeCoverageSummary(session, answersByQuestion),
       resumeGrounding: createResumeGroundingOverview(answersByQuestion, resumeSummary),
@@ -345,7 +355,8 @@ export function createReport(session) {
     },
     questions: answersByQuestion,
     weakAreas: [...new Set(weakAreas)],
-    nextPractice: createNextPractice(answersByQuestion, weakAreas, interviewPatterns)
+    nextPractice: createNextPractice(answersByQuestion, weakAreas, interviewPatterns),
+    practicePlan: createPracticePlan(answersByQuestion, coachPriorities, interviewPatterns)
   };
 }
 
@@ -454,11 +465,8 @@ function evaluateAnswer(answer, question, context = {}) {
 }
 
 function createFollowUpReply(question, evaluation, style, followUpCount = 0, level = 'middle', interviewContext = {}) {
-  const prefix = {
-    normal: '我想继续确认一个关键点：',
-    pressure: '这个回答还不够落地，我继续追问：',
-    coaching: '先把这块补完整：'
-  }[style] || '我想继续确认一个关键点：';
+  const stagnantFollowUpCount = interviewContext.stagnantFollowUpCount || 0;
+  const prefix = createFollowUpPrefix(style, stagnantFollowUpCount);
 
   const escalation = createFollowUpStageLead(evaluation, followUpCount, style);
   const objective = createFollowUpObjective(question, evaluation);
@@ -467,10 +475,27 @@ function createFollowUpReply(question, evaluation, style, followUpCount = 0, lev
     level,
     style,
     answer: interviewContext.answer,
-    resume: interviewContext.resume
+    resume: interviewContext.resume,
+    stagnantFollowUpCount
   });
   const objectiveLead = objective && followUpCount < 2 ? `${objective} ` : '';
   return `${prefix}${escalation}${objectiveLead}${suggestedFollowUp}`;
+}
+
+function createFollowUpPrefix(style, stagnantFollowUpCount = 0) {
+  if (stagnantFollowUpCount >= 1) {
+    return {
+      pressure: '这个回答还在绕，我直接收口追问：',
+      coaching: '这次不要再换一种泛说法，直接把缺口补上：',
+      normal: '你刚才还是没有回答到点上，我直接确认一个具体点：'
+    }[style] || '你刚才还是没有回答到点上，我直接确认一个具体点：';
+  }
+
+  return {
+    normal: '我想继续确认一个关键点：',
+    pressure: '这个回答还不够落地，我继续追问：',
+    coaching: '先把这块补完整：'
+  }[style] || '我想继续确认一个关键点：';
 }
 
 function createNextQuestionReply(nextQuestion, evaluation, style) {
@@ -643,6 +668,43 @@ function createAnswerRebuildPlan(question, evaluation, levelProfile = getLevelEx
   };
 }
 
+function createCoachChecklist(question, evaluation, levelProfile = getLevelExpectation('middle')) {
+  const checklist = [];
+  const missingMustHave = (question.scoringRubric?.mustHave || []).filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  });
+
+  if (missingMustHave.length) {
+    checklist.push(`首轮先覆盖 ${missingMustHave.slice(0, 2).join('、')}`);
+  }
+
+  if (question.type === 'project' && !evaluation.communication.hasOwnership) {
+    checklist.push('把团队叙述收窄到你亲手负责的判断、实现和结果');
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !evaluation.communication.hasDiagnosisFlow) {
+    checklist.push('按排查顺序回答，先说先看什么，再说如何缩小范围');
+  }
+
+  if (question.type !== 'algorithm' && !evaluation.communication.hasTradeoff) {
+    checklist.push('补一句方案取舍，明确为什么这样选以及代价');
+  }
+
+  if (['project', 'system-design'].includes(question.type) && !evaluation.communication.hasMetrics) {
+    checklist.push('补一个结果指标或验证信号，证明方案有效');
+  }
+
+  if (question.type !== 'knowledge' && !evaluation.communication.hasExample) {
+    checklist.push('换成真实项目或线上案例来讲，不只停在概念');
+  }
+
+  if (!checklist.length) {
+    checklist.push(`保持当前主线，并继续按“${levelProfile.focus}”压缩表达密度`);
+  }
+
+  return checklist.slice(0, 4);
+}
+
 function createInterviewerVerdict(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
   const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
     return !evaluation.rubricHits.mustHave.includes(item);
@@ -745,6 +807,69 @@ function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = su
   return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
 
+function createPracticeSummary(answersByQuestion, coachPriorities, interviewPatterns = summarizeInterviewPatterns([])) {
+  if (!answersByQuestion.length) {
+    return '先完成一次完整模拟，再根据最低分题目安排重练。';
+  }
+
+  const riskyCount = answersByQuestion.filter((item) => item.score < 70).length;
+  const primaryLine = interviewPatterns.primary
+    ? `当前最主要的面试风险是“${interviewPatterns.primary.label}”。`
+    : '当前主要问题集中在首轮命中率和深挖稳定性。';
+  const firstPriority = coachPriorities[0];
+  const priorityLine = firstPriority
+    ? `下一轮先修 ${firstPriority.category}，把“${firstPriority.target}”练成默认输出。`
+    : '下一轮先从最低分题开始，把首轮回答主线讲完整。';
+
+  return `本轮共有 ${riskyCount}/${answersByQuestion.length} 题在真实面试里大概率会被继续追问。${primaryLine}${priorityLine}`;
+}
+
+function createPracticePlan(answersByQuestion, coachPriorities, interviewPatterns = summarizeInterviewPatterns([])) {
+  if (!answersByQuestion.length) return [];
+
+  const sorted = [...answersByQuestion].sort((left, right) => left.score - right.score);
+  const first = sorted[0];
+  const second = sorted[1] || sorted[0];
+  const primary = interviewPatterns.primary;
+  const plan = [];
+
+  if (first) {
+    plan.push({
+      title: 'Round 1 | 修首轮命中率',
+      focus: `${first.category} / 最低分题`,
+      task: `把这题重答 3 遍，每次先完成：${(first.coachChecklist || []).slice(0, 2).join('；') || createImmediateFix(first.question, first)}`,
+      successMark: '第一轮回答就能命中核心点，不靠追问补洞'
+    });
+  }
+
+  if (second) {
+    plan.push({
+      title: 'Round 2 | 修追问稳定性',
+      focus: `${second.category} / ${describeFollowUpCategory(second.followUpCategory)}`,
+      task: `围绕“${second.nextFollowUp || createImmediateFix(second.question, second)}”做两轮追问演练，再补一句取舍、指标或案例。`,
+      successMark: '第二轮追问时仍能给出具体判断、过程和证据'
+    });
+  }
+
+  if (primary) {
+    plan.push({
+      title: 'Round 3 | 修整体面试观感',
+      focus: primary.label,
+      task: primary.practiceAction,
+      successMark: '面试官不再优先形成这类负面判断'
+    });
+  } else if (coachPriorities[0]) {
+    plan.push({
+      title: 'Round 3 | 固化高频模板',
+      focus: coachPriorities[0].category,
+      task: `把 ${coachPriorities[0].category} 相关题整理成“结论 -> 原理/场景 -> 取舍 -> 结果”的口述模板。`,
+      successMark: '同类题能稳定复用模板，不再临场拼凑'
+    });
+  }
+
+  return plan.slice(0, 3);
+}
+
 function createCoachTip(question, evaluation, levelProfile = getLevelExpectation('middle')) {
   if (evaluation.redFlags.length) {
     return `先修正这些明显风险信号：${evaluation.redFlags.join('、')}`;
@@ -786,10 +911,12 @@ function createFollowUpObjective(question, evaluation) {
 function createCoachPriorities(answersByQuestion) {
   if (!answersByQuestion.length) return [];
 
+  const recurringCategories = summarizeRecurringFollowUpCategories(answersByQuestion);
+
   return [...answersByQuestion]
     .sort((left, right) => {
-      const leftRisk = scoreCoachPriority(left);
-      const rightRisk = scoreCoachPriority(right);
+      const leftRisk = scoreCoachPriority(left) + getRecurringPriorityBoost(left, recurringCategories);
+      const rightRisk = scoreCoachPriority(right) + getRecurringPriorityBoost(right, recurringCategories);
       return rightRisk - leftRisk;
     })
     .slice(0, 3)
@@ -806,7 +933,7 @@ function createCoachPriorities(answersByQuestion) {
         followUpFocus: item.nextFollowUp,
         weaknesses: item.weaknesses
       }),
-      detail: `先修 ${describeFollowUpCategory(item.followUpCategory)}；下一次重答时优先做到：${item.answerRebuildPlan?.checkpoints?.[0] || '把主线讲完整'}。`
+      detail: createCoachPriorityDetail(item, recurringCategories)
     }));
 }
 
@@ -824,17 +951,18 @@ function createOverallSummary(session, answersByQuestion, levelProfile = getLeve
     return `这轮 ${level}${role} 面试回答整体比较完整，已经达到“${levelProfile.labels[0]}”的预期，并接近可继续深挖的水平。`;
   }
 
+  const panelSummary = createPanelSignalSummary(answersByQuestion, levelProfile);
   if (weakCount >= Math.ceil(answersByQuestion.length / 2)) {
     const patternLine = interviewPatterns.primary
       ? `面试官最容易形成的判断是“${interviewPatterns.primary.interviewerView}”。`
       : '面试官会继续通过追问确认你是否真的掌握到可落地的细节。';
-    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。建议先把最低分的两题各重讲 3 遍，练到首轮就能把核心点答实。${patternLine}`;
+    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。${panelSummary} 建议先把最低分的两题各重讲 3 遍，练到首轮就能把核心点答实。${patternLine}`;
   }
 
   const patternLead = interviewPatterns.primary
     ? `当前最明显的模式是${interviewPatterns.primary.label}。`
     : '当前主要问题集中在追问稳定性。';
-  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。下一轮训练重点不是刷更多题，而是把已答题练成首轮就站得住。${patternLead}`;
+  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。${panelSummary} 下一轮训练重点不是刷更多题，而是把已答题练成首轮就站得住。${patternLead}`;
 }
 
 function createInterviewerImpression(session, answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
@@ -848,26 +976,27 @@ function createInterviewerImpression(session, answersByQuestion, levelProfile = 
   const riskCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk').length;
   const repeatedFollowUps = answersByQuestion.filter((item) => item.followUpCount >= 2).length;
   const primaryPattern = interviewPatterns.primary;
+  const panelSummary = createPanelSignalSummary(answersByQuestion, levelProfile);
 
   if (strongCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2)) && riskCount === 0) {
-    return `作为 ${level}${role} 候选人，你给人的整体印象是主线清楚、追问也能接住。面试官更可能继续验证上限，而不是怀疑基础是否属实。`;
+    return `作为 ${level}${role} 候选人，你给人的整体印象是主线清楚、追问也能接住。${panelSummary} 面试官更可能继续验证上限，而不是怀疑基础是否属实。`;
   }
 
   if (riskCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2))) {
     const patternTail = primaryPattern
       ? `最突出的短板是“${primaryPattern.label}”。`
       : '面试官大概率会继续怀疑回答是否真的来自真实项目经历。';
-    return `整体印象会偏保守：你能讲出部分主线，但一被追问就容易失去说服力。${patternTail}`;
+    return `整体印象会偏保守：你能讲出部分主线，但一被追问就容易失去说服力。${panelSummary} ${patternTail}`;
   }
 
   if (repeatedFollowUps >= 2) {
     const patternTail = primaryPattern
       ? `现在最影响观感的是“${primaryPattern.label}”。`
       : '当前主要问题是追问稳定性还不够。';
-    return `面试官会觉得你“不是完全不会，但答得不够稳”。${patternTail} 如果不主动补细节、取舍和结果，评价容易停在中间档。`;
+    return `面试官会觉得你“不是完全不会，但答得不够稳”。${panelSummary} ${patternTail} 如果不主动补细节、取舍和结果，评价容易停在中间档。`;
   }
 
-  return `整体印象处在可继续观察的区间：已经具备 ${levelProfile.labels[0]} 的一部分基础，但还需要把回答密度和稳定性再往上提。`;
+  return `整体印象处在可继续观察的区间：已经具备 ${levelProfile.labels[0]} 的一部分基础，但还需要把回答密度和稳定性再往上提。${panelSummary}`;
 }
 
 function createHiringSignal(answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
@@ -884,19 +1013,20 @@ function createHiringSignal(answersByQuestion, levelProfile = getLevelExpectatio
   const riskCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk').length;
   const repeatedFollowUps = answersByQuestion.filter((item) => item.followUpCount >= 2).length;
   const primaryPattern = interviewPatterns.primary;
+  const panelSummary = createPanelSignalSummary(answersByQuestion, levelProfile);
 
   if (score >= levelProfile.minScoreToMoveNext + 8 && strongCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2)) && riskCount === 0) {
     return {
       label: '通过信号偏强',
       level: 'strong',
-      detail: '如果真实面试也保持这个稳定度，面试官更可能把你归到“可进入下一轮或继续深挖”的候选人。'
+      detail: `如果真实面试也保持这个稳定度，面试官更可能把你归到“可进入下一轮或继续深挖”的候选人。${panelSummary}`
     };
   }
 
   if (riskCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2)) || score < levelProfile.minScoreToMoveNext - 8) {
     const detail = primaryPattern
-      ? `当前更像“暂不通过”信号，主要因为“${primaryPattern.label}”反复出现，面试官容易担心这个问题不是单题失误。`
-      : '当前更像“暂不通过”信号，因为多道题都需要追问补主线，整体稳定性不够。';
+      ? `当前更像“暂不通过”信号，主要因为“${primaryPattern.label}”反复出现，面试官容易担心这个问题不是单题失误。${panelSummary}`
+      : `当前更像“暂不通过”信号，因为多道题都需要追问补主线，整体稳定性不够。${panelSummary}`;
     return {
       label: '暂不通过风险高',
       level: 'risk',
@@ -905,8 +1035,8 @@ function createHiringSignal(answersByQuestion, levelProfile = getLevelExpectatio
   }
 
   const detail = repeatedFollowUps >= 2
-    ? '当前更像“需要再观察”信号。你有一定基础，但面试官通常会担心继续深挖后稳定性不够。'
-    : '当前更像“可继续观察”信号。主线基本能成立，但还缺少足够多的亮点题把整体评价抬上去。';
+    ? `当前更像“需要再观察”信号。你有一定基础，但面试官通常会担心继续深挖后稳定性不够。${panelSummary}`
+    : `当前更像“可继续观察”信号。主线基本能成立，但还缺少足够多的亮点题把整体评价抬上去。${panelSummary}`;
 
   return {
     label: '需要继续观察',
@@ -1090,6 +1220,31 @@ function communicationHints(answer) {
     hasExample: /比如|例如|项目|线上|生产|场景|案例|当时/.test(answer),
     hasOwnership: /我负责|我主要|我做|我写|我处理|我排查|我推动|我设计|我改了|我加了/.test(answer),
     hasDiagnosisFlow: /先|然后|再|接着|最后|第一步|第二步|第三步|先确认|先看|再看|最后看/.test(answer)
+  };
+}
+
+function measureAnswerProgress(question, previousAnswer, nextAnswer) {
+  if (!question) {
+    return {
+      addedKeywordHits: 0,
+      lengthGain: 0,
+      isStagnant: false
+    };
+  }
+
+  const previousKeywordHits = question.keywords.filter((keyword) => matchesConcept(previousAnswer, keyword));
+  const nextKeywordHits = question.keywords.filter((keyword) => matchesConcept(nextAnswer, keyword));
+  const addedKeywordHits = nextKeywordHits.filter((keyword) => !previousKeywordHits.includes(keyword)).length;
+  const lengthGain = Math.max(0, String(nextAnswer || '').trim().length - String(previousAnswer || '').trim().length);
+  const previousNormalized = normalizeText(previousAnswer);
+  const nextNormalized = normalizeText(nextAnswer);
+  const isSubsetRepeat = Boolean(previousNormalized) && Boolean(nextNormalized)
+    && (previousNormalized.includes(nextNormalized) || nextNormalized.includes(previousNormalized));
+
+  return {
+    addedKeywordHits,
+    lengthGain,
+    isStagnant: addedKeywordHits === 0 && lengthGain < 20 && isSubsetRepeat
   };
 }
 
@@ -1360,6 +1515,48 @@ function scoreCoachPriority(item) {
   return score;
 }
 
+function summarizeRecurringFollowUpCategories(answersByQuestion) {
+  return answersByQuestion.reduce((acc, item) => {
+    const key = item.followUpCategory || 'complete';
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+}
+
+function getRecurringPriorityBoost(item, recurringCategories) {
+  const count = recurringCategories[item.followUpCategory] || 0;
+  return count >= 2 ? 6 : 0;
+}
+
+function createCoachPriorityDetail(item, recurringCategories) {
+  const recurringCount = recurringCategories[item.followUpCategory] || 0;
+  const repeatedLine = recurringCount >= 2
+    ? `这类问题已经重复出现 ${recurringCount} 次，说明它正在从单题失误变成整体面试印象。`
+    : `先修 ${describeFollowUpCategory(item.followUpCategory)}，别让它在下一轮继续扩大。`;
+  const checkpoint = item.answerRebuildPlan?.checkpoints?.[0] || '把主线讲完整';
+
+  return `${repeatedLine} 下一次重答时优先做到：${checkpoint}。`;
+}
+
+function createPanelSignalSummary(answersByQuestion, levelProfile) {
+  const score = estimateScore(answersByQuestion);
+  const belowBarCount = answersByQuestion.filter((item) => item.score < levelProfile.minScoreToMoveNext).length;
+  const repeatedFollowUps = answersByQuestion.filter((item) => item.followUpCount >= 2).length;
+  const riskCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk').length;
+
+  if (!answersByQuestion.length) return '';
+  if (!belowBarCount && repeatedFollowUps <= 1 && riskCount === 0) {
+    return `从面试官 debrief 的视角看，当前大多数题已经达到这个级别的通过线，均分约 ${score}。`;
+  }
+
+  const reasons = [];
+  if (belowBarCount) reasons.push(`${belowBarCount} 题低于当前级别通过线`);
+  if (repeatedFollowUps) reasons.push(`${repeatedFollowUps} 题被追问两轮以上`);
+  if (riskCount) reasons.push(`${riskCount} 题留下明显风险信号`);
+
+  return `如果按真实面试官会后汇总来写，当前卡点主要是：${reasons.join('，')}。`;
+}
+
 function summarizeCompetencySignals(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
   if (!answersByQuestion.length) {
     return '没有有效作答时，系统还无法模拟面试官对能力维度的稳定判断。';
@@ -1496,10 +1693,16 @@ function createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, co
 
 function buildSuggestedFollowUp(question, evaluation, context = {}) {
   const followUpCount = context.followUpCount || 0;
+  const stagnantFollowUpCount = context.stagnantFollowUpCount || 0;
   const levelProfile = getLevelExpectation(context.level);
   const bankedFollowUp = selectFollowUp(question, evaluation, context);
   const basePrompt = bankedFollowUp || evaluation.followUpFocus || question.followUps?.[0] || '你再展开一下刚才的方案和关键细节。';
   const anchoredPrompt = anchorFollowUpWithCandidateContext(basePrompt, question, evaluation, context);
+
+  if (stagnantFollowUpCount >= 1) {
+    const stagnationPrompt = createStagnationFollowUp(question, evaluation, levelProfile);
+    if (stagnationPrompt) return anchorFollowUpWithCandidateContext(stagnationPrompt, question, evaluation, context);
+  }
 
   if (followUpCount === 1) {
     const pinDownPrompt = createPinDownFollowUp(question, evaluation, levelProfile);
@@ -1532,6 +1735,36 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
   }
 
   return anchoredPrompt;
+}
+
+function createStagnationFollowUp(question, evaluation, levelProfile) {
+  if (evaluation.followUpCategory === 'ownership') {
+    return '不要再用“我们”概括了，直接从你本人开始讲：你拍板了什么、改了哪段、结果怎么验证。';
+  }
+
+  if (evaluation.followUpCategory === 'evidence') {
+    return '别再总结观点，直接锁定一次真实场景，按“当时出了什么问题 -> 你怎么处理 -> 结果怎样”三句答完。';
+  }
+
+  if (evaluation.followUpCategory === 'impact') {
+    return '这次只回答结果信号：前后指标是多少，或者你上线后具体看哪两个数据判断它真的生效。';
+  }
+
+  if (evaluation.followUpCategory === 'tradeoff') {
+    return '不要重复方案描述，只回答取舍：为什么选它，不选什么，代价落在哪。';
+  }
+
+  if (evaluation.followUpCategory === 'detail') {
+    return question.type === 'knowledge'
+      ? '不要再复述概念，按排查顺序讲三步：先看什么，再怎么缩小范围，最后如何验证。'
+      : '不要再讲大主线，直接补一个实现细节、一个边界条件、一个异常处理。';
+  }
+
+  if (evaluation.followUpCategory === 'core') {
+    return createCoreFollowUp(question, evaluation, levelProfile, 'pressure');
+  }
+
+  return '';
 }
 
 function getMissingRubricFocus(question, evaluation) {

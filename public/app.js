@@ -177,6 +177,7 @@ function renderReport(report) {
   const overview = report.overview || {};
   const weakAreas = Array.isArray(report.weakAreas) ? report.weakAreas : [];
   const nextPractice = Array.isArray(report.nextPractice) ? report.nextPractice : [];
+  const practicePlan = Array.isArray(report.practicePlan) ? report.practicePlan : [];
   const competencyBreakdown = Array.isArray(overview.competencyBreakdown) ? overview.competencyBreakdown : [];
   const coachPriorityHtml = Array.isArray(overview.coachPriorities) && overview.coachPriorities.length
     ? overview.coachPriorities.map((item, index) => `
@@ -203,6 +204,16 @@ function renderReport(report) {
         </article>
       `).join('')
     : '<p>Complete more answers to generate targeted next-practice recommendations.</p>';
+  const practicePlanHtml = practicePlan.length
+    ? practicePlan.map((item) => `
+        <article class="plan-item">
+          <strong>${escapeHtml(item.title || 'Practice round')}</strong>
+          <p>${escapeHtml(`Focus: ${item.focus || 'N/A'}`)}</p>
+          <p>${escapeHtml(`Task: ${item.task || 'N/A'}`)}</p>
+          <p>${escapeHtml(`Success mark: ${item.successMark || 'N/A'}`)}</p>
+        </article>
+      `).join('')
+    : '<p>Finish more interview answers to generate a staged practice plan.</p>';
   const competencyBreakdownHtml = competencyBreakdown.length
     ? competencyBreakdown.map((item) => `
         <article class="practice-item">
@@ -245,6 +256,7 @@ function renderReport(report) {
     const strengths = renderList(item.strengths, 'No clear strength captured.');
     const weaknesses = renderList(item.weaknesses, 'No major weakness captured.');
     const redFlags = renderList(item.redFlags, 'No obvious red flag.');
+    const coachChecklist = renderList(item.coachChecklist, 'No checklist generated.');
     const retryBlueprint = renderRetryBlueprint(item.retryBlueprint);
     const answerRebuildPlan = renderAnswerRebuildPlan(item.answerRebuildPlan);
 
@@ -296,6 +308,8 @@ function renderReport(report) {
         <p>${escapeHtml(item.nextFollowUp || 'N/A')}</p>
         <div class="section-label">Coach tip</div>
         <p>${escapeHtml(item.coachTip || 'N/A')}</p>
+        <div class="section-label">Coach checklist</div>
+        ${coachChecklist}
         <div class="section-label">Retry blueprint</div>
         ${retryBlueprint}
         <div class="section-label">Re-answer plan</div>
@@ -323,6 +337,8 @@ function renderReport(report) {
       ${competencyBreakdownHtml}
       <div class="section-label">Coaching focus</div>
       <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
+      <div class="section-label">Practice summary</div>
+      <p>${escapeHtml(overview.practiceSummary || 'Add more answers to generate a structured practice summary.')}</p>
       <div class="section-label">Real interview risk</div>
       <p>${escapeHtml(overview.riskSummary || 'Add more answers to estimate interview risk.')}</p>
       <div class="section-label">Resume grounding coverage</div>
@@ -338,6 +354,9 @@ function renderReport(report) {
     ${questionsHtml}
     <article class="report-card">
       <h3>Next practice</h3>
+      <div class="section-label">Staged plan</div>
+      ${practicePlanHtml}
+      <div class="section-label">Suggested drills</div>
       ${nextPracticeHtml}
     </article>
   `;
