@@ -1848,6 +1848,11 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
     return anchorFollowUpWithCandidateContext(createDetailFollowUp(question), question, evaluation, context);
   }
 
+  const roleAwarePrompt = createRoleAwareFollowUp(question, evaluation, context);
+  if (roleAwarePrompt) {
+    return anchorFollowUpWithCandidateContext(roleAwarePrompt, question, evaluation, context);
+  }
+
   return anchoredPrompt;
 }
 
@@ -2019,12 +2024,24 @@ function createPinDownFollowUp(question, evaluation, levelProfile) {
 
 function selectFollowUp(question, evaluation, context = {}) {
   const followUpCount = context.followUpCount || 0;
+  const missingRubricFocus = getMissingRubricFocus(question, evaluation);
+
   if (followUpCount >= 2 && evaluation.followUpCategory === 'evidence') {
     return '不要泛泛而谈，直接举一个你亲自处理过的线上或项目场景，按背景、动作、结果讲清楚。';
   }
 
   if (followUpCount >= 2 && evaluation.followUpCategory === 'tradeoff') {
     return '把你的取舍讲透：为什么选这个方案，不选什么，代价和边界分别是什么？';
+  }
+
+  if (followUpCount >= 1) {
+    const roleAwarePrompt = createRoleAwareFollowUp(question, evaluation, context);
+    if (roleAwarePrompt) return roleAwarePrompt;
+  }
+
+  if (missingRubricFocus) {
+    const targetedPrompt = createRubricTargetedFollowUp(question, evaluation, context, missingRubricFocus);
+    if (targetedPrompt) return targetedPrompt;
   }
 
   const directFocus = evaluation.followUpFocus;
@@ -2118,6 +2135,177 @@ function createPressureTestFollowUp(question, evaluation, levelProfile) {
     }
 
     return `不要再泛讲主线，按这个级别的要求补细节：${levelProfile.focus}。`;
+  }
+
+  return '';
+}
+
+function createRubricTargetedFollowUp(question, evaluation, context, focus) {
+  const levelProfile = getLevelExpectation(context.level);
+
+  if (question.type === 'project') {
+    return createProjectRubricFollowUp(focus, levelProfile);
+  }
+
+  if (question.type === 'system-design') {
+    return createSystemDesignRubricFollowUp(focus, levelProfile);
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return createTroubleshootingRubricFollowUp(focus, levelProfile);
+  }
+
+  if (question.type === 'algorithm') {
+    return createAlgorithmRubricFollowUp(focus);
+  }
+
+  return '';
+}
+
+function createRoleAwareFollowUp(question, evaluation, context = {}) {
+  const levelProfile = getLevelExpectation(context.level);
+  const focus = getMissingRubricFocus(question, evaluation);
+
+  if (!focus) return '';
+
+  if (question.type === 'project') {
+    return createProjectRubricFollowUp(focus, levelProfile);
+  }
+
+  if (question.type === 'system-design') {
+    return createSystemDesignRubricFollowUp(focus, levelProfile);
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return createTroubleshootingRubricFollowUp(focus, levelProfile);
+  }
+
+  return '';
+}
+
+function createProjectRubricFollowUp(focus, levelProfile) {
+  if (matchesConcept(focus, '项目背景')) {
+    return '先别展开技术细节，先把业务背景说清楚：这件事要解决什么问题，为什么当时必须做。';
+  }
+
+  if (matchesConcept(focus, '个人职责') || matchesConcept(focus, '职责')) {
+    return '把团队动作先拿掉，只说你亲自负责的模块、你拍板的判断，以及你真正落地的实现。';
+  }
+
+  if (matchesConcept(focus, '技术栈')) {
+    return '把技术栈收敛到这题真正相关的几项，并说明每一项分别承担什么职责，不要只报名词。';
+  }
+
+  if (matchesConcept(focus, '关键问题') || matchesConcept(focus, '问题')) {
+    return '挑一个最难的问题讲透：当时现象是什么，你先怎么判断，再怎么收敛到最终方案。';
+  }
+
+  if (matchesConcept(focus, '指标结果') || matchesConcept(focus, '结果')) {
+    return levelProfile === levelExpectations.junior
+      ? '补一个可以落地的结果信号，哪怕不是完整指标，也要说明做完后有什么可见变化。'
+      : '不要只说“做完了”，直接补前后指标、线上变化，或者你上线后怎么验证它真的生效。';
+  }
+
+  if (matchesConcept(focus, '取舍原因')) {
+    return levelProfile === levelExpectations.junior
+      ? '补一句你为什么这样做，以及如果不这么做会遇到什么问题。'
+      : '把方案取舍讲完整：你比较过什么，不选什么，代价和边界分别是什么。';
+  }
+
+  if (matchesConcept(focus, '复盘改进')) {
+    return '如果现在重做一次，你会先改哪一块，为什么那会成为你优先修的风险点？';
+  }
+
+  return '';
+}
+
+function createSystemDesignRubricFollowUp(focus, levelProfile) {
+  if (matchesConcept(focus, '任务模型')) {
+    return '先定义核心任务模型：任务实例里至少要存哪些字段，系统靠什么识别它的生命周期和重试状态？';
+  }
+
+  if (matchesConcept(focus, '调度')) {
+    return '只讲调度主线：任务怎么被触发、怎么分发、怎么避免同一任务被重复拉起。';
+  }
+
+  if (matchesConcept(focus, '重试')) {
+    return '把失败处理讲具体：哪些错误会立即失败，哪些会退避重试，超过阈值后怎么兜底。';
+  }
+
+  if (matchesConcept(focus, '幂等')) {
+    return '我现在只关心幂等：如果调度器没收到回执又重复投递，你靠什么避免任务被执行两次？';
+  }
+
+  if (matchesConcept(focus, '监控') || matchesConcept(focus, '统计')) {
+    return levelProfile === levelExpectations.senior
+      ? '别停在“会加监控”，直接说你会盯哪几个指标、哪类告警，以及这些信号分别说明什么风险。'
+      : '补一下可观测性：至少说清你会看哪些日志、指标或告警来判断系统是否稳定。';
+  }
+
+  if (matchesConcept(focus, '缓存')) {
+    return '只讲缓存层的职责：它扛哪一段读流量，失效后如何回源，热点时如何避免击穿。';
+  }
+
+  if (matchesConcept(focus, '高可用')) {
+    return '把高可用讲成故障场景：单点挂了以后谁接替，数据和流量分别怎么兜底。';
+  }
+
+  if (matchesConcept(focus, '取舍原因')) {
+    return '把架构取舍摆出来：为什么是这个拆法，不选更简单或更重的方案，代价在哪里。';
+  }
+
+  return '';
+}
+
+function createTroubleshootingRubricFollowUp(focus, levelProfile) {
+  if (matchesConcept(focus, '先定位')) {
+    return '按真实排障顺序回答：先确认影响范围，再列出你优先排的两到三个方向，最后说如何验证根因。';
+  }
+
+  if (matchesConcept(focus, '慢查询')) {
+    return '只讲命令或请求层的排查：你会看什么慢信号，怎么区分是单个热点请求还是整体变慢。';
+  }
+
+  if (matchesConcept(focus, '网络')) {
+    return '把网络层讲具体：你先看连接、带宽还是跨机房路径，分别想排除什么问题？';
+  }
+
+  if (matchesConcept(focus, '内存')) {
+    return '只聚焦内存信号：你会看哪些占用、碎片、淘汰或堆对象指标来判断是不是内存问题。';
+  }
+
+  if (matchesConcept(focus, '持久化') || matchesConcept(focus, '对象') || matchesConcept(focus, '参数')) {
+    return levelProfile === levelExpectations.senior
+      ? '不要只说会看日志，直接说你会结合哪些日志、监控和现场数据来区分它是不是配置或后台任务引起的抖动。'
+      : '把这个排查点再讲细一点：你会看什么日志或指标，看到什么现象才会继续往这个方向收敛。';
+  }
+
+  if (matchesConcept(focus, 'profiling') || matchesConcept(focus, 'pprof') || matchesConcept(focus, 'gc 日志')) {
+    return '别只提工具名，直接说你会先看哪类样本或日志信号，以及这些信号怎么帮助你缩小范围。';
+  }
+
+  if (matchesConcept(focus, 'gil') || matchesConcept(focus, '多进程')) {
+    return '把判断门槛说清楚：出现什么现象你才会怀疑是 GIL 或并发模型，而不是业务代码热点本身。';
+  }
+
+  return '';
+}
+
+function createAlgorithmRubricFollowUp(focus) {
+  if (matchesConcept(focus, '哈希表')) {
+    return '把哈希表在这题里的作用讲明确：你存什么，查什么，为什么能把复杂度降下来。';
+  }
+
+  if (matchesConcept(focus, '一次遍历')) {
+    return '不要只说能做，直接讲遍历顺序和每一步的数据结构变化，说明为什么只需要一遍。';
+  }
+
+  if (matchesConcept(focus, '复杂度') || matchesConcept(focus, '时间复杂度') || matchesConcept(focus, '空间复杂度')) {
+    return '把复杂度单独说清楚：时间为什么是这个量级，额外空间花在了哪里。';
+  }
+
+  if (matchesConcept(focus, '重复数字处理') || matchesConcept(focus, '边界')) {
+    return '补一个边界情况：有重复数字、无解或已排序时，你的写法怎么处理。';
   }
 
   return '';

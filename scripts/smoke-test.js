@@ -71,6 +71,29 @@ async function main() {
     });
     assert(answer2.currentQuestion !== session.plan[0].id, 'stronger answer should advance to the next question');
 
+    const seniorSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'backend',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 5,
+        resume: '负责过高并发订单和缓存排障，做过 Redis 延迟分析和任务调度平台治理。'
+      }
+    });
+
+    const seniorAnswer = await request(`/api/interviews/${seniorSession.sessionId}/answer`, {
+      method: 'POST',
+      body: {
+        answer: '我会先看监控，看看 Redis 是不是慢了，再看看网络和内存，如果有问题就处理。'
+      }
+    });
+    const seniorReply = seniorAnswer.messages.at(-1)?.content || '';
+    assert(
+      /按真实排障顺序回答|先确认影响范围|网络层讲具体|只聚焦内存信号|不要只说会看日志/.test(seniorReply),
+      `senior troubleshooting follow-up should force a concrete diagnostic path, got: ${seniorReply}`
+    );
+
     const reportResult = await request(`/api/interviews/${session.sessionId}/finish`, {
       method: 'POST'
     });
