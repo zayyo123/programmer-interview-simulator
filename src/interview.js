@@ -227,7 +227,11 @@ export function createFallbackInterviewerReply({ session, answer }) {
       evaluation,
       session.config.style,
       answerEntry?.followUpCount || 0,
-      session.config.level
+      session.config.level,
+      {
+        answer: effectiveAnswer,
+        resume: session.config.resume
+      }
     );
   }
 
@@ -448,7 +452,7 @@ function evaluateAnswer(answer, question, context = {}) {
   };
 }
 
-function createFollowUpReply(question, evaluation, style, followUpCount = 0, level = 'middle') {
+function createFollowUpReply(question, evaluation, style, followUpCount = 0, level = 'middle', interviewContext = {}) {
   const prefix = {
     normal: '我想继续确认一个关键点：',
     pressure: '这个回答还不够落地，我继续追问：',
@@ -460,7 +464,9 @@ function createFollowUpReply(question, evaluation, style, followUpCount = 0, lev
   const suggestedFollowUp = buildSuggestedFollowUp(question, evaluation, {
     followUpCount,
     level,
-    style
+    style,
+    answer: interviewContext.answer,
+    resume: interviewContext.resume
   });
   const objectiveLead = objective && followUpCount < 2 ? `${objective} ` : '';
   return `${prefix}${escalation}${objectiveLead}${suggestedFollowUp}`;
@@ -1414,15 +1420,16 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
   const levelProfile = getLevelExpectation(context.level);
   const bankedFollowUp = selectFollowUp(question, evaluation, context);
   const basePrompt = bankedFollowUp || evaluation.followUpFocus || question.followUps?.[0] || '你再展开一下刚才的方案和关键细节。';
+  const anchoredPrompt = anchorFollowUpWithCandidateContext(basePrompt, question, evaluation, context);
 
   if (followUpCount === 1) {
     const pinDownPrompt = createPinDownFollowUp(question, evaluation, levelProfile);
-    if (pinDownPrompt) return pinDownPrompt;
+    if (pinDownPrompt) return anchorFollowUpWithCandidateContext(pinDownPrompt, question, evaluation, context);
   }
 
   if (followUpCount >= 2) {
     const repeatedPrompt = createPressureTestFollowUp(question, evaluation, levelProfile);
-    if (repeatedPrompt) return repeatedPrompt;
+    if (repeatedPrompt) return anchorFollowUpWithCandidateContext(repeatedPrompt, question, evaluation, context);
   }
 
   if (evaluation.followUpCategory === 'impact' && levelProfile === levelExpectations.senior) {
@@ -1442,10 +1449,72 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
   }
 
   if (evaluation.followUpCategory === 'detail') {
-    return createDetailFollowUp(question);
+    return anchorFollowUpWithCandidateContext(createDetailFollowUp(question), question, evaluation, context);
   }
 
-  return basePrompt;
+  return anchoredPrompt;
+}
+
+function getMissingRubricFocus(question, evaluation) {
+  return question.scoringRubric?.mustHave?.find((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  }) || question.keywords?.find((item) => !evaluation.hitKeywords.includes(item)) || '';
+}
+
+function createCoreFollowUp(question, evaluation, levelProfile, mode = 'first') {
+  const focus = getMissingRubricFocus(question, evaluation) || '核心考点';
+
+  if (question.type === 'project') {
+    if (focus === '项目背景') {
+      return '先别急着讲技术细节，直接用三句话补清楚项目是给谁解决什么问题、业务目标是什么、你为什么会参与这件事。';
+    }
+
+    if (focus === '个人职责') {
+      return '把团队动作先拿掉，直接只讲你自己负责的模块、你拍板的判断，以及你亲手推进的关键动作。';
+    }
+
+    if (focus === '技术栈') {
+      return '不要只说“做了一个项目”，直接补你当时用的核心技术栈，以及这些技术分别承担了什么职责。';
+    }
+
+    if (focus === '关键问题') {
+      return '把项目里最难的一次问题单独拎出来，讲清楚当时卡在哪里、你怎么判断、最后怎么解决。';
+    }
+  }
+
+  if (question.type === 'system-design') {
+    if (focus === '存储映射' || focus === '任务模型') {
+      return `不要继续泛讲架构，直接先把“${focus}”讲实：核心数据怎么组织、主键或实例怎么唯一标识、状态怎么流转。`;
+    }
+
+    if (focus === '访问重定向' || focus === '调度') {
+      return `把链路收窄到“${focus}”，按请求怎么进来、怎么路由、怎么返回结果这条主线讲清楚。`;
+    }
+  }
+
+  if (question.type === 'algorithm') {
+    if (focus === '哈希表') {
+      return '不要只说“双重循环”或“遍历”，直接讲哈希表里存什么、什么时候查、什么时候写，再补复杂度。';
+    }
+
+    if (focus === '复杂度') {
+      return '思路先不用扩展，直接把时间复杂度和空间复杂度讲清楚，再说明为什么是这个量级。';
+    }
+  }
+
+  if (question.type === 'knowledge') {
+    if (mode === 'pressure' && focus === '先定位') {
+      return '不要背结论，直接按真实排障顺序回答：先确认现象范围，再看哪组指标，最后怎么验证根因。';
+    }
+
+    return `这题现在缺的不是更多名词，而是把“${focus}”讲实。直接围绕这个点补原理、机制，或者真实排查顺序。`;
+  }
+
+  if (mode === 'pressure') {
+    return `这题已经追问两轮了，直接围绕“${focus}”重答，按结论、关键机制、你的处理方式讲清楚。`;
+  }
+
+  return `不要平铺直叙，直接把“${focus}”讲实，至少补上结论、关键机制和你的处理方式。`;
 }
 
 function createOwnershipFollowUp(question) {
@@ -1490,7 +1559,7 @@ function createDetailFollowUp(question) {
 
 function createPinDownFollowUp(question, evaluation, levelProfile) {
   if (evaluation.followUpCategory === 'core') {
-    return `不要平铺直叙，直接把 ${question.scoringRubric.mustHave[0] || '核心考点'} 讲成“结论、原理、你的处理”三句话。`;
+    return createCoreFollowUp(question, evaluation, levelProfile, 'pin-down');
   }
 
   if (evaluation.followUpCategory === 'ownership') {
@@ -1543,9 +1612,62 @@ function selectFollowUp(question, evaluation, context = {}) {
   }) || question.followUps[0] || '你再展开一下刚才的方案和关键细节。';
 }
 
+function anchorFollowUpWithCandidateContext(prompt, question, evaluation, context = {}) {
+  const normalizedPrompt = String(prompt || '').trim();
+  if (!normalizedPrompt) return '';
+
+  const answerAnchor = extractAnswerAnchor(context.answer, evaluation);
+  if (answerAnchor) {
+    return `你刚才提到“${answerAnchor}”，但这还没有回答到我想确认的点。${normalizedPrompt}`;
+  }
+
+  const resumeAnchor = extractResumeAnchor(context.resume, question);
+  if (resumeAnchor) {
+    return `你简历里提到过“${resumeAnchor}”，这题可以直接落到那段经历上。${normalizedPrompt}`;
+  }
+
+  return normalizedPrompt;
+}
+
+function extractAnswerAnchor(answer, evaluation) {
+  const text = String(answer || '').trim();
+  if (!text) return '';
+
+  const candidateSnippets = splitIntoAnswerSnippets(text).filter((snippet) => {
+    if (snippet.length < 6 || snippet.length > 28) return false;
+    return !evaluation.hitKeywords.some((keyword) => matchesConcept(snippet, keyword));
+  });
+
+  return candidateSnippets[0] || '';
+}
+
+function splitIntoAnswerSnippets(answer) {
+  return String(answer || '')
+    .split(/[，。；：、！？\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .map((item) => item.replace(/^(首先|然后|最后|其实|就是|当时|我们|我觉得|我会|我主要|我负责)/, '').trim());
+}
+
+function extractResumeAnchor(resume, question) {
+  const resumeSignals = extractResumeSignals(resume);
+  if (!resumeSignals.snippets.length) return '';
+
+  const matchedSnippet = resumeSignals.snippets.find((snippet) => {
+    const normalizedSnippet = normalizeText(snippet);
+    const normalizedQuestion = normalizeText([question.category, question.question].join(' '));
+    return normalizedSnippet && (
+      normalizedQuestion.includes(normalizedSnippet.slice(0, Math.min(10, normalizedSnippet.length)))
+      || matchesConcept(snippet, question.category)
+    );
+  });
+
+  return matchedSnippet || resumeSignals.snippets[0] || '';
+}
+
 function createPressureTestFollowUp(question, evaluation, levelProfile) {
   if (evaluation.followUpCategory === 'core') {
-    return `这题已经追问两轮了，直接按“结论 -> 原理 -> 你的处理方式”重答，至少把 ${question.scoringRubric.mustHave[0] || '核心考点'} 讲实。`;
+    return createCoreFollowUp(question, evaluation, levelProfile, 'pressure');
   }
 
   if (evaluation.followUpCategory === 'ownership') {
