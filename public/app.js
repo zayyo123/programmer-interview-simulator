@@ -116,8 +116,11 @@ function renderReport(report) {
         <span class="pill">${escapeHtml(overview.level)}</span>
         <span class="pill">${escapeHtml(overview.style)}</span>
         <span class="pill green">评分 ${overview.score}/100</span>
+        <span class="pill amber">${escapeHtml(overview.readiness || '待评估')}</span>
         <span class="pill">${overview.answeredQuestions}/${overview.totalQuestions} 题</span>
       </div>
+      <div class="section-label">整体判断</div>
+      <p>${escapeHtml(overview.summary || '完成更多回答后会生成整体判断。')}</p>
       <div class="section-label">薄弱方向</div>
       <div class="meta-row">${weakAreas}</div>
     </article>
@@ -127,15 +130,20 @@ function renderReport(report) {
         <h3>${index + 1}. ${escapeHtml(item.question)}</h3>
         <div class="meta-row">
           <span class="pill">${escapeHtml(item.category)}</span>
+          <span class="pill green">本题 ${item.score}/100</span>
         </div>
         <div class="section-label">你的回答摘要</div>
         <p>${escapeHtml(item.userAnswerSummary)}</p>
+        <div class="section-label">表现亮点</div>
+        ${renderList(item.strengths)}
         <div class="section-label">参考答案</div>
         <p>${escapeHtml(item.referenceAnswer)}</p>
         <div class="section-label">面试版优秀回答</div>
         <p>${escapeHtml(item.excellentAnswer)}</p>
         <div class="section-label">差距分析</div>
         <p>${escapeHtml(item.gapAnalysis)}</p>
+        <div class="section-label">下一步追问焦点</div>
+        <p>${escapeHtml(item.nextFollowUp)}</p>
         <div class="section-label">优化后的表达</div>
         <p>${escapeHtml(item.improvedUserAnswer)}</p>
       </article>
@@ -155,6 +163,14 @@ function setBusy(isBusy, text) {
     finishButton.disabled = isBusy;
   }
   if (text) statusText.textContent = text;
+}
+
+function renderList(items = []) {
+  if (!items.length) {
+    return '<p>暂无明显亮点，建议先补齐核心主线。</p>';
+  }
+
+  return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
 }
 
 function formatTime(value) {
