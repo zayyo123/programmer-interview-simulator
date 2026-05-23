@@ -291,6 +291,7 @@ export function createReport(session) {
     .filter((item) => item.score < 75 || item.gapAnalysis.includes('还需要补强'))
     .map((item) => item.category);
   const coachPriorities = createCoachPriorities(answersByQuestion);
+  const interviewPatterns = summarizeInterviewPatterns(answersByQuestion);
 
   return {
     overview: {
@@ -301,9 +302,9 @@ export function createReport(session) {
       totalQuestions: session.plan.length,
       score: estimateScore(answersByQuestion),
       readiness: describeReadiness(answersByQuestion, levelProfile),
-      summary: createOverallSummary(session, answersByQuestion, levelProfile),
-      coachingFocus: createCoachingFocus(answersByQuestion, levelProfile),
-      riskSummary: createRiskSummary(answersByQuestion, levelProfile),
+      summary: createOverallSummary(session, answersByQuestion, levelProfile, interviewPatterns),
+      coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
+      riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
       resumeSummary,
       resumeCoverage: createResumeCoverageSummary(session, answersByQuestion),
       resumeGrounding: createResumeGroundingOverview(answersByQuestion, resumeSummary),
@@ -312,7 +313,7 @@ export function createReport(session) {
     },
     questions: answersByQuestion,
     weakAreas: [...new Set(weakAreas)],
-    nextPractice: createNextPractice(answersByQuestion, weakAreas)
+    nextPractice: createNextPractice(answersByQuestion, weakAreas, interviewPatterns)
   };
 }
 
@@ -504,7 +505,7 @@ function estimateScore(answersByQuestion) {
   return Math.round(total / answersByQuestion.length);
 }
 
-function createNextPractice(answersByQuestion, weakAreas) {
+function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = summarizeInterviewPatterns([])) {
   const lowest = [...answersByQuestion].sort((a, b) => a.score - b.score).slice(0, 2);
   const suggestions = lowest.map((item) => {
     return {
@@ -525,9 +526,23 @@ function createNextPractice(answersByQuestion, weakAreas) {
       goal: '避免一被深挖就只剩概念和结论。',
       action: '重点训练边界情况、定位过程和技术取舍。'
     });
-    return suggestions.slice(0, 3);
+    if (interviewPatterns.primary) {
+      suggestions.unshift({
+        title: `专项修正${interviewPatterns.primary.label}`,
+        goal: interviewPatterns.primary.interviewerView,
+        action: interviewPatterns.primary.practiceAction
+      });
+    }
+    return dedupePracticeSuggestions(suggestions).slice(0, 3);
   }
 
+  if (interviewPatterns.primary) {
+    suggestions.push({
+      title: `专项修正${interviewPatterns.primary.label}`,
+      goal: interviewPatterns.primary.interviewerView,
+      action: interviewPatterns.primary.practiceAction
+    });
+  }
   suggestions.push({
     title: `专项复习 ${[...new Set(weakAreas)].join('、')}`,
     goal: '把零散知识点串成可被追问的完整主线。',
@@ -594,7 +609,7 @@ function createCoachPriorities(answersByQuestion) {
     }));
 }
 
-function createOverallSummary(session, answersByQuestion, levelProfile = getLevelExpectation('middle')) {
+function createOverallSummary(session, answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
   if (!answersByQuestion.length) {
     return '本轮没有有效回答，建议先完成一次完整模拟再看复盘。';
   }
@@ -609,22 +624,32 @@ function createOverallSummary(session, answersByQuestion, levelProfile = getLeve
   }
 
   if (weakCount >= Math.ceil(answersByQuestion.length / 2)) {
-    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。`;
+    const patternLine = interviewPatterns.primary
+      ? `面试官最容易形成的判断是“${interviewPatterns.primary.interviewerView}”。`
+      : '面试官会继续通过追问确认你是否真的掌握到可落地的细节。';
+    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。${patternLine}`;
   }
 
-  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。`;
+  const patternLead = interviewPatterns.primary
+    ? `当前最明显的模式是${interviewPatterns.primary.label}。`
+    : '当前主要问题集中在追问稳定性。';
+  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。${patternLead}`;
 }
 
-function createCoachingFocus(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
+function createCoachingFocus(answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
   if (!answersByQuestion.length) return '先完成一轮完整作答，再根据复盘安排训练。';
 
   const highestRisk = [...answersByQuestion]
     .sort((a, b) => a.score - b.score || b.attempts - a.attempts)[0];
 
+  if (interviewPatterns.primary) {
+    return `先优先修正${interviewPatterns.primary.label}这个共性问题：${interviewPatterns.primary.coachingFocus}。然后回到 ${highestRisk.category} 题，围绕“${highestRisk.nextFollowUp}”按“${levelProfile.focus}”的标准重练。`;
+  }
+
   return `当前最该优先修的，是 ${highestRisk.category} 题里的“${highestRisk.nextFollowUp}”这类追问。先按“${levelProfile.focus}”的标准重练。`;
 }
 
-function createRiskSummary(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
+function createRiskSummary(answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
   if (!answersByQuestion.length) return '暂无风险判断。';
 
   const repeated = answersByQuestion.filter((item) => item.attempts >= 2).length;
@@ -635,11 +660,74 @@ function createRiskSummary(answersByQuestion, levelProfile = getLevelExpectation
     return '当前最大风险是面试官会把你判断成“概念听过，但真实落地和判断过程站不住”。需要用具体职责、取舍和结果证据把答案讲实。';
   }
 
+  if (interviewPatterns.primary && interviewPatterns.primary.count >= 2) {
+    return `当前最稳定的风险信号是${interviewPatterns.primary.label}，它已经在 ${interviewPatterns.primary.count} 道题里重复出现。真实面试里，这会让面试官倾向于判断“${interviewPatterns.primary.interviewerView}”。`;
+  }
+
   if (repeated >= 2 || lowConfidence >= Math.ceil(answersByQuestion.length / 2)) {
     return '当前主要风险不是完全不会，而是被追问两层后容易暴露主线不稳、细节不足。';
   }
 
   return `当前主要风险集中在少数题目的深挖稳定性。对于这个级别，${levelProfile.riskThreshold}。`;
+}
+
+function summarizeInterviewPatterns(answersByQuestion) {
+  const patternDefinitions = {
+    ownership: {
+      label: '个人贡献和 ownership 不够具体',
+      interviewerView: '你更像在复述团队项目，而不是讲清自己真正负责过的判断和落地',
+      coachingFocus: '把项目题统一收敛到“背景、我的职责、关键判断、结果”这条主线',
+      practiceAction: '针对每个项目题补一版只讲自己负责部分的 90 秒答案，明确你改了什么、为什么这样改、结果怎样'
+    },
+    tradeoff: {
+      label: '方案取舍解释不够',
+      interviewerView: '你知道结论，但方案判断过程和代价意识偏弱',
+      coachingFocus: '每道非算法题都补上“为什么这样选、不选什么、代价和边界是什么”',
+      practiceAction: '把常见方案题各练一遍取舍版答案，固定输出收益、代价、边界和备选方案'
+    },
+    evidence: {
+      label: '真实案例支撑不足',
+      interviewerView: '回答听起来像背过的标准答案，缺少真实经历锚点',
+      coachingFocus: '把每个核心知识点都绑定到一个你做过的线上场景或排障案例',
+      practiceAction: '为高频题准备一组可复用的真实案例，按背景、动作、结果复述'
+    },
+    impact: {
+      label: '结果和指标表达偏弱',
+      interviewerView: '你描述了动作，但没有证明这些动作带来了结果',
+      coachingFocus: '项目和系统设计题都主动补前后指标、验证方式和风险观察',
+      practiceAction: '把项目经历里的性能、成功率、吞吐、成本等结果指标整理成口述素材'
+    },
+    core: {
+      label: '核心考点覆盖不完整',
+      interviewerView: '基础概念或关键原理没有答实，继续深挖会比较危险',
+      coachingFocus: '先把每题必须命中的核心点讲完整，再谈扩展内容',
+      practiceAction: '按题目 rubric 回补核心考点，练到首轮回答就能覆盖主要原理'
+    },
+    detail: {
+      label: '实现细节密度不足',
+      interviewerView: '主线能讲，但一进实现细节就容易变虚',
+      coachingFocus: '回答里主动补关键流程、边界处理、复杂度或异常兜底',
+      practiceAction: '针对每类题准备一版深挖细节答案，专练实现流程和边界条件'
+    }
+  };
+
+  const entries = Object.entries(patternDefinitions)
+    .map(([key, definition]) => {
+      const related = answersByQuestion.filter((item) => item.followUpCategory === key);
+      return {
+        key,
+        ...definition,
+        count: related.length,
+        questions: related.map((item) => item.question)
+      };
+    })
+    .filter((item) => item.count > 0)
+    .sort((left, right) => right.count - left.count);
+
+  return {
+    primary: entries[0] || null,
+    ranked: entries
+  };
 }
 
 function describeReadiness(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
