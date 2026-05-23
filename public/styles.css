@@ -284,6 +284,41 @@ button:disabled {
   margin-top: 10px;
 }
 
+.priority-list {
+  display: grid;
+  gap: 10px;
+}
+
+.priority-item {
+  display: grid;
+  grid-template-columns: 42px 1fr;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(35, 100, 170, 0.08), rgba(255, 255, 255, 0.92));
+}
+
+.priority-rank {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--blue);
+  color: #fff;
+  font-weight: 800;
+}
+
+.priority-body {
+  display: grid;
+  gap: 6px;
+}
+
+.priority-body strong {
+  line-height: 1.45;
+}
+
 .meta-row {
   display: flex;
   flex-wrap: wrap;

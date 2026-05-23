@@ -104,9 +104,24 @@ function renderMessages(messages) {
 function renderReport(report) {
   reportEl.className = 'report';
   const overview = report.overview;
+  const coachPriorities = Array.isArray(overview.coachPriorities) ? overview.coachPriorities : [];
   const weakAreas = report.weakAreas.length
     ? report.weakAreas.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
     : '<span class="pill green">暂无明显短板</span>';
+  const coachPriorityHtml = coachPriorities.length
+    ? coachPriorities.map((item, index) => `
+      <div class="priority-item">
+        <div class="priority-rank">0${index + 1}</div>
+        <div class="priority-body">
+          <strong>${escapeHtml(item.category)}: ${escapeHtml(item.question)}</strong>
+          <p>${escapeHtml(item.signal)}</p>
+          <p>${escapeHtml(item.interviewerSignal)}</p>
+          <p>下轮重点追问: ${escapeHtml(item.target)}</p>
+          <p>建议练法: ${escapeHtml(item.drill)}</p>
+        </div>
+      </div>
+    `).join('')
+    : '<p>继续完成更多回答后，这里会给出最值得优先补强的题目。</p>';
 
   reportEl.innerHTML = `
     <article class="report-card">
@@ -125,6 +140,8 @@ function renderReport(report) {
       <p>${escapeHtml(overview.coachingFocus || '完成更多回答后会生成训练重点。')}</p>
       <div class="section-label">真实面试风险</div>
       <p>${escapeHtml(overview.riskSummary || '完成更多回答后会生成风险判断。')}</p>
+      <div class="section-label">优先补强顺序</div>
+      <div class="priority-list">${coachPriorityHtml}</div>
       <div class="section-label">薄弱方向</div>
       <div class="meta-row">${weakAreas}</div>
     </article>
@@ -136,12 +153,15 @@ function renderReport(report) {
           <span class="pill">${escapeHtml(item.category)}</span>
           <span class="pill green">本题 ${item.score}/100</span>
           <span class="pill">作答 ${item.attempts || 1} 轮</span>
+          <span class="pill">追问 ${item.followUpCount || 0} 次</span>
           <span class="pill ${item.confidence?.level === 'high' ? 'green' : item.confidence?.level === 'low' ? 'amber' : ''}">${escapeHtml(item.confidence?.label || '待评估')}</span>
         </div>
         <div class="section-label">你的回答摘要</div>
         <p>${escapeHtml(item.userAnswerSummary)}</p>
         <div class="section-label">把握度判断</div>
         <p>${escapeHtml(item.confidence?.detail || '暂无把握度判断。')}</p>
+        <div class="section-label">追问信号</div>
+        <p>${escapeHtml(item.followUpSignal || '暂无追问信号。')}</p>
         <div class="section-label">表现亮点</div>
         ${renderList(item.strengths)}
         <div class="section-label">主要缺口</div>
