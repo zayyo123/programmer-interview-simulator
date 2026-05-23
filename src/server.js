@@ -79,7 +79,8 @@ const server = createServer(async (request, response) => {
       return sendJson(response, 200, {
         provider: result.provider,
         messages: session.messages,
-        currentQuestion: getCurrentQuestion(session)?.id || null
+        currentQuestion: getCurrentQuestion(session)?.id || null,
+        completed: Boolean(session.completed)
       });
     }
 
@@ -131,6 +132,7 @@ function createSession(input) {
     plan,
     currentIndex: 0,
     answers: [],
+    completed: false,
     messages: [
       {
         role: 'interviewer',

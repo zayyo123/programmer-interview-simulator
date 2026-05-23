@@ -122,6 +122,7 @@ export function createOpening(config, firstQuestion) {
 }
 
 export function getCurrentQuestion(session) {
+  if (session.completed) return null;
   return session.plan[session.currentIndex] || null;
 }
 
@@ -243,7 +244,12 @@ export function maybeAdvanceQuestion(session, answer) {
   if (!evaluateAnswer(effectiveAnswer, question, { level: session.config.level }).readyToMoveNext) return;
   if (session.currentIndex < session.plan.length - 1) {
     session.currentIndex += 1;
+    return;
   }
+
+  session.currentIndex = session.plan.length;
+  session.completed = true;
+  session.completedAt = new Date().toISOString();
 }
 
 export function createReport(session) {

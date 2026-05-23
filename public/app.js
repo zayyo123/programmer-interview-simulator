@@ -72,11 +72,19 @@ answerForm.addEventListener('submit', async (event) => {
 
     providerText.textContent = data.provider || 'mock';
     renderMessages(data.messages || []);
-    statusText.textContent = data.currentQuestion
-      ? 'Keep going. The interviewer may still be probing the same topic.'
-      : 'All planned questions are covered. You can finish to generate the report.';
+    if (data.completed || !data.currentQuestion) {
+      statusText.textContent = 'All planned questions are covered. You can finish to generate the report.';
+      answerInput.disabled = true;
+      answerSubmitButton.disabled = true;
+    } else {
+      statusText.textContent = 'Keep going. The interviewer may still be probing the same topic.';
+      answerInput.disabled = false;
+      answerSubmitButton.disabled = false;
+    }
     answerInput.value = '';
-    answerInput.focus();
+    if (!answerInput.disabled) {
+      answerInput.focus();
+    }
   } catch (error) {
     statusText.textContent = `Failed to submit the answer: ${error.message}`;
   } finally {
