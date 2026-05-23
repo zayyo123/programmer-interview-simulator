@@ -2,8 +2,8 @@ import { levelLabels, questionBank, roleLabels, styleLabels } from './questions.
 
 const roleTopics = {
   backend: ['项目经历', 'MySQL', 'Redis', '系统设计', '算法'],
-  frontend: ['项目经历', '前端', '算法'],
-  fullstack: ['项目经历', '前端', 'MySQL', 'Redis', '系统设计'],
+  frontend: ['项目经历', '前端', '前端', '算法', '前端'],
+  fullstack: ['项目经历', '项目经历', '前端', '系统设计', '算法'],
   java: ['项目经历', 'Java', 'MySQL', 'Redis', '系统设计', '算法'],
   go: ['项目经历', 'Go', 'MySQL', 'Redis', '系统设计', '算法'],
   python: ['项目经历', 'Python', 'MySQL', 'Redis', '系统设计', '算法']
@@ -19,8 +19,8 @@ const levelDifficultyTargets = {
 
 const roleStageBlueprints = {
   backend: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
-  frontend: ['project', 'knowledge', 'knowledge', 'knowledge', 'algorithm'],
-  fullstack: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
+  frontend: ['project', 'project', 'knowledge', 'algorithm', 'knowledge'],
+  fullstack: ['project', 'project', 'knowledge', 'system-design', 'algorithm'],
   java: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
   go: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
   python: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm']
@@ -63,7 +63,8 @@ export function createInterviewPlan(config) {
   const topics = roleTopics[role] || roleTopics.backend;
   const stages = roleStageBlueprints[role] || roleStageBlueprints.backend;
   const difficultyTargets = levelDifficultyTargets[level] || levelDifficultyTargets.middle;
-  const available = buildCandidateQuestionPool(role, level);
+  const resumeSignals = extractResumeSignals(config.resume);
+  const available = buildCandidateQuestionPool(role, level, resumeSignals);
   const selected = [];
 
   for (let index = 0; index < Math.min(targetCount, topics.length); index += 1) {
@@ -72,7 +73,8 @@ export function createInterviewPlan(config) {
       selected,
       preferredCategory: topics[index],
       preferredType: stages[index] || stages[stages.length - 1] || 'knowledge',
-      targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2
+      targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2,
+      resumeSignals
     });
 
     if (match) selected.push(match);
@@ -84,7 +86,8 @@ export function createInterviewPlan(config) {
       selected,
       preferredCategory: null,
       preferredType: stages[selected.length] || 'knowledge',
-      targetDifficulty: difficultyTargets[selected.length] || difficultyTargets[difficultyTargets.length - 1] || 2
+      targetDifficulty: difficultyTargets[selected.length] || difficultyTargets[difficultyTargets.length - 1] || 2,
+      resumeSignals
     });
 
     if (!match) break;
@@ -245,6 +248,7 @@ export function maybeAdvanceQuestion(session, answer) {
 
 export function createReport(session) {
   const levelProfile = getLevelExpectation(session.config.level);
+  const resumeSummary = summarizeResumeForInterview(session.config.resume);
   const answersByQuestion = session.answers.map((entry) => {
     const followUpCount = entry.followUpCount || Math.max(0, (entry.attempts || 1) - 1);
     const evaluation = evaluateAnswer(entry.answer, entry.question, {
@@ -267,9 +271,11 @@ export function createReport(session) {
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
       followUpCategory: evaluation.followUpCategory,
+      followUpObjective: createFollowUpObjective(entry.question, evaluation),
       followUpSignal: createFollowUpSignal(evaluation, entry.attempts || 1),
       coachTip: createCoachTip(entry.question, evaluation, levelProfile),
       gapAnalysis: createGapAnalysis(entry.question, evaluation),
+      resumeSupport: createResumeSupport(entry.question, entry.answer, session.config.resume),
       interviewerSignal: createInterviewerSignal(entry.question, evaluation, entry.attempts || 1),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
       nextFollowUp: buildSuggestedFollowUp(entry.question, evaluation, {
@@ -298,6 +304,9 @@ export function createReport(session) {
       summary: createOverallSummary(session, answersByQuestion, levelProfile),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile),
+      resumeSummary,
+      resumeCoverage: createResumeCoverageSummary(session, answersByQuestion),
+      resumeGrounding: createResumeGroundingOverview(answersByQuestion, resumeSummary),
       levelExpectation: createLevelExpectationSummary(levelProfile),
       coachPriorities
     },
@@ -398,12 +407,14 @@ function createFollowUpReply(question, evaluation, style, followUpCount = 0, lev
   const escalation = followUpCount >= 2
     ? '这已经是这题的连续追问了，别再讲概念，直接讲你做过的判断、细节和结果。'
     : '';
+  const objective = createFollowUpObjective(question, evaluation);
   const suggestedFollowUp = buildSuggestedFollowUp(question, evaluation, {
     followUpCount,
     level,
     style
   });
-  return `${prefix}${escalation}${suggestedFollowUp}`;
+  const objectiveLead = objective && followUpCount < 2 ? `${objective} ` : '';
+  return `${prefix}${escalation}${objectiveLead}${suggestedFollowUp}`;
 }
 
 function createNextQuestionReply(nextQuestion, evaluation, style) {
@@ -543,6 +554,24 @@ function createCoachTip(question, evaluation, levelProfile = getLevelExpectation
   }
 
   return `按“${levelProfile.focus}”这个标准，围绕“${question.category}”先收敛主线，再主动补一个场景或取舍细节。`;
+}
+
+function createFollowUpObjective(question, evaluation) {
+  const objective = {
+    core: '我现在不是想听更多概念，而是确认你有没有答实这题的核心考点。',
+    ownership: '我现在想确认这件事到底是不是你亲自做过，而不只是团队层面的描述。',
+    tradeoff: '我现在想确认你是否真的做过方案判断，而不只是记住了结论。',
+    evidence: '我现在想确认你回答背后有没有真实场景支撑，而不只是泛泛而谈。',
+    impact: '我现在想确认你的方案是否真的产生过结果，而不只是做过动作。',
+    detail: '我现在想确认你是否掌握到了可追问的实现细节，而不只是停在表面。'
+  }[evaluation.followUpCategory];
+
+  if (!objective) return '';
+  if (question.type === 'algorithm' && evaluation.followUpCategory === 'detail') {
+    return '我现在想确认你的解法是不是你自己真正能写出来并解释复杂度。';
+  }
+
+  return objective;
 }
 
 function createCoachPriorities(answersByQuestion) {
@@ -814,7 +843,59 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
     return `别停留在结论，直接讲你当时怎么比较方案、为什么这么选，以及代价是什么。`;
   }
 
+  if (evaluation.followUpCategory === 'ownership') {
+    return createOwnershipFollowUp(question);
+  }
+
+  if (evaluation.followUpCategory === 'evidence') {
+    return createEvidenceFollowUp(question);
+  }
+
+  if (evaluation.followUpCategory === 'detail') {
+    return createDetailFollowUp(question);
+  }
+
   return basePrompt;
+}
+
+function createOwnershipFollowUp(question) {
+  if (question.type === 'project') {
+    return '把范围收窄到你亲手负责的一块，按背景、你的判断、你改了什么、最后结果怎样讲清楚。';
+  }
+
+  if (question.type === 'system-design') {
+    return '别只讲标准架构，直接说如果这题落到你负责，你会先拍哪三个关键决策，为什么。';
+  }
+
+  return '不要只讲团队或常规做法，直接说你自己会怎么做、做过什么、依据是什么。';
+}
+
+function createEvidenceFollowUp(question) {
+  if (question.type === 'system-design') {
+    return '给我一个你实际遇到过的高并发、故障或取舍场景，说明你当时是怎么判断和落地的。';
+  }
+
+  if (question.type === 'project') {
+    return '不要继续抽象总结，直接举一个你线上或项目里真的处理过的场景，按问题、动作、结果讲。';
+  }
+
+  return '举一个你自己处理过的具体场景，不要只背概念，说明当时为什么这么做。';
+}
+
+function createDetailFollowUp(question) {
+  if (question.type === 'algorithm') {
+    return '别只说思路，直接讲关键数据结构、遍历顺序、边界情况，以及时间和空间复杂度。';
+  }
+
+  if (question.type === 'system-design') {
+    return '主线先不展开了，直接补最关键的实现细节：请求怎么流转、状态怎么保证、异常怎么兜底。';
+  }
+
+  if (question.type === 'knowledge') {
+    return '别停在定义，直接补原理、关键机制和一个容易被追问的边界点。';
+  }
+
+  return '别再泛讲主线，直接补实现细节、边界条件和你当时的具体处理。';
 }
 
 function selectFollowUp(question, evaluation, context = {}) {
@@ -952,7 +1033,7 @@ function countOccurrences(text, token) {
   return matches ? matches.length : 0;
 }
 
-function selectBestQuestion({ available, selected, preferredCategory, preferredType, targetDifficulty }) {
+function selectBestQuestion({ available, selected, preferredCategory, preferredType, targetDifficulty, resumeSignals = createEmptyResumeSignals() }) {
   const selectedIds = new Set(selected.map((item) => item.id));
   const selectedCategories = new Set(selected.map((item) => item.category));
 
@@ -964,7 +1045,8 @@ function selectBestQuestion({ available, selected, preferredCategory, preferredT
         preferredCategory,
         preferredType,
         targetDifficulty,
-        selectedCategories
+        selectedCategories,
+        resumeSignals
       })
     }))
     .sort((left, right) => right.score - left.score);
@@ -972,7 +1054,7 @@ function selectBestQuestion({ available, selected, preferredCategory, preferredT
   return ranked[0]?.item || null;
 }
 
-function buildCandidateQuestionPool(role, level) {
+function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals()) {
   const exactMatches = questionBank.filter((item) => item.roles.includes(role) && item.levels.includes(level));
   const sameRoleFallback = questionBank.filter((item) => item.roles.includes(role) && !exactMatches.includes(item));
   const adjacentRoleFallback = questionBank.filter((item) => {
@@ -982,7 +1064,8 @@ function buildCandidateQuestionPool(role, level) {
       && sharesInterviewTrack(role, item.roles);
   });
 
-  return [...exactMatches, ...sameRoleFallback, ...adjacentRoleFallback];
+  return [...exactMatches, ...sameRoleFallback, ...adjacentRoleFallback]
+    .sort((left, right) => scoreResumeQuestionMatch(right, resumeSignals) - scoreResumeQuestionMatch(left, resumeSignals));
 }
 
 function sharesInterviewTrack(role, roles) {
@@ -998,13 +1081,14 @@ function sharesInterviewTrack(role, roles) {
   return roles.includes(role) || (relatedRoles[role] || []).some((candidate) => roles.includes(candidate));
 }
 
-function scoreQuestionFit(item, { preferredCategory, preferredType, targetDifficulty, selectedCategories }) {
+function scoreQuestionFit(item, { preferredCategory, preferredType, targetDifficulty, selectedCategories, resumeSignals = createEmptyResumeSignals() }) {
   let score = 0;
 
   if (preferredCategory && item.category === preferredCategory) score += 50;
   if (preferredType && item.type === preferredType) score += 20;
   if (!selectedCategories.has(item.category)) score += 12;
   score -= Math.abs((item.difficulty || 2) - targetDifficulty) * 6;
+  score += scoreResumeQuestionMatch(item, resumeSignals);
 
   if (item.type === 'project' && selectedCategories.size === 0) score += 8;
   if (item.type === 'algorithm' && selectedCategories.size >= 3) score += 5;
@@ -1015,6 +1099,155 @@ function scoreQuestionFit(item, { preferredCategory, preferredType, targetDiffic
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function extractResumeSignals(resume) {
+  const text = String(resume || '').trim();
+  if (!text) return createEmptyResumeSignals();
+
+  const snippets = text
+    .split(/[\r\n，。,；;、]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+  const normalized = normalizeText(text);
+  const categoryHints = {
+    Java: ['java', 'spring', 'jvm', 'hashmap'],
+    Go: ['go', 'golang', 'goroutine', 'gin'],
+    Python: ['python', 'django', 'flask', 'fastapi', 'celery'],
+    Redis: ['redis', 'cache', '缓存'],
+    MySQL: ['mysql', 'sql', '索引', '事务'],
+    '鍓嶇': ['react', 'vue', 'webpack', 'vite', '前端', '浏览器'],
+    '绯荤粺璁捐': ['高并发', '架构', '系统设计', '分布式', '秒杀', '削峰'],
+    '绠楁硶': ['算法', '复杂度', '哈希', '链表', '二叉树']
+  };
+
+  const categories = Object.entries(categoryHints)
+    .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
+    .map(([category]) => category);
+
+  return {
+    text,
+    snippets,
+    categories,
+    ownership: /(负责|主导|设计|优化|排查|实现|落地)/.test(text),
+    metrics: /\d+/.test(text)
+  };
+}
+
+function createEmptyResumeSignals() {
+  return {
+    text: '',
+    snippets: [],
+    categories: [],
+    ownership: false,
+    metrics: false
+  };
+}
+
+function summarizeResumeForInterview(resume) {
+  const signals = extractResumeSignals(resume);
+  return signals.snippets.slice(0, 3).join('；');
+}
+
+function scoreResumeQuestionMatch(item, resumeSignals) {
+  if (!resumeSignals?.text) return 0;
+
+  let score = 0;
+  if (resumeSignals.categories.includes(item.category)) score += 18;
+  if (item.type === 'project' && resumeSignals.ownership) score += 8;
+  if ((item.type === 'project' || item.type === 'system-design') && resumeSignals.metrics) score += 4;
+
+  const itemText = normalizeText([item.category, item.question, ...(item.keywords || [])].join(' '));
+  if (resumeSignals.snippets.some((snippet) => {
+    const normalizedSnippet = normalizeText(snippet);
+    return normalizedSnippet && (itemText.includes(normalizedSnippet) || normalizedSnippet.includes(itemText));
+  })) {
+    score += 12;
+  }
+
+  return score;
+}
+
+function createResumeSupport(question, answer, resume) {
+  const signals = extractResumeSignals(resume);
+  if (!signals.text || !question) {
+    return {
+      status: 'not_applicable',
+      label: '未提供简历背景',
+      detail: '本题没有额外的简历绑定要求。'
+    };
+  }
+
+  const normalizedAnswer = normalizeText(answer);
+  const matchedSnippet = signals.snippets.find((snippet) => {
+    const normalizedSnippet = normalizeText(snippet);
+    return normalizedSnippet && normalizedAnswer.includes(normalizedSnippet.slice(0, Math.min(8, normalizedSnippet.length)));
+  });
+
+  if (matchedSnippet) {
+    return {
+      status: 'grounded',
+      label: '已落回真实经历',
+      detail: `这题已经引用到你的经历：${matchedSnippet}。下一步继续补足当时的判断、取舍和结果。`
+    };
+  }
+
+  if (signals.categories.includes(question.category)) {
+    return {
+      status: 'missed',
+      label: '有背景但没用上',
+      detail: `你的简历里出现过 ${question.category} 相关经历，但这题回答还没落回真实项目细节。`
+    };
+  }
+
+  if (question.type === 'project') {
+    return {
+      status: 'missed',
+      label: '项目题未绑定经历',
+      detail: '这题更适合落到你的项目经历上，建议补上背景、个人负责部分和量化结果。'
+    };
+  }
+
+  return {
+    status: 'weak',
+    label: '简历支撑偏弱',
+    detail: '当前回答还没有主动借用简历里的项目或故障处理经历来增强可信度。'
+  };
+}
+
+function createResumeCoverageSummary(session, answersByQuestion) {
+  const resumeSummary = summarizeResumeForInterview(session.config.resume);
+  if (!resumeSummary) {
+    return '本轮未提供简历或项目背景，仍按通用技术面试标准评估。';
+  }
+
+  const groundedCount = answersByQuestion.filter((item) => item.resumeSupport?.status === 'grounded').length;
+  const missCount = answersByQuestion.filter((item) => item.resumeSupport?.status === 'missed').length;
+  const weakCount = answersByQuestion.filter((item) => item.resumeSupport?.status === 'weak').length;
+
+  return `已根据你的背景“${resumeSummary}”安排追问；本轮有 ${groundedCount}/${answersByQuestion.length || 1} 题真正落回了真实经历，另有 ${missCount} 题错过了最该绑定项目细节的机会，${weakCount} 题支撑偏弱。`;
+}
+
+function createResumeGroundingOverview(answersByQuestion, resumeSummary) {
+  if (!resumeSummary) {
+    return '没有简历输入时，系统无法判断你的回答是否真正借用了过往经历。';
+  }
+
+  const groundedCount = answersByQuestion.filter((item) => item.resumeSupport?.status === 'grounded').length;
+  const missedQuestions = answersByQuestion
+    .filter((item) => item.resumeSupport?.status === 'missed')
+    .map((item) => item.category);
+
+  if (!answersByQuestion.length) {
+    return '还没有作答，暂时无法判断你是否会把回答落回真实项目。';
+  }
+
+  if (!missedQuestions.length) {
+    return `你已经把大部分回答和背景“${resumeSummary}”建立了连接，这会显著提升答案可信度。`;
+  }
+
+  return `目前只有 ${groundedCount}/${answersByQuestion.length} 题真正引用了你的经历；优先补强 ${[...new Set(missedQuestions)].join('、')} 这些题型的项目化表达。`;
 }
 
 const conceptAliases = {

@@ -164,6 +164,8 @@ function renderReport(report) {
         <p>${escapeHtml(item.confidence?.detail || '暂无把握度判断。')}</p>
         <div class="section-label">追问信号</div>
         <p>${escapeHtml(item.followUpSignal || '暂无追问信号。')}</p>
+        <div class="section-label">面试官这轮到底在确认什么</div>
+        <p>${escapeHtml(item.followUpObjective || '暂无明确追问目标。')}</p>
         <div class="section-label">教练提醒</div>
         <p>${escapeHtml(item.coachTip || '先把主线讲顺，再补足关键细节。')}</p>
         <div class="section-label">风险信号</div>
