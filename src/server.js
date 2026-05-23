@@ -12,6 +12,7 @@ import {
   createOpening,
   createReport,
   getCurrentQuestion,
+  getRecordedAnswerForCurrentQuestion,
   maybeAdvanceQuestion,
   recordAnswerForCurrentQuestion
 } from './interview.js';
@@ -63,7 +64,8 @@ const server = createServer(async (request, response) => {
         createdAt: new Date().toISOString()
       });
 
-      const prompt = buildInterviewPrompt({ session, answer });
+      const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
+      const prompt = buildInterviewPrompt({ session, answer: effectiveAnswer });
       const result = await generateInterviewerReply({ config, session, answer, prompt });
       maybeAdvanceQuestion(session, answer);
       session.provider = result.provider;

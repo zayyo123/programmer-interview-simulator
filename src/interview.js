@@ -118,10 +118,19 @@ export function recordAnswerForCurrentQuestion(session, answer) {
   currentEntry.updatedAt = new Date().toISOString();
 }
 
+export function getRecordedAnswerForCurrentQuestion(session) {
+  const question = getCurrentQuestion(session);
+  if (!question) return '';
+
+  const entry = session.answers.find((item) => item.question.id === question.id);
+  return entry?.answer || '';
+}
+
 export function buildInterviewPrompt({ session, answer }) {
   const question = getCurrentQuestion(session);
   const nextQuestion = session.plan[session.currentIndex + 1];
-  const evaluation = evaluateAnswer(answer, question);
+  const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
+  const evaluation = evaluateAnswer(effectiveAnswer, question);
   const history = session.messages
     .slice(-8)
     .map((message) => `${message.role === 'candidate' ? '候选人' : '面试官'}：${message.content}`)
@@ -169,7 +178,8 @@ export function createFallbackInterviewerReply({ session, answer }) {
   }
 
   const answerEntry = session.answers.find((entry) => entry.question.id === question.id);
-  const evaluation = evaluateAnswer(answerEntry?.answer || answer, question, {
+  const effectiveAnswer = answerEntry?.answer || answer;
+  const evaluation = evaluateAnswer(effectiveAnswer, question, {
     followUpCount: answerEntry?.followUpCount || 0
   });
   if (!evaluation.readyToMoveNext) {
@@ -187,7 +197,8 @@ export function createFallbackInterviewerReply({ session, answer }) {
 export function maybeAdvanceQuestion(session, answer) {
   const question = getCurrentQuestion(session);
   if (!question) return;
-  if (!shouldMoveToNextQuestion(answer, question)) return;
+  const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
+  if (!shouldMoveToNextQuestion(effectiveAnswer, question)) return;
   if (session.currentIndex < session.plan.length - 1) {
     session.currentIndex += 1;
   }
