@@ -11,22 +11,57 @@ const roleTopics = {
 
 const fillerWords = ['然后', '就是', '那个', '可能', '感觉', '大概', '比较', '这个', '那个时候'];
 
+const levelDifficultyTargets = {
+  junior: [1, 2, 2, 2, 2],
+  middle: [2, 2, 3, 2, 3],
+  senior: [2, 3, 3, 3, 3]
+};
+
+const roleStageBlueprints = {
+  backend: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
+  frontend: ['project', 'knowledge', 'knowledge', 'knowledge', 'algorithm'],
+  fullstack: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
+  java: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
+  go: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
+  python: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm']
+};
+
 export function createInterviewPlan(config) {
-  const topics = roleTopics[config.role] || roleTopics.backend;
+  const role = config.role || 'backend';
+  const level = config.level || 'middle';
+  const targetCount = clamp(Number(config.questionCount || 5), 3, 8);
+  const topics = roleTopics[role] || roleTopics.backend;
+  const stages = roleStageBlueprints[role] || roleStageBlueprints.backend;
+  const difficultyTargets = levelDifficultyTargets[level] || levelDifficultyTargets.middle;
+  const available = questionBank.filter((item) => item.roles.includes(role) && item.levels.includes(level));
   const selected = [];
 
-  for (const topic of topics) {
-    const match = questionBank.find((item) => {
-      return item.category === topic
-        && item.roles.includes(config.role)
-        && item.levels.includes(config.level)
-        && !selected.some((selectedItem) => selectedItem.id === item.id);
+  for (let index = 0; index < Math.min(targetCount, topics.length); index += 1) {
+    const match = selectBestQuestion({
+      available,
+      selected,
+      preferredCategory: topics[index],
+      preferredType: stages[index] || stages[stages.length - 1] || 'knowledge',
+      targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2
     });
 
     if (match) selected.push(match);
   }
 
-  return selected.slice(0, Number(config.questionCount || 5));
+  while (selected.length < Math.min(targetCount, available.length)) {
+    const match = selectBestQuestion({
+      available,
+      selected,
+      preferredCategory: null,
+      preferredType: stages[selected.length] || 'knowledge',
+      targetDifficulty: difficultyTargets[selected.length] || difficultyTargets[difficultyTargets.length - 1] || 2
+    });
+
+    if (!match) break;
+    selected.push(match);
+  }
+
+  return selected;
 }
 
 export function createOpening(config, firstQuestion) {
@@ -594,6 +629,41 @@ function matchesConcept(answer, concept) {
 function countOccurrences(text, token) {
   const matches = String(text).match(new RegExp(token, 'g'));
   return matches ? matches.length : 0;
+}
+
+function selectBestQuestion({ available, selected, preferredCategory, preferredType, targetDifficulty }) {
+  const selectedIds = new Set(selected.map((item) => item.id));
+  const selectedCategories = new Set(selected.map((item) => item.category));
+
+  const ranked = available
+    .filter((item) => !selectedIds.has(item.id))
+    .map((item) => ({
+      item,
+      score: scoreQuestionFit(item, {
+        preferredCategory,
+        preferredType,
+        targetDifficulty,
+        selectedCategories
+      })
+    }))
+    .sort((left, right) => right.score - left.score);
+
+  return ranked[0]?.item || null;
+}
+
+function scoreQuestionFit(item, { preferredCategory, preferredType, targetDifficulty, selectedCategories }) {
+  let score = 0;
+
+  if (preferredCategory && item.category === preferredCategory) score += 50;
+  if (preferredType && item.type === preferredType) score += 20;
+  if (!selectedCategories.has(item.category)) score += 12;
+  score -= Math.abs((item.difficulty || 2) - targetDifficulty) * 6;
+
+  if (item.type === 'project' && selectedCategories.size === 0) score += 8;
+  if (item.type === 'algorithm' && selectedCategories.size >= 3) score += 5;
+  if (item.type === 'system-design' && targetDifficulty >= 3) score += 5;
+
+  return score;
 }
 
 function clamp(value, min, max) {
