@@ -46,7 +46,7 @@ answerForm.addEventListener('submit', async (event) => {
   providerText.textContent = data.provider;
   renderMessages(data.messages);
   statusText.textContent = data.currentQuestion
-    ? '继续回答当前问题或下一题。'
+    ? '继续回答当前问题或下一个问题。'
     : '题目已经完成，可以结束面试生成报告。';
   setBusy(false);
   answerInput.focus();
@@ -87,7 +87,7 @@ function renderMessages(messages) {
   messagesEl.className = 'messages';
   messagesEl.innerHTML = messages.map((message) => {
     const roleLabel = message.role === 'candidate' ? '候选人' : 'AI 面试官';
-    const provider = message.provider ? ` · ${message.provider}` : '';
+    const provider = message.provider ? ` | ${message.provider}` : '';
     return `
       <article class="message ${escapeHtml(message.role)}">
         <div class="message-header">
@@ -125,7 +125,7 @@ function renderReport(report) {
 
   reportEl.innerHTML = `
     <article class="report-card">
-      <h3>总体表现</h3>
+      <h3>整体表现</h3>
       <div class="meta-row">
         <span class="pill">${escapeHtml(overview.role)}</span>
         <span class="pill">${escapeHtml(overview.level)}</span>
@@ -142,6 +142,12 @@ function renderReport(report) {
       <p>${escapeHtml(overview.coachingFocus || '完成更多回答后会生成训练重点。')}</p>
       <div class="section-label">真实面试风险</div>
       <p>${escapeHtml(overview.riskSummary || '完成更多回答后会生成风险判断。')}</p>
+      <div class="section-label">简历绑定情况</div>
+      <div class="meta-row">
+        <span class="pill ${getResumeChipClass(overview.resumeSummary ? { status: 'grounded' } : null)}">${escapeHtml(overview.resumeSummary ? '已加入简历背景' : '未提供简历')}</span>
+      </div>
+      <p>${escapeHtml(overview.resumeCoverage || '暂无简历绑定评估。')}</p>
+      <p>${escapeHtml(overview.resumeGrounding || '暂无简历绑定判断。')}</p>
       <div class="section-label">优先补强顺序</div>
       <div class="priority-list">${coachPriorityHtml}</div>
       <div class="section-label">薄弱方向</div>
@@ -180,6 +186,11 @@ function renderReport(report) {
         <p>${escapeHtml(item.excellentAnswer)}</p>
         <div class="section-label">差距分析</div>
         <p>${escapeHtml(item.gapAnalysis)}</p>
+        <div class="section-label">简历绑定判断</div>
+        <div class="meta-row">
+          <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || '暂无')}</span>
+        </div>
+        <p>${escapeHtml(item.resumeSupport?.detail || '暂无简历绑定判断。')}</p>
         <div class="section-label">面试官可能的判断</div>
         <p>${escapeHtml(item.interviewerSignal)}</p>
         <div class="section-label">下一步追问焦点</div>
@@ -236,4 +247,11 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function getResumeChipClass(resumeSupport) {
+  if (!resumeSupport) return '';
+  if (resumeSupport.status === 'grounded') return 'green';
+  if (resumeSupport.status === 'missed') return 'amber';
+  return '';
 }
