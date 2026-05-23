@@ -222,8 +222,10 @@ export function createReport(session) {
       confidence: describeAnswerConfidence(evaluation, entry.attempts || 1),
       strengths: evaluation.strengths,
       weaknesses: evaluation.weaknesses,
+      redFlags: evaluation.redFlags,
       followUpCategory: evaluation.followUpCategory,
       followUpSignal: createFollowUpSignal(evaluation, entry.attempts || 1),
+      coachTip: createCoachTip(entry.question, evaluation),
       gapAnalysis: createGapAnalysis(entry.question, evaluation),
       interviewerSignal: createInterviewerSignal(entry.question, evaluation, entry.attempts || 1),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
@@ -268,6 +270,7 @@ function evaluateAnswer(answer, question, context = {}) {
       weaknesses: [],
       followUpCategory: 'complete',
       followUpFocus: '',
+      redFlags: [],
       rubricHits: {
         mustHave: [],
         goodToHave: []
@@ -286,15 +289,12 @@ function evaluateAnswer(answer, question, context = {}) {
   const missingKeywords = question.keywords.filter((keyword) => !matchesConcept(answer, keyword));
   const mustHaveHits = rubric.mustHave.filter((item) => matchesConcept(answer, item));
   const goodToHaveHits = rubric.goodToHave.filter((item) => matchesConcept(answer, item));
-  const communication = {
-    hasStructure: /首先|然后|最后|一方面|另一方面|先|再|总结/.test(answer),
-    hasMetrics: /\d+|百分之|ms|秒|qps|tps|延迟|吞吐|成功率|耗时/.test(answer),
-    hasTradeoff: /因为|所以|权衡|取舍|代价|收益|风险|边界/.test(answer),
-    hasExample: /比如|例如|项目|线上|生产|场景|案例|当时/.test(answer)
-  };
+  const communication = communicationHints(answer);
+  const redFlags = detectRedFlags(answer, question, rubric, communication);
   const fillerCount = fillerWords.reduce((count, word) => count + countOccurrences(answer, word), 0);
   const concisePenalty = answer.trim().length < 40 ? 12 : 0;
   const fillerPenalty = fillerCount >= 6 ? 6 : 0;
+  const redFlagPenalty = Math.min(12, redFlags.length * 4);
   const keywordScore = question.keywords.length
     ? Math.round((hitKeywords.length / question.keywords.length) * 35)
     : 35;
@@ -311,7 +311,7 @@ function evaluateAnswer(answer, question, context = {}) {
     communication.hasExample
   ].filter(Boolean).length * 5;
   const depthPenalty = (context.followUpCount || 0) >= 2 && mustHaveHits.length < rubric.mustHave.length ? 4 : 0;
-  const rawScore = clamp(keywordScore + mustHaveScore + goodToHaveScore + communicationScore - concisePenalty - fillerPenalty, 0, 100);
+  const rawScore = clamp(keywordScore + mustHaveScore + goodToHaveScore + communicationScore - concisePenalty - fillerPenalty - redFlagPenalty, 0, 100);
   const score = clamp(rawScore - depthPenalty, 0, 100);
   const followUpCategory = classifyFollowUpCategory(question, rubric, mustHaveHits, missingKeywords, communication);
   const readyToMoveNext = mustHaveHits.length >= Math.max(1, Math.ceil(rubric.mustHave.length * 0.6))
@@ -325,6 +325,7 @@ function evaluateAnswer(answer, question, context = {}) {
     missingKeywords,
     strengths: collectStrengths(question, mustHaveHits, goodToHaveHits, communication),
     weaknesses: collectWeaknesses(question, rubric, communication, missingKeywords),
+    redFlags,
     followUpCategory,
     followUpFocus: createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, communication, followUpCategory),
     rubricHits: {
@@ -390,6 +391,7 @@ function createGapAnalysis(question, evaluation) {
   if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') communicationGaps.push('缺少方案取舍或原因');
   if (!evaluation.communication.hasExample && question.type !== 'knowledge') communicationGaps.push('缺少真实场景或案例');
   if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) communicationGaps.push('缺少结果指标或量化信息');
+  if (evaluation.redFlags.length) communicationGaps.push(`面试官容易警惕这些风险信号：${evaluation.redFlags.join('、')}`);
 
   const parts = [];
   if (missingMustHave.length) parts.push(`还需要补强的核心点：${missingMustHave.join('、')}`);
@@ -467,6 +469,26 @@ function createNextPractice(answersByQuestion, weakAreas) {
   return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
 
+function createCoachTip(question, evaluation) {
+  if (evaluation.redFlags.length) {
+    return `先修正这些明显风险信号：${evaluation.redFlags.join('、')}`;
+  }
+
+  if (evaluation.followUpCategory === 'ownership') {
+    return '先用“背景→我的职责→具体判断→结果”的顺序回答，避免一直停留在团队视角。';
+  }
+
+  if (evaluation.followUpCategory === 'tradeoff') {
+    return '把取舍讲完整：为什么这样选、不选什么、代价和边界分别是什么。';
+  }
+
+  if (evaluation.followUpCategory === 'impact') {
+    return '补充结果指标，把改动前后的延迟、成功率、吞吐或人工成本变化讲出来。';
+  }
+
+  return `围绕“${question.category}”先收敛主线，再主动补一个场景或取舍细节。`;
+}
+
 function createCoachPriorities(answersByQuestion) {
   if (!answersByQuestion.length) return [];
 
@@ -521,6 +543,11 @@ function createRiskSummary(answersByQuestion) {
 
   const repeated = answersByQuestion.filter((item) => item.attempts >= 2).length;
   const lowConfidence = answersByQuestion.filter((item) => item.confidence.level !== 'high').length;
+  const redFlagged = answersByQuestion.filter((item) => (item.redFlags || []).length > 0).length;
+
+  if (redFlagged >= Math.max(1, Math.ceil(answersByQuestion.length / 2))) {
+    return '当前最大风险是面试官会把你判断成“概念听过，但真实落地和判断过程站不住”。需要用具体职责、取舍和结果证据把答案讲实。';
+  }
 
   if (repeated >= 2 || lowConfidence >= Math.ceil(answersByQuestion.length / 2)) {
     return '当前主要风险不是完全不会，而是被追问两层后容易暴露主线不稳、细节不足。';
@@ -565,6 +592,39 @@ function collectWeaknesses(question, rubric, communication, missingKeywords) {
   if (!communication.hasMetrics && ['project', 'system-design'].includes(question.type)) weaknesses.push('缺少量化结果');
 
   return weaknesses;
+}
+
+function detectRedFlags(answer, question, rubric, communication) {
+  const flags = [];
+
+  for (const redFlag of rubric.redFlags || []) {
+    if (matchesConcept(answer, redFlag)) {
+      flags.push(redFlag);
+    }
+  }
+
+  if (question.type === 'project' && !/我负责|我主要|我做|我写|我处理/.test(answer) && /我们|团队|大家/.test(answer)) {
+    flags.push('整体停留在团队视角，个人贡献不清晰');
+  }
+
+  if (question.type !== 'algorithm' && !communication.hasTradeoff && answer.trim().length >= 80) {
+    flags.push('有结论但没讲为什么这样做以及代价');
+  }
+
+  if (['project', 'system-design'].includes(question.type) && !communication.hasMetrics) {
+    flags.push('缺少结果指标，难以证明改动真正生效');
+  }
+
+  return [...new Set(flags)];
+}
+
+function communicationHints(answer) {
+  return {
+    hasStructure: /首先|然后|最后|一方面|另一方面|先|再|总结/.test(answer),
+    hasMetrics: /\d+|百分之|ms|秒|qps|tps|延迟|吞吐|成功率|耗时/.test(answer),
+    hasTradeoff: /因为|所以|权衡|取舍|代价|收益|风险|边界/.test(answer),
+    hasExample: /比如|例如|项目|线上|生产|场景|案例|当时/.test(answer)
+  };
 }
 
 function describeAnswerConfidence(evaluation, attempts) {

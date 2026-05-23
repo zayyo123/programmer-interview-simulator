@@ -162,6 +162,10 @@ function renderReport(report) {
         <p>${escapeHtml(item.confidence?.detail || '暂无把握度判断。')}</p>
         <div class="section-label">追问信号</div>
         <p>${escapeHtml(item.followUpSignal || '暂无追问信号。')}</p>
+        <div class="section-label">教练提醒</div>
+        <p>${escapeHtml(item.coachTip || '先把主线讲顺，再补足关键细节。')}</p>
+        <div class="section-label">风险信号</div>
+        ${renderList(item.redFlags, '暂无明显风险信号。')}
         <div class="section-label">表现亮点</div>
         ${renderList(item.strengths)}
         <div class="section-label">主要缺口</div>
@@ -205,9 +209,9 @@ function setBusy(isBusy, text) {
   if (text) statusText.textContent = text;
 }
 
-function renderList(items = []) {
+function renderList(items = [], emptyText = '暂无明显亮点，建议先补齐核心主线。') {
   if (!items.length) {
-    return '<p>暂无明显亮点，建议先补齐核心主线。</p>';
+    return `<p>${escapeHtml(emptyText)}</p>`;
   }
 
   return `<ul class="compact-list">${items.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
