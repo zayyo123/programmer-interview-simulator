@@ -60,21 +60,25 @@ export function createInterviewPlan(config) {
   const role = config.role || 'backend';
   const level = config.level || 'middle';
   const targetCount = clamp(Number(config.questionCount || 5), 3, 8);
-  const topics = roleTopics[role] || roleTopics.backend;
-  const stages = roleStageBlueprints[role] || roleStageBlueprints.backend;
-  const difficultyTargets = levelDifficultyTargets[level] || levelDifficultyTargets.middle;
   const resumeSignals = extractResumeSignals(config.resume);
-  const available = buildCandidateQuestionPool(role, level, resumeSignals);
+  const blueprint = createInterviewBlueprint({
+    role,
+    level,
+    targetCount,
+    resumeSignals
+  });
+  const available = buildCandidateQuestionPool(role, level, resumeSignals, blueprint);
   const selected = [];
 
-  for (let index = 0; index < Math.min(targetCount, topics.length); index += 1) {
+  for (let index = 0; index < blueprint.length; index += 1) {
+    const stage = blueprint[index];
     const match = selectBestQuestion({
       available,
       selected,
-      preferredCategory: topics[index],
-      preferredType: stages[index] || stages[stages.length - 1] || 'knowledge',
-      targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2,
-      resumeSignals
+      stage,
+      resumeSignals,
+      role,
+      level
     });
 
     if (match) selected.push(match);
@@ -84,10 +88,10 @@ export function createInterviewPlan(config) {
     const match = selectBestQuestion({
       available,
       selected,
-      preferredCategory: null,
-      preferredType: stages[selected.length] || 'knowledge',
-      targetDifficulty: difficultyTargets[selected.length] || difficultyTargets[difficultyTargets.length - 1] || 2,
-      resumeSignals
+      stage: createFallbackBlueprintStage(selected.length, role, level, resumeSignals),
+      resumeSignals,
+      role,
+      level
     });
 
     if (!match) break;
@@ -2251,19 +2255,24 @@ function countOccurrences(text, token) {
   return matches ? matches.length : 0;
 }
 
-function selectBestQuestion({ available, selected, preferredCategory, preferredType, targetDifficulty, resumeSignals = createEmptyResumeSignals() }) {
+function selectBestQuestion({ available, selected, stage = {}, resumeSignals = createEmptyResumeSignals() }) {
+  const preferredCategory = stage.preferredCategory || null;
+  const preferredType = stage.preferredType || null;
+  const targetDifficulty = stage.targetDifficulty || 2;
   const selectedIds = new Set(selected.map((item) => item.id));
   const selectedCategories = new Set(selected.map((item) => item.category));
+  const selectedTypes = new Set(selected.map((item) => item.type));
 
   const ranked = available
     .filter((item) => !selectedIds.has(item.id))
     .map((item) => ({
       item,
       score: scoreQuestionFit(item, {
+        selectedCategories,
+        selectedTypes,
         preferredCategory,
         preferredType,
         targetDifficulty,
-        selectedCategories,
         resumeSignals
       })
     }))
@@ -2272,7 +2281,9 @@ function selectBestQuestion({ available, selected, preferredCategory, preferredT
   return ranked[0]?.item || null;
 }
 
-function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals()) {
+function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals(), blueprint = []) {
+  const blueprintCategories = new Set(blueprint.map((item) => item.preferredCategory).filter(Boolean));
+  const blueprintTypes = new Set(blueprint.map((item) => item.preferredType).filter(Boolean));
   const exactMatches = questionBank.filter((item) => item.roles.includes(role) && item.levels.includes(level));
   const sameRoleFallback = questionBank.filter((item) => item.roles.includes(role) && !exactMatches.includes(item));
   const adjacentRoleFallback = questionBank.filter((item) => {
@@ -2283,7 +2294,10 @@ function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResu
   });
 
   return [...exactMatches, ...sameRoleFallback, ...adjacentRoleFallback]
-    .sort((left, right) => scoreResumeQuestionMatch(right, resumeSignals) - scoreResumeQuestionMatch(left, resumeSignals));
+    .sort((left, right) => {
+      return scorePoolPriority(right, resumeSignals, blueprintCategories, blueprintTypes)
+        - scorePoolPriority(left, resumeSignals, blueprintCategories, blueprintTypes);
+    });
 }
 
 function sharesInterviewTrack(role, roles) {
@@ -2299,19 +2313,120 @@ function sharesInterviewTrack(role, roles) {
   return roles.includes(role) || (relatedRoles[role] || []).some((candidate) => roles.includes(candidate));
 }
 
-function scoreQuestionFit(item, { preferredCategory, preferredType, targetDifficulty, selectedCategories, resumeSignals = createEmptyResumeSignals() }) {
+function scoreQuestionFit(item, {
+  preferredCategory,
+  preferredType,
+  targetDifficulty,
+  selectedCategories,
+  selectedTypes,
+  resumeSignals = createEmptyResumeSignals()
+}) {
   let score = 0;
   const shouldEncourageCategoryVariety = item.type !== 'project' || selectedCategories.size === 0;
 
   if (preferredCategory && item.category === preferredCategory) score += 50;
   if (preferredType && item.type === preferredType) score += 20;
   if (!selectedCategories.has(item.category) && shouldEncourageCategoryVariety) score += 12;
+  if (!selectedTypes.has(item.type)) score += 8;
   score -= Math.abs((item.difficulty || 2) - targetDifficulty) * 6;
   score += scoreResumeQuestionMatch(item, resumeSignals);
 
   if (item.type === 'project' && selectedCategories.size === 0) score += 8;
   if (item.type === 'algorithm' && selectedCategories.size >= 3) score += 5;
   if (item.type === 'system-design' && targetDifficulty >= 3) score += 5;
+  if (resumeSignals.categories.includes(item.category) && item.type !== 'algorithm') score += 6;
+  if (resumeSignals.ownership && item.type === 'project') score += 5;
+
+  return score;
+}
+
+function createInterviewBlueprint({ role, level, targetCount, resumeSignals = createEmptyResumeSignals() }) {
+  const topics = roleTopics[role] || roleTopics.backend;
+  const stages = roleStageBlueprints[role] || roleStageBlueprints.backend;
+  const difficultyTargets = levelDifficultyTargets[level] || levelDifficultyTargets.middle;
+  const preferredCategories = createPreferredCategoryQueue(role, resumeSignals, targetCount, topics);
+  const blueprint = [];
+
+  for (let index = 0; index < targetCount; index += 1) {
+    blueprint.push({
+      preferredCategory: preferredCategories[index] || topics[index] || null,
+      preferredType: stages[index] || stages[stages.length - 1] || 'knowledge',
+      targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2
+    });
+  }
+
+  return blueprint;
+}
+
+function createFallbackBlueprintStage(index, role, level, resumeSignals = createEmptyResumeSignals()) {
+  return createInterviewBlueprint({
+    role,
+    level,
+    targetCount: Math.max(index + 1, 3),
+    resumeSignals
+  })[index] || {
+    preferredCategory: null,
+    preferredType: 'knowledge',
+    targetDifficulty: 2
+  };
+}
+
+function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults) {
+  const queue = [];
+  const used = new Set();
+
+  const tryPush = (value) => {
+    if (!value || used.has(value)) return;
+    used.add(value);
+    queue.push(value);
+  };
+
+  tryPush('椤圭洰缁忓巻');
+
+  const rolePriority = getRolePriorityCategories(role);
+  const resumePriority = (resumeSignals.categories || []).filter((item) => item !== '椤圭洰缁忓巻');
+  const seniorDiagnostic = targetCount >= 5 ? getDiagnosticPriorityCategories(role) : [];
+
+  [...resumePriority, ...rolePriority, ...seniorDiagnostic, ...defaults].forEach(tryPush);
+
+  while (queue.length < targetCount) {
+    defaults.forEach(tryPush);
+    if (queue.length >= targetCount) break;
+    questionBank.map((item) => item.category).forEach(tryPush);
+  }
+
+  return queue.slice(0, targetCount);
+}
+
+function getRolePriorityCategories(role) {
+  return {
+    backend: ['MySQL', 'Redis', '绯荤粺璁捐', '绠楁硶'],
+    java: ['Java', 'MySQL', 'Redis', '绯荤粺璁捐'],
+    go: ['Go', 'Redis', '绯荤粺璁捐', 'MySQL'],
+    python: ['Python', 'MySQL', 'Redis', '绯荤粺璁捐'],
+    frontend: ['鍓嶇', '椤圭洰缁忓巻', '绠楁硶'],
+    fullstack: ['椤圭洰缁忓巻', '鍓嶇', 'MySQL', 'Redis', '绯荤粺璁捐']
+  }[role] || ['MySQL', 'Redis', '绯荤粺璁捐', '绠楁硶'];
+}
+
+function getDiagnosticPriorityCategories(role) {
+  return {
+    backend: ['Redis', 'MySQL'],
+    java: ['Java', 'MySQL'],
+    go: ['Go', 'Redis'],
+    python: ['Python', 'Redis'],
+    frontend: ['鍓嶇'],
+    fullstack: ['鍓嶇', 'Redis']
+  }[role] || [];
+}
+
+function scorePoolPriority(item, resumeSignals, blueprintCategories, blueprintTypes) {
+  let score = scoreResumeQuestionMatch(item, resumeSignals);
+
+  if (blueprintCategories.has(item.category)) score += 16;
+  if (blueprintTypes.has(item.type)) score += 8;
+  if (resumeSignals.categories.includes(item.category)) score += 10;
+  if (resumeSignals.ownership && item.type === 'project') score += 4;
 
   return score;
 }
