@@ -262,6 +262,13 @@ function renderReport(report) {
       <p>${escapeHtml(overview.readiness || '暂无')}</p>
       <div class="section-label">整体总结</div>
       <p>${escapeHtml(overview.summary || '暂无')}</p>
+      <div class="section-label">面试官整体印象</div>
+      <p>${escapeHtml(overview.interviewerImpression || '暂无')}</p>
+      <div class="section-label">通过信号</div>
+      <div class="meta-row">
+        <span class="pill ${getVerdictChipClass(overview.hireSignal)}">${escapeHtml(overview.hireSignal?.label || '暂无')}</span>
+      </div>
+      <p>${escapeHtml(overview.hireSignal?.detail || '暂无通过信号判断。')}</p>
       <div class="section-label">训练重点</div>
       <p>${escapeHtml(overview.coachingFocus || '完成更多回答后会生成训练重点。')}</p>
       <div class="section-label">真实面试风险</div>

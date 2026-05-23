@@ -304,6 +304,8 @@ export function createReport(session) {
       score: estimateScore(answersByQuestion),
       readiness: describeReadiness(answersByQuestion, levelProfile),
       summary: createOverallSummary(session, answersByQuestion, levelProfile, interviewPatterns),
+      interviewerImpression: createInterviewerImpression(session, answersByQuestion, levelProfile, interviewPatterns),
+      hireSignal: createHiringSignal(answersByQuestion, levelProfile, interviewPatterns),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
       resumeSummary,
@@ -681,6 +683,84 @@ function createOverallSummary(session, answersByQuestion, levelProfile = getLeve
     ? `当前最明显的模式是${interviewPatterns.primary.label}。`
     : '当前主要问题集中在追问稳定性。';
   return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。${patternLead}`;
+}
+
+function createInterviewerImpression(session, answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
+  if (!answersByQuestion.length) {
+    return '还没有形成有效面试印象，先完成一次完整作答。';
+  }
+
+  const role = roleLabels[session.config.role] || session.config.role;
+  const level = levelLabels[session.config.level] || session.config.level;
+  const strongCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'strong').length;
+  const riskCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk').length;
+  const repeatedFollowUps = answersByQuestion.filter((item) => item.followUpCount >= 2).length;
+  const primaryPattern = interviewPatterns.primary;
+
+  if (strongCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2)) && riskCount === 0) {
+    return `作为 ${level}${role} 候选人，你给人的整体印象是主线清楚、追问也能接住。面试官更可能继续验证上限，而不是怀疑基础是否属实。`;
+  }
+
+  if (riskCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2))) {
+    const patternTail = primaryPattern
+      ? `最突出的短板是“${primaryPattern.label}”。`
+      : '面试官大概率会继续怀疑回答是否真的来自真实项目经历。';
+    return `整体印象会偏保守：你能讲出部分主线，但一被追问就容易失去说服力。${patternTail}`;
+  }
+
+  if (repeatedFollowUps >= 2) {
+    const patternTail = primaryPattern
+      ? `现在最影响观感的是“${primaryPattern.label}”。`
+      : '当前主要问题是追问稳定性还不够。';
+    return `面试官会觉得你“不是完全不会，但答得不够稳”。${patternTail} 如果不主动补细节、取舍和结果，评价容易停在中间档。`;
+  }
+
+  return `整体印象处在可继续观察的区间：已经具备 ${levelProfile.labels[0]} 的一部分基础，但还需要把回答密度和稳定性再往上提。`;
+}
+
+function createHiringSignal(answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
+  if (!answersByQuestion.length) {
+    return {
+      label: '暂无法判断',
+      level: 'borderline',
+      detail: '没有有效作答时，系统无法模拟真实面试官的通过倾向。'
+    };
+  }
+
+  const score = estimateScore(answersByQuestion);
+  const strongCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'strong').length;
+  const riskCount = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk').length;
+  const repeatedFollowUps = answersByQuestion.filter((item) => item.followUpCount >= 2).length;
+  const primaryPattern = interviewPatterns.primary;
+
+  if (score >= levelProfile.minScoreToMoveNext + 8 && strongCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2)) && riskCount === 0) {
+    return {
+      label: '通过信号偏强',
+      level: 'strong',
+      detail: '如果真实面试也保持这个稳定度，面试官更可能把你归到“可进入下一轮或继续深挖”的候选人。'
+    };
+  }
+
+  if (riskCount >= Math.max(2, Math.ceil(answersByQuestion.length / 2)) || score < levelProfile.minScoreToMoveNext - 8) {
+    const detail = primaryPattern
+      ? `当前更像“暂不通过”信号，主要因为“${primaryPattern.label}”反复出现，面试官容易担心这个问题不是单题失误。`
+      : '当前更像“暂不通过”信号，因为多道题都需要追问补主线，整体稳定性不够。';
+    return {
+      label: '暂不通过风险高',
+      level: 'risk',
+      detail
+    };
+  }
+
+  const detail = repeatedFollowUps >= 2
+    ? '当前更像“需要再观察”信号。你有一定基础，但面试官通常会担心继续深挖后稳定性不够。'
+    : '当前更像“可继续观察”信号。主线基本能成立，但还缺少足够多的亮点题把整体评价抬上去。';
+
+  return {
+    label: '需要继续观察',
+    level: 'borderline',
+    detail
+  };
 }
 
 function createCoachingFocus(answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
