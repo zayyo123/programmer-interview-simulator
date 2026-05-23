@@ -177,6 +177,7 @@ function renderReport(report) {
   const overview = report.overview || {};
   const weakAreas = Array.isArray(report.weakAreas) ? report.weakAreas : [];
   const nextPractice = Array.isArray(report.nextPractice) ? report.nextPractice : [];
+  const competencyBreakdown = Array.isArray(overview.competencyBreakdown) ? overview.competencyBreakdown : [];
   const coachPriorityHtml = Array.isArray(overview.coachPriorities) && overview.coachPriorities.length
     ? overview.coachPriorities.map((item, index) => `
         <div class="priority-item">
@@ -202,6 +203,19 @@ function renderReport(report) {
         </article>
       `).join('')
     : '<p>Complete more answers to generate targeted next-practice recommendations.</p>';
+  const competencyBreakdownHtml = competencyBreakdown.length
+    ? competencyBreakdown.map((item) => `
+        <article class="practice-item">
+          <div class="meta-row">
+            <strong>${escapeHtml(item.label || 'Competency')}</strong>
+            <span class="pill ${getCompetencyLevelChipClass(item.level)}">${escapeHtml(getCompetencyLevelText(item.level))}</span>
+          </div>
+          <p>${escapeHtml(item.evidence || '')}</p>
+          <p>${escapeHtml(`Gap: ${item.gap || 'N/A'}`)}</p>
+          <p>${escapeHtml(`Next drill: ${item.action || 'N/A'}`)}</p>
+        </article>
+      `).join('')
+    : '<p>Add more answers to generate a competency breakdown.</p>';
 
   const snapshotStats = [
     {
@@ -305,6 +319,8 @@ function renderReport(report) {
       <p>${escapeHtml(overview.interviewerImpression || 'N/A')}</p>
       <div class="section-label">Competency summary</div>
       <p>${escapeHtml(overview.competencySummary || 'N/A')}</p>
+      <div class="section-label">Competency breakdown</div>
+      ${competencyBreakdownHtml}
       <div class="section-label">Coaching focus</div>
       <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
       <div class="section-label">Real interview risk</div>
@@ -417,4 +433,18 @@ function getCompetencyChipClass(signal) {
   if (signal.level === 'strong') return 'green';
   if (signal.level === 'risk') return 'amber';
   return '';
+}
+
+function getCompetencyLevelChipClass(level) {
+  if (level === 'strong') return 'green';
+  if (level === 'risk') return 'amber';
+  return '';
+}
+
+function getCompetencyLevelText(level) {
+  return {
+    strong: 'Above bar',
+    watch: 'Watch',
+    risk: 'Below bar'
+  }[level] || 'Watch';
 }

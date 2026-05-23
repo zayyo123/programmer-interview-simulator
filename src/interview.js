@@ -334,6 +334,7 @@ export function createReport(session) {
       interviewerImpression: createInterviewerImpression(session, answersByQuestion, levelProfile, interviewPatterns),
       hireSignal: createHiringSignal(answersByQuestion, levelProfile, interviewPatterns),
       competencySummary: summarizeCompetencySignals(answersByQuestion, levelProfile),
+      competencyBreakdown: createCompetencyBreakdown(answersByQuestion, levelProfile),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
       resumeSummary,
@@ -1380,6 +1381,84 @@ function summarizeCompetencySignals(answersByQuestion, levelProfile = getLevelEx
   }
 
   return `你已经能给出一部分可用信号，但整体还处在“可继续观察”区间。下一步优先把 ${recurring.join('、') || 'ownership、取舍 reasoning 和结果量化'} 讲得更像自己真正做过。`;
+}
+
+function createCompetencyBreakdown(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
+  if (!answersByQuestion.length) return [];
+
+  const competencies = [
+    {
+      id: 'ownership',
+      label: '项目 ownership',
+      positive: ['ownership 基本可信'],
+      negative: ['ownership 不够实'],
+      fallbackGap: '把项目题回答收敛到你亲手负责的判断、动作和结果。',
+      fallbackAction: '重答 2 道项目题，每次强制用“背景 -> 我的职责 -> 关键动作 -> 结果”开头。'
+    },
+    {
+      id: 'tradeoff',
+      label: '方案判断',
+      positive: ['有一定取舍意识'],
+      negative: ['方案判断偏弱'],
+      fallbackGap: '回答里有结论，但取舍理由、代价和边界还不够稳定。',
+      fallbackAction: '针对知识题和设计题补一句“为什么这么选，不选什么，代价是什么”。'
+    },
+    {
+      id: 'impact',
+      label: '结果证明',
+      positive: ['能用结果支撑结论'],
+      negative: ['结果量化不足'],
+      fallbackGap: '容易讲动作，但没有用指标、收益或验证方式把结果坐实。',
+      fallbackAction: '把做过的项目和优化各补一版量化结果口述，至少带一个指标和一个验证动作。'
+    }
+  ];
+
+  return competencies.map((competency) => {
+    const matching = answersByQuestion.filter((item) => {
+      const dimensions = item.interviewerCompetencySignal?.dimensions || [];
+      return dimensions.some((dimension) => competency.positive.includes(dimension) || competency.negative.includes(dimension));
+    });
+    const strongCount = matching.filter((item) => {
+      const dimensions = item.interviewerCompetencySignal?.dimensions || [];
+      return dimensions.some((dimension) => competency.positive.includes(dimension));
+    }).length;
+    const riskCount = matching.filter((item) => {
+      const dimensions = item.interviewerCompetencySignal?.dimensions || [];
+      return dimensions.some((dimension) => competency.negative.includes(dimension));
+    }).length;
+    const representative = matching
+      .slice()
+      .sort((left, right) => scoreCoachPriority(right) - scoreCoachPriority(left))[0];
+
+    let level = 'watch';
+    if (riskCount >= Math.max(1, strongCount + 1)) level = 'risk';
+    else if (strongCount >= Math.max(1, riskCount + 1)) level = 'strong';
+
+    const gap = representative
+      ? representative.answerRebuildPlan?.checkpoints?.[0]
+        || representative.weaknesses?.[0]
+        || competency.fallbackGap
+      : competency.fallbackGap;
+    const evidence = representative
+      ? `${representative.category} 题里最明显，面试官会因为“${describeFollowUpCategory(representative.followUpCategory)}”继续确认这项能力。`
+      : `当前作答样本较少，先按 ${levelProfile.labels[0]} 的标准把这项能力练成首轮就能讲稳。`;
+    const action = representative
+      ? representative.answerRebuildPlan?.rehearsalPrompt
+        || representative.practiceDrill
+        || competency.fallbackAction
+      : competency.fallbackAction;
+
+    return {
+      id: competency.id,
+      label: competency.label,
+      level,
+      strongCount,
+      riskCount,
+      evidence,
+      gap,
+      action
+    };
+  });
 }
 
 function createFollowUpFocus(question, rubric, mustHaveHits, missingKeywords, communication, followUpCategory) {
