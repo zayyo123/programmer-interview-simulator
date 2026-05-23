@@ -216,6 +216,11 @@ function renderReport(report) {
         <p>${escapeHtml(item.excellentAnswer || '暂无')}</p>
         <div class="section-label">差距分析</div>
         <p>${escapeHtml(item.gapAnalysis || '暂无')}</p>
+        <div class="section-label">面试官结论</div>
+        <div class="meta-row">
+          <span class="pill ${getVerdictChipClass(item.interviewerVerdict)}">${escapeHtml(item.interviewerVerdict?.label || '暂无')}</span>
+        </div>
+        <p>${escapeHtml(item.interviewerVerdict?.detail || '暂无面试官结论。')}</p>
         <div class="section-label">简历绑定判断</div>
         <div class="meta-row">
           <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || '暂无')}</span>
@@ -312,5 +317,12 @@ function getResumeChipClass(resumeSupport) {
   if (!resumeSupport) return '';
   if (resumeSupport.status === 'grounded') return 'green';
   if (resumeSupport.status === 'missed') return 'amber';
+  return '';
+}
+
+function getVerdictChipClass(verdict) {
+  if (!verdict) return '';
+  if (verdict.level === 'strong') return 'green';
+  if (verdict.level === 'risk') return 'amber';
   return '';
 }

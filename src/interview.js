@@ -267,6 +267,7 @@ export function createReport(session) {
       excellentAnswer: entry.question.excellentAnswer,
       score: evaluation.score,
       confidence: describeAnswerConfidence(evaluation, entry.attempts || 1, levelProfile),
+      interviewerVerdict: createInterviewerVerdict(entry.question, evaluation, entry.attempts || 1, levelProfile),
       strengths: evaluation.strengths,
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
@@ -497,6 +498,52 @@ function improveAnswer(answer, question, evaluation) {
     : '';
 
   return `${opening}${question.excellentAnswer}${supplement}`;
+}
+
+function createInterviewerVerdict(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
+  const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  });
+  const concernCount = missingMustHave.length + evaluation.redFlags.length;
+  const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
+
+  if (evaluation.score >= levelProfile.minScoreToMoveNext + 12 && attempts <= 1 && !concernCount) {
+    return {
+      level: 'strong',
+      label: '面试官判断：这一题能站住',
+      detail: '首轮回答就覆盖了核心考点，继续深挖时更可能考察你的上限，而不是补基础。'
+    };
+  }
+
+  if (repeatedPressure || concernCount >= 3) {
+    return {
+      level: 'risk',
+      label: '面试官判断：这一题会明显扣分',
+      detail: `连续追问后仍暴露“${describeFollowUpCategory(evaluation.followUpCategory)}”问题，面试官通常会把它记成稳定性风险。`
+    };
+  }
+
+  if (evaluation.readyToMoveNext) {
+    return {
+      level: 'borderline',
+      label: '面试官判断：能过题，但说服力一般',
+      detail: '主线基本成立，但更像补出来的答案；真实面试里通常不会把这题算成明显亮点。'
+    };
+  }
+
+  if (missingMustHave.length) {
+    return {
+      level: 'risk',
+      label: '面试官判断：核心点没答实',
+      detail: `这题最危险的是 ${missingMustHave[0]} 没有答实，面试官往往会据此怀疑基础是否真的掌握。`
+    };
+  }
+
+  return {
+    level: 'borderline',
+    label: '面试官判断：回答还不够稳',
+    detail: `当前主要卡在“${describeFollowUpCategory(evaluation.followUpCategory)}”，如果同类题连续出现，整体评价会被拉低。`
+  };
 }
 
 function estimateScore(answersByQuestion) {
@@ -862,8 +909,16 @@ function createInterviewerSignal(question, evaluation, attempts) {
 function createPracticeDrill(question, evaluation) {
   const focus = evaluation.followUpFocus || question.followUps?.[0] || '把关键细节讲具体';
   const firstMissing = evaluation.weaknesses[0] || '把回答组织得更像真实面试口述';
+  const drillMode = {
+    core: '按 rubric 补核心点',
+    ownership: '改成只讲自己负责的部分',
+    tradeoff: '补方案比较和代价',
+    evidence: '换成真实项目案例复述',
+    impact: '补结果指标和验证方式',
+    detail: '补实现细节和边界'
+  }[evaluation.followUpCategory] || '做一次追问演练';
 
-  return `下次练这题时，先用 90 秒讲完主线，再单独针对“${focus}”做一次追问演练，重点按“${describeFollowUpCategory(evaluation.followUpCategory)}”这类压力补强，修正“${firstMissing}”。`;
+  return `下次练这题时，先用 90 秒讲完主线，再围绕“${focus}”做一次“${drillMode}”练习，重点修正“${firstMissing}”。`;
 }
 
 function dedupePracticeSuggestions(items) {
