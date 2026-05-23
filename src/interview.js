@@ -278,6 +278,7 @@ export function createReport(session) {
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
       followUpCategory: evaluation.followUpCategory,
+      followUpPressure: describeFollowUpPressure(entry.question, evaluation, followUpCount, levelProfile),
       followUpObjective: createFollowUpObjective(entry.question, evaluation),
       followUpSignal: createFollowUpSignal(evaluation, entry.attempts || 1),
       coachTip: createCoachTip(entry.question, evaluation, levelProfile),
@@ -444,9 +445,7 @@ function createFollowUpReply(question, evaluation, style, followUpCount = 0, lev
     coaching: '先把这块补完整：'
   }[style] || '我想继续确认一个关键点：';
 
-  const escalation = followUpCount >= 2
-    ? '这已经是这题的连续追问了，别再讲概念，直接讲你做过的判断、细节和结果。'
-    : '';
+  const escalation = createFollowUpStageLead(evaluation, followUpCount, style);
   const objective = createFollowUpObjective(question, evaluation);
   const suggestedFollowUp = buildSuggestedFollowUp(question, evaluation, {
     followUpCount,
@@ -1252,8 +1251,13 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
   const bankedFollowUp = selectFollowUp(question, evaluation, context);
   const basePrompt = bankedFollowUp || evaluation.followUpFocus || question.followUps?.[0] || '你再展开一下刚才的方案和关键细节。';
 
+  if (followUpCount === 1) {
+    const pinDownPrompt = createPinDownFollowUp(question, evaluation, levelProfile);
+    if (pinDownPrompt) return pinDownPrompt;
+  }
+
   if (followUpCount >= 2) {
-    const repeatedPrompt = createRepeatedFollowUpPrompt(question, evaluation, levelProfile);
+    const repeatedPrompt = createPressureTestFollowUp(question, evaluation, levelProfile);
     if (repeatedPrompt) return repeatedPrompt;
   }
 
@@ -1320,6 +1324,40 @@ function createDetailFollowUp(question) {
   return '别再泛讲主线，直接补实现细节、边界条件和你当时的具体处理。';
 }
 
+function createPinDownFollowUp(question, evaluation, levelProfile) {
+  if (evaluation.followUpCategory === 'core') {
+    return `不要平铺直叙，直接把 ${question.scoringRubric.mustHave[0] || '核心考点'} 讲成“结论、原理、你的处理”三句话。`;
+  }
+
+  if (evaluation.followUpCategory === 'ownership') {
+    return '把团队动作全部拿掉，只保留你亲手负责的一段，讲清你拍板了什么、改了什么、为什么这样改。';
+  }
+
+  if (evaluation.followUpCategory === 'evidence') {
+    return '直接挑一个真实场景，按当时发生了什么、你怎么处理、结果怎样这三步说，不要再总结观点。';
+  }
+
+  if (evaluation.followUpCategory === 'tradeoff') {
+    return levelProfile === levelExpectations.junior
+      ? '至少说明你为什么这么做，以及如果不这么做会有什么问题。'
+      : '把备选方案一起摆出来，说清你为什么选这个、不选什么，以及代价落在哪。';
+  }
+
+  if (evaluation.followUpCategory === 'impact') {
+    return '别只说“有提升”，直接给前后指标、观测方式，或者你上线后怎么验证效果。';
+  }
+
+  if (evaluation.followUpCategory === 'detail') {
+    if (question.type === 'knowledge') {
+      return '按排查或推导顺序讲，先确认什么，再看什么，最后怎么收敛到结论。';
+    }
+
+    return '把主线停一下，直接补最关键的实现细节、边界条件和异常处理。';
+  }
+
+  return '';
+}
+
 function selectFollowUp(question, evaluation, context = {}) {
   const followUpCount = context.followUpCount || 0;
   if (followUpCount >= 2 && evaluation.followUpCategory === 'evidence') {
@@ -1341,24 +1379,72 @@ function selectFollowUp(question, evaluation, context = {}) {
   }) || question.followUps[0] || '你再展开一下刚才的方案和关键细节。';
 }
 
-function createRepeatedFollowUpPrompt(question, evaluation, levelProfile) {
+function createPressureTestFollowUp(question, evaluation, levelProfile) {
   if (evaluation.followUpCategory === 'core') {
     return `这题已经追问两轮了，直接按“结论 -> 原理 -> 你的处理方式”重答，至少把 ${question.scoringRubric.mustHave[0] || '核心考点'} 讲实。`;
   }
 
   if (evaluation.followUpCategory === 'ownership') {
-    return '别再讲团队怎么做，直接收窄到你亲手负责的一块，说清你的判断、改动和结果。';
+    return '如果把团队名字都删掉，这题还剩下什么是你亲手做的？直接说你负责的那一块、你的判断和落地结果。';
+  }
+
+  if (evaluation.followUpCategory === 'evidence') {
+    return '不要再给抽象答案，就挑一次真实线上或项目事件，把时间点、问题、动作和结果完整讲出来。';
   }
 
   if (evaluation.followUpCategory === 'impact') {
     return '不要只说做了优化，直接给出前后指标、线上变化，或者你实际怎么验证效果。';
   }
 
+  if (evaluation.followUpCategory === 'tradeoff') {
+    return '直接做取舍题：你为什么选这个方案，不选哪个方案，各自代价、风险和适用边界分别是什么？';
+  }
+
   if (evaluation.followUpCategory === 'detail') {
+    if (question.type === 'knowledge') {
+      return '别再背概念，按真实排障顺序讲：先看什么信号，再怎么缩小范围，最后如何验证根因。';
+    }
+
     return `不要再泛讲主线，按这个级别的要求补细节：${levelProfile.focus}。`;
   }
 
   return '';
+}
+
+function createFollowUpStageLead(evaluation, followUpCount, style) {
+  if (followUpCount <= 0) return '';
+
+  if (followUpCount === 1) {
+    return {
+      pressure: '上一轮还是偏泛，我把问题收得更窄一点：',
+      coaching: '上一轮主线有了，但还没答实，我帮你把口子收窄：',
+      normal: '上一轮还不够具体，我把问题收窄一点：'
+    }[style] || '上一轮还不够具体，我把问题收窄一点：';
+  }
+
+  return {
+    pressure: `这已经是连续追问了，真实面试里我会直接按“${describeFollowUpCategory(evaluation.followUpCategory)}”判断风险：`,
+    coaching: `这已经是连续追问了，再答泛了就会被当成“${describeFollowUpCategory(evaluation.followUpCategory)}”问题：`,
+    normal: `这已经是连续追问了，我现在要直接确认你是否真的补上了“${describeFollowUpCategory(evaluation.followUpCategory)}”：`
+  }[style] || `这已经是连续追问了，我现在要直接确认你是否真的补上了“${describeFollowUpCategory(evaluation.followUpCategory)}”：`;
+}
+
+function describeFollowUpPressure(question, evaluation, followUpCount, levelProfile) {
+  if (evaluation.followUpCategory === 'complete') {
+    return followUpCount <= 0
+      ? '首轮回答就能继续推进，说明这题基础表达已经比较接近真实面试的通过线。'
+      : '虽然有追问，但后续补答已经把主要风险收住，面试官通常会继续往下一题走。';
+  }
+
+  if (followUpCount >= 2) {
+    return `这题已经进入“压力追问”阶段，面试官会直接盯着“${describeFollowUpCategory(evaluation.followUpCategory)}”继续压细节。对 ${levelProfile.focus} 这个级别要求来说，这类连续追问如果还补不上，通常会被记成明显短板。`;
+  }
+
+  if (followUpCount === 1) {
+    return `这题已经从首轮澄清进入“收口追问”，面试官会把问题收窄到“${describeFollowUpCategory(evaluation.followUpCategory)}”，确认你能不能把泛化回答落到真实细节。`;
+  }
+
+  return `如果是真实面试，面试官下一步大概率会围绕“${describeFollowUpCategory(evaluation.followUpCategory)}”继续追问，先确认这题是不是只会讲主线。`;
 }
 
 function pickFollowUpFromBank(question, category) {

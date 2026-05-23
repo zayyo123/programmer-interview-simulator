@@ -273,6 +273,8 @@ function renderReport(report) {
         <p>${escapeHtml(item.interviewerCompetencySignal?.detail || 'No competency signal available.')}</p>
         <div class="section-label">Follow-up objective</div>
         <p>${escapeHtml(item.followUpObjective || 'N/A')}</p>
+        <div class="section-label">Follow-up pressure</div>
+        <p>${escapeHtml(item.followUpPressure || 'N/A')}</p>
         <div class="section-label">Most likely next follow-up</div>
         <p>${escapeHtml(item.nextFollowUp || 'N/A')}</p>
         <div class="section-label">Coach tip</div>
