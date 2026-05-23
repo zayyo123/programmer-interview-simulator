@@ -204,7 +204,9 @@ export function buildInterviewPrompt({ session, answer }) {
 }
 
 export function shouldMoveToNextQuestion(answer, question) {
-  return evaluateAnswer(answer, question).readyToMoveNext;
+  return evaluateAnswer(answer, question, {
+    followUpCount: 0
+  }).readyToMoveNext;
 }
 
 export function createFallbackInterviewerReply({ session, answer }) {
@@ -240,8 +242,14 @@ export function createFallbackInterviewerReply({ session, answer }) {
 export function maybeAdvanceQuestion(session, answer) {
   const question = getCurrentQuestion(session);
   if (!question) return;
-  const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
-  if (!evaluateAnswer(effectiveAnswer, question, { level: session.config.level }).readyToMoveNext) return;
+  const answerEntry = session.answers.find((entry) => entry.question.id === question.id);
+  const effectiveAnswer = answerEntry?.answer || getRecordedAnswerForCurrentQuestion(session) || answer;
+  const followUpCount = answerEntry?.followUpCount || Math.max(0, (answerEntry?.attempts || 1) - 1);
+
+  if (!evaluateAnswer(effectiveAnswer, question, {
+    followUpCount,
+    level: session.config.level
+  }).readyToMoveNext) return;
   if (session.currentIndex < session.plan.length - 1) {
     session.currentIndex += 1;
     return;
