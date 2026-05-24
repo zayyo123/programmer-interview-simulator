@@ -222,10 +222,20 @@ async function main() {
       method: 'POST'
     });
     const firstQuestion = reportResult.report?.questions?.[0];
+    const interviewerConcerns = reportResult.report?.overview?.interviewerConcerns;
     assert(firstQuestion, 'report should include first question details');
     assert(
       /核心点没答实|表达上最影响说服力|下一句就该补/.test(firstQuestion.gapAnalysis || ''),
       'gap analysis should explain the interview gap'
+    );
+    assert(interviewerConcerns?.headline, 'report overview should include an interviewer concern headline');
+    assert(
+      Array.isArray(interviewerConcerns?.evidence) && interviewerConcerns.evidence.length >= 1,
+      'report overview should include interviewer concern evidence'
+    );
+    assert(
+      /追问|风险|题|面试官/.test(interviewerConcerns.summary || ''),
+      `interviewer concern summary should explain the concern, got: ${interviewerConcerns?.summary || ''}`
     );
 
     console.log('Smoke test passed');

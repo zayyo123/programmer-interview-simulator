@@ -180,6 +180,10 @@ function renderReport(report) {
   const practicePlan = Array.isArray(report.practicePlan) ? report.practicePlan : [];
   const uncoveredQuestions = Array.isArray(report.uncoveredQuestions) ? report.uncoveredQuestions : [];
   const competencyBreakdown = Array.isArray(overview.competencyBreakdown) ? overview.competencyBreakdown : [];
+  const interviewerConcerns = overview.interviewerConcerns || null;
+  const interviewerConcernEvidenceHtml = Array.isArray(interviewerConcerns?.evidence) && interviewerConcerns.evidence.length
+    ? renderList(interviewerConcerns.evidence, 'No interviewer concern evidence captured.')
+    : '<p>No interviewer concern evidence captured.</p>';
   const coachPriorityHtml = Array.isArray(overview.coachPriorities) && overview.coachPriorities.length
     ? overview.coachPriorities.map((item, index) => `
         <div class="priority-item">
@@ -360,6 +364,11 @@ function renderReport(report) {
       <p>${escapeHtml(overview.summary || 'N/A')}</p>
       <div class="section-label">Interviewer impression</div>
       <p>${escapeHtml(overview.interviewerImpression || 'N/A')}</p>
+      <div class="section-label">Likely interviewer concern</div>
+      <p>${escapeHtml(interviewerConcerns?.headline || 'N/A')}</p>
+      <p>${escapeHtml(interviewerConcerns?.summary || 'No synthesized interviewer concern yet.')}</p>
+      ${interviewerConcernEvidenceHtml}
+      <p>${escapeHtml(interviewerConcerns?.practice ? `Practice first: ${interviewerConcerns.practice}` : '')}</p>
       <div class="section-label">Panel decision</div>
       <div class="meta-row">
         <span class="pill ${getPanelDecisionChipClass(overview.panelDecision)}">${escapeHtml(overview.panelDecision?.label || 'N/A')}</span>

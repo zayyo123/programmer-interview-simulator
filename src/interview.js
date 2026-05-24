@@ -394,6 +394,12 @@ export function createReport(session) {
       hireSignal: createHiringSignal(answersByQuestion, levelProfile, interviewPatterns),
       competencySummary: summarizeCompetencySignals(answersByQuestion, levelProfile),
       competencyBreakdown: createCompetencyBreakdown(answersByQuestion, levelProfile),
+      interviewerConcerns: createInterviewerConcernSummary(
+        answersByQuestion,
+        levelProfile,
+        interviewPatterns,
+        uncoveredQuestions
+      ),
       panelDecision: createPanelDecision(answersByQuestion, levelProfile, interviewPatterns),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
@@ -1058,6 +1064,73 @@ function createPracticePlan(
   }
 
   return plan.slice(0, 3);
+}
+
+function createInterviewerConcernSummary(
+  answersByQuestion,
+  levelProfile = getLevelExpectation('middle'),
+  interviewPatterns = summarizeInterviewPatterns([]),
+  uncoveredQuestions = []
+) {
+  if (!answersByQuestion.length) {
+    return {
+      headline: '暂无稳定面试官判断',
+      summary: '还没有有效作答，暂时无法模拟面试官在会后会带走什么顾虑。',
+      evidence: [],
+      practice: '先完成一次完整模拟，再根据重复出现的追问类型判断主要顾虑。'
+    };
+  }
+
+  const primaryPattern = interviewPatterns.primary;
+  const repeatedFollowUps = answersByQuestion.filter((item) => (item.followUpCount || 0) >= 2);
+  const lowConfidence = answersByQuestion.filter((item) => item.confidence?.level === 'low');
+  const riskVerdicts = answersByQuestion.filter((item) => item.interviewerVerdict?.level === 'risk');
+  const concernHeadline = primaryPattern
+    ? `面试官最可能带走的顾虑：${primaryPattern.label}`
+    : '面试官最可能带走的顾虑：追问稳定性一般';
+
+  const summaryParts = [];
+  if (primaryPattern) {
+    summaryParts.push(`这类问题已经在 ${primaryPattern.count} 道题里重复出现，容易形成“${primaryPattern.interviewerView}”的整体印象`);
+  } else if (riskVerdicts.length) {
+    summaryParts.push(`有 ${riskVerdicts.length} 道题已经留下明显风险信号，说明当前回答质量还不够稳定`);
+  } else {
+    summaryParts.push(`目前主要问题不是完全不会，而是深入两层后容易暴露主线和细节不稳`);
+  }
+
+  if (uncoveredQuestions.length) {
+    summaryParts.push(`另外还有 ${uncoveredQuestions.length} 道计划题没有覆盖，真实面试里会进一步放大准备偏科或后程失速的观感`);
+  }
+
+  const evidence = [];
+  if (primaryPattern) {
+    evidence.push(`重复模式：${primaryPattern.count} 道题都卡在“${describeFollowUpCategory(primaryPattern.key)}”`);
+  }
+  if (repeatedFollowUps.length) {
+    evidence.push(`深挖压力：${repeatedFollowUps.length} 道题被追问两轮以上才收口`);
+  }
+  if (lowConfidence.length) {
+    evidence.push(`稳定性：${lowConfidence.length} 道题的回答信心低于 ${levelProfile.labels[0]} 预期`);
+  }
+  if (riskVerdicts.length) {
+    evidence.push(`会后 debrief：${riskVerdicts.length} 道题会让面试官标记为风险项`);
+  }
+
+  const representative = pickRepresentativeConcernQuestion(answersByQuestion, primaryPattern?.key);
+  if (representative) {
+    evidence.push(`代表题：${representative.category} 题最能暴露这个顾虑，主要缺口是“${createImmediateFix(representative.question, representative)}”`);
+  }
+
+  const practice = representative
+    ? `下一轮先重练“${representative.question}”，按“${levelProfile.focus}”重答，并主动补上 ${createImmediateFix(representative.question, representative)}。`
+    : primaryPattern?.practiceAction || `先把最低分题练到首轮就能满足“${levelProfile.labels[0]}”的要求。`;
+
+  return {
+    headline: concernHeadline,
+    summary: `${summaryParts.join('；')}。`,
+    evidence: evidence.slice(0, 4),
+    practice
+  };
 }
 
 function createCoachTip(question, evaluation, levelProfile = getLevelExpectation('middle')) {
@@ -1951,6 +2024,16 @@ function createPanelSignalSummary(answersByQuestion, levelProfile) {
   if (riskCount) reasons.push(`${riskCount} 题留下明显风险信号`);
 
   return `如果按真实面试官会后汇总来写，当前卡点主要是：${reasons.join('，')}。`;
+}
+
+function pickRepresentativeConcernQuestion(answersByQuestion, followUpCategory) {
+  const pool = followUpCategory
+    ? answersByQuestion.filter((item) => item.followUpCategory === followUpCategory)
+    : answersByQuestion;
+
+  return pool
+    .slice()
+    .sort((left, right) => scoreCoachPriority(right) - scoreCoachPriority(left))[0] || null;
 }
 
 function summarizeCompetencySignals(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
