@@ -177,15 +177,16 @@ function renderLiveCoach(snapshot) {
     return;
   }
 
+  const normalizedSnapshot = translateLiveCoachSnapshot(snapshot);
   const badgeClass = getLiveCoachStageClass(snapshot.stage);
-  const followUpMeta = snapshot.followUpCount
-    ? `<span class="pill ${badgeClass}">${escapeHtml(`已追问 ${snapshot.followUpCount} 次`)}</span>`
+  const followUpMeta = normalizedSnapshot.followUpCount
+    ? `<span class="pill ${badgeClass}">${escapeHtml(`已追问 ${normalizedSnapshot.followUpCount} 次`)}</span>`
     : '';
-  const stagnationMeta = snapshot.stagnantFollowUpCount
-    ? `<span class="pill amber">${escapeHtml(`弱回答重复 ${snapshot.stagnantFollowUpCount} 次`)}</span>`
+  const stagnationMeta = normalizedSnapshot.stagnantFollowUpCount
+    ? `<span class="pill amber">${escapeHtml(`弱回答重复 ${normalizedSnapshot.stagnantFollowUpCount} 次`)}</span>`
     : '';
-  const missingSignals = Array.isArray(snapshot.missingSignals) && snapshot.missingSignals.length
-    ? snapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
+  const missingSignals = Array.isArray(normalizedSnapshot.missingSignals) && normalizedSnapshot.missingSignals.length
+    ? normalizedSnapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
     : '<span class="pill green">暂无明显缺失信号</span>';
 
   liveCoachEl.className = 'live-coach';
@@ -193,27 +194,95 @@ function renderLiveCoach(snapshot) {
     <div class="live-coach-header">
       <div>
         <strong>实时面试官雷达</strong>
-        <p>${escapeHtml(snapshot.currentQuestion || '暂无进行中的问题')}</p>
+        <p>${escapeHtml(normalizedSnapshot.currentQuestion || '暂无进行中的问题')}</p>
       </div>
       <div class="meta-row">
-        <span class="pill ${badgeClass}">${escapeHtml(snapshot.stageLabel || '实时')}</span>
+        <span class="pill ${badgeClass}">${escapeHtml(normalizedSnapshot.stageLabel || '实时')}</span>
         ${followUpMeta}
         ${stagnationMeta}
       </div>
     </div>
     <div class="section-label">面试官正在考察</div>
-    <p>${escapeHtml(snapshot.target || '暂无')}</p>
+    <p>${escapeHtml(normalizedSnapshot.target || '暂无')}</p>
     <div class="section-label">当前缺口</div>
-    <p>${escapeHtml(snapshot.focus || '暂无')}</p>
+    <p>${escapeHtml(normalizedSnapshot.focus || '暂无')}</p>
     <div class="section-label">压力来源</div>
-    <p>${escapeHtml(snapshot.pressureReason || '暂无')}</p>
+    <p>${escapeHtml(normalizedSnapshot.pressureReason || '暂无')}</p>
     <div class="section-label">缺失信号</div>
     <div class="meta-row">${missingSignals}</div>
     <div class="section-label">为什么重要</div>
-    <p>${escapeHtml(snapshot.risk || '暂无')}</p>
+    <p>${escapeHtml(normalizedSnapshot.risk || '暂无')}</p>
     <div class="section-label">下一步最佳回答</div>
-    <p>${escapeHtml(snapshot.suggestedMove || '暂无')}</p>
+    <p>${escapeHtml(normalizedSnapshot.suggestedMove || '暂无')}</p>
   `;
+}
+
+function translateLiveCoachSnapshot(snapshot) {
+  return {
+    ...snapshot,
+    stageLabel: translateLiveCoachText(snapshot.stageLabel),
+    currentQuestion: translateLiveCoachText(snapshot.currentQuestion),
+    target: translateLiveCoachText(snapshot.target),
+    focus: translateLiveCoachText(snapshot.focus),
+    pressureReason: translateLiveCoachText(snapshot.pressureReason),
+    risk: translateLiveCoachText(snapshot.risk),
+    suggestedMove: translateLiveCoachText(snapshot.suggestedMove),
+    missingSignals: Array.isArray(snapshot.missingSignals)
+      ? snapshot.missingSignals.map(translateLiveCoachText)
+      : snapshot.missingSignals
+  };
+}
+
+function translateLiveCoachText(value) {
+  const text = String(value || '').trim();
+  if (!text) return '';
+
+  const exactTranslations = {
+    'New question': '新问题',
+    'Interview complete': '面试完成',
+    'Ready to move on': '可以进入下一题',
+    'Pressure follow-up': '压力追问',
+    'Pin-down follow-up': '定点追问',
+    'Clarifying follow-up': '澄清追问',
+    'The interviewer is checking whether you can turn a project into a credible ownership story instead of a team summary.': '面试官正在判断你能不能把项目讲成可信的个人负责经历，而不是团队流水账。',
+    'The interviewer is checking whether you can structure the main path first, then explain key components, bottlenecks, and tradeoffs.': '面试官正在看你能不能先搭出主链路，再讲清核心组件、瓶颈和取舍。',
+    'The interviewer is checking whether you can state the approach, key data structure, and complexity before wandering into details.': '面试官正在看你能不能先说清解法、关键数据结构和复杂度，再展开细节。',
+    'The interviewer is checking whether you have a real diagnostic sequence, not just concept recall.': '面试官正在看你有没有真实排查顺序，而不是只背概念。',
+    'Lead with the conclusion, then add mechanism, scenario, and result.': '先给结论，再补机制、场景和结果。',
+    'The first answer decides whether this becomes a normal question or a pressure follow-up.': '第一轮回答会决定这题是正常推进，还是进入压力追问。',
+    'If the opening answer stays at “we built this”, the interviewer will immediately push for your own role, decision, and outcome.': '如果开场还停留在“我们做了什么”，面试官会立刻追问你的个人职责、关键判断和最终结果。',
+    'Answer in this order: background -> your scope -> key action -> result.': '按这个顺序回答：背景、你的职责范围、关键动作、结果。',
+    'Answer in this order: main path -> components -> traffic/risk -> tradeoff.': '按这个顺序回答：主链路、核心组件、流量或风险、取舍。',
+    'Answer in this order: solution -> data structure -> complexity -> edge cases.': '按这个顺序回答：解法、数据结构、复杂度、边界情况。',
+    'Keep answer density': '保持回答密度',
+    'Prepare next question': '准备进入下一题',
+    'personal ownership': '个人职责',
+    tradeoff: '取舍判断',
+    'real scene': '真实场景',
+    'result evidence': '结果证据',
+    'diagnostic order': '排查顺序'
+  };
+
+  if (exactTranslations[text]) return exactTranslations[text];
+
+  const landMatch = text.match(/^Land these first: (.+)\.$/);
+  if (landMatch) {
+    return `先把这些关键点讲出来：${landMatch[1].replaceAll(' / ', '、')}。`;
+  }
+
+  const levelMatch = text.match(/^At (.+) level, the interviewer is checking whether your first answer already covers the core idea plus supporting detail\.$/);
+  if (levelMatch) {
+    return `按照${levelMatch[1].replaceAll(' / ', ' / ')}的要求，面试官会看你的首轮回答是否已经覆盖核心思路和支撑细节。`;
+  }
+
+  const weakMatch = text.match(/^At this level, weak first-pass answers quickly trigger follow-ups around (.+)\.$/);
+  if (weakMatch) {
+    return `这个级别下，首轮回答偏虚时，面试官很快会围绕${weakMatch[1]}继续追问。`;
+  }
+
+  return text
+    .replaceAll(' / ', '、')
+    .replaceAll(' -> ', '、');
 }
 
 function renderReport(report) {

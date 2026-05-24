@@ -746,7 +746,7 @@ function mergeAnswerAttempts(previousAnswer, latestAnswer) {
 function improveAnswer(answer, question, evaluation) {
   const opening = evaluation.communication.hasStructure
     ? '可以继续把这段回答压缩成更像面试口述的版本：'
-    : '建议按“结论 -> 原理/方案 -> 场景/结果”的顺序重组回答：';
+    : '建议按“结论、原理/方案、场景/结果”的顺序重组回答：';
   const framework = buildAnswerFramework(question, evaluation);
   const supplement = framework
     ? ` 你可以直接按这个框架重讲：${framework}`
@@ -888,11 +888,11 @@ function createPlaybookFirst30Seconds(question, evaluation, levelProfile, firstM
   const mustLand = firstMissing ? `首句后马上补“${firstMissing}”` : `首句后马上补“${createImmediateFix(question, evaluation)}”`;
 
   if (question.type === 'project') {
-    return `前 30 秒先按“背景 -> 我负责 -> 关键动作 -> 结果”讲，不要铺陈团队全貌；${mustLand}。`;
+    return `前 30 秒先按“背景、我负责、关键动作、结果”讲，不要铺陈团队全貌；${mustLand}。`;
   }
 
   if (question.type === 'system-design') {
-    return `前 30 秒先拆“核心链路 -> 关键组件 -> 风险点 -> 取舍”，先把主方案立住，再展开细节；${mustLand}。`;
+    return `前 30 秒先拆“核心链路、关键组件、风险点、取舍”，先把主方案立住，再展开细节；${mustLand}。`;
   }
 
   if (question.type === 'algorithm') {
@@ -1276,7 +1276,7 @@ function createNextPractice(
   suggestions.push({
     title: `专项复习 ${[...new Set(weakAreas)].join('、')}`,
     goal: '把零散知识点串成可被追问的完整主线。',
-    action: '每个薄弱主题至少准备一版“定义/原理 -> 场景 -> 取舍/边界 -> 结果”的口述答案。'
+    action: '每个薄弱主题至少准备一版“定义/原理、场景、取舍/边界、结果”的口述答案。'
   });
   return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
@@ -1360,7 +1360,7 @@ function createPracticePlan(
     plan.push({
       title: `Round ${plan.length + 1} | 固化高频模板`,
       focus: coachPriorities[0].category,
-      task: `把 ${coachPriorities[0].category} 相关题整理成“结论 -> 原理/场景 -> 取舍 -> 结果”的口述模板。`,
+      task: `把 ${coachPriorities[0].category} 相关题整理成“结论、原理/场景、取舍、结果”的口述模板。`,
       successMark: '同类题能稳定复用模板，不再临场拼凑'
     });
   }
@@ -2136,7 +2136,7 @@ function createOpeningCoachFocus(question) {
     return '先给结论，再补机制、场景和结果。';
   }
 
-  return `先把这些关键点讲出来：${mustHave.join(' / ')}。`;
+  return `先把这些关键点讲出来：${mustHave.join('、')}。`;
 }
 
 function createOpeningCoachRisk(question, levelProfile) {
@@ -2149,15 +2149,15 @@ function createOpeningCoachRisk(question, levelProfile) {
 
 function createOpeningCoachMove(question) {
   if (question.type === 'project') {
-    return '按这个顺序回答：背景 -> 你的职责范围 -> 关键动作 -> 结果。';
+    return '按这个顺序回答：背景、你的职责范围、关键动作、结果。';
   }
 
   if (question.type === 'system-design') {
-    return '按这个顺序回答：主链路 -> 核心组件 -> 流量或风险 -> 取舍。';
+    return '按这个顺序回答：主链路、核心组件、流量或风险、取舍。';
   }
 
   if (question.type === 'algorithm') {
-    return '按这个顺序回答：解法 -> 数据结构 -> 复杂度 -> 边界情况。';
+    return '按这个顺序回答：解法、数据结构、复杂度、边界情况。';
   }
 
   return '先给结论，再补能证明这个结论的机制、边界或取舍。';
@@ -2362,7 +2362,7 @@ function createRetryEvidencePrompt(question, evaluation, firstMissing) {
   }
 
   if (evaluation.followUpCategory === 'evidence') {
-    return '第二段直接换成一次真实项目或线上场景，按“问题 -> 动作 -> 结果”讲。';
+    return '第二段直接换成一次真实项目或线上场景，按“问题、动作、结果”讲。';
   }
 
   if (question.type === 'knowledge' && question.difficulty >= 3) {
@@ -2527,7 +2527,7 @@ function createCompetencyBreakdown(answersByQuestion, levelProfile = getLevelExp
       positive: ['ownership 基本可信'],
       negative: ['ownership 不够实'],
       fallbackGap: '把项目题回答收敛到你亲手负责的判断、动作和结果。',
-      fallbackAction: '重答 2 道项目题，每次强制用“背景 -> 我的职责 -> 关键动作 -> 结果”开头。'
+      fallbackAction: '重答 2 道项目题，每次强制用“背景、我的职责、关键动作、结果”开头。'
     },
     {
       id: 'tradeoff',
@@ -2713,7 +2713,7 @@ function createStagnationFollowUp(question, evaluation, levelProfile) {
   }
 
   if (evaluation.followUpCategory === 'evidence') {
-    return '别再总结观点，直接锁定一次真实场景，按“当时出了什么问题 -> 你怎么处理 -> 结果怎样”三句答完。';
+    return '别再总结观点，直接锁定一次真实场景，按“当时出了什么问题、你怎么处理、结果怎样”三句答完。';
   }
 
   if (evaluation.followUpCategory === 'impact') {
