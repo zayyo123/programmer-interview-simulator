@@ -311,6 +311,12 @@ function renderReport(report) {
           <span class="pill ${getPassBarChipClass(item.passBarSignal)}">${escapeHtml(item.passBarSignal?.label || 'N/A')}</span>
         </div>
         <p>${escapeHtml(item.passBarSignal?.detail || 'No pass-bar guidance available.')}</p>
+        <div class="section-label">What the interviewer still needed</div>
+        <p>${escapeHtml(item.passBarDelta?.headline || 'No pass-bar delta available.')}</p>
+        <p>${escapeHtml(item.passBarDelta?.detail || '')}</p>
+        ${renderList(item.passBarDelta?.mustLand, 'No concrete missing answer target generated.')}
+        <p>${escapeHtml(item.passBarDelta?.nextSentence ? `Next sentence to add: ${item.passBarDelta.nextSentence}` : '')}</p>
+        <p>${escapeHtml(item.passBarDelta?.risk || '')}</p>
         <div class="section-label">Resume grounding</div>
         <div class="meta-row">
           <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || 'N/A')}</span>
@@ -382,6 +388,8 @@ function renderReport(report) {
       <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
       <div class="section-label">Practice summary</div>
       <p>${escapeHtml(overview.practiceSummary || 'Add more answers to generate a structured practice summary.')}</p>
+      <div class="section-label">Answer target</div>
+      <p>${escapeHtml(overview.answerTargetSummary || 'Add more answers to generate a clearer pass-bar target.')}</p>
       <div class="section-label">Uncovered planned questions</div>
       <p>${escapeHtml(overview.uncoveredQuestionSummary || 'N/A')}</p>
       ${uncoveredQuestionsHtml}

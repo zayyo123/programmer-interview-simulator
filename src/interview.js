@@ -340,6 +340,13 @@ export function createReport(session) {
         levelProfile,
         entry.exitReason || 'open'
       ),
+      passBarDelta: createPassBarDelta(
+        entry.question,
+        evaluation,
+        entry.attempts || 1,
+        levelProfile,
+        entry.exitReason || 'open'
+      ),
       strengths: evaluation.strengths,
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
@@ -410,6 +417,7 @@ export function createReport(session) {
         uncoveredQuestions,
         session.plan.length
       ),
+      answerTargetSummary: createAnswerTargetSummary(answersByQuestion, levelProfile),
       resumeSummary,
       resumeCoverage: createResumeCoverageSummary(session, answersByQuestion),
       resumeGrounding: createResumeGroundingOverview(answersByQuestion, resumeSummary),
@@ -907,6 +915,71 @@ function createPassBarSignal(
     level: 'watch',
     label: '已经接近过线',
     detail: '这题已经接近真实面试通过线，下一步重点是把表达压缩得更利落，并补强结果、取舍或案例锚点。'
+  };
+}
+
+function createPassBarDelta(
+  question,
+  evaluation,
+  attempts,
+  levelProfile = getLevelExpectation('middle'),
+  exitReason = 'open'
+) {
+  const mustHave = question.scoringRubric?.mustHave || [];
+  const goodToHave = question.scoringRubric?.goodToHave || [];
+  const missingMustHave = mustHave.filter((item) => !evaluation.rubricHits.mustHave.includes(item));
+  const missingGoodToHave = goodToHave.filter((item) => !evaluation.rubricHits.goodToHave.includes(item));
+  const targetScore = Math.min(100, levelProfile.minScoreToMoveNext + 8);
+  const scoreGap = Math.max(0, targetScore - (evaluation.score || 0));
+  const immediateFix = createImmediateFix(question, evaluation);
+  const interviewerCutoff = exitReason === 'stalled_follow_up';
+  const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
+  const headline = evaluation.score >= targetScore && !missingMustHave.length && !evaluation.redFlags.length
+    ? '这题已经接近真实面试里的稳定过线答案'
+    : scoreGap >= 12
+      ? `这题离稳定过线还差 ${scoreGap} 分左右的表达密度`
+      : '这题已经接近过线，差的是最后一层说服力';
+
+  const mustLand = [];
+
+  if (missingMustHave.length) {
+    mustLand.push(`先补实 ${missingMustHave.slice(0, 2).join('、')}`);
+  }
+
+  if (!evaluation.communication.hasStructure) {
+    mustLand.push('第一句话先给结论，再按主线展开');
+  }
+
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') {
+    mustLand.push('补一句为什么这样选，以及代价是什么');
+  }
+
+  if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) {
+    mustLand.push('补一个结果指标或验证信号');
+  }
+
+  if (!evaluation.communication.hasExample && question.type !== 'knowledge') {
+    mustLand.push('落回真实项目或线上案例，不只讲概念');
+  }
+
+  if (!mustLand.length && missingGoodToHave.length) {
+    mustLand.push(`继续补强 ${missingGoodToHave.slice(0, 2).join('、')}`);
+  }
+
+  const risk = interviewerCutoff
+    ? '这题已经出现“追问后仍站不住”的信号，真实面试里通常会被记成稳定性扣分。'
+    : repeatedPressure
+      ? '这题需要多轮追问才能补齐，说明首轮口述密度不够，容易拖低整体评价。'
+      : evaluation.redFlags.length
+        ? `当前最容易被面试官放大的风险是：${evaluation.redFlags[0]}。`
+        : `如果同类题再出现一次“${describeFollowUpCategory(evaluation.followUpCategory)}”问题，面试官会开始怀疑这不是单题失误。`;
+
+  return {
+    headline,
+    detail: `目标至少是 ${targetScore} 分左右的首轮回答密度；当前更需要补的是“${describeFollowUpCategory(evaluation.followUpCategory)}”。`,
+    mustLand: mustLand.slice(0, 3),
+    nextSentence: immediateFix,
+    risk
   };
 }
 
@@ -1789,6 +1862,30 @@ function createPracticeDrill(question, evaluation) {
   }[evaluation.followUpCategory] || '做一次追问演练';
 
   return `下次练这题时，先用 90 秒讲完主线，再围绕“${focus}”做一次“${drillMode}”练习；最后强制自己补一句“${createImmediateFix(question, evaluation)}”，重点修正“${firstMissing}”。`;
+}
+
+function createAnswerTargetSummary(answersByQuestion, levelProfile = getLevelExpectation('middle')) {
+  if (!answersByQuestion.length) {
+    return '还没有足够作答内容，暂时无法给出稳定的过线回答目标。';
+  }
+
+  const riskyAnswers = answersByQuestion.filter((item) => {
+    return item.score < levelProfile.minScoreToMoveNext
+      || item.passBarSignal?.level === 'risk'
+      || item.exitReason === 'stalled_follow_up';
+  });
+
+  if (!riskyAnswers.length) {
+    return '大部分题已经具备过线雏形，下一步重点是继续压缩表达，让首轮回答就把主线、取舍和结果一次说透。';
+  }
+
+  const topRisk = [...riskyAnswers].sort((left, right) => {
+    const leftPenalty = (left.passBarSignal?.level === 'risk' ? 2 : 0) + (left.exitReason === 'stalled_follow_up' ? 2 : 0);
+    const rightPenalty = (right.passBarSignal?.level === 'risk' ? 2 : 0) + (right.exitReason === 'stalled_follow_up' ? 2 : 0);
+    return rightPenalty - leftPenalty || left.score - right.score;
+  })[0];
+
+  return `当前最该先重练的是「${topRisk.category}」题。目标不是多讲，而是首轮就达到 ${levelProfile.minScoreToMoveNext}-${Math.min(100, levelProfile.minScoreToMoveNext + 8)} 分的口述密度：先把 ${topRisk.passBarDelta?.nextSentence || '核心点讲具体'} 说出来，再补一层取舍、结果或验证方式。`;
 }
 
 function createRehearsalAnswer(question, evaluation, levelProfile = getLevelExpectation('middle')) {
