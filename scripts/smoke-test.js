@@ -35,6 +35,10 @@ async function main() {
 
     assert(session.sessionId, 'sessionId should exist');
     assert(Array.isArray(session.plan) && session.plan.length >= 3, 'plan should contain requested questions');
+    assert(
+      session.plan.some((item) => item.id === 'backend_004'),
+      `backend plan should include the consistency project question when resume signals match, got: ${session.plan.map((item) => item.id).join(', ')}`
+    );
 
     const weakAnswer = '我们团队做了一个项目，主要用了 Java。';
     const answer1 = await request(`/api/interviews/${session.sessionId}/answer`, {
