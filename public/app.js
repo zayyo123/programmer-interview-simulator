@@ -184,6 +184,9 @@ function renderLiveCoach(snapshot) {
   const stagnationMeta = snapshot.stagnantFollowUpCount
     ? `<span class="pill amber">${escapeHtml(`${snapshot.stagnantFollowUpCount} repeated weak turn${snapshot.stagnantFollowUpCount > 1 ? 's' : ''}`)}</span>`
     : '';
+  const missingSignals = Array.isArray(snapshot.missingSignals) && snapshot.missingSignals.length
+    ? snapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
+    : '<span class="pill green">No obvious missing signal</span>';
 
   liveCoachEl.className = 'live-coach';
   liveCoachEl.innerHTML = `
@@ -202,6 +205,10 @@ function renderLiveCoach(snapshot) {
     <p>${escapeHtml(snapshot.target || 'N/A')}</p>
     <div class="section-label">Current gap</div>
     <p>${escapeHtml(snapshot.focus || 'N/A')}</p>
+    <div class="section-label">Pressure reason</div>
+    <p>${escapeHtml(snapshot.pressureReason || 'N/A')}</p>
+    <div class="section-label">Missing signals</div>
+    <div class="meta-row">${missingSignals}</div>
     <div class="section-label">Why it matters</div>
     <p>${escapeHtml(snapshot.risk || 'N/A')}</p>
     <div class="section-label">Best next move</div>

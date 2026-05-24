@@ -452,6 +452,8 @@ export function createLiveCoachSnapshot(session, answer = '') {
       category: '',
       target: 'All planned questions have been covered. Build the report to review the biggest interview risks and answer gaps.',
       focus: 'Review the final report and rehearse the weakest question types first.',
+      pressureReason: 'No active pressure signal remains.',
+      missingSignals: [],
       risk: 'No active question remains in this round.',
       suggestedMove: 'Finish the session to generate the coaching report.',
       followUpCount: 0,
@@ -472,6 +474,8 @@ export function createLiveCoachSnapshot(session, answer = '') {
       category: question.category,
       target: createOpeningCoachTarget(question, levelProfile),
       focus: createOpeningCoachFocus(question),
+      pressureReason: 'The first answer decides whether this becomes a normal question or a pressure follow-up.',
+      missingSignals: createOpeningCoachSignals(question),
       risk: createOpeningCoachRisk(question, levelProfile),
       suggestedMove: createOpeningCoachMove(question),
       followUpCount: 0,
@@ -491,6 +495,8 @@ export function createLiveCoachSnapshot(session, answer = '') {
     category: question.category,
     target: createFollowUpObjective(question, evaluation),
     focus: `Interviewer is still checking whether you can land "${createImmediateFix(question, evaluation)}".`,
+    pressureReason: createLivePressureReason(question, evaluation, followUpCount, stagnantFollowUpCount),
+    missingSignals: createLiveMissingSignals(question, evaluation),
     risk: describeFollowUpPressure(question, evaluation, followUpCount, levelProfile),
     suggestedMove: buildSuggestedFollowUp(question, evaluation, {
       followUpCount,
@@ -2155,6 +2161,68 @@ function createOpeningCoachMove(question) {
   }
 
   return 'Lead with the conclusion, then add the mechanism, boundary, or tradeoff that proves it.';
+}
+
+function createOpeningCoachSignals(question) {
+  const mustHave = (question.scoringRubric?.mustHave || []).slice(0, 3);
+  if (mustHave.length) return mustHave;
+
+  return question.type === 'algorithm'
+    ? ['解法', '数据结构', '复杂度']
+    : ['结论', '机制', '边界'];
+}
+
+function createLivePressureReason(question, evaluation, followUpCount, stagnantFollowUpCount) {
+  if (evaluation.followUpCategory === 'complete') {
+    return 'The answer has enough signal to move forward; now keep the next answer equally dense.';
+  }
+
+  const categoryReason = {
+    core: 'The interviewer still cannot hear the required core points.',
+    ownership: 'The answer sounds too team-level; personal ownership is not yet credible.',
+    tradeoff: 'The answer gives a solution but not the reason, cost, or alternative.',
+    evidence: 'The answer lacks a concrete scene that proves this came from real experience.',
+    impact: 'The answer does not prove impact with metrics, validation, or observable results.',
+    detail: 'The answer is still too high-level for the expected depth.'
+  }[evaluation.followUpCategory] || 'The interviewer needs one sharper, more concrete signal.';
+
+  if (stagnantFollowUpCount >= 1) {
+    return `${categoryReason} The last follow-up did not add enough new signal, so pressure is rising.`;
+  }
+
+  if (followUpCount >= 2) {
+    return `${categoryReason} This is already a repeated follow-up, so the next answer needs to be specific immediately.`;
+  }
+
+  if (question.type === 'project') {
+    return `${categoryReason} For project questions, this usually decides whether the experience feels real.`;
+  }
+
+  return categoryReason;
+}
+
+function createLiveMissingSignals(question, evaluation) {
+  if (evaluation.followUpCategory === 'complete') {
+    return ['Keep answer density', 'Prepare next question'];
+  }
+
+  const missingMustHave = (question.scoringRubric?.mustHave || []).filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  });
+  const missingGoodToHave = (question.scoringRubric?.goodToHave || []).filter((item) => {
+    return !evaluation.rubricHits.goodToHave.includes(item);
+  });
+  const communicationSignals = [];
+
+  if (question.type === 'project' && !evaluation.communication.hasOwnership) communicationSignals.push('personal ownership');
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') communicationSignals.push('tradeoff');
+  if (!evaluation.communication.hasExample && question.type !== 'knowledge') communicationSignals.push('real scene');
+  if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) communicationSignals.push('result evidence');
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !evaluation.communication.hasDiagnosisFlow) communicationSignals.push('diagnostic order');
+
+  return [...missingMustHave, ...communicationSignals, ...missingGoodToHave]
+    .filter(Boolean)
+    .slice(0, 5);
 }
 
 function createAnswerTargetSummary(answersByQuestion, levelProfile = getLevelExpectation('middle')) {

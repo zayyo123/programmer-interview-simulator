@@ -46,6 +46,8 @@ async function main() {
     assert(Array.isArray(session.plan) && session.plan.length >= 3, 'plan should contain requested questions');
     assert(session.liveCoach?.stage === 'opening', `new session should expose opening live coach state, got: ${session.liveCoach?.stage || 'missing'}`);
     assert(session.liveCoach?.target, 'new session should expose live coach interviewer target');
+    assert(session.liveCoach?.pressureReason, 'new session should expose why the first answer matters');
+    assert(Array.isArray(session.liveCoach?.missingSignals) && session.liveCoach.missingSignals.length >= 1, 'new session should expose opening missing signals');
     assert(
       session.plan.some((item) => item.id === 'backend_004'),
       `backend plan should include the consistency project question when resume signals match, got: ${session.plan.map((item) => item.id).join(', ')}`
@@ -63,6 +65,8 @@ async function main() {
     );
     assert(answer1.liveCoach?.stage === 'clarify', `first weak answer should expose clarify follow-up stage, got: ${answer1.liveCoach?.stage || 'missing'}`);
     assert(answer1.liveCoach?.suggestedMove, 'first weak answer should include a live coach next move');
+    assert(answer1.liveCoach?.pressureReason, 'weak answer should include a live coach pressure reason');
+    assert(Array.isArray(answer1.liveCoach?.missingSignals) && answer1.liveCoach.missingSignals.length >= 1, 'weak answer should include missing interview signals');
     assert(answer1.currentQuestion === session.plan[0].id, 'weak answer should stay on the same question');
 
     const weakAnswer2 = '主要还是团队一起做的，我这边就是参与开发。';
