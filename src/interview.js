@@ -1,12 +1,12 @@
 import { levelLabels, questionBank, roleLabels, styleLabels } from './questions.js';
 
 const roleTopics = {
-  backend: ['项目经历', 'MySQL', 'Redis', '系统设计', '算法'],
-  frontend: ['项目经历', '前端', '前端', '算法', '前端'],
-  fullstack: ['项目经历', '项目经历', '前端', '系统设计', '算法'],
-  java: ['项目经历', 'Java', 'MySQL', 'Redis', '系统设计', '算法'],
-  go: ['项目经历', 'Go', 'MySQL', 'Redis', '系统设计', '算法'],
-  python: ['项目经历', 'Python', 'MySQL', 'Redis', '系统设计', '算法']
+  backend: ['MySQL', 'Redis', '项目经历', '系统设计', '算法'],
+  frontend: ['前端', '算法', '项目经历', '前端', '系统设计'],
+  fullstack: ['前端', 'MySQL', '项目经历', '系统设计', '算法'],
+  java: ['Java', 'MySQL', '项目经历', 'Redis', '系统设计', '算法'],
+  go: ['Go', 'Redis', '项目经历', 'MySQL', '系统设计', '算法'],
+  python: ['Python', 'MySQL', '项目经历', 'Redis', '系统设计', '算法']
 };
 
 const fillerWords = ['然后', '就是', '那个', '可能', '感觉', '大概', '比较', '这个', '那个时候'];
@@ -18,12 +18,12 @@ const levelDifficultyTargets = {
 };
 
 const roleStageBlueprints = {
-  backend: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
-  frontend: ['project', 'project', 'knowledge', 'algorithm', 'knowledge'],
-  fullstack: ['project', 'project', 'knowledge', 'system-design', 'algorithm'],
-  java: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
-  go: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm'],
-  python: ['project', 'knowledge', 'knowledge', 'system-design', 'algorithm']
+  backend: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  frontend: ['knowledge', 'project', 'knowledge', 'algorithm', 'knowledge'],
+  fullstack: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  java: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  go: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  python: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm']
 };
 
 const levelExpectations = {
@@ -3529,8 +3529,13 @@ function selectBestQuestion({ available, selected, stage = {}, resumeSignals = c
   const selectedCategories = new Set(selected.map((item) => item.category));
   const selectedTypes = new Set(selected.map((item) => item.type));
 
-  const ranked = available
-    .filter((item) => !selectedIds.has(item.id))
+  const candidates = available.filter((item) => !selectedIds.has(item.id));
+  const typeMatchedCandidates = preferredType
+    ? candidates.filter((item) => item.type === preferredType)
+    : candidates;
+  const effectiveCandidates = typeMatchedCandidates.length ? typeMatchedCandidates : candidates;
+
+  const ranked = effectiveCandidates
     .map((item) => ({
       item,
       score: scoreQuestionFit(item, {
@@ -3617,15 +3622,29 @@ function createInterviewBlueprint({ role, level, targetCount, resumeSignals = cr
   const blueprint = [];
 
   for (let index = 0; index < targetCount; index += 1) {
+    const preferredType = stages[index] || stages[stages.length - 1] || 'knowledge';
     blueprint.push({
-      preferredCategory: preferredCategories[index] || topics[index] || null,
-      preferredType: stages[index] || stages[stages.length - 1] || 'knowledge',
+      preferredCategory: preferredType === 'project'
+        ? getPreferredProjectCategory(role)
+        : preferredCategories[index] || topics[index] || null,
+      preferredType,
       preferredRole: role,
       targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2
     });
   }
 
   return blueprint;
+}
+
+function getPreferredProjectCategory(role) {
+  return {
+    backend: '项目经历',
+    java: 'Java',
+    go: 'Go',
+    python: 'Python',
+    frontend: '前端',
+    fullstack: '项目经历'
+  }[role] || '项目经历';
 }
 
 function createFallbackBlueprintStage(index, role, level, resumeSignals = createEmptyResumeSignals()) {
@@ -3652,13 +3671,14 @@ function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults
     queue.push(value);
   };
 
-  tryPush('项目经历');
-
   const rolePriority = getRolePriorityCategories(role);
   const resumePriority = (resumeSignals.categories || []).filter((item) => item !== '项目经历');
   const seniorDiagnostic = targetCount >= 5 ? getDiagnosticPriorityCategories(role) : [];
+  const technicalPriority = [...rolePriority, ...resumePriority, ...seniorDiagnostic, ...defaults]
+    .filter((item) => item !== '项目经历');
 
-  [...resumePriority, ...rolePriority, ...seniorDiagnostic, ...defaults].forEach(tryPush);
+  technicalPriority.forEach(tryPush);
+  tryPush('项目经历');
 
   while (queue.length < targetCount) {
     defaults.forEach(tryPush);

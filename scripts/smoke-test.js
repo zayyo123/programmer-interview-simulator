@@ -44,6 +44,8 @@ async function main() {
 
     assert(session.sessionId, 'sessionId should exist');
     assert(Array.isArray(session.plan) && session.plan.length >= 3, 'plan should contain requested questions');
+    assert(session.plan[0]?.type === 'knowledge', `first question should be a technical knowledge question, got: ${session.plan[0]?.id || 'missing'}`);
+    assert(session.plan[0]?.id !== 'project_001' && session.plan[0]?.id !== 'backend_004', `first question should not be a project question, got: ${session.plan[0]?.id}`);
     assert(session.liveCoach?.stage === 'opening', `new session should expose opening live coach state, got: ${session.liveCoach?.stage || 'missing'}`);
     assert(session.liveCoach?.target, 'new session should expose live coach interviewer target');
     assert(session.liveCoach?.pressureReason, 'new session should expose why the first answer matters');
@@ -52,6 +54,19 @@ async function main() {
       session.plan.some((item) => item.id === 'backend_004'),
       `backend plan should include the consistency project question when resume signals match, got: ${session.plan.map((item) => item.id).join(', ')}`
     );
+
+    const technicalWarmupAnswer = [
+      'MySQL 索引能提升查询速度，核心是用 B+ 树这样的有序结构减少扫描范围。',
+      'InnoDB 主键索引的叶子节点存整行数据，二级索引叶子节点存主键值，所以查非索引字段可能需要回表。',
+      '如果查询字段都在索引里，就可以走覆盖索引，减少回表和随机 I/O。',
+      '所以我会从减少扫描范围、B+ 树有序定位、回表成本和覆盖索引这几块回答。'
+    ].join('');
+    const warmupAnswer = await request(`/api/interviews/${session.sessionId}/answer`, {
+      method: 'POST',
+      body: { answer: technicalWarmupAnswer }
+    });
+    assert(warmupAnswer.liveCoach?.stage, 'technical warmup response should expose a live coach snapshot');
+    assert(warmupAnswer.currentQuestion === 'backend_004', `technical warmup should advance to the project question, got: ${warmupAnswer.currentQuestion}`);
 
     const weakAnswer = '我们团队做了一个项目，主要用了 Java。';
     const answer1 = await request(`/api/interviews/${session.sessionId}/answer`, {
@@ -67,7 +82,7 @@ async function main() {
     assert(answer1.liveCoach?.suggestedMove, 'first weak answer should include a live coach next move');
     assert(answer1.liveCoach?.pressureReason, 'weak answer should include a live coach pressure reason');
     assert(Array.isArray(answer1.liveCoach?.missingSignals) && answer1.liveCoach.missingSignals.length >= 1, 'weak answer should include missing interview signals');
-    assert(answer1.currentQuestion === session.plan[0].id, 'weak answer should stay on the same question');
+    assert(answer1.currentQuestion === 'backend_004', 'weak project answer should stay on the project question');
 
     const weakAnswer2 = '主要还是团队一起做的，我这边就是参与开发。';
     const answerRepeat = await request(`/api/interviews/${session.sessionId}/answer`, {
@@ -83,7 +98,7 @@ async function main() {
       ['pin_down', 'pressure'].includes(answerRepeat.liveCoach?.stage),
       `repeated weak answer should escalate live coach stage, got: ${answerRepeat.liveCoach?.stage || 'missing'}`
     );
-    assert(answerRepeat.currentQuestion === session.plan[0].id, 'repeated weak answer should still stay on the same question');
+    assert(answerRepeat.currentQuestion === 'backend_004', 'repeated weak project answer should still stay on the project question');
 
     const strongerAnswer = [
       '这个项目是订单履约系统，目标是减少库存扣减和订单状态不一致的问题。',
@@ -97,7 +112,7 @@ async function main() {
       body: { answer: strongerAnswer }
     });
     assert(answer2.liveCoach?.stage, 'stronger answer response should still expose a live coach snapshot');
-    assert(answer2.currentQuestion !== session.plan[0].id, 'stronger answer should advance to the next question');
+    assert(answer2.currentQuestion !== 'backend_004', 'stronger project answer should advance to the next question');
 
     const seniorSession = await request('/api/interviews', {
       method: 'POST',
@@ -116,26 +131,30 @@ async function main() {
 
     let seniorCurrentQuestion = seniorSession.plan[0]?.id;
     let seniorBridgeGuard = 0;
-    while (seniorCurrentQuestion !== 'redis_002' && seniorBridgeGuard < 3) {
+    while (seniorCurrentQuestion !== 'redis_002' && seniorBridgeGuard < 5) {
       seniorBridgeGuard += 1;
+      const bridgeAnswer = {
+        mysql_001: [
+          'MySQL 索引提升查询速度的核心是用 B+ 树这样的有序结构减少扫描范围。',
+          'InnoDB 主键索引叶子节点存整行数据，二级索引叶子节点存主键值，所以二级索引查非索引字段可能需要回表。',
+          '如果查询字段都在索引里，就可以走覆盖索引，减少回表和随机 I/O。',
+          '所以我会从减少扫描范围、B+ 树定位、回表成本和覆盖索引这几块回答。'
+        ].join(''),
+        backend_004: [
+          '我做过高并发订单链路治理项目，业务目标是降低支付成功后订单和库存不一致的问题。',
+          '我负责订单状态流转、数据一致性和幂等设计。',
+          '核心风险是支付回调重复、库存扣减超时和 MQ 重投会导致状态乱序或重复执行。',
+          '我用业务单号加事件类型做幂等，用状态机限制非法流转，失败时落补偿任务并按退避策略重试。',
+          '没有直接用强一致事务，是因为跨服务链路峰值流量高，优先保证可恢复性和下单成功率，异常订单明显减少。'
+        ].join('')
+      }[seniorCurrentQuestion] || [
+        '我会先给结论，再补核心机制、边界条件和实际场景。',
+        '这题的关键是先说明主链路，再解释为什么这样设计，以及异常情况下怎么验证。',
+        '如果是线上问题，我会先看影响范围和时间线，再结合监控、日志和关键指标定位。'
+      ].join('');
       const projectBridgeAnswer = await request(`/api/interviews/${seniorSession.sessionId}/answer`, {
         method: 'POST',
-        body: {
-          answer: seniorCurrentQuestion === 'backend_004'
-            ? [
-              '我做过高并发订单链路治理项目，业务目标是降低支付成功后订单和库存不一致的问题。',
-              '我负责订单状态流转、数据一致性和幂等设计。',
-              '核心风险是支付回调重复、库存扣减超时和 MQ 重投会导致状态乱序或重复执行。',
-              '我用业务单号加事件类型做幂等，用状态机限制非法流转，失败时落补偿任务并按退避策略重试。',
-              '没有直接用强一致事务，是因为跨服务链路峰值流量高，优先保证可恢复性和下单成功率，异常订单明显减少。'
-            ].join('')
-            : [
-              '我做过订单和缓存稳定性治理项目，目标是降低高峰期缓存抖动对下单链路的影响。',
-              '我负责 Redis 延迟分析、缓存降级策略和订单链路保护。',
-              '当时核心问题是热点 key 和慢命令会放大接口延迟，我先用监控时间线定位影响范围，再结合慢查询、大 key 和网络指标收敛根因。',
-              '方案上我做了热点隔离、超时降级和缓存重建保护，避免请求全部打到数据库，最终高峰期延迟明显下降。'
-            ].join('')
-        }
+        body: { answer: bridgeAnswer }
       });
       seniorCurrentQuestion = projectBridgeAnswer.currentQuestion;
     }
