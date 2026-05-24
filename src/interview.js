@@ -232,6 +232,17 @@ export function createFallbackInterviewerReply({ session, answer }) {
     followUpCount: answerEntry?.followUpCount || 0,
     level: session.config.level
   });
+  const forceMoveNext = shouldForceMoveNext(question, evaluation, {
+    followUpCount: answerEntry?.followUpCount || 0,
+    stagnantFollowUpCount: answerEntry?.stagnantFollowUpCount || 0,
+    level: session.config.level
+  });
+
+  if (forceMoveNext) {
+    const nextQuestion = session.plan[session.currentIndex + 1];
+    return createForcedMoveOnReply(nextQuestion, question, evaluation, session.config.style);
+  }
+
   if (!evaluation.readyToMoveNext) {
     return createFollowUpReply(
       question,
@@ -261,11 +272,27 @@ export function maybeAdvanceQuestion(session, answer) {
   const answerEntry = session.answers.find((entry) => entry.question.id === question.id);
   const effectiveAnswer = answerEntry?.answer || getRecordedAnswerForCurrentQuestion(session) || answer;
   const followUpCount = answerEntry?.followUpCount || Math.max(0, (answerEntry?.attempts || 1) - 1);
-
-  if (!evaluateAnswer(effectiveAnswer, question, {
+  const evaluation = evaluateAnswer(effectiveAnswer, question, {
     followUpCount,
     level: session.config.level
-  }).readyToMoveNext) return;
+  });
+
+  if (shouldForceMoveNext(question, evaluation, {
+    followUpCount,
+    stagnantFollowUpCount: answerEntry?.stagnantFollowUpCount || 0,
+    level: session.config.level
+  })) {
+    if (answerEntry) {
+      answerEntry.endedByInterviewer = true;
+      answerEntry.exitReason = 'stalled_follow_up';
+    }
+  } else if (!evaluation.readyToMoveNext) {
+    return;
+  } else if (answerEntry) {
+    answerEntry.endedByInterviewer = false;
+    answerEntry.exitReason = 'answered';
+  }
+
   if (session.currentIndex < session.plan.length - 1) {
     session.currentIndex += 1;
     return;
@@ -291,14 +318,28 @@ export function createReport(session) {
       category: entry.question.category,
       attempts: entry.attempts || 1,
       followUpCount,
+      endedByInterviewer: Boolean(entry.endedByInterviewer),
+      exitReason: entry.exitReason || 'open',
       userAnswer: entry.answer,
       userAnswerSummary: summarizeAnswer(entry.answer),
       referenceAnswer: entry.question.referenceAnswer,
       excellentAnswer: entry.question.excellentAnswer,
       score: evaluation.score,
       confidence: describeAnswerConfidence(evaluation, entry.attempts || 1, levelProfile),
-      interviewerVerdict: createInterviewerVerdict(entry.question, evaluation, entry.attempts || 1, levelProfile),
-      passBarSignal: createPassBarSignal(entry.question, evaluation, entry.attempts || 1, levelProfile),
+      interviewerVerdict: createInterviewerVerdict(
+        entry.question,
+        evaluation,
+        entry.attempts || 1,
+        levelProfile,
+        entry.exitReason || 'open'
+      ),
+      passBarSignal: createPassBarSignal(
+        entry.question,
+        evaluation,
+        entry.attempts || 1,
+        levelProfile,
+        entry.exitReason || 'open'
+      ),
       strengths: evaluation.strengths,
       weaknesses: evaluation.weaknesses,
       redFlags: evaluation.redFlags,
@@ -307,7 +348,7 @@ export function createReport(session) {
       followUpObjective: createFollowUpObjective(entry.question, evaluation),
       followUpSignal: createFollowUpSignal(evaluation, entry.attempts || 1),
       coachTip: createCoachTip(entry.question, evaluation, levelProfile),
-      gapAnalysis: createGapAnalysis(entry.question, evaluation),
+      gapAnalysis: createGapAnalysis(entry.question, evaluation, entry.exitReason || 'open'),
       resumeSupport: createResumeSupport(entry.question, entry.answer, session.config.resume),
       interviewerSignal: createInterviewerSignal(entry.question, evaluation, entry.attempts || 1),
       interviewerCompetencySignal: createInterviewerCompetencySignal(
@@ -331,9 +372,11 @@ export function createReport(session) {
     };
   });
 
+  const uncoveredQuestions = createUncoveredQuestionAnalysis(session, answersByQuestion);
   const weakAreas = answersByQuestion
     .filter((item) => item.score < 75 || item.gapAnalysis.includes('还需要补强'))
     .map((item) => item.category);
+  const uncoveredAreas = uncoveredQuestions.map((item) => item.category);
   const coachPriorities = createCoachPriorities(answersByQuestion);
   const interviewPatterns = summarizeInterviewPatterns(answersByQuestion);
 
@@ -354,17 +397,26 @@ export function createReport(session) {
       panelDecision: createPanelDecision(answersByQuestion, levelProfile, interviewPatterns),
       coachingFocus: createCoachingFocus(answersByQuestion, levelProfile, interviewPatterns),
       riskSummary: createRiskSummary(answersByQuestion, levelProfile, interviewPatterns),
-      practiceSummary: createPracticeSummary(answersByQuestion, coachPriorities, interviewPatterns),
+      practiceSummary: createPracticeSummary(
+        answersByQuestion,
+        coachPriorities,
+        interviewPatterns,
+        uncoveredQuestions,
+        session.plan.length
+      ),
       resumeSummary,
       resumeCoverage: createResumeCoverageSummary(session, answersByQuestion),
       resumeGrounding: createResumeGroundingOverview(answersByQuestion, resumeSummary),
       levelExpectation: createLevelExpectationSummary(levelProfile),
-      coachPriorities
+      coachPriorities,
+      uncoveredQuestionCount: uncoveredQuestions.length,
+      uncoveredQuestionSummary: createUncoveredQuestionSummary(uncoveredQuestions, session.plan.length)
     },
     questions: answersByQuestion,
-    weakAreas: [...new Set(weakAreas)],
-    nextPractice: createNextPractice(answersByQuestion, weakAreas, interviewPatterns),
-    practicePlan: createPracticePlan(answersByQuestion, coachPriorities, interviewPatterns)
+    uncoveredQuestions,
+    weakAreas: [...new Set([...weakAreas, ...uncoveredAreas])],
+    nextPractice: createNextPractice(answersByQuestion, weakAreas, interviewPatterns, uncoveredQuestions),
+    practicePlan: createPracticePlan(answersByQuestion, coachPriorities, interviewPatterns, uncoveredQuestions)
   };
 }
 
@@ -511,6 +563,20 @@ function createNextQuestionReply(nextQuestion, evaluation, style) {
   return `${feedback}下一题：${nextQuestion.question}`;
 }
 
+function createForcedMoveOnReply(nextQuestion, question, evaluation, style) {
+  const cutoff = {
+    normal: `这题我先收在这里。你现在的问题不是没听过概念，而是“${describeFollowUpCategory(evaluation.followUpCategory)}”一直没有答实。`,
+    pressure: `这题先到这里。连续追问后你还是没有把“${describeFollowUpCategory(evaluation.followUpCategory)}”答到可落地的程度，正式面试里这通常已经记成扣分项。`,
+    coaching: `这题我先帮你收口。当前最需要补的是“${describeFollowUpCategory(evaluation.followUpCategory)}”，否则继续追问也只会重复。`
+  }[style] || `这题我先收在这里。你现在的问题是“${describeFollowUpCategory(evaluation.followUpCategory)}”没有答实。`;
+
+  if (!nextQuestion) {
+    return `${cutoff} 这轮主要问题已经问完，你可以点击结束面试生成复盘报告。`;
+  }
+
+  return `${cutoff} 先切到下一题：${nextQuestion.question}`;
+}
+
 function createClosingReply(evaluation) {
   const feedback = createPositiveFeedback(evaluation, 'normal');
   return `${feedback}这轮主要问题已经问完，你可以点击结束面试生成复盘报告。`;
@@ -534,7 +600,7 @@ function createPositiveFeedback(evaluation, style) {
     : '好的，这题先到这里，主线基本有了。';
 }
 
-function createGapAnalysis(question, evaluation) {
+function createGapAnalysis(question, evaluation, exitReason = 'open') {
   const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
     return !evaluation.rubricHits.mustHave.includes(item);
   });
@@ -550,6 +616,9 @@ function createGapAnalysis(question, evaluation) {
   if (evaluation.redFlags.length) communicationGaps.push(`面试官容易警惕这些风险信号：${evaluation.redFlags.join('、')}`);
 
   const parts = [];
+  if (exitReason === 'stalled_follow_up') {
+    parts.push(`这题在连续追问后被面试官主动收口，说明“${describeFollowUpCategory(evaluation.followUpCategory)}”已经影响到真实面试里的稳定性判断`);
+  }
   if (missingMustHave.length) parts.push(`这题先丢分在核心点没答实：${missingMustHave.join('、')}`);
   if (missingGoodToHave.length) parts.push(`如果想把这题从“能答”拉到“能打”，继续补：${missingGoodToHave.join('、')}`);
   if (communicationGaps.length) parts.push(`表达上最影响说服力的是：${communicationGaps.join('、')}`);
@@ -713,18 +782,33 @@ function createCoachChecklist(question, evaluation, levelProfile = getLevelExpec
   return checklist.slice(0, 4);
 }
 
-function createInterviewerVerdict(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
+function createInterviewerVerdict(
+  question,
+  evaluation,
+  attempts,
+  levelProfile = getLevelExpectation('middle'),
+  exitReason = 'open'
+) {
   const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
     return !evaluation.rubricHits.mustHave.includes(item);
   });
   const concernCount = missingMustHave.length + evaluation.redFlags.length;
   const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
+  const interviewerCutoff = exitReason === 'stalled_follow_up';
 
   if (evaluation.score >= levelProfile.minScoreToMoveNext + 12 && attempts <= 1 && !concernCount) {
     return {
       level: 'strong',
       label: '面试官判断：这一题能站住',
       detail: '首轮回答就覆盖了核心考点，继续深挖时更可能考察你的上限，而不是补基础。'
+    };
+  }
+
+  if (interviewerCutoff) {
+    return {
+      level: 'risk',
+      label: '面试官判断：追问后仍没站住',
+      detail: `这题已经被面试官主动收口，说明“${describeFollowUpCategory(evaluation.followUpCategory)}”在真实面试里会被直接记成稳定性风险。`
     };
   }
 
@@ -759,18 +843,33 @@ function createInterviewerVerdict(question, evaluation, attempts, levelProfile =
   };
 }
 
-function createPassBarSignal(question, evaluation, attempts, levelProfile = getLevelExpectation('middle')) {
+function createPassBarSignal(
+  question,
+  evaluation,
+  attempts,
+  levelProfile = getLevelExpectation('middle'),
+  exitReason = 'open'
+) {
   const missingMustHave = question.scoringRubric.mustHave.filter((item) => {
     return !evaluation.rubricHits.mustHave.includes(item);
   });
   const firstGap = missingMustHave[0];
   const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
+  const interviewerCutoff = exitReason === 'stalled_follow_up';
 
   if (evaluation.score >= levelProfile.minScoreToMoveNext + 12 && !missingMustHave.length && !evaluation.redFlags.length) {
     return {
       level: 'strong',
       label: '过线动作已经具备',
       detail: '这题已经具备真实面试里的过线密度，首轮回答就能把核心点、解释和说服力一起立住。'
+    };
+  }
+
+  if (interviewerCutoff) {
+    return {
+      level: 'risk',
+      label: '被收口前仍没过线',
+      detail: `这题在连续追问后仍卡在“${describeFollowUpCategory(evaluation.followUpCategory)}”。想过线，必须先把“${createImmediateFix(question, evaluation)}”练成首轮就能说出的内容。`
     };
   }
 
@@ -811,7 +910,12 @@ function estimateScore(answersByQuestion) {
   return Math.round(total / answersByQuestion.length);
 }
 
-function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = summarizeInterviewPatterns([])) {
+function createNextPractice(
+  answersByQuestion,
+  weakAreas,
+  interviewPatterns = summarizeInterviewPatterns([]),
+  uncoveredQuestions = []
+) {
   const lowest = [...answersByQuestion].sort((a, b) => a.score - b.score).slice(0, 2);
   const suggestions = lowest.map((item) => {
     return {
@@ -853,6 +957,14 @@ function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = su
       action: interviewPatterns.primary.practiceAction
     });
   }
+  if (uncoveredQuestions.length) {
+    const topUncovered = uncoveredQuestions[0];
+    suggestions.push({
+      title: `补齐未覆盖 ${topUncovered.category}`,
+      goal: '把还没答到的计划题提前练成首轮可输出的完整答案。',
+      action: `围绕“${topUncovered.question}”先做一版 ${topUncovered.targetDuration} 秒口述，至少覆盖 ${topUncovered.mustCover.join('、')}。`
+    });
+  }
   suggestions.push({
     title: `专项复习 ${[...new Set(weakAreas)].join('、')}`,
     goal: '把零散知识点串成可被追问的完整主线。',
@@ -861,7 +973,13 @@ function createNextPractice(answersByQuestion, weakAreas, interviewPatterns = su
   return dedupePracticeSuggestions(suggestions).slice(0, 3);
 }
 
-function createPracticeSummary(answersByQuestion, coachPriorities, interviewPatterns = summarizeInterviewPatterns([])) {
+function createPracticeSummary(
+  answersByQuestion,
+  coachPriorities,
+  interviewPatterns = summarizeInterviewPatterns([]),
+  uncoveredQuestions = [],
+  plannedQuestionCount = answersByQuestion.length
+) {
   if (!answersByQuestion.length) {
     return '先完成一次完整模拟，再根据最低分题目安排重练。';
   }
@@ -874,11 +992,19 @@ function createPracticeSummary(answersByQuestion, coachPriorities, interviewPatt
   const priorityLine = firstPriority
     ? `下一轮先修 ${firstPriority.category}，把“${firstPriority.target}”练成默认输出。`
     : '下一轮先从最低分题开始，把首轮回答主线讲完整。';
+  const uncoveredLine = uncoveredQuestions.length
+    ? `另外还有 ${uncoveredQuestions.length}/${plannedQuestionCount} 道计划题没来得及覆盖，说明你的完整面试续航和题型准备还不够。`
+    : '';
 
-  return `本轮共有 ${riskyCount}/${answersByQuestion.length} 题在真实面试里大概率会被继续追问。${primaryLine}${priorityLine}`;
+  return `本轮共有 ${riskyCount}/${answersByQuestion.length} 题在真实面试里大概率会被继续追问。${primaryLine}${priorityLine}${uncoveredLine}`;
 }
 
-function createPracticePlan(answersByQuestion, coachPriorities, interviewPatterns = summarizeInterviewPatterns([])) {
+function createPracticePlan(
+  answersByQuestion,
+  coachPriorities,
+  interviewPatterns = summarizeInterviewPatterns([]),
+  uncoveredQuestions = []
+) {
   if (!answersByQuestion.length) return [];
 
   const sorted = [...answersByQuestion].sort((left, right) => left.score - right.score);
@@ -905,16 +1031,26 @@ function createPracticePlan(answersByQuestion, coachPriorities, interviewPattern
     });
   }
 
+  if (uncoveredQuestions[0]) {
+    const missed = uncoveredQuestions[0];
+    plan.push({
+      title: 'Round 3 | 补未覆盖题型',
+      focus: `${missed.category} / 计划内未完成`,
+      task: `先按“${missed.coachingFocus}”准备“${missed.question}”这题的首轮答案，再模拟一轮 ${missed.interviewerIntent} 的追问。`,
+      successMark: '即使在原计划后半段，也能稳定输出完整答案，不因为疲劳或准备偏科直接失分'
+    });
+  }
+
   if (primary) {
     plan.push({
-      title: 'Round 3 | 修整体面试观感',
+      title: `Round ${plan.length + 1} | 修整体面试观感`,
       focus: primary.label,
       task: primary.practiceAction,
       successMark: '面试官不再优先形成这类负面判断'
     });
   } else if (coachPriorities[0]) {
     plan.push({
-      title: 'Round 3 | 固化高频模板',
+      title: `Round ${plan.length + 1} | 固化高频模板`,
       focus: coachPriorities[0].category,
       task: `把 ${coachPriorities[0].category} 相关题整理成“结论 -> 原理/场景 -> 取舍 -> 结果”的口述模板。`,
       successMark: '同类题能稳定复用模板，不再临场拼凑'
@@ -998,11 +1134,15 @@ function createOverallSummary(session, answersByQuestion, levelProfile = getLeve
 
   const strongCount = answersByQuestion.filter((item) => item.score >= 80).length;
   const weakCount = answersByQuestion.filter((item) => item.score < 70).length;
+  const uncoveredQuestions = createUncoveredQuestionAnalysis(session, answersByQuestion);
   const role = roleLabels[session.config.role] || session.config.role;
   const level = levelLabels[session.config.level] || session.config.level;
+  const uncoveredLine = uncoveredQuestions.length
+    ? `另外本轮还有 ${uncoveredQuestions.length} 道计划题没有覆盖，说明完整面试节奏下的续航和题型准备还不够稳。`
+    : '';
 
   if (strongCount === answersByQuestion.length) {
-    return `这轮 ${level}${role} 面试回答整体比较完整，已经达到“${levelProfile.labels[0]}”的预期，并接近可继续深挖的水平。`;
+    return `这轮 ${level}${role} 面试回答整体比较完整，已经达到“${levelProfile.labels[0]}”的预期，并接近可继续深挖的水平。${uncoveredLine}`;
   }
 
   const panelSummary = createPanelSignalSummary(answersByQuestion, levelProfile);
@@ -1010,13 +1150,92 @@ function createOverallSummary(session, answersByQuestion, levelProfile = getLeve
     const patternLine = interviewPatterns.primary
       ? `面试官最容易形成的判断是“${interviewPatterns.primary.interviewerView}”。`
       : '面试官会继续通过追问确认你是否真的掌握到可落地的细节。';
-    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。${panelSummary} 建议先把最低分的两题各重讲 3 遍，练到首轮就能把核心点答实。${patternLine}`;
+    return `这轮 ${level}${role} 面试里基础主线还不够稳定，距离“${levelProfile.labels.join('、')}”还有差距，尤其需要补强回答结构、关键原理和场景化表达。${panelSummary} 建议先把最低分的两题各重讲 3 遍，练到首轮就能把核心点答实。${patternLine}${uncoveredLine}`;
   }
 
   const patternLead = interviewPatterns.primary
     ? `当前最明显的模式是${interviewPatterns.primary.label}。`
     : '当前主要问题集中在追问稳定性。';
-  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。${panelSummary} 下一轮训练重点不是刷更多题，而是把已答题练成首轮就站得住。${patternLead}`;
+  return `这轮 ${level}${role} 面试的基础是有的，但稳定性一般，还没有完全达到“${levelProfile.labels.join('、')}”的预期，容易在追问时暴露细节、取舍和场景表达不足。${panelSummary} 下一轮训练重点不是刷更多题，而是把已答题练成首轮就站得住。${patternLead}${uncoveredLine}`;
+}
+
+function createUncoveredQuestionAnalysis(session, answersByQuestion) {
+  const answeredIds = new Set(session.answers.map((entry) => entry.question.id));
+  const levelProfile = getLevelExpectation(session.config.level);
+
+  return session.plan
+    .filter((question) => !answeredIds.has(question.id))
+    .map((question) => {
+      const rubric = question.scoringRubric || { mustHave: [] };
+      const mustCover = (rubric.mustHave || []).slice(0, 3);
+      return {
+        id: question.id,
+        question: question.question,
+        category: question.category,
+        type: question.type,
+        difficulty: question.difficulty,
+        mustCover,
+        interviewerIntent: describeQuestionIntent(question),
+        coachingFocus: createUncoveredQuestionCoachingFocus(question, levelProfile),
+        targetDuration: question.type === 'project' || question.type === 'system-design' ? 120 : 90,
+        preparationHint: createUncoveredQuestionPreparationHint(question, mustCover),
+        risk: createUncoveredQuestionRisk(question, levelProfile)
+      };
+    });
+}
+
+function createUncoveredQuestionSummary(uncoveredQuestions, plannedQuestionCount) {
+  if (!uncoveredQuestions.length) {
+    return '本轮计划题都至少进入过作答，不存在完全没覆盖的题型空白。';
+  }
+
+  const categories = [...new Set(uncoveredQuestions.map((item) => item.category))];
+  return `本轮共有 ${uncoveredQuestions.length}/${plannedQuestionCount} 道计划题未覆盖，主要空白集中在 ${categories.join('、')}。这些题型如果在真实面试后半段出现，当前准备容易直接暴露短板。`;
+}
+
+function describeQuestionIntent(question) {
+  return {
+    project: '项目复盘和个人贡献',
+    knowledge: '关键原理和追问细节',
+    'system-design': '架构判断和方案取舍',
+    algorithm: '思路、复杂度和边界处理'
+  }[question.type] || '核心能力判断';
+}
+
+function createUncoveredQuestionCoachingFocus(question, levelProfile = getLevelExpectation('middle')) {
+  if (question.type === 'project') {
+    return '背景、职责、关键判断、结果';
+  }
+
+  if (question.type === 'system-design') {
+    return '主链路、核心组件、风险点、取舍';
+  }
+
+  if (question.type === 'algorithm') {
+    return '思路、复杂度、边界情况';
+  }
+
+  return levelProfile.focus;
+}
+
+function createUncoveredQuestionPreparationHint(question, mustCover = []) {
+  if (mustCover.length) {
+    return `先把这题的必答点准备成首轮口述：${mustCover.join('、')}。`;
+  }
+
+  return `先围绕“${question.category}”准备一版能被继续追问的完整口述。`;
+}
+
+function createUncoveredQuestionRisk(question, levelProfile = getLevelExpectation('middle')) {
+  if (question.difficulty >= 3) {
+    return `这是 ${levelProfile === levelExpectations.senior ? '高级' : '中高阶'} 难度题，如果后半程直接空白，面试官通常会明显下调级别判断。`;
+  }
+
+  if (question.type === 'project') {
+    return '项目题如果完全没覆盖，面试官很难建立你真实做过事情的信任感。';
+  }
+
+  return '这类题如果没有准备到可首轮输出，真实面试里通常会被继续追问并放大短板。';
 }
 
 function createInterviewerImpression(session, answersByQuestion, levelProfile = getLevelExpectation('middle'), interviewPatterns = summarizeInterviewPatterns([])) {
@@ -1356,11 +1575,12 @@ function measureAnswerProgress(question, previousAnswer, nextAnswer) {
   const nextNormalized = normalizeText(nextAnswer);
   const isSubsetRepeat = Boolean(previousNormalized) && Boolean(nextNormalized)
     && (previousNormalized.includes(nextNormalized) || nextNormalized.includes(previousNormalized));
+  const vagueRewrite = addedKeywordHits === 0 && lengthGain < 35;
 
   return {
     addedKeywordHits,
     lengthGain,
-    isStagnant: addedKeywordHits === 0 && lengthGain < 20 && isSubsetRepeat
+    isStagnant: addedKeywordHits === 0 && (isSubsetRepeat || vagueRewrite)
   };
 }
 
@@ -1916,6 +2136,34 @@ function buildSuggestedFollowUp(question, evaluation, context = {}) {
   }
 
   return anchoredPrompt;
+}
+
+function shouldForceMoveNext(question, evaluation, context = {}) {
+  if (!question || evaluation.readyToMoveNext) return false;
+
+  const followUpCount = context.followUpCount || 0;
+  const stagnantFollowUpCount = context.stagnantFollowUpCount || 0;
+  const levelProfile = getLevelExpectation(context.level);
+  const unresolvedCore = question.scoringRubric?.mustHave?.filter((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  }).length || 0;
+  const heavyRisk = evaluation.redFlags.length >= 2 || unresolvedCore >= 2;
+
+  if (stagnantFollowUpCount >= 2) return true;
+  if (followUpCount >= 3 && heavyRisk) return true;
+  if (followUpCount >= 4) return true;
+
+  if (
+    levelProfile === levelExpectations.senior
+    && question.type === 'knowledge'
+    && question.difficulty >= 3
+    && followUpCount >= 2
+    && evaluation.followUpCategory === 'detail'
+  ) {
+    return true;
+  }
+
+  return false;
 }
 
 function createStagnationFollowUp(question, evaluation, levelProfile) {

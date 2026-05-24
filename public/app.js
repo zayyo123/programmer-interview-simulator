@@ -178,6 +178,7 @@ function renderReport(report) {
   const weakAreas = Array.isArray(report.weakAreas) ? report.weakAreas : [];
   const nextPractice = Array.isArray(report.nextPractice) ? report.nextPractice : [];
   const practicePlan = Array.isArray(report.practicePlan) ? report.practicePlan : [];
+  const uncoveredQuestions = Array.isArray(report.uncoveredQuestions) ? report.uncoveredQuestions : [];
   const competencyBreakdown = Array.isArray(overview.competencyBreakdown) ? overview.competencyBreakdown : [];
   const coachPriorityHtml = Array.isArray(overview.coachPriorities) && overview.coachPriorities.length
     ? overview.coachPriorities.map((item, index) => `
@@ -200,10 +201,24 @@ function renderReport(report) {
     ? nextPractice.map((item) => `
         <article class="practice-item">
           <strong>${escapeHtml(item.title || 'Next drill')}</strong>
-          <p>${escapeHtml(item.detail || '')}</p>
+          <p>${escapeHtml(item.goal || item.detail || '')}</p>
+          <p>${escapeHtml(item.action || '')}</p>
         </article>
       `).join('')
     : '<p>Complete more answers to generate targeted next-practice recommendations.</p>';
+  const uncoveredQuestionsHtml = uncoveredQuestions.length
+    ? uncoveredQuestions.map((item) => `
+        <article class="practice-item">
+          <div class="meta-row">
+            <strong>${escapeHtml(item.category || 'Uncovered area')}</strong>
+            <span class="pill amber">${escapeHtml(`${item.targetDuration || 90}s prep`)}</span>
+          </div>
+          <p>${escapeHtml(item.question || '')}</p>
+          <p>${escapeHtml(item.preparationHint || '')}</p>
+          <p>${escapeHtml(item.risk || '')}</p>
+        </article>
+      `).join('')
+    : '<p>All planned questions were at least reached once in this round.</p>';
   const practicePlanHtml = practicePlan.length
     ? practicePlan.map((item) => `
         <article class="plan-item">
@@ -358,6 +373,9 @@ function renderReport(report) {
       <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
       <div class="section-label">Practice summary</div>
       <p>${escapeHtml(overview.practiceSummary || 'Add more answers to generate a structured practice summary.')}</p>
+      <div class="section-label">Uncovered planned questions</div>
+      <p>${escapeHtml(overview.uncoveredQuestionSummary || 'N/A')}</p>
+      ${uncoveredQuestionsHtml}
       <div class="section-label">Real interview risk</div>
       <p>${escapeHtml(overview.riskSummary || 'Add more answers to estimate interview risk.')}</p>
       <div class="section-label">Resume grounding coverage</div>

@@ -1,9 +1,18 @@
+import {
+  createFallbackInterviewerReply,
+  createInterviewPlan,
+  createReport,
+  maybeAdvanceQuestion,
+  recordAnswerForCurrentQuestion
+} from '../src/interview.js';
 import { spawn } from 'node:child_process';
 
 const port = 3210;
 const baseUrl = `http://127.0.0.1:${port}`;
 
 async function main() {
+  verifyStalledFollowUpCutoff();
+
   const server = spawn(process.execPath, ['src/server.js'], {
     cwd: process.cwd(),
     env: {
@@ -226,6 +235,44 @@ async function main() {
       process.stderr.write(stderr);
     }
   }
+}
+
+function verifyStalledFollowUpCutoff() {
+  const config = {
+    role: 'backend',
+    level: 'middle',
+    style: 'pressure',
+    questionCount: 5,
+    resume: '负责订单系统，使用 Java、MySQL、Redis，做过库存一致性优化。'
+  };
+  const session = {
+    config,
+    plan: createInterviewPlan(config),
+    currentIndex: 0,
+    answers: [],
+    completed: false,
+    messages: []
+  };
+  const weakAnswers = [
+    '我们团队做了一个订单项目，主要用 Java。',
+    '主要还是团队一起做的，我这边就是参与开发。',
+    '就是配合开发和联调，更多是团队推进。'
+  ];
+
+  for (const answer of weakAnswers) {
+    recordAnswerForCurrentQuestion(session, answer);
+    createFallbackInterviewerReply({ session, answer });
+    maybeAdvanceQuestion(session, answer);
+  }
+
+  const report = createReport(session);
+  assert(session.currentIndex === 1, `stalled follow-up should advance after repeated non-progress answers, got index ${session.currentIndex}`);
+  assert(report.questions[0]?.exitReason === 'stalled_follow_up', `stalled answer should be marked as interviewer cutoff, got ${report.questions[0]?.exitReason}`);
+  assert(
+    /主动收口|连续追问后被面试官主动收口/.test(report.questions[0]?.gapAnalysis || ''),
+    `gap analysis should explain the interviewer cutoff, got: ${report.questions[0]?.gapAnalysis || ''}`
+  );
+  assert(report.uncoveredQuestions.length >= 1, 'report should keep remaining planned questions as uncovered after cutoff');
 }
 
 async function waitForHealth(timeoutMs = 8000) {
