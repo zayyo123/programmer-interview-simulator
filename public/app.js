@@ -8,6 +8,8 @@ const providerText = document.querySelector('#providerText');
 const statusText = document.querySelector('#statusText');
 const finishButton = document.querySelector('#finishButton');
 const answerSubmitButton = answerForm.querySelector('button[type="submit"]');
+const styleSelect = setupForm.querySelector('select[name="style"]');
+const styleHint = document.querySelector('#styleHint');
 
 let sessionId = null;
 let busy = false;
@@ -21,6 +23,12 @@ liveCoachEl.addEventListener('click', (event) => {
   liveCoachDetailsOpen = !liveCoachDetailsOpen;
   renderLiveCoach(latestLiveCoachSnapshot);
 });
+
+styleSelect.addEventListener('change', () => {
+  renderStyleHint(styleSelect.value);
+});
+
+renderStyleHint(styleSelect.value);
 
 setupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -136,6 +144,29 @@ function setBusy(nextBusy) {
   answerInput.disabled = nextBusy || !sessionId;
   answerSubmitButton.disabled = nextBusy || !sessionId;
   finishButton.disabled = nextBusy || !sessionId;
+}
+
+function renderStyleHint(style) {
+  const hints = {
+    normal: {
+      title: '常规面试',
+      detail: '接近真实技术面节奏：先问基础技术题，回答足够完整就进入下一题，回答偏泛时会适度追问。'
+    },
+    pressure: {
+      title: '压力面试',
+      detail: '追问更紧，重点压边界条件、取舍原因、排查顺序和真实细节；适合练抗压和补漏洞。'
+    },
+    coaching: {
+      title: '教练模式',
+      detail: '仍按面试标准提问，但会给更明确的引导，帮助你练结构、补关键点和形成可复述答案。'
+    }
+  };
+  const hint = hints[style] || hints.normal;
+
+  styleHint.innerHTML = `
+    <strong>${escapeHtml(hint.title)}</strong>
+    <span>${escapeHtml(hint.detail)}</span>
+  `;
 }
 
 async function requestJson(url, options = {}) {

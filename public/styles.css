@@ -103,6 +103,23 @@ label span {
   gap: 14px;
 }
 
+.style-hint {
+  display: grid;
+  gap: 4px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f7fafc;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.style-hint strong {
+  color: var(--ink);
+  font-size: 13px;
+}
+
 label {
   display: grid;
   gap: 7px;
