@@ -261,6 +261,7 @@ function renderReport(report) {
     const weaknesses = renderList(item.weaknesses, 'No major weakness captured.');
     const redFlags = renderList(item.redFlags, 'No obvious red flag.');
     const coachChecklist = renderList(item.coachChecklist, 'No checklist generated.');
+    const rehearsalDrill = renderList(item.mockInterviewDrill, 'No mock interview drill generated.');
     const retryBlueprint = renderRetryBlueprint(item.retryBlueprint);
     const answerRebuildPlan = renderAnswerRebuildPlan(item.answerRebuildPlan);
 
@@ -319,6 +320,10 @@ function renderReport(report) {
         <p>${escapeHtml(item.coachTip || 'N/A')}</p>
         <div class="section-label">Coach checklist</div>
         ${coachChecklist}
+        <div class="section-label">Rehearsal answer script</div>
+        <p>${escapeHtml(item.rehearsalAnswer || 'N/A')}</p>
+        <div class="section-label">Mock interview drill</div>
+        ${rehearsalDrill}
         <div class="section-label">Retry blueprint</div>
         ${retryBlueprint}
         <div class="section-label">Re-answer plan</div>

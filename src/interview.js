@@ -319,6 +319,8 @@ export function createReport(session) {
       coachChecklist: createCoachChecklist(entry.question, evaluation, levelProfile),
       retryBlueprint: createRetryBlueprint(entry.question, evaluation, levelProfile),
       answerRebuildPlan: createAnswerRebuildPlan(entry.question, evaluation, levelProfile),
+      rehearsalAnswer: createRehearsalAnswer(entry.question, evaluation, levelProfile),
+      mockInterviewDrill: createMockInterviewDrill(entry.question, evaluation, levelProfile),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
       nextFollowUp: buildSuggestedFollowUp(entry.question, evaluation, {
         followUpCount,
@@ -1496,6 +1498,66 @@ function createPracticeDrill(question, evaluation) {
   return `下次练这题时，先用 90 秒讲完主线，再围绕“${focus}”做一次“${drillMode}”练习；最后强制自己补一句“${createImmediateFix(question, evaluation)}”，重点修正“${firstMissing}”。`;
 }
 
+function createRehearsalAnswer(question, evaluation, levelProfile = getLevelExpectation('middle')) {
+  const opening = createRetryOpeningLine(
+    question,
+    evaluation,
+    question.scoringRubric?.mustHave?.find((item) => !evaluation.rubricHits.mustHave.includes(item)) || ''
+  );
+  const structure = buildAnswerFramework(question, evaluation) || `按“${levelProfile.focus}”组织回答`;
+  const fix = createImmediateFix(question, evaluation);
+  const emphasis = createRehearsalEmphasis(question, evaluation);
+
+  return `重练这题时，先记住开头：${opening} 然后按“${structure}”往下讲。中段一定补上：${fix}。结尾收在：${emphasis}。`;
+}
+
+function createRehearsalEmphasis(question, evaluation) {
+  if (['project', 'system-design'].includes(question.type)) {
+    return evaluation.communication.hasMetrics
+      ? '结果怎么验证、后面还会怎么优化'
+      : '至少一个结果指标，以及你怎么判断方案真的有效';
+  }
+
+  if (question.type === 'algorithm') {
+    return '复杂度、边界条件，以及为什么这是更稳的解法';
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return '排查顺序、根因判断依据，以及最后怎么验证';
+  }
+
+  return evaluation.communication.hasTradeoff
+    ? '适用边界和一个真实场景'
+    : '为什么这样选、代价是什么、适用边界在哪里';
+}
+
+function createMockInterviewDrill(question, evaluation, levelProfile = getLevelExpectation('middle')) {
+  const firstTurn = createRetryOpeningLine(
+    question,
+    evaluation,
+    question.scoringRubric?.mustHave?.find((item) => !evaluation.rubricHits.mustHave.includes(item)) || ''
+  );
+  const secondTurn = buildSuggestedFollowUp(question, evaluation, {
+    followUpCount: 1,
+    level: getLevelKey(levelProfile),
+    style: 'pressure'
+  });
+  const finalTurn = createPressureTestFollowUp(question, evaluation, levelProfile)
+    || createImmediateFix(question, evaluation);
+
+  return [
+    `第 1 轮：先用 60-90 秒回答，第一句就按“${firstTurn}”开场。`,
+    `第 2 轮：假设面试官追问“${secondTurn}”时，强制补上你最缺的证据或取舍。`,
+    `第 3 轮：再追问“${finalTurn}”时，结尾必须落到结果、边界或验证方式。`
+  ];
+}
+
+function getLevelKey(levelProfile) {
+  if (levelProfile === levelExpectations.junior) return 'junior';
+  if (levelProfile === levelExpectations.senior) return 'senior';
+  return 'middle';
+}
+
 function createImmediateFix(question, evaluation) {
   if (evaluation.followUpFocus) return evaluation.followUpFocus;
 
@@ -1989,6 +2051,9 @@ function createDetailFollowUp(question) {
 }
 
 function createPinDownFollowUp(question, evaluation, levelProfile) {
+  const scenarioSpecificPrompt = createScenarioSpecificFollowUp(question, evaluation, levelProfile);
+  if (scenarioSpecificPrompt) return scenarioSpecificPrompt;
+
   if (evaluation.followUpCategory === 'core') {
     return createCoreFollowUp(question, evaluation, levelProfile, 'pin-down');
   }
@@ -2025,6 +2090,12 @@ function createPinDownFollowUp(question, evaluation, levelProfile) {
 function selectFollowUp(question, evaluation, context = {}) {
   const followUpCount = context.followUpCount || 0;
   const missingRubricFocus = getMissingRubricFocus(question, evaluation);
+  const levelProfile = getLevelExpectation(context.level);
+  const scenarioSpecificPrompt = createScenarioSpecificFollowUp(question, evaluation, levelProfile);
+
+  if (followUpCount >= 2 && scenarioSpecificPrompt) {
+    return scenarioSpecificPrompt;
+  }
 
   if (followUpCount >= 2 && evaluation.followUpCategory === 'evidence') {
     return '不要泛泛而谈，直接举一个你亲自处理过的线上或项目场景，按背景、动作、结果讲清楚。';
@@ -2109,6 +2180,9 @@ function extractResumeAnchor(resume, question) {
 }
 
 function createPressureTestFollowUp(question, evaluation, levelProfile) {
+  const scenarioSpecificPrompt = createScenarioSpecificFollowUp(question, evaluation, levelProfile);
+  if (scenarioSpecificPrompt) return scenarioSpecificPrompt;
+
   if (evaluation.followUpCategory === 'core') {
     return createCoreFollowUp(question, evaluation, levelProfile, 'pressure');
   }
