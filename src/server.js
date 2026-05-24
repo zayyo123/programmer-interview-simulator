@@ -52,11 +52,11 @@ const server = createServer(async (request, response) => {
     if (request.method === 'POST' && url.pathname.match(/^\/api\/interviews\/[^/]+\/answer$/)) {
       const sessionId = url.pathname.split('/')[3];
       const session = sessions.get(sessionId);
-      if (!session) return sendJson(response, 404, { error: 'Session not found' });
+      if (!session) return sendJson(response, 404, { error: '未找到这轮面试会话' });
 
       const body = await readJson(request);
       const answer = String(body.answer || '').trim();
-      if (!answer) return sendJson(response, 400, { error: 'Answer is required' });
+      if (!answer) return sendJson(response, 400, { error: '请先输入回答' });
 
       recordAnswerForCurrentQuestion(session, answer);
 
@@ -90,7 +90,7 @@ const server = createServer(async (request, response) => {
     if (request.method === 'POST' && url.pathname.match(/^\/api\/interviews\/[^/]+\/finish$/)) {
       const sessionId = url.pathname.split('/')[3];
       const session = sessions.get(sessionId);
-      if (!session) return sendJson(response, 404, { error: 'Session not found' });
+      if (!session) return sendJson(response, 404, { error: '未找到这轮面试会话' });
 
       session.finishedAt = new Date().toISOString();
       session.report = createReport(session);
@@ -105,10 +105,10 @@ const server = createServer(async (request, response) => {
       return serveStatic(response, url.pathname);
     }
 
-    return sendJson(response, 404, { error: 'Not found' });
+    return sendJson(response, 404, { error: '未找到请求的内容' });
   } catch (error) {
     console.error(error);
-    return sendJson(response, 500, { error: 'Internal server error' });
+    return sendJson(response, 500, { error: '服务器内部错误' });
   }
 });
 
@@ -166,7 +166,7 @@ async function serveStatic(response, pathname) {
   const target = join(publicDir, cleanPath.replace(/^\/+/, ''));
 
   if (!target.startsWith(publicDir)) {
-    return sendJson(response, 403, { error: 'Forbidden' });
+    return sendJson(response, 403, { error: '没有访问权限' });
   }
 
   try {
@@ -176,7 +176,7 @@ async function serveStatic(response, pathname) {
     });
     response.end(content);
   } catch {
-    sendJson(response, 404, { error: 'Not found' });
+    sendJson(response, 404, { error: '未找到请求的内容' });
   }
 }
 

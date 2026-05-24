@@ -447,15 +447,15 @@ export function createLiveCoachSnapshot(session, answer = '') {
   if (!question) {
     return {
       stage: 'completed',
-      stageLabel: 'Interview complete',
+      stageLabel: '面试完成',
       currentQuestion: '',
       category: '',
-      target: 'All planned questions have been covered. Build the report to review the biggest interview risks and answer gaps.',
-      focus: 'Review the final report and rehearse the weakest question types first.',
-      pressureReason: 'No active pressure signal remains.',
+      target: '计划题目已经全部覆盖。生成报告后重点查看最大的面试风险和回答差距。',
+      focus: '先复盘最终报告，再优先练习最薄弱的题型。',
+      pressureReason: '当前没有进行中的追问信号。',
       missingSignals: [],
-      risk: 'No active question remains in this round.',
-      suggestedMove: 'Finish the session to generate the coaching report.',
+      risk: '本轮已经没有进行中的题目。',
+      suggestedMove: '结束本轮面试并生成复盘报告。',
       followUpCount: 0,
       stagnantFollowUpCount: 0
     };
@@ -469,12 +469,12 @@ export function createLiveCoachSnapshot(session, answer = '') {
   if (!effectiveAnswer) {
     return {
       stage: 'opening',
-      stageLabel: 'New question',
+      stageLabel: '新问题',
       currentQuestion: question.question,
       category: question.category,
       target: createOpeningCoachTarget(question, levelProfile),
       focus: createOpeningCoachFocus(question),
-      pressureReason: 'The first answer decides whether this becomes a normal question or a pressure follow-up.',
+      pressureReason: '第一轮回答会决定这题是正常推进，还是进入压力追问。',
       missingSignals: createOpeningCoachSignals(question),
       risk: createOpeningCoachRisk(question, levelProfile),
       suggestedMove: createOpeningCoachMove(question),
@@ -494,7 +494,7 @@ export function createLiveCoachSnapshot(session, answer = '') {
     currentQuestion: question.question,
     category: question.category,
     target: createFollowUpObjective(question, evaluation),
-    focus: `Interviewer is still checking whether you can land "${createImmediateFix(question, evaluation)}".`,
+    focus: `面试官还在确认你能不能把“${createImmediateFix(question, evaluation)}”讲到位。`,
     pressureReason: createLivePressureReason(question, evaluation, followUpCount, stagnantFollowUpCount),
     missingSignals: createLiveMissingSignals(question, evaluation),
     risk: describeFollowUpPressure(question, evaluation, followUpCount, levelProfile),
@@ -2103,64 +2103,64 @@ function getLiveFollowUpStage(followUpCount, stagnantFollowUpCount, evaluation) 
 function getLiveFollowUpStageLabel(followUpCount, stagnantFollowUpCount, evaluation) {
   const stage = getLiveFollowUpStage(followUpCount, stagnantFollowUpCount, evaluation);
   return {
-    ready: 'Ready to move on',
-    pressure: 'Pressure follow-up',
-    pin_down: 'Pin-down follow-up',
-    clarify: 'Clarifying follow-up'
-  }[stage] || 'Clarifying follow-up';
+    ready: '可以进入下一题',
+    pressure: '压力追问',
+    pin_down: '定点追问',
+    clarify: '澄清追问'
+  }[stage] || '澄清追问';
 }
 
 function createOpeningCoachTarget(question, levelProfile) {
   if (question.type === 'project') {
-    return 'The interviewer is checking whether you can turn a project into a credible ownership story instead of a team summary.';
+    return '面试官正在判断你能不能把项目讲成可信的个人负责经历，而不是团队流水账。';
   }
 
   if (question.type === 'system-design') {
-    return 'The interviewer is checking whether you can structure the main path first, then explain key components, bottlenecks, and tradeoffs.';
+    return '面试官正在看你能不能先搭出主链路，再讲清核心组件、瓶颈和取舍。';
   }
 
   if (question.type === 'algorithm') {
-    return 'The interviewer is checking whether you can state the approach, key data structure, and complexity before wandering into details.';
+    return '面试官正在看你能不能先说清解法、关键数据结构和复杂度，再展开细节。';
   }
 
   if (question.type === 'knowledge' && question.difficulty >= 3) {
-    return 'The interviewer is checking whether you have a real diagnostic sequence, not just concept recall.';
+    return '面试官正在看你有没有真实排查顺序，而不是只背概念。';
   }
 
-  return `At ${levelProfile.labels.join(' / ')} level, the interviewer is checking whether your first answer already covers the core idea plus supporting detail.`;
+  return `按照${levelProfile.labels.join(' / ')}的要求，面试官会看你的首轮回答是否已经覆盖核心思路和支撑细节。`;
 }
 
 function createOpeningCoachFocus(question) {
   const mustHave = (question.scoringRubric?.mustHave || []).slice(0, 3);
   if (!mustHave.length) {
-    return 'Lead with the conclusion, then add mechanism, scenario, and result.';
+    return '先给结论，再补机制、场景和结果。';
   }
 
-  return `Land these first: ${mustHave.join(' / ')}.`;
+  return `先把这些关键点讲出来：${mustHave.join(' / ')}。`;
 }
 
 function createOpeningCoachRisk(question, levelProfile) {
   if (question.type === 'project') {
-    return 'If the opening answer stays at “we built this”, the interviewer will immediately push for your own role, decision, and outcome.';
+    return '如果开场还停留在“我们做了什么”，面试官会立刻追问你的个人职责、关键判断和最终结果。';
   }
 
-  return `At this level, weak first-pass answers quickly trigger follow-ups around ${levelProfile.focus}.`;
+  return `这个级别下，首轮回答偏虚时，面试官很快会围绕${levelProfile.focus}继续追问。`;
 }
 
 function createOpeningCoachMove(question) {
   if (question.type === 'project') {
-    return 'Answer in this order: background -> your scope -> key action -> result.';
+    return '按这个顺序回答：背景 -> 你的职责范围 -> 关键动作 -> 结果。';
   }
 
   if (question.type === 'system-design') {
-    return 'Answer in this order: main path -> components -> traffic/risk -> tradeoff.';
+    return '按这个顺序回答：主链路 -> 核心组件 -> 流量或风险 -> 取舍。';
   }
 
   if (question.type === 'algorithm') {
-    return 'Answer in this order: solution -> data structure -> complexity -> edge cases.';
+    return '按这个顺序回答：解法 -> 数据结构 -> 复杂度 -> 边界情况。';
   }
 
-  return 'Lead with the conclusion, then add the mechanism, boundary, or tradeoff that proves it.';
+  return '先给结论，再补能证明这个结论的机制、边界或取舍。';
 }
 
 function createOpeningCoachSignals(question) {
@@ -2174,28 +2174,28 @@ function createOpeningCoachSignals(question) {
 
 function createLivePressureReason(question, evaluation, followUpCount, stagnantFollowUpCount) {
   if (evaluation.followUpCategory === 'complete') {
-    return 'The answer has enough signal to move forward; now keep the next answer equally dense.';
+    return '这次回答已经有足够信号可以推进；下一题继续保持同样的信息密度。';
   }
 
   const categoryReason = {
-    core: 'The interviewer still cannot hear the required core points.',
-    ownership: 'The answer sounds too team-level; personal ownership is not yet credible.',
-    tradeoff: 'The answer gives a solution but not the reason, cost, or alternative.',
-    evidence: 'The answer lacks a concrete scene that proves this came from real experience.',
-    impact: 'The answer does not prove impact with metrics, validation, or observable results.',
-    detail: 'The answer is still too high-level for the expected depth.'
-  }[evaluation.followUpCategory] || 'The interviewer needs one sharper, more concrete signal.';
+    core: '面试官还没听到本题必须落地的核心点。',
+    ownership: '回答听起来还停留在团队层面，个人负责部分不够可信。',
+    tradeoff: '回答给了方案，但没有讲清原因、成本或替代方案。',
+    evidence: '回答缺少具体场景，无法证明这是来自真实经历。',
+    impact: '回答还没有用指标、验证方式或可观察结果证明效果。',
+    detail: '回答对这个级别来说仍然太概括。'
+  }[evaluation.followUpCategory] || '面试官需要一个更锋利、更具体的信号。';
 
   if (stagnantFollowUpCount >= 1) {
-    return `${categoryReason} The last follow-up did not add enough new signal, so pressure is rising.`;
+    return `${categoryReason} 上一次追问没有补出足够新信息，所以追问压力正在上升。`;
   }
 
   if (followUpCount >= 2) {
-    return `${categoryReason} This is already a repeated follow-up, so the next answer needs to be specific immediately.`;
+    return `${categoryReason} 这已经是重复追问，下一轮必须马上给出具体内容。`;
   }
 
   if (question.type === 'project') {
-    return `${categoryReason} For project questions, this usually decides whether the experience feels real.`;
+    return `${categoryReason} 项目题里，这通常会决定面试官是否相信这段经历真实可靠。`;
   }
 
   return categoryReason;
@@ -2203,7 +2203,7 @@ function createLivePressureReason(question, evaluation, followUpCount, stagnantF
 
 function createLiveMissingSignals(question, evaluation) {
   if (evaluation.followUpCategory === 'complete') {
-    return ['Keep answer density', 'Prepare next question'];
+    return ['保持回答密度', '准备进入下一题'];
   }
 
   const missingMustHave = (question.scoringRubric?.mustHave || []).filter((item) => {
@@ -2214,11 +2214,11 @@ function createLiveMissingSignals(question, evaluation) {
   });
   const communicationSignals = [];
 
-  if (question.type === 'project' && !evaluation.communication.hasOwnership) communicationSignals.push('personal ownership');
-  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') communicationSignals.push('tradeoff');
-  if (!evaluation.communication.hasExample && question.type !== 'knowledge') communicationSignals.push('real scene');
-  if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) communicationSignals.push('result evidence');
-  if (question.type === 'knowledge' && question.difficulty >= 3 && !evaluation.communication.hasDiagnosisFlow) communicationSignals.push('diagnostic order');
+  if (question.type === 'project' && !evaluation.communication.hasOwnership) communicationSignals.push('个人职责');
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') communicationSignals.push('取舍判断');
+  if (!evaluation.communication.hasExample && question.type !== 'knowledge') communicationSignals.push('真实场景');
+  if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) communicationSignals.push('结果证据');
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !evaluation.communication.hasDiagnosisFlow) communicationSignals.push('排查顺序');
 
   return [...missingMustHave, ...communicationSignals, ...missingGoodToHave]
     .filter(Boolean)

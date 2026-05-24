@@ -26,7 +26,7 @@ setupForm.addEventListener('submit', async (event) => {
   };
 
   setBusy(true);
-  statusText.textContent = 'Starting the interview...';
+  statusText.textContent = '正在开始面试...';
 
   try {
     const data = await requestJson('/api/interviews', {
@@ -35,19 +35,19 @@ setupForm.addEventListener('submit', async (event) => {
     });
 
     sessionId = data.sessionId;
-    providerText.textContent = data.provider || 'mock';
+    providerText.textContent = getProviderText(data.provider);
     renderMessages(data.messages || []);
     renderLiveCoach(data.liveCoach);
     reportEl.className = 'report empty-state';
-    reportEl.innerHTML = '<p>The interview is in progress. Finish the session to generate coaching feedback.</p>';
-    statusText.textContent = 'Interview started. Answer as if you were in a real technical screen.';
+    reportEl.innerHTML = '<p>面试正在进行中。结束后会生成针对性的复盘反馈。</p>';
+    statusText.textContent = '面试已开始。请像真实技术面一样回答。';
     answerInput.value = '';
     answerInput.disabled = false;
     answerSubmitButton.disabled = false;
     finishButton.disabled = false;
     answerInput.focus();
   } catch (error) {
-    statusText.textContent = `Failed to start the interview: ${error.message}`;
+    statusText.textContent = `开始面试失败：${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -59,12 +59,12 @@ answerForm.addEventListener('submit', async (event) => {
 
   const answer = answerInput.value.trim();
   if (!answer) {
-    statusText.textContent = 'Enter an answer before sending.';
+    statusText.textContent = '请先输入回答再提交。';
     return;
   }
 
   setBusy(true);
-  statusText.textContent = 'The interviewer is responding...';
+  statusText.textContent = '面试官正在回应...';
 
   try {
     const data = await requestJson(`/api/interviews/${sessionId}/answer`, {
@@ -72,15 +72,15 @@ answerForm.addEventListener('submit', async (event) => {
       body: JSON.stringify({ answer })
     });
 
-    providerText.textContent = data.provider || 'mock';
+    providerText.textContent = getProviderText(data.provider);
     renderMessages(data.messages || []);
     renderLiveCoach(data.liveCoach);
     if (data.completed || !data.currentQuestion) {
-      statusText.textContent = 'All planned questions are covered. You can finish to generate the report.';
+      statusText.textContent = '计划题目已完成。可以结束并生成复盘报告。';
       answerInput.disabled = true;
       answerSubmitButton.disabled = true;
     } else {
-      statusText.textContent = 'Keep going. The interviewer may still be probing the same topic.';
+      statusText.textContent = '继续回答。面试官可能还在追问同一个主题。';
       answerInput.disabled = false;
       answerSubmitButton.disabled = false;
     }
@@ -89,7 +89,7 @@ answerForm.addEventListener('submit', async (event) => {
       answerInput.focus();
     }
   } catch (error) {
-    statusText.textContent = `Failed to submit the answer: ${error.message}`;
+    statusText.textContent = `提交回答失败：${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -99,7 +99,7 @@ finishButton.addEventListener('click', async () => {
   if (busy || !sessionId) return;
 
   setBusy(true);
-  statusText.textContent = 'Building the coaching report...';
+  statusText.textContent = '正在生成复盘报告...';
 
   try {
     const data = await requestJson(`/api/interviews/${sessionId}/finish`, {
@@ -111,9 +111,9 @@ finishButton.addEventListener('click', async () => {
     answerInput.disabled = true;
     answerSubmitButton.disabled = true;
     finishButton.disabled = true;
-    statusText.textContent = 'Report ready. Review the coach snapshot and the question-by-question gaps.';
+    statusText.textContent = '报告已生成。请查看总览和逐题差距。';
   } catch (error) {
-    statusText.textContent = `Failed to build the report: ${error.message}`;
+    statusText.textContent = `生成报告失败：${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -137,7 +137,7 @@ async function requestJson(url, options = {}) {
 
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.error || `HTTP ${response.status}`);
+    throw new Error(data.error || `请求失败（${response.status}）`);
   }
 
   return data;
@@ -146,13 +146,13 @@ async function requestJson(url, options = {}) {
 function renderMessages(messages) {
   if (!messages.length) {
     messagesEl.className = 'messages empty-state';
-    messagesEl.innerHTML = '<p>The full interview transcript will appear here.</p>';
+    messagesEl.innerHTML = '<p>完整面试记录会显示在这里。</p>';
     return;
   }
 
   messagesEl.className = 'messages';
   messagesEl.innerHTML = messages.map((message) => {
-    const roleLabel = message.role === 'candidate' ? 'Candidate' : 'Interviewer';
+    const roleLabel = message.role === 'candidate' ? '候选人' : '面试官';
     const provider = message.provider ? ` | ${message.provider}` : '';
     const timestamp = message.createdAt ? formatTime(message.createdAt) : '';
 
@@ -173,53 +173,53 @@ function renderMessages(messages) {
 function renderLiveCoach(snapshot) {
   if (!snapshot) {
     liveCoachEl.className = 'live-coach empty-state';
-    liveCoachEl.innerHTML = '<p>No live coach snapshot is available.</p>';
+    liveCoachEl.innerHTML = '<p>暂无实时面试提示。</p>';
     return;
   }
 
   const badgeClass = getLiveCoachStageClass(snapshot.stage);
   const followUpMeta = snapshot.followUpCount
-    ? `<span class="pill ${badgeClass}">${escapeHtml(`${snapshot.followUpCount} follow-up${snapshot.followUpCount > 1 ? 's' : ''}`)}</span>`
+    ? `<span class="pill ${badgeClass}">${escapeHtml(`已追问 ${snapshot.followUpCount} 次`)}</span>`
     : '';
   const stagnationMeta = snapshot.stagnantFollowUpCount
-    ? `<span class="pill amber">${escapeHtml(`${snapshot.stagnantFollowUpCount} repeated weak turn${snapshot.stagnantFollowUpCount > 1 ? 's' : ''}`)}</span>`
+    ? `<span class="pill amber">${escapeHtml(`弱回答重复 ${snapshot.stagnantFollowUpCount} 次`)}</span>`
     : '';
   const missingSignals = Array.isArray(snapshot.missingSignals) && snapshot.missingSignals.length
     ? snapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
-    : '<span class="pill green">No obvious missing signal</span>';
+    : '<span class="pill green">暂无明显缺失信号</span>';
 
   liveCoachEl.className = 'live-coach';
   liveCoachEl.innerHTML = `
     <div class="live-coach-header">
       <div>
-        <strong>Live interviewer radar</strong>
-        <p>${escapeHtml(snapshot.currentQuestion || 'No active question')}</p>
+        <strong>实时面试官雷达</strong>
+        <p>${escapeHtml(snapshot.currentQuestion || '暂无进行中的问题')}</p>
       </div>
       <div class="meta-row">
-        <span class="pill ${badgeClass}">${escapeHtml(snapshot.stageLabel || 'Live')}</span>
+        <span class="pill ${badgeClass}">${escapeHtml(snapshot.stageLabel || '实时')}</span>
         ${followUpMeta}
         ${stagnationMeta}
       </div>
     </div>
-    <div class="section-label">What the interviewer is checking</div>
-    <p>${escapeHtml(snapshot.target || 'N/A')}</p>
-    <div class="section-label">Current gap</div>
-    <p>${escapeHtml(snapshot.focus || 'N/A')}</p>
-    <div class="section-label">Pressure reason</div>
-    <p>${escapeHtml(snapshot.pressureReason || 'N/A')}</p>
-    <div class="section-label">Missing signals</div>
+    <div class="section-label">面试官正在考察</div>
+    <p>${escapeHtml(snapshot.target || '暂无')}</p>
+    <div class="section-label">当前缺口</div>
+    <p>${escapeHtml(snapshot.focus || '暂无')}</p>
+    <div class="section-label">压力来源</div>
+    <p>${escapeHtml(snapshot.pressureReason || '暂无')}</p>
+    <div class="section-label">缺失信号</div>
     <div class="meta-row">${missingSignals}</div>
-    <div class="section-label">Why it matters</div>
-    <p>${escapeHtml(snapshot.risk || 'N/A')}</p>
-    <div class="section-label">Best next move</div>
-    <p>${escapeHtml(snapshot.suggestedMove || 'N/A')}</p>
+    <div class="section-label">为什么重要</div>
+    <p>${escapeHtml(snapshot.risk || '暂无')}</p>
+    <div class="section-label">下一步最佳回答</div>
+    <p>${escapeHtml(snapshot.suggestedMove || '暂无')}</p>
   `;
 }
 
 function renderReport(report) {
   if (!report) {
     reportEl.className = 'report empty-state';
-    reportEl.innerHTML = '<p>No report data is available.</p>';
+    reportEl.innerHTML = '<p>暂无报告数据。</p>';
     return;
   }
 
@@ -231,90 +231,90 @@ function renderReport(report) {
   const competencyBreakdown = Array.isArray(overview.competencyBreakdown) ? overview.competencyBreakdown : [];
   const interviewerConcerns = overview.interviewerConcerns || null;
   const interviewerConcernEvidenceHtml = Array.isArray(interviewerConcerns?.evidence) && interviewerConcerns.evidence.length
-    ? renderList(interviewerConcerns.evidence, 'No interviewer concern evidence captured.')
-    : '<p>No interviewer concern evidence captured.</p>';
+    ? renderList(interviewerConcerns.evidence, '暂无面试官顾虑证据。')
+    : '<p>暂无面试官顾虑证据。</p>';
   const coachPriorityHtml = Array.isArray(overview.coachPriorities) && overview.coachPriorities.length
     ? overview.coachPriorities.map((item, index) => `
         <div class="priority-item">
           <div class="priority-rank">${index + 1}</div>
           <div class="priority-body">
-            <strong>${escapeHtml(item.title || 'Priority area')}</strong>
+            <strong>${escapeHtml(item.title || '优先提升项')}</strong>
             <p>${escapeHtml(item.detail || '')}</p>
-            <p>${escapeHtml(item.rebuildPrompt ? `Re-answer prompt: ${item.rebuildPrompt}` : '')}</p>
+            <p>${escapeHtml(item.rebuildPrompt ? `重答提示：${item.rebuildPrompt}` : '')}</p>
           </div>
         </div>
       `).join('')
-    : '<p>Add more interview answers to generate a stronger coaching priority list.</p>';
+    : '<p>继续完成更多回答后，会生成更完整的提升优先级。</p>';
 
   const weakAreaHtml = weakAreas.length
     ? weakAreas.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
-    : '<span class="pill">No obvious weak area yet</span>';
+    : '<span class="pill">暂未发现明显薄弱点</span>';
 
   const nextPracticeHtml = nextPractice.length
     ? nextPractice.map((item) => `
         <article class="practice-item">
-          <strong>${escapeHtml(item.title || 'Next drill')}</strong>
+          <strong>${escapeHtml(item.title || '下一轮练习')}</strong>
           <p>${escapeHtml(item.goal || item.detail || '')}</p>
           <p>${escapeHtml(item.action || '')}</p>
         </article>
       `).join('')
-    : '<p>Complete more answers to generate targeted next-practice recommendations.</p>';
+    : '<p>完成更多回答后，会生成更有针对性的练习建议。</p>';
   const uncoveredQuestionsHtml = uncoveredQuestions.length
     ? uncoveredQuestions.map((item) => `
         <article class="practice-item">
           <div class="meta-row">
-            <strong>${escapeHtml(item.category || 'Uncovered area')}</strong>
-            <span class="pill amber">${escapeHtml(`${item.targetDuration || 90}s prep`)}</span>
+            <strong>${escapeHtml(item.category || '未覆盖方向')}</strong>
+            <span class="pill amber">${escapeHtml(`${item.targetDuration || 90} 秒准备`)}</span>
           </div>
           <p>${escapeHtml(item.question || '')}</p>
           <p>${escapeHtml(item.preparationHint || '')}</p>
           <p>${escapeHtml(item.risk || '')}</p>
         </article>
       `).join('')
-    : '<p>All planned questions were at least reached once in this round.</p>';
+    : '<p>本轮计划题目都至少覆盖过一次。</p>';
   const practicePlanHtml = practicePlan.length
     ? practicePlan.map((item) => `
         <article class="plan-item">
-          <strong>${escapeHtml(item.title || 'Practice round')}</strong>
-          <p>${escapeHtml(`Focus: ${item.focus || 'N/A'}`)}</p>
-          <p>${escapeHtml(`Task: ${item.task || 'N/A'}`)}</p>
-          <p>${escapeHtml(`Success mark: ${item.successMark || 'N/A'}`)}</p>
+          <strong>${escapeHtml(item.title || '练习轮次')}</strong>
+          <p>${escapeHtml(`重点：${item.focus || '暂无'}`)}</p>
+          <p>${escapeHtml(`任务：${item.task || '暂无'}`)}</p>
+          <p>${escapeHtml(`达标标志：${item.successMark || '暂无'}`)}</p>
         </article>
       `).join('')
-    : '<p>Finish more interview answers to generate a staged practice plan.</p>';
+    : '<p>完成更多面试回答后，会生成分阶段练习计划。</p>';
   const competencyBreakdownHtml = competencyBreakdown.length
     ? competencyBreakdown.map((item) => `
         <article class="practice-item">
           <div class="meta-row">
-            <strong>${escapeHtml(item.label || 'Competency')}</strong>
+            <strong>${escapeHtml(item.label || '能力项')}</strong>
             <span class="pill ${getCompetencyLevelChipClass(item.level)}">${escapeHtml(getCompetencyLevelText(item.level))}</span>
           </div>
           <p>${escapeHtml(item.evidence || '')}</p>
-          <p>${escapeHtml(`Gap: ${item.gap || 'N/A'}`)}</p>
-          <p>${escapeHtml(`Next drill: ${item.action || 'N/A'}`)}</p>
+          <p>${escapeHtml(`差距：${item.gap || '暂无'}`)}</p>
+          <p>${escapeHtml(`下一步练习：${item.action || '暂无'}`)}</p>
         </article>
       `).join('')
-    : '<p>Add more answers to generate a competency breakdown.</p>';
+    : '<p>继续作答后，会生成能力拆解。</p>';
 
   const snapshotStats = [
     {
-      label: 'Overall score',
+      label: '总分',
       value: overview.score ?? '-'
     },
     {
-      label: 'Answered',
+      label: '已答题',
       value: `${overview.answeredQuestions ?? 0}/${overview.totalQuestions ?? 0}`
     },
     {
-      label: 'Readiness',
+      label: '面试准备度',
       value: overview.readiness || '-'
     },
     {
-      label: 'Interview signal',
+      label: '面试信号',
       value: overview.hireSignal?.label || '-'
     },
     {
-      label: 'Panel decision',
+      label: '面试结论',
       value: overview.panelDecision?.label || '-'
     }
   ].map((item) => `
@@ -325,90 +325,90 @@ function renderReport(report) {
     `).join('');
 
   const questionsHtml = (report.questions || []).map((item, index) => {
-    const strengths = renderList(item.strengths, 'No clear strength captured.');
-    const weaknesses = renderList(item.weaknesses, 'No major weakness captured.');
-    const redFlags = renderList(item.redFlags, 'No obvious red flag.');
-    const coachChecklist = renderList(item.coachChecklist, 'No checklist generated.');
-    const rehearsalDrill = renderList(item.mockInterviewDrill, 'No mock interview drill generated.');
+    const strengths = renderList(item.strengths, '暂无明确优势信号。');
+    const weaknesses = renderList(item.weaknesses, '暂无明显短板。');
+    const redFlags = renderList(item.redFlags, '暂无明显风险信号。');
+    const coachChecklist = renderList(item.coachChecklist, '暂无检查清单。');
+    const rehearsalDrill = renderList(item.mockInterviewDrill, '暂无模拟练习。');
     const retryBlueprint = renderRetryBlueprint(item.retryBlueprint);
     const answerRebuildPlan = renderAnswerRebuildPlan(item.answerRebuildPlan);
     const answerPlaybook = renderAnswerPlaybook(item.answerPlaybook);
 
     return `
       <article class="report-card">
-        <h3>Question ${index + 1} | ${escapeHtml(item.category || 'Uncategorized')}</h3>
+        <h3>第 ${index + 1} 题 | ${escapeHtml(item.category || '未分类')}</h3>
         <p>${escapeHtml(item.question || '')}</p>
         <div class="meta-row">
-          <span class="pill">${escapeHtml(`Score ${item.score ?? '-'}`)}</span>
-          <span class="pill">${escapeHtml(`Attempts ${item.attempts ?? 1}`)}</span>
-          <span class="pill">${escapeHtml(`Follow-ups ${item.followUpCount ?? 0}`)}</span>
+          <span class="pill">${escapeHtml(`得分 ${item.score ?? '-'}`)}</span>
+          <span class="pill">${escapeHtml(`回答次数 ${item.attempts ?? 1}`)}</span>
+          <span class="pill">${escapeHtml(`追问 ${item.followUpCount ?? 0}`)}</span>
         </div>
-        <div class="section-label">Your answer summary</div>
-        <p>${escapeHtml(item.userAnswerSummary || item.userAnswer || 'N/A')}</p>
-        <div class="section-label">Reference answer</div>
-        <p>${escapeHtml(item.referenceAnswer || 'N/A')}</p>
-        <div class="section-label">Strong interview answer example</div>
-        <p>${escapeHtml(item.excellentAnswer || 'N/A')}</p>
-        <div class="section-label">Gap analysis</div>
-        <p>${escapeHtml(item.gapAnalysis || 'N/A')}</p>
-        <div class="section-label">Interviewer verdict</div>
+        <div class="section-label">你的回答摘要</div>
+        <p>${escapeHtml(item.userAnswerSummary || item.userAnswer || '暂无')}</p>
+        <div class="section-label">参考答案</div>
+        <p>${escapeHtml(item.referenceAnswer || '暂无')}</p>
+        <div class="section-label">优秀回答示例</div>
+        <p>${escapeHtml(item.excellentAnswer || '暂无')}</p>
+        <div class="section-label">差距分析</div>
+        <p>${escapeHtml(item.gapAnalysis || '暂无')}</p>
+        <div class="section-label">面试官判断</div>
         <div class="meta-row">
-          <span class="pill ${getVerdictChipClass(item.interviewerVerdict)}">${escapeHtml(item.interviewerVerdict?.label || 'N/A')}</span>
+          <span class="pill ${getVerdictChipClass(item.interviewerVerdict)}">${escapeHtml(item.interviewerVerdict?.label || '暂无')}</span>
         </div>
-        <p>${escapeHtml(item.interviewerVerdict?.detail || 'No interviewer verdict available.')}</p>
-        <div class="section-label">Pass-bar guidance</div>
+        <p>${escapeHtml(item.interviewerVerdict?.detail || '暂无面试官判断。')}</p>
+        <div class="section-label">通过线建议</div>
         <div class="meta-row">
-          <span class="pill ${getPassBarChipClass(item.passBarSignal)}">${escapeHtml(item.passBarSignal?.label || 'N/A')}</span>
+          <span class="pill ${getPassBarChipClass(item.passBarSignal)}">${escapeHtml(item.passBarSignal?.label || '暂无')}</span>
         </div>
-        <p>${escapeHtml(item.passBarSignal?.detail || 'No pass-bar guidance available.')}</p>
-        <div class="section-label">What the interviewer still needed</div>
-        <p>${escapeHtml(item.passBarDelta?.headline || 'No pass-bar delta available.')}</p>
+        <p>${escapeHtml(item.passBarSignal?.detail || '暂无通过线建议。')}</p>
+        <div class="section-label">面试官还想听到什么</div>
+        <p>${escapeHtml(item.passBarDelta?.headline || '暂无通过线差距。')}</p>
         <p>${escapeHtml(item.passBarDelta?.detail || '')}</p>
-        ${renderList(item.passBarDelta?.mustLand, 'No concrete missing answer target generated.')}
-        <p>${escapeHtml(item.passBarDelta?.nextSentence ? `Next sentence to add: ${item.passBarDelta.nextSentence}` : '')}</p>
+        ${renderList(item.passBarDelta?.mustLand, '暂无具体补充目标。')}
+        <p>${escapeHtml(item.passBarDelta?.nextSentence ? `下一句应该补：${item.passBarDelta.nextSentence}` : '')}</p>
         <p>${escapeHtml(item.passBarDelta?.risk || '')}</p>
-        <div class="section-label">Resume grounding</div>
+        <div class="section-label">简历支撑</div>
         <div class="meta-row">
-          <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || 'N/A')}</span>
+          <span class="pill ${getResumeChipClass(item.resumeSupport)}">${escapeHtml(item.resumeSupport?.label || '暂无')}</span>
         </div>
-        <p>${escapeHtml(item.resumeSupport?.detail || 'No resume grounding analysis available.')}</p>
-        <div class="section-label">Strengths</div>
+        <p>${escapeHtml(item.resumeSupport?.detail || '暂无简历支撑分析。')}</p>
+        <div class="section-label">优势</div>
         ${strengths}
-        <div class="section-label">Weak spots</div>
+        <div class="section-label">薄弱点</div>
         ${weaknesses}
-        <div class="section-label">Risk signals</div>
+        <div class="section-label">风险信号</div>
         ${redFlags}
-        <div class="section-label">Likely interviewer takeaway</div>
-        <p>${escapeHtml(item.interviewerSignal || 'N/A')}</p>
-        <div class="section-label">Competency signal</div>
+        <div class="section-label">面试官可能形成的印象</div>
+        <p>${escapeHtml(item.interviewerSignal || '暂无')}</p>
+        <div class="section-label">能力信号</div>
         <div class="meta-row">
-          <span class="pill ${getCompetencyChipClass(item.interviewerCompetencySignal)}">${escapeHtml(item.interviewerCompetencySignal?.label || 'N/A')}</span>
+          <span class="pill ${getCompetencyChipClass(item.interviewerCompetencySignal)}">${escapeHtml(item.interviewerCompetencySignal?.label || '暂无')}</span>
         </div>
-        <p>${escapeHtml(item.interviewerCompetencySignal?.detail || 'No competency signal available.')}</p>
-        <div class="section-label">Follow-up objective</div>
-        <p>${escapeHtml(item.followUpObjective || 'N/A')}</p>
-        <div class="section-label">Follow-up pressure</div>
-        <p>${escapeHtml(item.followUpPressure || 'N/A')}</p>
-        <div class="section-label">Most likely next follow-up</div>
-        <p>${escapeHtml(item.nextFollowUp || 'N/A')}</p>
-        <div class="section-label">Coach tip</div>
-        <p>${escapeHtml(item.coachTip || 'N/A')}</p>
-        <div class="section-label">Coach checklist</div>
+        <p>${escapeHtml(item.interviewerCompetencySignal?.detail || '暂无能力信号。')}</p>
+        <div class="section-label">追问目标</div>
+        <p>${escapeHtml(item.followUpObjective || '暂无')}</p>
+        <div class="section-label">追问压力</div>
+        <p>${escapeHtml(item.followUpPressure || '暂无')}</p>
+        <div class="section-label">最可能的下一问</div>
+        <p>${escapeHtml(item.nextFollowUp || '暂无')}</p>
+        <div class="section-label">教练建议</div>
+        <p>${escapeHtml(item.coachTip || '暂无')}</p>
+        <div class="section-label">教练检查清单</div>
         ${coachChecklist}
-        <div class="section-label">Answer playbook</div>
+        <div class="section-label">回答策略</div>
         ${answerPlaybook}
-        <div class="section-label">Rehearsal answer script</div>
-        <p>${escapeHtml(item.rehearsalAnswer || 'N/A')}</p>
-        <div class="section-label">Mock interview drill</div>
+        <div class="section-label">复述练习脚本</div>
+        <p>${escapeHtml(item.rehearsalAnswer || '暂无')}</p>
+        <div class="section-label">模拟练习</div>
         ${rehearsalDrill}
-        <div class="section-label">Retry blueprint</div>
+        <div class="section-label">重答蓝图</div>
         ${retryBlueprint}
-        <div class="section-label">Re-answer plan</div>
+        <div class="section-label">重答计划</div>
         ${answerRebuildPlan}
-        <div class="section-label">Improved answer</div>
-        <p>${escapeHtml(item.improvedUserAnswer || 'N/A')}</p>
-        <div class="section-label">Practice drill</div>
-        <p>${escapeHtml(item.practiceDrill || 'N/A')}</p>
+        <div class="section-label">优化后的回答</div>
+        <p>${escapeHtml(item.improvedUserAnswer || '暂无')}</p>
+        <div class="section-label">练习任务</div>
+        <p>${escapeHtml(item.practiceDrill || '暂无')}</p>
       </article>
     `;
   }).join('');
@@ -416,53 +416,53 @@ function renderReport(report) {
   reportEl.className = 'report';
   reportEl.innerHTML = `
     <article class="report-card snapshot-card">
-      <h3>Coach snapshot</h3>
+      <h3>教练总览</h3>
       <div class="snapshot-grid">${snapshotStats}</div>
-      <div class="section-label">Overall summary</div>
-      <p>${escapeHtml(overview.summary || 'N/A')}</p>
-      <div class="section-label">Interviewer impression</div>
-      <p>${escapeHtml(overview.interviewerImpression || 'N/A')}</p>
-      <div class="section-label">Likely interviewer concern</div>
-      <p>${escapeHtml(interviewerConcerns?.headline || 'N/A')}</p>
-      <p>${escapeHtml(interviewerConcerns?.summary || 'No synthesized interviewer concern yet.')}</p>
+      <div class="section-label">总体总结</div>
+      <p>${escapeHtml(overview.summary || '暂无')}</p>
+      <div class="section-label">面试官印象</div>
+      <p>${escapeHtml(overview.interviewerImpression || '暂无')}</p>
+      <div class="section-label">面试官可能的顾虑</div>
+      <p>${escapeHtml(interviewerConcerns?.headline || '暂无')}</p>
+      <p>${escapeHtml(interviewerConcerns?.summary || '暂无面试官顾虑总结。')}</p>
       ${interviewerConcernEvidenceHtml}
-      <p>${escapeHtml(interviewerConcerns?.practice ? `Practice first: ${interviewerConcerns.practice}` : '')}</p>
-      <div class="section-label">Panel decision</div>
+      <p>${escapeHtml(interviewerConcerns?.practice ? `优先练习：${interviewerConcerns.practice}` : '')}</p>
+      <div class="section-label">面试结论</div>
       <div class="meta-row">
-        <span class="pill ${getPanelDecisionChipClass(overview.panelDecision)}">${escapeHtml(overview.panelDecision?.label || 'N/A')}</span>
+        <span class="pill ${getPanelDecisionChipClass(overview.panelDecision)}">${escapeHtml(overview.panelDecision?.label || '暂无')}</span>
       </div>
-      <p>${escapeHtml(overview.panelDecision?.detail || 'No panel decision available.')}</p>
-      <div class="section-label">Competency summary</div>
-      <p>${escapeHtml(overview.competencySummary || 'N/A')}</p>
-      <div class="section-label">Competency breakdown</div>
+      <p>${escapeHtml(overview.panelDecision?.detail || '暂无面试结论。')}</p>
+      <div class="section-label">能力总结</div>
+      <p>${escapeHtml(overview.competencySummary || '暂无')}</p>
+      <div class="section-label">能力拆解</div>
       ${competencyBreakdownHtml}
-      <div class="section-label">Coaching focus</div>
-      <p>${escapeHtml(overview.coachingFocus || 'Add more answers to surface coaching themes.')}</p>
-      <div class="section-label">Practice summary</div>
-      <p>${escapeHtml(overview.practiceSummary || 'Add more answers to generate a structured practice summary.')}</p>
-      <div class="section-label">Answer target</div>
-      <p>${escapeHtml(overview.answerTargetSummary || 'Add more answers to generate a clearer pass-bar target.')}</p>
-      <div class="section-label">Uncovered planned questions</div>
-      <p>${escapeHtml(overview.uncoveredQuestionSummary || 'N/A')}</p>
+      <div class="section-label">辅导重点</div>
+      <p>${escapeHtml(overview.coachingFocus || '继续作答后，会形成更明确的辅导主题。')}</p>
+      <div class="section-label">练习总结</div>
+      <p>${escapeHtml(overview.practiceSummary || '继续作答后，会生成结构化练习总结。')}</p>
+      <div class="section-label">回答目标</div>
+      <p>${escapeHtml(overview.answerTargetSummary || '继续作答后，会生成更清晰的通过线目标。')}</p>
+      <div class="section-label">未覆盖的计划题目</div>
+      <p>${escapeHtml(overview.uncoveredQuestionSummary || '暂无')}</p>
       ${uncoveredQuestionsHtml}
-      <div class="section-label">Real interview risk</div>
-      <p>${escapeHtml(overview.riskSummary || 'Add more answers to estimate interview risk.')}</p>
-      <div class="section-label">Resume grounding coverage</div>
-      <p>${escapeHtml(overview.resumeCoverage || 'N/A')}</p>
-      <p>${escapeHtml(overview.resumeGrounding || 'N/A')}</p>
-      <div class="section-label">Level expectation</div>
-      <p>${escapeHtml(overview.levelExpectation || 'N/A')}</p>
-      <div class="section-label">Top coaching priorities</div>
+      <div class="section-label">真实面试风险</div>
+      <p>${escapeHtml(overview.riskSummary || '继续作答后，会估算真实面试风险。')}</p>
+      <div class="section-label">简历支撑覆盖度</div>
+      <p>${escapeHtml(overview.resumeCoverage || '暂无')}</p>
+      <p>${escapeHtml(overview.resumeGrounding || '暂无')}</p>
+      <div class="section-label">级别要求</div>
+      <p>${escapeHtml(overview.levelExpectation || '暂无')}</p>
+      <div class="section-label">最高优先级提升项</div>
       <div class="priority-list">${coachPriorityHtml}</div>
-      <div class="section-label">Weak areas</div>
+      <div class="section-label">薄弱领域</div>
       <div class="meta-row">${weakAreaHtml}</div>
     </article>
     ${questionsHtml}
     <article class="report-card">
-      <h3>Next practice</h3>
-      <div class="section-label">Staged plan</div>
+      <h3>下一步练习</h3>
+      <div class="section-label">分阶段计划</div>
       ${practicePlanHtml}
-      <div class="section-label">Suggested drills</div>
+      <div class="section-label">建议练习</div>
       ${nextPracticeHtml}
     </article>
   `;
@@ -478,35 +478,35 @@ function renderList(items, fallback) {
 
 function renderAnswerRebuildPlan(plan) {
   if (!plan) {
-    return '<p>No re-answer plan available.</p>';
+    return '<p>暂无重答计划。</p>';
   }
 
   return [
-    `<p>${escapeHtml(plan.opening || 'N/A')}</p>`,
-    `<p>${escapeHtml(plan.structure || 'N/A')}</p>`,
-    renderList(plan.checkpoints, 'No concrete rebuild checkpoints generated.'),
+    `<p>${escapeHtml(plan.opening || '暂无')}</p>`,
+    `<p>${escapeHtml(plan.structure || '暂无')}</p>`,
+    renderList(plan.checkpoints, '暂无具体重构检查点。'),
     `<p>${escapeHtml(plan.emphasis || '')}</p>`,
     `<p>${escapeHtml(plan.closing || '')}</p>`,
-    `<p>${escapeHtml(plan.rehearsalPrompt ? `Rehearsal prompt: ${plan.rehearsalPrompt}` : '')}</p>`,
-    `<p>${escapeHtml(plan.avoid ? `Avoid: ${plan.avoid}` : '')}</p>`
+    `<p>${escapeHtml(plan.rehearsalPrompt ? `复述练习提示：${plan.rehearsalPrompt}` : '')}</p>`,
+    `<p>${escapeHtml(plan.avoid ? `避免这样说：${plan.avoid}` : '')}</p>`
   ].join('');
 }
 
 function renderRetryBlueprint(blueprint) {
   if (!blueprint) {
-    return '<p>No retry blueprint available.</p>';
+    return '<p>暂无重答蓝图。</p>';
   }
 
   const rows = [
-    ['Opening line', blueprint.openingLine],
-    ['Answer structure', blueprint.structure],
-    ['Keep this anchor', blueprint.anchor],
-    ['What to add', blueprint.addEvidence],
-    ['Trap to avoid', blueprint.avoidTrap]
+    ['开场句', blueprint.openingLine],
+    ['回答结构', blueprint.structure],
+    ['保留锚点', blueprint.anchor],
+    ['需要补充', blueprint.addEvidence],
+    ['避坑提醒', blueprint.avoidTrap]
   ].filter(([, value]) => value);
 
   if (!rows.length) {
-    return '<p>No retry blueprint available.</p>';
+    return '<p>暂无重答蓝图。</p>';
   }
 
   return `
@@ -523,16 +523,16 @@ function renderRetryBlueprint(blueprint) {
 
 function renderAnswerPlaybook(playbook) {
   if (!playbook) {
-    return '<p>No answer playbook available.</p>';
+    return '<p>暂无回答策略。</p>';
   }
 
   return [
-    `<p>${escapeHtml(playbook.interviewerIntent || 'N/A')}</p>`,
-    `<p>${escapeHtml(playbook.first30Seconds ? `First 30 seconds: ${playbook.first30Seconds}` : '')}</p>`,
-    renderList(playbook.proofPoints, 'No concrete proof points generated.'),
-    `<p>${escapeHtml(playbook.likelyPushback ? `Likely pushback: ${playbook.likelyPushback}` : '')}</p>`,
-    `<p>${escapeHtml(playbook.recoveryLine ? `Recovery line: ${playbook.recoveryLine}` : '')}</p>`,
-    `<p>${escapeHtml(playbook.doNotSay ? `Do not say: ${playbook.doNotSay}` : '')}</p>`
+    `<p>${escapeHtml(playbook.interviewerIntent || '暂无')}</p>`,
+    `<p>${escapeHtml(playbook.first30Seconds ? `前 30 秒：${playbook.first30Seconds}` : '')}</p>`,
+    renderList(playbook.proofPoints, '暂无具体证明点。'),
+    `<p>${escapeHtml(playbook.likelyPushback ? `可能追问：${playbook.likelyPushback}` : '')}</p>`,
+    `<p>${escapeHtml(playbook.recoveryLine ? `补救句：${playbook.recoveryLine}` : '')}</p>`,
+    `<p>${escapeHtml(playbook.doNotSay ? `不要这样说：${playbook.doNotSay}` : '')}</p>`
   ].join('');
 }
 
@@ -550,10 +550,19 @@ function getLiveCoachStageClass(stage) {
 function formatTime(value) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '';
-  return date.toLocaleTimeString('en-US', {
+  return date.toLocaleTimeString('zh-CN', {
     hour: '2-digit',
     minute: '2-digit'
   });
+}
+
+function getProviderText(provider) {
+  return {
+    mock: '本地模拟面试官',
+    gemini: 'Gemini',
+    openrouter: 'OpenRouter',
+    ollama: 'Ollama'
+  }[provider] || provider || '本地模拟面试官';
 }
 
 function escapeHtml(value) {
@@ -594,10 +603,10 @@ function getCompetencyLevelChipClass(level) {
 
 function getCompetencyLevelText(level) {
   return {
-    strong: 'Above bar',
-    watch: 'Watch',
-    risk: 'Below bar'
-  }[level] || 'Watch';
+    strong: '高于通过线',
+    watch: '需要观察',
+    risk: '低于通过线'
+  }[level] || '需要观察';
 }
 
 function getPassBarChipClass(signal) {

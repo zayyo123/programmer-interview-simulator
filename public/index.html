@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Programmer Interview Simulator</title>
+    <title>程序员模拟面试系统</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -12,97 +12,97 @@
         <div class="brand">
           <div class="brand-mark">AI</div>
           <div>
-            <h1>Programmer Interview Simulator</h1>
-            <p>Mock interviewer, follow-up pressure, and coaching report in one flow.</p>
+            <h1>程序员模拟面试系统</h1>
+            <p>模拟面试官、真实追问压力和复盘报告，一次完整练习。</p>
           </div>
         </div>
 
         <form id="setupForm" class="setup-form">
           <label>
-            <span>Role track</span>
+            <span>面试方向</span>
             <select name="role">
-              <option value="java">Java Backend</option>
-              <option value="backend">Backend</option>
-              <option value="frontend">Frontend</option>
-              <option value="fullstack">Full Stack</option>
-              <option value="go">Go Backend</option>
-              <option value="python">Python Backend</option>
+              <option value="java">Java 后端</option>
+              <option value="backend">后端开发</option>
+              <option value="frontend">前端开发</option>
+              <option value="fullstack">全栈开发</option>
+              <option value="go">Go 后端</option>
+              <option value="python">Python 后端</option>
             </select>
           </label>
 
           <label>
-            <span>Level</span>
+            <span>面试级别</span>
             <select name="level">
-              <option value="junior">Junior</option>
-              <option value="middle" selected>Mid-level</option>
-              <option value="senior">Senior</option>
+              <option value="junior">初级</option>
+              <option value="middle" selected>中级</option>
+              <option value="senior">高级</option>
             </select>
           </label>
 
           <label>
-            <span>Interview style</span>
+            <span>面试风格</span>
             <select name="style">
-              <option value="normal">Normal</option>
-              <option value="pressure">Pressure</option>
-              <option value="coaching">Coaching</option>
+              <option value="normal">常规面试</option>
+              <option value="pressure">压力面试</option>
+              <option value="coaching">教练模式</option>
             </select>
           </label>
 
           <label>
-            <span>Question count</span>
+            <span>题目数量</span>
             <input name="questionCount" type="number" min="3" max="6" value="5" />
           </label>
 
           <label class="wide">
-            <span>Resume or project context</span>
+            <span>简历或项目背景</span>
             <textarea
               name="resume"
               rows="6"
-              placeholder="Example: Built an order platform with Spring Boot, MySQL, Redis, and RabbitMQ. Owned inventory deduction, retry compensation, and incident debugging."
+              placeholder="示例：负责订单平台，技术栈 Spring Boot、MySQL、Redis、RabbitMQ，主导库存扣减、失败补偿和线上问题排查。"
             ></textarea>
           </label>
 
-          <button type="submit" class="primary-button">Start interview</button>
+          <button type="submit" class="primary-button">开始模拟面试</button>
         </form>
 
         <div class="provider-note">
-          <strong>AI Provider</strong>
-          <span id="providerText">Not started</span>
+          <strong>AI 提供方</strong>
+          <span id="providerText">尚未开始</span>
         </div>
       </section>
 
       <section class="interview-panel">
         <div class="panel-header">
           <div>
-            <h2>Interview chat</h2>
-            <p id="statusText">Choose a setup to begin. If no model is configured, the app uses the local mock interviewer.</p>
+            <h2>面试对话</h2>
+            <p id="statusText">选择配置后开始。如果没有配置模型，系统会使用本地模拟面试官。</p>
           </div>
-          <button id="finishButton" class="ghost-button" disabled>Finish and build report</button>
+          <button id="finishButton" class="ghost-button" disabled>结束并生成报告</button>
         </div>
 
         <div id="messages" class="messages empty-state">
-          <p>The interviewer will open the session here and ask the first question.</p>
+          <p>面试官会在这里开场，并提出第一道问题。</p>
         </div>
 
         <aside id="liveCoach" class="live-coach empty-state">
-          <p>Start an interview to see what the interviewer is testing right now.</p>
+          <p>开始面试后，这里会显示面试官当前正在考察什么。</p>
         </aside>
 
         <form id="answerForm" class="answer-form">
-          <textarea id="answerInput" rows="4" placeholder="Type your answer here..." disabled></textarea>
-          <button type="submit" class="primary-button" disabled>Send answer</button>
+          <textarea id="answerInput" rows="4" placeholder="在这里输入你的回答..." disabled></textarea>
+          <button type="submit" class="primary-button" disabled>提交回答</button>
         </form>
       </section>
 
       <section class="report-panel">
         <div class="panel-header">
           <div>
-            <h2>Coaching report</h2>
-            <p>After the interview, review score signals, gap analysis, and better answer examples.</p>
+            <h2>复盘报告</h2>
+            <p>面试结束后查看评分信号、差距分析和更好的回答示例。</p>
           </div>
         </div>
         <div id="report" class="report empty-state">
-          <p>Finish an interview to generate the coaching report.</p>
+          <p>完成一轮面试后会生成复盘报告。</p>
         </div>
       </section>
     </main>
