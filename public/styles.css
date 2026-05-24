@@ -230,6 +230,22 @@ button:disabled {
   margin-bottom: 4px;
 }
 
+.live-coach-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.live-coach-toggle {
+  height: 34px;
+}
+
+.live-coach-details {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
 .empty-state {
   display: grid;
   place-items: center;

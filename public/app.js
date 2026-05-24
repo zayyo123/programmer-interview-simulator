@@ -11,6 +11,16 @@ const answerSubmitButton = answerForm.querySelector('button[type="submit"]');
 
 let sessionId = null;
 let busy = false;
+let latestLiveCoachSnapshot = null;
+let liveCoachDetailsOpen = false;
+
+liveCoachEl.addEventListener('click', (event) => {
+  const toggle = event.target.closest('[data-live-coach-toggle]');
+  if (!toggle || !latestLiveCoachSnapshot) return;
+
+  liveCoachDetailsOpen = !liveCoachDetailsOpen;
+  renderLiveCoach(latestLiveCoachSnapshot);
+});
 
 setupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -35,6 +45,7 @@ setupForm.addEventListener('submit', async (event) => {
     });
 
     sessionId = data.sessionId;
+    liveCoachDetailsOpen = false;
     providerText.textContent = getProviderText(data.provider);
     renderMessages(data.messages || []);
     renderLiveCoach(data.liveCoach);
@@ -172,11 +183,13 @@ function renderMessages(messages) {
 
 function renderLiveCoach(snapshot) {
   if (!snapshot) {
+    latestLiveCoachSnapshot = null;
     liveCoachEl.className = 'live-coach empty-state';
     liveCoachEl.innerHTML = '<p>暂无实时面试提示。</p>';
     return;
   }
 
+  latestLiveCoachSnapshot = snapshot;
   const normalizedSnapshot = translateLiveCoachSnapshot(snapshot);
   const badgeClass = getLiveCoachStageClass(snapshot.stage);
   const followUpMeta = normalizedSnapshot.followUpCount
@@ -188,6 +201,25 @@ function renderLiveCoach(snapshot) {
   const missingSignals = Array.isArray(normalizedSnapshot.missingSignals) && normalizedSnapshot.missingSignals.length
     ? normalizedSnapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
     : '<span class="pill green">暂无明显缺失信号</span>';
+  const toggleText = liveCoachDetailsOpen ? '隐藏提示' : '查看提示';
+  const detailsHtml = liveCoachDetailsOpen
+    ? `
+        <div class="live-coach-details">
+          <div class="section-label">面试官正在考察</div>
+          <p>${escapeHtml(normalizedSnapshot.target || '暂无')}</p>
+          <div class="section-label">当前缺口</div>
+          <p>${escapeHtml(normalizedSnapshot.focus || '暂无')}</p>
+          <div class="section-label">压力来源</div>
+          <p>${escapeHtml(normalizedSnapshot.pressureReason || '暂无')}</p>
+          <div class="section-label">缺失信号</div>
+          <div class="meta-row">${missingSignals}</div>
+          <div class="section-label">为什么重要</div>
+          <p>${escapeHtml(normalizedSnapshot.risk || '暂无')}</p>
+          <div class="section-label">下一步最佳回答</div>
+          <p>${escapeHtml(normalizedSnapshot.suggestedMove || '暂无')}</p>
+        </div>
+      `
+    : '';
 
   liveCoachEl.className = 'live-coach';
   liveCoachEl.innerHTML = `
@@ -202,18 +234,12 @@ function renderLiveCoach(snapshot) {
         ${stagnationMeta}
       </div>
     </div>
-    <div class="section-label">面试官正在考察</div>
-    <p>${escapeHtml(normalizedSnapshot.target || '暂无')}</p>
-    <div class="section-label">当前缺口</div>
-    <p>${escapeHtml(normalizedSnapshot.focus || '暂无')}</p>
-    <div class="section-label">压力来源</div>
-    <p>${escapeHtml(normalizedSnapshot.pressureReason || '暂无')}</p>
-    <div class="section-label">缺失信号</div>
-    <div class="meta-row">${missingSignals}</div>
-    <div class="section-label">为什么重要</div>
-    <p>${escapeHtml(normalizedSnapshot.risk || '暂无')}</p>
-    <div class="section-label">下一步最佳回答</div>
-    <p>${escapeHtml(normalizedSnapshot.suggestedMove || '暂无')}</p>
+    <div class="live-coach-actions">
+      <button type="button" class="ghost-button live-coach-toggle" data-live-coach-toggle aria-expanded="${liveCoachDetailsOpen}">
+        ${toggleText}
+      </button>
+    </div>
+    ${detailsHtml}
   `;
 }
 
