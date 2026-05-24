@@ -44,6 +44,8 @@ async function main() {
 
     assert(session.sessionId, 'sessionId should exist');
     assert(Array.isArray(session.plan) && session.plan.length >= 3, 'plan should contain requested questions');
+    assert(session.liveCoach?.stage === 'opening', `new session should expose opening live coach state, got: ${session.liveCoach?.stage || 'missing'}`);
+    assert(session.liveCoach?.target, 'new session should expose live coach interviewer target');
     assert(
       session.plan.some((item) => item.id === 'backend_004'),
       `backend plan should include the consistency project question when resume signals match, got: ${session.plan.map((item) => item.id).join(', ')}`
@@ -59,6 +61,8 @@ async function main() {
       /你自己负责|亲手负责|技术栈|项目是给谁解决什么问题|卡在哪里/.test(lastReply1),
       `follow-up should target the missing project signal, got: ${lastReply1}`
     );
+    assert(answer1.liveCoach?.stage === 'clarify', `first weak answer should expose clarify follow-up stage, got: ${answer1.liveCoach?.stage || 'missing'}`);
+    assert(answer1.liveCoach?.suggestedMove, 'first weak answer should include a live coach next move');
     assert(answer1.currentQuestion === session.plan[0].id, 'weak answer should stay on the same question');
 
     const weakAnswer2 = '主要还是团队一起做的，我这边就是参与开发。';
@@ -71,6 +75,10 @@ async function main() {
       /不要再用“我们”概括|没有回答到点上|直接从你本人开始讲|别再总结观点/.test(lastReplyRepeat),
       `repeated weak answer should trigger a tighter follow-up, got: ${lastReplyRepeat}`
     );
+    assert(
+      ['pin_down', 'pressure'].includes(answerRepeat.liveCoach?.stage),
+      `repeated weak answer should escalate live coach stage, got: ${answerRepeat.liveCoach?.stage || 'missing'}`
+    );
     assert(answerRepeat.currentQuestion === session.plan[0].id, 'repeated weak answer should still stay on the same question');
 
     const strongerAnswer = [
@@ -82,6 +90,7 @@ async function main() {
       method: 'POST',
       body: { answer: strongerAnswer }
     });
+    assert(answer2.liveCoach?.stage, 'stronger answer response should still expose a live coach snapshot');
     assert(answer2.currentQuestion !== session.plan[0].id, 'stronger answer should advance to the next question');
 
     const seniorSession = await request('/api/interviews', {
@@ -236,6 +245,12 @@ async function main() {
     assert(
       /追问|风险|题|面试官/.test(interviewerConcerns.summary || ''),
       `interviewer concern summary should explain the concern, got: ${interviewerConcerns?.summary || ''}`
+    );
+    assert(firstQuestion.answerPlaybook?.interviewerIntent, 'report should include answer playbook interviewer intent');
+    assert(firstQuestion.answerPlaybook?.first30Seconds, 'report should include answer playbook first-30-seconds guidance');
+    assert(
+      Array.isArray(firstQuestion.answerPlaybook?.proofPoints) && firstQuestion.answerPlaybook.proofPoints.length >= 1,
+      'report should include answer playbook proof points'
     );
 
     console.log('Smoke test passed');

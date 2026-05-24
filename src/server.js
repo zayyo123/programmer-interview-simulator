@@ -8,6 +8,7 @@ import { generateInterviewerReply } from './ai.js';
 import { chooseProvider, loadConfig } from './config.js';
 import {
   buildInterviewPrompt,
+  createLiveCoachSnapshot,
   createInterviewPlan,
   createOpening,
   createReport,
@@ -38,6 +39,7 @@ const server = createServer(async (request, response) => {
         sessionId: session.id,
         provider: session.provider,
         messages: session.messages,
+        liveCoach: createLiveCoachSnapshot(session),
         plan: session.plan.map((item) => ({
           id: item.id,
           category: item.category,
@@ -79,6 +81,7 @@ const server = createServer(async (request, response) => {
       return sendJson(response, 200, {
         provider: result.provider,
         messages: session.messages,
+        liveCoach: createLiveCoachSnapshot(session),
         currentQuestion: getCurrentQuestion(session)?.id || null,
         completed: Boolean(session.completed)
       });

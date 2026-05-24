@@ -2,6 +2,7 @@ const setupForm = document.querySelector('#setupForm');
 const answerForm = document.querySelector('#answerForm');
 const answerInput = document.querySelector('#answerInput');
 const messagesEl = document.querySelector('#messages');
+const liveCoachEl = document.querySelector('#liveCoach');
 const reportEl = document.querySelector('#report');
 const providerText = document.querySelector('#providerText');
 const statusText = document.querySelector('#statusText');
@@ -36,6 +37,7 @@ setupForm.addEventListener('submit', async (event) => {
     sessionId = data.sessionId;
     providerText.textContent = data.provider || 'mock';
     renderMessages(data.messages || []);
+    renderLiveCoach(data.liveCoach);
     reportEl.className = 'report empty-state';
     reportEl.innerHTML = '<p>The interview is in progress. Finish the session to generate coaching feedback.</p>';
     statusText.textContent = 'Interview started. Answer as if you were in a real technical screen.';
@@ -72,6 +74,7 @@ answerForm.addEventListener('submit', async (event) => {
 
     providerText.textContent = data.provider || 'mock';
     renderMessages(data.messages || []);
+    renderLiveCoach(data.liveCoach);
     if (data.completed || !data.currentQuestion) {
       statusText.textContent = 'All planned questions are covered. You can finish to generate the report.';
       answerInput.disabled = true;
@@ -165,6 +168,45 @@ function renderMessages(messages) {
   }).join('');
 
   messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function renderLiveCoach(snapshot) {
+  if (!snapshot) {
+    liveCoachEl.className = 'live-coach empty-state';
+    liveCoachEl.innerHTML = '<p>No live coach snapshot is available.</p>';
+    return;
+  }
+
+  const badgeClass = getLiveCoachStageClass(snapshot.stage);
+  const followUpMeta = snapshot.followUpCount
+    ? `<span class="pill ${badgeClass}">${escapeHtml(`${snapshot.followUpCount} follow-up${snapshot.followUpCount > 1 ? 's' : ''}`)}</span>`
+    : '';
+  const stagnationMeta = snapshot.stagnantFollowUpCount
+    ? `<span class="pill amber">${escapeHtml(`${snapshot.stagnantFollowUpCount} repeated weak turn${snapshot.stagnantFollowUpCount > 1 ? 's' : ''}`)}</span>`
+    : '';
+
+  liveCoachEl.className = 'live-coach';
+  liveCoachEl.innerHTML = `
+    <div class="live-coach-header">
+      <div>
+        <strong>Live interviewer radar</strong>
+        <p>${escapeHtml(snapshot.currentQuestion || 'No active question')}</p>
+      </div>
+      <div class="meta-row">
+        <span class="pill ${badgeClass}">${escapeHtml(snapshot.stageLabel || 'Live')}</span>
+        ${followUpMeta}
+        ${stagnationMeta}
+      </div>
+    </div>
+    <div class="section-label">What the interviewer is checking</div>
+    <p>${escapeHtml(snapshot.target || 'N/A')}</p>
+    <div class="section-label">Current gap</div>
+    <p>${escapeHtml(snapshot.focus || 'N/A')}</p>
+    <div class="section-label">Why it matters</div>
+    <p>${escapeHtml(snapshot.risk || 'N/A')}</p>
+    <div class="section-label">Best next move</div>
+    <p>${escapeHtml(snapshot.suggestedMove || 'N/A')}</p>
+  `;
 }
 
 function renderReport(report) {
@@ -283,6 +325,7 @@ function renderReport(report) {
     const rehearsalDrill = renderList(item.mockInterviewDrill, 'No mock interview drill generated.');
     const retryBlueprint = renderRetryBlueprint(item.retryBlueprint);
     const answerRebuildPlan = renderAnswerRebuildPlan(item.answerRebuildPlan);
+    const answerPlaybook = renderAnswerPlaybook(item.answerPlaybook);
 
     return `
       <article class="report-card">
@@ -345,6 +388,8 @@ function renderReport(report) {
         <p>${escapeHtml(item.coachTip || 'N/A')}</p>
         <div class="section-label">Coach checklist</div>
         ${coachChecklist}
+        <div class="section-label">Answer playbook</div>
+        ${answerPlaybook}
         <div class="section-label">Rehearsal answer script</div>
         <p>${escapeHtml(item.rehearsalAnswer || 'N/A')}</p>
         <div class="section-label">Mock interview drill</div>
@@ -467,6 +512,32 @@ function renderRetryBlueprint(blueprint) {
       `).join('')}
     </div>
   `;
+}
+
+function renderAnswerPlaybook(playbook) {
+  if (!playbook) {
+    return '<p>No answer playbook available.</p>';
+  }
+
+  return [
+    `<p>${escapeHtml(playbook.interviewerIntent || 'N/A')}</p>`,
+    `<p>${escapeHtml(playbook.first30Seconds ? `First 30 seconds: ${playbook.first30Seconds}` : '')}</p>`,
+    renderList(playbook.proofPoints, 'No concrete proof points generated.'),
+    `<p>${escapeHtml(playbook.likelyPushback ? `Likely pushback: ${playbook.likelyPushback}` : '')}</p>`,
+    `<p>${escapeHtml(playbook.recoveryLine ? `Recovery line: ${playbook.recoveryLine}` : '')}</p>`,
+    `<p>${escapeHtml(playbook.doNotSay ? `Do not say: ${playbook.doNotSay}` : '')}</p>`
+  ].join('');
+}
+
+function getLiveCoachStageClass(stage) {
+  return {
+    ready: 'green',
+    completed: 'green',
+    pressure: 'amber',
+    pin_down: 'amber',
+    clarify: '',
+    opening: ''
+  }[stage] || '';
 }
 
 function formatTime(value) {

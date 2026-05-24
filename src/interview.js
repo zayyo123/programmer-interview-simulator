@@ -367,6 +367,12 @@ export function createReport(session) {
       coachChecklist: createCoachChecklist(entry.question, evaluation, levelProfile),
       retryBlueprint: createRetryBlueprint(entry.question, evaluation, levelProfile),
       answerRebuildPlan: createAnswerRebuildPlan(entry.question, evaluation, levelProfile),
+      answerPlaybook: createAnswerPlaybook(
+        entry.question,
+        evaluation,
+        levelProfile,
+        entry.exitReason || 'open'
+      ),
       rehearsalAnswer: createRehearsalAnswer(entry.question, evaluation, levelProfile),
       mockInterviewDrill: createMockInterviewDrill(entry.question, evaluation, levelProfile),
       improvedUserAnswer: improveAnswer(entry.answer, entry.question, evaluation),
@@ -431,6 +437,71 @@ export function createReport(session) {
     weakAreas: [...new Set([...weakAreas, ...uncoveredAreas])],
     nextPractice: createNextPractice(answersByQuestion, weakAreas, interviewPatterns, uncoveredQuestions),
     practicePlan: createPracticePlan(answersByQuestion, coachPriorities, interviewPatterns, uncoveredQuestions)
+  };
+}
+
+export function createLiveCoachSnapshot(session, answer = '') {
+  const question = getCurrentQuestion(session);
+  const levelProfile = getLevelExpectation(session?.config?.level);
+
+  if (!question) {
+    return {
+      stage: 'completed',
+      stageLabel: 'Interview complete',
+      currentQuestion: '',
+      category: '',
+      target: 'All planned questions have been covered. Build the report to review the biggest interview risks and answer gaps.',
+      focus: 'Review the final report and rehearse the weakest question types first.',
+      risk: 'No active question remains in this round.',
+      suggestedMove: 'Finish the session to generate the coaching report.',
+      followUpCount: 0,
+      stagnantFollowUpCount: 0
+    };
+  }
+
+  const answerEntry = session.answers.find((entry) => entry.question.id === question.id);
+  const effectiveAnswer = answerEntry?.answer || String(answer || '').trim();
+  const followUpCount = answerEntry?.followUpCount || Math.max(0, (answerEntry?.attempts || 1) - 1);
+  const stagnantFollowUpCount = answerEntry?.stagnantFollowUpCount || 0;
+
+  if (!effectiveAnswer) {
+    return {
+      stage: 'opening',
+      stageLabel: 'New question',
+      currentQuestion: question.question,
+      category: question.category,
+      target: createOpeningCoachTarget(question, levelProfile),
+      focus: createOpeningCoachFocus(question),
+      risk: createOpeningCoachRisk(question, levelProfile),
+      suggestedMove: createOpeningCoachMove(question),
+      followUpCount: 0,
+      stagnantFollowUpCount: 0
+    };
+  }
+
+  const evaluation = evaluateAnswer(effectiveAnswer, question, {
+    followUpCount,
+    level: session.config.level
+  });
+
+  return {
+    stage: getLiveFollowUpStage(followUpCount, stagnantFollowUpCount, evaluation),
+    stageLabel: getLiveFollowUpStageLabel(followUpCount, stagnantFollowUpCount, evaluation),
+    currentQuestion: question.question,
+    category: question.category,
+    target: createFollowUpObjective(question, evaluation),
+    focus: `Interviewer is still checking whether you can land "${createImmediateFix(question, evaluation)}".`,
+    risk: describeFollowUpPressure(question, evaluation, followUpCount, levelProfile),
+    suggestedMove: buildSuggestedFollowUp(question, evaluation, {
+      followUpCount,
+      level: session.config.level,
+      style: session.config.style,
+      answer: effectiveAnswer,
+      resume: session.config.resume,
+      stagnantFollowUpCount
+    }),
+    followUpCount,
+    stagnantFollowUpCount
   };
 }
 
@@ -757,6 +828,150 @@ function createAnswerRebuildPlan(question, evaluation, levelProfile = getLevelEx
       : '结尾收在“适用边界、取舍或复杂度”上。',
     avoid: createRetryTrapWarning(evaluation)
   };
+}
+
+function createAnswerPlaybook(
+  question,
+  evaluation,
+  levelProfile = getLevelExpectation('middle'),
+  exitReason = 'open'
+) {
+  const firstMissing = (question.scoringRubric?.mustHave || []).find((item) => {
+    return !evaluation.rubricHits.mustHave.includes(item);
+  }) || question.keywords?.find((item) => !evaluation.hitKeywords.includes(item)) || '';
+  const firstGoodToHave = (question.scoringRubric?.goodToHave || []).find((item) => {
+    return !evaluation.rubricHits.goodToHave.includes(item);
+  }) || '';
+
+  return {
+    interviewerIntent: createPlaybookInterviewerIntent(question, evaluation),
+    first30Seconds: createPlaybookFirst30Seconds(question, evaluation, levelProfile, firstMissing),
+    proofPoints: createPlaybookProofPoints(question, evaluation, firstMissing, firstGoodToHave),
+    likelyPushback: createPlaybookLikelyPushback(question, evaluation, exitReason),
+    recoveryLine: createPlaybookRecoveryLine(question, evaluation, firstMissing),
+    doNotSay: createPlaybookDoNotSay(question, evaluation, exitReason)
+  };
+}
+
+function createPlaybookInterviewerIntent(question, evaluation) {
+  if (question.type === 'project') {
+    return '面试官在确认这段经历是不是你亲自做过，以及你能不能把背景、职责、判断和结果讲成一条真实主线。';
+  }
+
+  if (question.type === 'system-design') {
+    return '面试官在确认你会不会先拆主链路，再说明关键设计、瓶颈位置和取舍。';
+  }
+
+  if (question.type === 'algorithm') {
+    return '面试官在确认这是不是你自己能当场写出来的解法，而不是只记住题解结论。';
+  }
+
+  if (question.difficulty >= 3 && evaluation.followUpCategory === 'detail') {
+    return '面试官在确认你是否真的做过排查或深水区实现，能不能给出有顺序的定位过程。';
+  }
+
+  return '面试官在确认你能不能先答核心原理，再补场景、边界或取舍，而不是只给结论。';
+}
+
+function createPlaybookFirst30Seconds(question, evaluation, levelProfile, firstMissing) {
+  const framework = buildAnswerFramework(question, evaluation) || levelProfile.focus;
+  const mustLand = firstMissing ? `首句后马上补“${firstMissing}”` : `首句后马上补“${createImmediateFix(question, evaluation)}”`;
+
+  if (question.type === 'project') {
+    return `前 30 秒先按“背景 -> 我负责 -> 关键动作 -> 结果”讲，不要铺陈团队全貌；${mustLand}。`;
+  }
+
+  if (question.type === 'system-design') {
+    return `前 30 秒先拆“核心链路 -> 关键组件 -> 风险点 -> 取舍”，先把主方案立住，再展开细节；${mustLand}。`;
+  }
+
+  if (question.type === 'algorithm') {
+    return `前 30 秒先给解法、核心数据结构和复杂度，再补边界处理，不要先绕背景；${mustLand}。`;
+  }
+
+  return `前 30 秒先按“${framework}”组织回答，先说结论，再补机制或场景；${mustLand}。`;
+}
+
+function createPlaybookProofPoints(question, evaluation, firstMissing, firstGoodToHave) {
+  const points = [];
+
+  if (firstMissing) {
+    points.push(`至少补实“${firstMissing}”，不要只停在名词层。`);
+  }
+
+  if (!evaluation.communication.hasExample && question.type !== 'knowledge') {
+    points.push('补一个你亲手处理过的真实项目片段，带输入条件、动作和结果。');
+  }
+
+  if (!evaluation.communication.hasMetrics && ['project', 'system-design'].includes(question.type)) {
+    points.push('补一个结果指标、线上信号或人工成本变化，证明方案不是纸面设计。');
+  }
+
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') {
+    points.push('补一句为什么这样选，以及没选方案的代价或边界。');
+  }
+
+  if (!evaluation.communication.hasDiagnosisFlow && question.type === 'knowledge' && question.difficulty >= 3) {
+    points.push('把排查顺序讲出来，说明先看什么、再怎么缩小范围。');
+  }
+
+  if (firstGoodToHave) {
+    points.push(`如果还有时间，再补“${firstGoodToHave}”把答案从及格拉到更像强通过。`);
+  }
+
+  return points.slice(0, 4);
+}
+
+function createPlaybookLikelyPushback(question, evaluation, exitReason) {
+  if (exitReason === 'stalled_follow_up') {
+    return `如果你还停留在“${describeFollowUpCategory(evaluation.followUpCategory)}”，面试官通常会直接收口并把这题记成稳定性风险。`;
+  }
+
+  if (question.type === 'project' && !evaluation.communication.hasOwnership) {
+    return '面试官大概率会继续问：“这件事你自己到底亲手负责哪一段，关键判断是什么？”';
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3 && !evaluation.communication.hasDiagnosisFlow) {
+    return '面试官大概率会继续问：“别只说会排查，你先看什么，再怎么一步步缩小范围？”';
+  }
+
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') {
+    return '面试官大概率会继续问：“为什么这样选，不这样做的代价是什么？”';
+  }
+
+  return `面试官大概率会继续追问“${createImmediateFix(question, evaluation)}”，直到确认这不是背答案。`;
+}
+
+function createPlaybookRecoveryLine(question, evaluation, firstMissing) {
+  if (question.type === 'project') {
+    return `如果刚才答散了，可以直接重开一句：“我重新按背景、我负责、关键判断和结果讲一遍，重点补上${firstMissing || '我亲手做的部分'}。”`;
+  }
+
+  if (question.type === 'algorithm') {
+    return '如果刚才答散了，可以直接重开一句：“我先给解法和复杂度，再补为什么这样做以及边界处理。”';
+  }
+
+  return `如果刚才答散了，可以直接重开一句：“我先按主线回答，重点补上${firstMissing || createImmediateFix(question, evaluation)}。”`;
+}
+
+function createPlaybookDoNotSay(question, evaluation, exitReason) {
+  if (exitReason === 'stalled_follow_up') {
+    return '不要继续重复上一轮概括性说法，否则面试官会默认你没有更多真实内容可以落地。';
+  }
+
+  if (question.type === 'project' && !evaluation.communication.hasOwnership) {
+    return '不要再用“我们团队就是这么做的”收尾，必须切回你自己的判断、实现和结果。';
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return '不要只说“先看监控、日志、排查一下”，必须给出排查顺序和判断依据。';
+  }
+
+  if (!evaluation.communication.hasTradeoff && question.type !== 'algorithm') {
+    return '不要只报方案名词，后面一定要接为什么这样选。';
+  }
+
+  return '不要把回答停在概念或结论层，后面一定接机制、案例、边界或结果。';
 }
 
 function createCoachChecklist(question, evaluation, levelProfile = getLevelExpectation('middle')) {
@@ -1862,6 +2077,76 @@ function createPracticeDrill(question, evaluation) {
   }[evaluation.followUpCategory] || '做一次追问演练';
 
   return `下次练这题时，先用 90 秒讲完主线，再围绕“${focus}”做一次“${drillMode}”练习；最后强制自己补一句“${createImmediateFix(question, evaluation)}”，重点修正“${firstMissing}”。`;
+}
+
+function getLiveFollowUpStage(followUpCount, stagnantFollowUpCount, evaluation) {
+  if (evaluation?.followUpCategory === 'complete') return 'ready';
+  if (stagnantFollowUpCount >= 1 || followUpCount >= 2) return 'pressure';
+  if (followUpCount === 1) return 'pin_down';
+  return 'clarify';
+}
+
+function getLiveFollowUpStageLabel(followUpCount, stagnantFollowUpCount, evaluation) {
+  const stage = getLiveFollowUpStage(followUpCount, stagnantFollowUpCount, evaluation);
+  return {
+    ready: 'Ready to move on',
+    pressure: 'Pressure follow-up',
+    pin_down: 'Pin-down follow-up',
+    clarify: 'Clarifying follow-up'
+  }[stage] || 'Clarifying follow-up';
+}
+
+function createOpeningCoachTarget(question, levelProfile) {
+  if (question.type === 'project') {
+    return 'The interviewer is checking whether you can turn a project into a credible ownership story instead of a team summary.';
+  }
+
+  if (question.type === 'system-design') {
+    return 'The interviewer is checking whether you can structure the main path first, then explain key components, bottlenecks, and tradeoffs.';
+  }
+
+  if (question.type === 'algorithm') {
+    return 'The interviewer is checking whether you can state the approach, key data structure, and complexity before wandering into details.';
+  }
+
+  if (question.type === 'knowledge' && question.difficulty >= 3) {
+    return 'The interviewer is checking whether you have a real diagnostic sequence, not just concept recall.';
+  }
+
+  return `At ${levelProfile.labels.join(' / ')} level, the interviewer is checking whether your first answer already covers the core idea plus supporting detail.`;
+}
+
+function createOpeningCoachFocus(question) {
+  const mustHave = (question.scoringRubric?.mustHave || []).slice(0, 3);
+  if (!mustHave.length) {
+    return 'Lead with the conclusion, then add mechanism, scenario, and result.';
+  }
+
+  return `Land these first: ${mustHave.join(' / ')}.`;
+}
+
+function createOpeningCoachRisk(question, levelProfile) {
+  if (question.type === 'project') {
+    return 'If the opening answer stays at “we built this”, the interviewer will immediately push for your own role, decision, and outcome.';
+  }
+
+  return `At this level, weak first-pass answers quickly trigger follow-ups around ${levelProfile.focus}.`;
+}
+
+function createOpeningCoachMove(question) {
+  if (question.type === 'project') {
+    return 'Answer in this order: background -> your scope -> key action -> result.';
+  }
+
+  if (question.type === 'system-design') {
+    return 'Answer in this order: main path -> components -> traffic/risk -> tradeoff.';
+  }
+
+  if (question.type === 'algorithm') {
+    return 'Answer in this order: solution -> data structure -> complexity -> edge cases.';
+  }
+
+  return 'Lead with the conclusion, then add the mechanism, boundary, or tradeoff that proves it.';
 }
 
 function createAnswerTargetSummary(answersByQuestion, levelProfile = getLevelExpectation('middle')) {

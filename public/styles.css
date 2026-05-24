@@ -204,6 +204,32 @@ button:disabled {
   padding: 18px;
 }
 
+.live-coach {
+  display: grid;
+  gap: 10px;
+  margin: 0 18px 18px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(35, 100, 170, 0.08), rgba(255, 255, 255, 0.96));
+}
+
+.live-coach.empty-state {
+  min-height: 130px;
+}
+
+.live-coach-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.live-coach-header strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
 .empty-state {
   display: grid;
   place-items: center;
@@ -451,5 +477,13 @@ button:disabled {
 
   .answer-form {
     display: grid;
+  }
+
+  .live-coach {
+    margin: 0 10px 10px;
+  }
+
+  .live-coach-header {
+    flex-direction: column;
   }
 }
