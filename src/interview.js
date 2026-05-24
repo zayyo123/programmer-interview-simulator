@@ -2165,6 +2165,9 @@ function createRubricTargetedFollowUp(question, evaluation, context, focus) {
 function createRoleAwareFollowUp(question, evaluation, context = {}) {
   const levelProfile = getLevelExpectation(context.level);
   const focus = getMissingRubricFocus(question, evaluation);
+  const scenarioSpecificPrompt = createScenarioSpecificFollowUp(question, evaluation, levelProfile);
+
+  if (scenarioSpecificPrompt) return scenarioSpecificPrompt;
 
   if (!focus) return '';
 
@@ -2178,6 +2181,180 @@ function createRoleAwareFollowUp(question, evaluation, context = {}) {
 
   if (question.type === 'knowledge' && question.difficulty >= 3) {
     return createTroubleshootingRubricFollowUp(focus, levelProfile);
+  }
+
+  return '';
+}
+
+function createScenarioSpecificFollowUp(question, evaluation, levelProfile) {
+  if (!question?.id) return '';
+
+  if (question.id === 'backend_004') {
+    return createOrderChainFollowUp(question, evaluation, levelProfile);
+  }
+
+  if (question.id === 'system_001') {
+    return createShortLinkFollowUp(question, evaluation, levelProfile);
+  }
+
+  if (question.id === 'redis_002') {
+    return createRedisTroubleshootingFollowUp(question, evaluation, levelProfile);
+  }
+
+  if (question.id === 'java_003') {
+    return createJvmTroubleshootingFollowUp(question, evaluation, levelProfile);
+  }
+
+  if (question.id === 'frontend_002') {
+    return createFrontendIncidentFollowUp(question, evaluation, levelProfile);
+  }
+
+  return '';
+}
+
+function createOrderChainFollowUp(question, evaluation, levelProfile) {
+  const focus = getMissingRubricFocus(question, evaluation);
+
+  if (evaluation.followUpCategory === 'ownership') {
+    return '把链路收窄到你亲手负责的一段，比如支付回调、订单状态流转或库存补偿。直接说你拍板了什么、怎么落地、出了问题先看哪里。';
+  }
+
+  if (matchesConcept(focus, '数据一致性')) {
+    return '不要只说“保证一致性”，直接讲哪一步最容易出错：是支付成功后没落单、库存扣减超时，还是回调乱序？你怎么把状态收住。';
+  }
+
+  if (matchesConcept(focus, '幂等设计')) {
+    return '我现在只追幂等：支付回调重复、MQ 重投或者补偿重跑时，你拿什么键去重，状态机怎么避免重复扣库存或重复生成订单？';
+  }
+
+  if (matchesConcept(focus, '重试') || evaluation.followUpCategory === 'detail') {
+    return '把重试和补偿分开讲：什么错误会立即重试，什么会落补偿任务，重试上限、退避策略和人工兜底分别怎么定。';
+  }
+
+  if (matchesConcept(focus, '取舍原因') || evaluation.followUpCategory === 'tradeoff') {
+    return levelProfile === levelExpectations.junior
+      ? '补一句你为什么没把所有动作都放进同步事务里，这样做会卡在哪。'
+      : '直接讲取舍：为什么你选最终一致而不是强一致或分布式事务，代价是什么，峰值流量下你优先保什么。';
+  }
+
+  if (matchesConcept(focus, '指标结果') || evaluation.followUpCategory === 'impact') {
+    return '不要只说“稳定了”，直接给链路结果：异常订单占比、人工介入量、支付成功到落单时延，或者你上线后盯的告警指标。';
+  }
+
+  return '';
+}
+
+function createShortLinkFollowUp(question, evaluation, levelProfile) {
+  const focus = getMissingRubricFocus(question, evaluation);
+
+  if (matchesConcept(focus, '短码唯一')) {
+    return '先把短码生成讲实：你准备用发号器、分布式 ID 还是哈希，怎么避免冲突，冲突后怎么重试或兜底。';
+  }
+
+  if (matchesConcept(focus, '存储映射')) {
+    return '不要泛讲数据库，直接说短码映射表至少存哪些字段，主键怎么选，过期时间和状态位放在哪里。';
+  }
+
+  if (matchesConcept(focus, '访问重定向')) {
+    return '把访问链路按一跳一跳讲清楚：请求进来先查哪里，命中缓存和未命中分别怎么走，最后为什么返回 301 还是 302。';
+  }
+
+  if (matchesConcept(focus, '缓存')) {
+    return '只讲缓存层：热点短链被刷爆时怎么防击穿，回源失败怎么降级，缓存失效策略怎么定。';
+  }
+
+  if (matchesConcept(focus, '统计')) {
+    return levelProfile === levelExpectations.senior
+      ? '不要只说“做统计”，直接讲访问统计是同步打点还是异步上报，怎么避免重定向主链路被拖慢。'
+      : '补一下统计链路：点击数据什么时候记、怎么异步化，避免影响主重定向延迟。';
+  }
+
+  if (matchesConcept(focus, '高可用') || evaluation.followUpCategory === 'tradeoff') {
+    return '把故障场景讲出来：缓存挂了、数据库抖了或者某个热点短链爆了时，用户访问怎么兜底，你优先保护哪条链路。';
+  }
+
+  return '';
+}
+
+function createRedisTroubleshootingFollowUp(question, evaluation, levelProfile) {
+  const focus = getMissingRubricFocus(question, evaluation);
+
+  if (matchesConcept(focus, '先定位') || evaluation.followUpCategory === 'core') {
+    return '按真实排障顺序回答：先确认是单实例还是全局抖动，再区分是慢命令、连接暴涨、内存逼近上限，还是 AOF/RDB 带来的抖动。';
+  }
+
+  if (matchesConcept(focus, '慢查询')) {
+    return '把命令层讲具体：你会先查哪些慢命令、怎么识别大 key 或热 key、发现后优先止血还是先保留证据。';
+  }
+
+  if (matchesConcept(focus, '网络')) {
+    return '只讲网络层：你会看连接数、带宽、跨机房访问、客户端重试中的哪几个信号，怎么判断是链路问题不是实例本身变慢。';
+  }
+
+  if (matchesConcept(focus, '内存')) {
+    return '把内存层说实：接近 maxmemory、频繁淘汰、碎片率异常这几种情况，你分别怎么确认和处理。';
+  }
+
+  if (matchesConcept(focus, '持久化')) {
+    return levelProfile === levelExpectations.senior
+      ? '展开持久化抖动：AOF rewrite 或 RDB fork 为什么会放大延迟，你会从哪些监控或日志确认它就是根因。'
+      : '补一下持久化影响：什么时候 AOF rewrite 或 RDB 会把主线程拖慢，你会怎么验证。';
+  }
+
+  return '';
+}
+
+function createJvmTroubleshootingFollowUp(question, evaluation, levelProfile) {
+  const focus = getMissingRubricFocus(question, evaluation);
+
+  if (matchesConcept(focus, '先定位') || evaluation.followUpCategory === 'core') {
+    return '按排障顺序讲：先确认 Full GC 抖动从哪个版本或哪个时间段开始，再结合 GC 日志区分是分配速率暴涨、老年代回收不掉，还是参数配置不合理。';
+  }
+
+  if (matchesConcept(focus, 'GC 日志')) {
+    return '别只说“看 GC 日志”，直接说你会先看停顿时间、回收前后堆占用、晋升速率还是 Full GC 触发原因，用这些信号怎么分流判断。';
+  }
+
+  if (matchesConcept(focus, '内存')) {
+    return '把堆内存层讲具体：新生代打满、老年代降不下来、对象晋升过快这三种现象，你会各自怀疑什么。';
+  }
+
+  if (matchesConcept(focus, '对象')) {
+    return '只讲对象滞留：如果怀疑缓存、ThreadLocal 或大集合持有对象过久，你会怎么用 dump 或指标快速收敛到热点对象。';
+  }
+
+  if (matchesConcept(focus, '参数') || evaluation.followUpCategory === 'tradeoff') {
+    return levelProfile === levelExpectations.senior
+      ? '我现在想听的是调参边界：什么证据出现时你才会改收集器或代大小，而不是继续查代码分配行为。'
+      : '补一句调参边界：什么情况下你会考虑改 JVM 参数，而不是先回到代码和对象分配逻辑。';
+  }
+
+  return '';
+}
+
+function createFrontendIncidentFollowUp(question, evaluation, levelProfile) {
+  const focus = getMissingRubricFocus(question, evaluation);
+
+  if (matchesConcept(focus, '先定位') || evaluation.followUpCategory === 'core') {
+    return '按线上故障顺序回答：先圈定影响版本和用户范围，再确认是资源加载失败、运行时异常还是发布产物问题，最后再讲止血。';
+  }
+
+  if (matchesConcept(focus, '监控')) {
+    return '只讲监控信号：你会先看前端异常日志、白屏率、资源 404/加载失败，还是某个版本的发布对比，用这些信号怎么缩小范围。';
+  }
+
+  if (matchesConcept(focus, '回滚')) {
+    return '把止血动作讲具体：什么情况下直接回滚，什么情况下做开关降级或热修，决策依据是什么。';
+  }
+
+  if (matchesConcept(focus, '错误边界')) {
+    return '补一下兜底设计：错误边界能兜住哪类异常，兜不住哪类资源或启动期错误，用户侧怎么给降级反馈。';
+  }
+
+  if (matchesConcept(focus, '治理') || evaluation.followUpCategory === 'tradeoff') {
+    return levelProfile === levelExpectations.senior
+      ? '不要只停在修 bug，直接讲你后续怎么补发布门禁、灰度、监控和回滚预案，避免同类白屏再次进线上。'
+      : '补一下后续治理：同类白屏修完后，你会从发布流程、监控和兜底机制上补哪几道防线。';
   }
 
   return '';
@@ -2688,7 +2865,38 @@ function scoreResumeQuestionMatch(item, resumeSignals) {
     score += 12;
   }
 
+  score += scoreScenarioSpecificResumeMatch(item, resumeSignals.text);
+
   return score;
+}
+
+function scoreScenarioSpecificResumeMatch(item, resumeText) {
+  const normalizedResume = normalizeText(resumeText);
+  if (!normalizedResume) return 0;
+
+  const hasAny = (tokens) => tokens.some((token) => normalizedResume.includes(normalizeText(token)));
+
+  if (item.id === 'backend_004') {
+    const paymentChainSignals = ['支付', '支付回调', '订单', '库存', '履约', '补偿', '幂等', '一致性', '异常订单'];
+    return hasAny(paymentChainSignals) ? 28 : 0;
+  }
+
+  if (item.id === 'frontend_002') {
+    const incidentSignals = ['白屏', '资源404', '404', '运行时异常', '发布', '回滚', '热修', '监控'];
+    return hasAny(incidentSignals) ? 28 : 0;
+  }
+
+  if (item.id === 'redis_002') {
+    const redisSignals = ['redis', '延迟', '慢查询', '热key', '大key', '缓存排障'];
+    return hasAny(redisSignals) ? 24 : 0;
+  }
+
+  if (item.id === 'java_003') {
+    const jvmSignals = ['fullgc', 'gc', 'jvm', '堆', '内存泄漏', '老年代'];
+    return hasAny(jvmSignals) ? 24 : 0;
+  }
+
+  return 0;
 }
 
 function createResumeSupport(question, answer, resume) {

@@ -98,6 +98,60 @@ async function main() {
       `senior troubleshooting follow-up should force a concrete diagnostic path, got: ${seniorReply}`
     );
 
+    const backendScenarioSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'backend',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 5,
+        resume: '负责支付回调、订单状态流转和库存补偿，做过异常订单治理。'
+      }
+    });
+    assert(
+      backendScenarioSession.plan.some((item) => item.id === 'backend_004'),
+      `senior backend scenario should include backend_004, got: ${backendScenarioSession.plan.map((item) => item.id).join(', ')}`
+    );
+
+    const backendScenarioAnswer = await request(`/api/interviews/${backendScenarioSession.sessionId}/answer`, {
+      method: 'POST',
+      body: {
+        answer: '我们主要用 MQ 和消息重试保证一致性，基本就是这个方案。'
+      }
+    });
+    const backendScenarioReply = backendScenarioAnswer.messages.at(-1)?.content || '';
+    assert(
+      /支付回调|MQ 重投|补偿重跑|库存|最终一致/.test(backendScenarioReply),
+      `backend consistency follow-up should probe concrete chain risk, got: ${backendScenarioReply}`
+    );
+
+    const frontendIncidentSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'frontend',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 5,
+        resume: '负责前端发布和监控，排查过白屏、资源 404 和运行时异常。'
+      }
+    });
+    assert(
+      frontendIncidentSession.plan.some((item) => item.id === 'frontend_002'),
+      `senior frontend incident session should include frontend_002, got: ${frontendIncidentSession.plan.map((item) => item.id).join(', ')}`
+    );
+
+    const frontendIncidentAnswer = await request(`/api/interviews/${frontendIncidentSession.sessionId}/answer`, {
+      method: 'POST',
+      body: {
+        answer: '我会先看报错和监控，如果有问题就先回滚。'
+      }
+    });
+    const frontendIncidentReply = frontendIncidentAnswer.messages.at(-1)?.content || '';
+    assert(
+      /影响版本|用户范围|资源加载失败|运行时异常|回滚|热修/.test(frontendIncidentReply),
+      `frontend white-screen follow-up should probe concrete incident handling, got: ${frontendIncidentReply}`
+    );
+
     const reportResult = await request(`/api/interviews/${session.sessionId}/finish`, {
       method: 'POST'
     });
