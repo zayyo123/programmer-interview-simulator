@@ -375,6 +375,28 @@ export const questionBank = [
     }
   },
   {
+    id: 'java_004',
+    category: 'Java',
+    roles: ['java', 'backend'],
+    levels: ['middle', 'senior'],
+    type: 'project',
+    difficulty: 3,
+    question: '讲一个你用 Java 做过的核心业务链路治理项目。重点讲清线程池或异步编排、事务边界、失败补偿，以及你为什么这样拆。',
+    keywords: ['项目背景', '个人职责', '事务边界', '异步编排', '取舍原因'],
+    referenceAnswer: '这类 Java 项目题不是看你背了多少框架，而是看你能不能把真实链路里的并发、事务和恢复机制讲成一个完整判断过程。回答里应该体现业务目标、自己负责的边界、同步和异步怎么切、事务放在哪一层，以及失败后怎么补偿和验证。',
+    excellentAnswer: '我做过一个 Java 订单履约链路治理项目，用户支付成功后要更新订单状态、扣减库存并触发履约通知。我的职责是负责订单服务里的状态流转和异步编排。设计上我没有把所有动作都塞进一个长事务里，而是把“本地事务落订单事件”和“异步消费后续动作”拆开。同步链路里只做订单状态校验、幂等检查和事件落库，保证用户请求尽快返回；后续库存和通知通过线程池隔离的异步消费者处理。这样做的原因是下游依赖耗时波动大，如果放在主事务里会把 RT 和失败面一起放大。为了避免异步任务堆积，我把核心履约和低优先级通知分开线程池，并配了拒绝策略和降级开关。失败后通过补偿任务按退避策略重试，同时用状态机限制非法流转。上线后高峰期超时和人工补单量都明显下降。',
+    followUps: [
+      '为什么这里你没有直接把所有步骤放进一个事务里？',
+      '如果异步线程池开始排队，你会先怎么止血？',
+      '补偿任务重试很多次还不成功时，你怎么避免状态越修越乱？'
+    ],
+    scoringRubric: {
+      mustHave: ['项目背景', '个人职责', '事务边界', '异步编排'],
+      goodToHave: ['取舍原因', '补偿', '线程池隔离', '结果指标'],
+      redFlags: ['只说用了 Spring 事务', '讲不清同步和异步边界', '没有失败恢复和治理思路']
+    }
+  },
+  {
     id: 'frontend_003',
     category: '前端',
     roles: ['frontend', 'fullstack'],
@@ -482,6 +504,50 @@ export const questionBank = [
       mustHave: ['项目背景', '任务模型', '重试', '监控'],
       goodToHave: ['取舍原因', '幂等设计', '资源隔离', '结果指标'],
       redFlags: ['只说用了 Celery 或队列', '没有失败分类和治理思路', '讲不清自己负责哪部分']
+    }
+  },
+  {
+    id: 'python_004',
+    category: 'Python',
+    roles: ['python', 'backend', 'fullstack'],
+    levels: ['middle', 'senior'],
+    type: 'knowledge',
+    difficulty: 3,
+    question: '如果一个 Python 服务同时有接口请求慢、worker 积压和 CPU 飙高，你会怎么判断是 GIL、I/O 阻塞、序列化开销还是任务模型设计问题？',
+    keywords: ['先定位', '采样', 'I/O 阻塞', 'CPU 热点', '任务模型'],
+    referenceAnswer: '这类 Python 排障题的重点是有没有明确的拆解顺序。好的回答会先确认慢的是 Web 线程、后台 worker 还是两边一起，再结合 profile、队列堆积、I/O 等待和对象序列化成本去判断问题落在哪一层。',
+    excellentAnswer: '我会先把现象拆开，确认是接口慢带着 worker 积压，还是 worker 本身打满 CPU 反过来拖慢服务。先看请求 RT、队列长度、worker 并发数和 CPU 使用率的时间线，判断问题从哪一层开始。接着用 profile 或采样看热点函数，如果 CPU 主要耗在 JSON 序列化、压缩、数据处理这类纯 Python 代码，就要考虑 GIL 和 CPU 密集任务不适合堆线程；如果大量时间卡在数据库、网络或对象存储调用，就更像 I/O 阻塞或下游抖动。再往下我会看任务模型是不是把长任务和短任务混在一起、重试是否放大了积压、序列化 payload 是否过大。最后再决定是拆队列、改进程模型、把 CPU 密集逻辑下沉到独立 worker，还是先限流止血。',
+    followUps: [
+      '什么现象会让你优先怀疑是 GIL 或 CPU 密集逻辑，而不是 I/O？',
+      '如果确认是任务模型设计有问题，你会先怎么改队列和 worker 拆分？',
+      '你会拿哪几个指标来证明优化之后积压真的被收住了？'
+    ],
+    scoringRubric: {
+      mustHave: ['先定位', 'I/O 阻塞', 'CPU 热点', '任务模型'],
+      goodToHave: ['采样', 'GIL', '限流止血', '结果指标'],
+      redFlags: ['一上来就盲目扩容', '只会说 Python 有 GIL', '不会区分 CPU 密集和 I/O 密集']
+    }
+  },
+  {
+    id: 'go_003',
+    category: 'Go',
+    roles: ['go', 'backend', 'fullstack'],
+    levels: ['middle', 'senior'],
+    type: 'project',
+    difficulty: 3,
+    question: '讲一个你用 Go 做过的高并发服务或任务系统。重点讲清 goroutine 协作、限流背压、超时取消和故障止血是怎么设计的。',
+    keywords: ['项目背景', '个人职责', 'goroutine 协作', '限流背压', '取舍原因'],
+    referenceAnswer: '这类 Go 项目题要看候选人是否真的理解 Go 并发模型在生产环境里的使用方式。回答里应该体现 goroutine 怎么组织、channel 或队列怎么配合、超时取消如何贯穿链路，以及当积压出现时怎样止血和保住核心流量。',
+    excellentAnswer: '我做过一个 Go 的异步导出和回调服务，特点是高峰期会同时收到很多导出请求，而且下游回调偶尔会变慢。我负责 worker 执行框架和流量保护。并发模型上，我没有简单地每个请求起一串 goroutine，而是拆成接入层、任务队列和执行 worker 三层：接入层负责快速校验和入队，执行层按任务类型分 worker 池，避免大任务拖死小任务。goroutine 之间通过 channel 传递任务，但所有下游调用都带 context timeout 和 cancel，确保请求超时后不会把后台协程一直挂住。为了避免堆积扩散，我加了队列长度阈值、并发上限和熔断降级，先保住核心任务，低优先级导出允许延后。这样设计的取舍是实现复杂一些，但比无限起协程更可控，线上延迟抖动和 goroutine 泄漏风险都更低。',
+    followUps: [
+      '如果队列持续变长，你怎么判断该扩 worker、限流还是先降级？',
+      'context 取消在这条链路里最关键地避免了什么问题？',
+      '为什么这里你没有让每个任务自己再无限拆 goroutine？'
+    ],
+    scoringRubric: {
+      mustHave: ['项目背景', '个人职责', 'goroutine 协作', '限流背压'],
+      goodToHave: ['取舍原因', '超时取消', '资源隔离', '结果指标'],
+      redFlags: ['只说 Go 并发很轻量', '讲不清协程边界和治理策略', '没有止血和背压意识']
     }
   }
 ];

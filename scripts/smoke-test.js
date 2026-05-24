@@ -125,6 +125,63 @@ async function main() {
       `backend consistency follow-up should probe concrete chain risk, got: ${backendScenarioReply}`
     );
 
+    const javaSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'java',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 5,
+        resume: '负责 Java 订单履约链路治理，做过线程池隔离、事务边界拆分和失败补偿。'
+      }
+    });
+    assert(
+      javaSession.plan.some((item) => item.id === 'java_004'),
+      `java session should include java_004 when resume signals match, got: ${javaSession.plan.map((item) => item.id).join(', ')}`
+    );
+
+    const javaAnswer = await request(`/api/interviews/${javaSession.sessionId}/answer`, {
+      method: 'POST',
+      body: {
+        answer: '我们主要用 Java 把链路拆成几个服务，再配上异步处理。'
+      }
+    });
+    const javaReply = javaAnswer.messages.at(-1)?.content || '';
+    assert(
+      /简历里提到过|订单履约链路治理|线程池隔离|事务边界|失败补偿/.test(javaReply),
+      `java project follow-up should anchor on resume-backed project context, got: ${javaReply}`
+    );
+
+    const goSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'go',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 5,
+        resume: '负责 Go 异步任务平台，做过 goroutine 调度、限流背压和 context 超时治理。'
+      }
+    });
+    assert(
+      goSession.plan.some((item) => item.id === 'go_003'),
+      `go session should include go_003 when resume signals match, got: ${goSession.plan.map((item) => item.id).join(', ')}`
+    );
+
+    const pythonSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'python',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 5,
+        resume: '负责 Python worker 和 Celery 队列治理，处理过 CPU 飙高、GIL 争用和任务积压。'
+      }
+    });
+    assert(
+      pythonSession.plan.some((item) => item.id === 'python_004'),
+      `python session should include python_004 when resume signals match, got: ${pythonSession.plan.map((item) => item.id).join(', ')}`
+    );
+
     const frontendIncidentSession = await request('/api/interviews', {
       method: 'POST',
       body: {

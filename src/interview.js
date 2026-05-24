@@ -2034,6 +2034,15 @@ function createEvidenceFollowUp(question) {
   return '举一个你自己处理过的具体场景，不要只背概念，说明当时为什么这么做。';
 }
 
+function createResumeGroundedProjectFollowUp(question, context = {}) {
+  if (question?.type !== 'project') return '';
+
+  const resumeAnchor = extractResumeAnchor(context.resume, question);
+  if (!resumeAnchor) return '';
+
+  return `不要脱离你的项目背景，直接围绕你简历里这段“${resumeAnchor}”来讲：当时你具体负责什么、拍板了什么、怎么落地、结果怎么验证。`;
+}
+
 function createDetailFollowUp(question) {
   if (question.type === 'algorithm') {
     return '别只说思路，直接讲关键数据结构、遍历顺序、边界情况，以及时间和空间复杂度。';
@@ -2092,9 +2101,14 @@ function selectFollowUp(question, evaluation, context = {}) {
   const missingRubricFocus = getMissingRubricFocus(question, evaluation);
   const levelProfile = getLevelExpectation(context.level);
   const scenarioSpecificPrompt = createScenarioSpecificFollowUp(question, evaluation, levelProfile);
+  const resumeGroundedPrompt = createResumeGroundedProjectFollowUp(question, context);
 
   if (followUpCount >= 2 && scenarioSpecificPrompt) {
     return scenarioSpecificPrompt;
+  }
+
+  if (resumeGroundedPrompt && followUpCount >= 1 && ['ownership', 'evidence', 'detail'].includes(evaluation.followUpCategory)) {
+    return resumeGroundedPrompt;
   }
 
   if (followUpCount >= 2 && evaluation.followUpCategory === 'evidence') {
@@ -2240,8 +2254,12 @@ function createRoleAwareFollowUp(question, evaluation, context = {}) {
   const levelProfile = getLevelExpectation(context.level);
   const focus = getMissingRubricFocus(question, evaluation);
   const scenarioSpecificPrompt = createScenarioSpecificFollowUp(question, evaluation, levelProfile);
+  const resumeGroundedPrompt = createResumeGroundedProjectFollowUp(question, context);
 
   if (scenarioSpecificPrompt) return scenarioSpecificPrompt;
+  if (resumeGroundedPrompt && ['ownership', 'evidence', 'detail'].includes(evaluation.followUpCategory)) {
+    return resumeGroundedPrompt;
+  }
 
   if (!focus) return '';
 
@@ -2698,6 +2716,7 @@ function selectBestQuestion({ available, selected, stage = {}, resumeSignals = c
   const preferredCategory = stage.preferredCategory || null;
   const preferredType = stage.preferredType || null;
   const targetDifficulty = stage.targetDifficulty || 2;
+  const preferredRole = stage.preferredRole || null;
   const selectedIds = new Set(selected.map((item) => item.id));
   const selectedCategories = new Set(selected.map((item) => item.category));
   const selectedTypes = new Set(selected.map((item) => item.type));
@@ -2712,7 +2731,8 @@ function selectBestQuestion({ available, selected, stage = {}, resumeSignals = c
         preferredCategory,
         preferredType,
         targetDifficulty,
-        resumeSignals
+        resumeSignals,
+        preferredRole
       })
     }))
     .sort((left, right) => right.score - left.score);
@@ -2758,13 +2778,15 @@ function scoreQuestionFit(item, {
   targetDifficulty,
   selectedCategories,
   selectedTypes,
-  resumeSignals = createEmptyResumeSignals()
+  resumeSignals = createEmptyResumeSignals(),
+  preferredRole
 }) {
   let score = 0;
   const shouldEncourageCategoryVariety = item.type !== 'project' || selectedCategories.size === 0;
 
   if (preferredCategory && item.category === preferredCategory) score += 50;
   if (preferredType && item.type === preferredType) score += 20;
+  if (preferredRole && item.roles?.includes(preferredRole) && item.roles.length <= 3) score += 16;
   if (!selectedCategories.has(item.category) && shouldEncourageCategoryVariety) score += 12;
   if (!selectedTypes.has(item.type)) score += 8;
   score -= Math.abs((item.difficulty || 2) - targetDifficulty) * 6;
@@ -2790,6 +2812,7 @@ function createInterviewBlueprint({ role, level, targetCount, resumeSignals = cr
     blueprint.push({
       preferredCategory: preferredCategories[index] || topics[index] || null,
       preferredType: stages[index] || stages[stages.length - 1] || 'knowledge',
+      preferredRole: role,
       targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2
     });
   }
@@ -2806,6 +2829,7 @@ function createFallbackBlueprintStage(index, role, level, resumeSignals = create
   })[index] || {
     preferredCategory: null,
     preferredType: 'knowledge',
+    preferredRole: role,
     targetDifficulty: 2
   };
 }
@@ -2968,6 +2992,21 @@ function scoreScenarioSpecificResumeMatch(item, resumeText) {
   if (item.id === 'java_003') {
     const jvmSignals = ['fullgc', 'gc', 'jvm', '堆', '内存泄漏', '老年代'];
     return hasAny(jvmSignals) ? 24 : 0;
+  }
+
+  if (item.id === 'java_004') {
+    const javaProjectSignals = ['java', '订单', '履约', '异步', '线程池', '事务', '补偿', '失败恢复', '状态机'];
+    return hasAny(javaProjectSignals) ? 26 : 0;
+  }
+
+  if (item.id === 'python_004') {
+    const pythonPerfSignals = ['python', 'worker', '积压', 'gil', '序列化', 'cpu', 'io', 'celery', '任务模型'];
+    return hasAny(pythonPerfSignals) ? 26 : 0;
+  }
+
+  if (item.id === 'go_003') {
+    const goConcurrencySignals = ['go', 'goroutine', 'channel', '并发', '背压', '限流', '超时', '取消', 'worker'];
+    return hasAny(goConcurrencySignals) ? 26 : 0;
   }
 
   return 0;
