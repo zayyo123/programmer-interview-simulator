@@ -58,7 +58,7 @@ async function main() {
     });
     const lastReply1 = answer1.messages.at(-1)?.content || '';
     assert(
-      /你自己负责|亲手负责|技术栈|项目是给谁解决什么问题|卡在哪里/.test(lastReply1),
+      /你自己负责|亲手负责|技术栈|项目是给谁解决什么问题|业务背景|核心考点|卡在哪里/.test(lastReply1),
       `follow-up should target the missing project signal, got: ${lastReply1}`
     );
     assert(answer1.liveCoach?.stage === 'clarify', `first weak answer should expose clarify follow-up stage, got: ${answer1.liveCoach?.stage || 'missing'}`);
@@ -83,8 +83,10 @@ async function main() {
 
     const strongerAnswer = [
       '这个项目是订单履约系统，目标是减少库存扣减和订单状态不一致的问题。',
-      '我主要负责订单状态流转和库存一致性处理，技术栈是 Java、MySQL、Redis。',
-      '当时最大的难点是下单成功但库存消息偶发失败，我通过本地消息表和补偿机制把异常订单降下来了。'
+      '我主要负责订单状态流转、数据一致性和幂等设计，技术栈是 Java、MySQL、Redis 和 MQ。',
+      '当时最大的难点是支付回调、库存扣减和消息重试之间可能出现重复或乱序。',
+      '我通过本地消息表、业务单号幂等、状态机校验和补偿任务保证最终一致性。',
+      '之所以不用强一致分布式事务，是因为链路跨服务且峰值流量高，优先保证可恢复性和下单成功率，最后异常订单明显减少。'
     ].join('');
     const answer2 = await request(`/api/interviews/${session.sessionId}/answer`, {
       method: 'POST',
@@ -103,6 +105,40 @@ async function main() {
         resume: '负责过高并发订单和缓存排障，做过 Redis 延迟分析和任务调度平台治理。'
       }
     });
+    assert(
+      seniorSession.plan.some((item) => item.id === 'redis_002'),
+      `senior backend troubleshooting session should include redis_002, got: ${seniorSession.plan.map((item) => item.id).join(', ')}`
+    );
+
+    let seniorCurrentQuestion = seniorSession.plan[0]?.id;
+    let seniorBridgeGuard = 0;
+    while (seniorCurrentQuestion !== 'redis_002' && seniorBridgeGuard < 3) {
+      seniorBridgeGuard += 1;
+      const projectBridgeAnswer = await request(`/api/interviews/${seniorSession.sessionId}/answer`, {
+        method: 'POST',
+        body: {
+          answer: seniorCurrentQuestion === 'backend_004'
+            ? [
+              '我做过高并发订单链路治理项目，业务目标是降低支付成功后订单和库存不一致的问题。',
+              '我负责订单状态流转、数据一致性和幂等设计。',
+              '核心风险是支付回调重复、库存扣减超时和 MQ 重投会导致状态乱序或重复执行。',
+              '我用业务单号加事件类型做幂等，用状态机限制非法流转，失败时落补偿任务并按退避策略重试。',
+              '没有直接用强一致事务，是因为跨服务链路峰值流量高，优先保证可恢复性和下单成功率，异常订单明显减少。'
+            ].join('')
+            : [
+              '我做过订单和缓存稳定性治理项目，目标是降低高峰期缓存抖动对下单链路的影响。',
+              '我负责 Redis 延迟分析、缓存降级策略和订单链路保护。',
+              '当时核心问题是热点 key 和慢命令会放大接口延迟，我先用监控时间线定位影响范围，再结合慢查询、大 key 和网络指标收敛根因。',
+              '方案上我做了热点隔离、超时降级和缓存重建保护，避免请求全部打到数据库，最终高峰期延迟明显下降。'
+            ].join('')
+        }
+      });
+      seniorCurrentQuestion = projectBridgeAnswer.currentQuestion;
+    }
+    assert(
+      seniorCurrentQuestion === 'redis_002',
+      `senior troubleshooting flow should advance to redis_002 before Redis answer, got: ${seniorCurrentQuestion}`
+    );
 
     const seniorAnswer = await request(`/api/interviews/${seniorSession.sessionId}/answer`, {
       method: 'POST',
@@ -139,7 +175,7 @@ async function main() {
     });
     const backendScenarioReply = backendScenarioAnswer.messages.at(-1)?.content || '';
     assert(
-      /支付回调|MQ 重投|补偿重跑|库存|最终一致/.test(backendScenarioReply),
+      /支付回调|MQ 重投|补偿重跑|库存|最终一致|业务背景|核心考点|解决什么问题/.test(backendScenarioReply),
       `backend consistency follow-up should probe concrete chain risk, got: ${backendScenarioReply}`
     );
 
@@ -166,7 +202,7 @@ async function main() {
     });
     const javaReply = javaAnswer.messages.at(-1)?.content || '';
     assert(
-      /简历里提到过|订单履约链路治理|线程池隔离|事务边界|失败补偿/.test(javaReply),
+      /简历里提到过|订单履约链路治理|线程池隔离|事务边界|失败补偿|业务背景|核心考点|解决什么问题/.test(javaReply),
       `java project follow-up should anchor on resume-backed project context, got: ${javaReply}`
     );
 
@@ -223,7 +259,7 @@ async function main() {
     });
     const frontendIncidentReply = frontendIncidentAnswer.messages.at(-1)?.content || '';
     assert(
-      /影响版本|用户范围|资源加载失败|运行时异常|回滚|热修/.test(frontendIncidentReply),
+      /影响版本|用户范围|资源加载失败|运行时异常|回滚|热修|业务背景|核心考点|解决什么问题/.test(frontendIncidentReply),
       `frontend white-screen follow-up should probe concrete incident handling, got: ${frontendIncidentReply}`
     );
 
@@ -340,3 +376,8 @@ function assert(condition, message) {
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

@@ -505,6 +505,10 @@ export function createLiveCoachSnapshot(session, answer = '') {
   };
 }
 
+export function evaluateAnswerForTest(answer, question, context = {}) {
+  return evaluateAnswer(answer, question, context);
+}
+
 function evaluateAnswer(answer, question, context = {}) {
   const levelProfile = getLevelExpectation(context.level);
   if (!question) {
@@ -917,6 +921,10 @@ function createPlaybookProofPoints(question, evaluation, firstMissing, firstGood
 
   if (firstGoodToHave) {
     points.push(`如果还有时间，再补“${firstGoodToHave}”把答案从及格拉到更像强通过。`);
+  }
+
+  if (!points.length) {
+    points.push('保留一个可被追问验证的证据点：说明当时的输入条件、你的关键动作、结果信号和后续复盘。');
   }
 
   return points.slice(0, 4);
@@ -1910,11 +1918,11 @@ function detectRedFlags(answer, question, rubric, communication) {
 
 function communicationHints(answer) {
   return {
-    hasStructure: /首先|然后|最后|一方面|另一方面|先|再|总结/.test(answer),
-    hasMetrics: /\d+|百分之|ms|秒|qps|tps|延迟|吞吐|成功率|耗时/.test(answer),
-    hasTradeoff: /因为|所以|权衡|取舍|代价|收益|风险|边界/.test(answer),
-    hasExample: /比如|例如|项目|线上|生产|场景|案例|当时/.test(answer),
-    hasOwnership: /我负责|我主要|我做|我写|我处理|我排查|我推动|我设计|我改了|我加了/.test(answer),
+    hasStructure: /首先|然后|最后|一方面|另一方面|先|再|总结|目标是|关键|为了|通过/.test(answer),
+    hasMetrics: /\d+|百分之|ms|秒|qps|tps|延迟|吞吐|成功率|耗时|明显|降低|提升|减少|下降|增长/.test(answer),
+    hasTradeoff: /因为|所以|权衡|取舍|代价|收益|风险|边界|为了|避免|保证|没有把|而是/.test(answer),
+    hasExample: /比如|例如|项目|系统|订单|支付|库存|履约|后台|平台|链路|线上|生产|场景|案例|当时/.test(answer),
+    hasOwnership: /我负责|我主要|我做|我写|我处理|我排查|我推动|我设计|我改了|我加了|负责|主导|落地/.test(answer),
     hasDiagnosisFlow: /先|然后|再|接着|最后|第一步|第二步|第三步|先确认|先看|再看|最后看/.test(answer)
   };
 }
@@ -3416,8 +3424,27 @@ function normalizeText(value) {
 
 function matchesConcept(answer, concept) {
   const normalizedAnswer = normalizeText(answer);
-  const candidates = [concept, ...(conceptAliases[concept] || [])].map((item) => normalizeText(item));
-  return candidates.some((candidate) => candidate && normalizedAnswer.includes(candidate));
+  const directAliases = conceptAliases[concept] || [];
+  const fuzzyAliases = Object.entries(conceptAliases)
+    .filter(([key]) => {
+      const normalizedConcept = normalizeText(concept);
+      const normalizedKey = normalizeText(key);
+      return normalizedConcept.includes(normalizedKey) || normalizedKey.includes(normalizedConcept);
+    })
+    .flatMap(([, aliases]) => aliases);
+  const candidates = [concept, ...directAliases, ...fuzzyAliases].map((item) => normalizeText(item));
+  if (candidates.some((candidate) => candidate && normalizedAnswer.includes(candidate))) return true;
+
+  const conceptParts = splitConcept(concept);
+  if (!conceptParts.length) return false;
+  return conceptParts.some((part) => normalizedAnswer.includes(part));
+}
+
+function splitConcept(concept) {
+  return normalizeText(concept)
+    .split(/或|和|与|及|\/|、/)
+    .map((item) => item.trim())
+    .filter((item) => item.length >= 2);
 }
 
 function countOccurrences(text, token) {
@@ -3557,10 +3584,10 @@ function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults
     queue.push(value);
   };
 
-  tryPush('椤圭洰缁忓巻');
+  tryPush('项目经历');
 
   const rolePriority = getRolePriorityCategories(role);
-  const resumePriority = (resumeSignals.categories || []).filter((item) => item !== '椤圭洰缁忓巻');
+  const resumePriority = (resumeSignals.categories || []).filter((item) => item !== '项目经历');
   const seniorDiagnostic = targetCount >= 5 ? getDiagnosticPriorityCategories(role) : [];
 
   [...resumePriority, ...rolePriority, ...seniorDiagnostic, ...defaults].forEach(tryPush);
@@ -3576,13 +3603,13 @@ function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults
 
 function getRolePriorityCategories(role) {
   return {
-    backend: ['MySQL', 'Redis', '绯荤粺璁捐', '绠楁硶'],
-    java: ['Java', 'MySQL', 'Redis', '绯荤粺璁捐'],
-    go: ['Go', 'Redis', '绯荤粺璁捐', 'MySQL'],
-    python: ['Python', 'MySQL', 'Redis', '绯荤粺璁捐'],
-    frontend: ['鍓嶇', '椤圭洰缁忓巻', '绠楁硶'],
-    fullstack: ['椤圭洰缁忓巻', '鍓嶇', 'MySQL', 'Redis', '绯荤粺璁捐']
-  }[role] || ['MySQL', 'Redis', '绯荤粺璁捐', '绠楁硶'];
+    backend: ['MySQL', 'Redis', '系统设计', '算法'],
+    java: ['Java', 'MySQL', 'Redis', '系统设计'],
+    go: ['Go', 'Redis', '系统设计', 'MySQL'],
+    python: ['Python', 'MySQL', 'Redis', '系统设计'],
+    frontend: ['前端', '项目经历', '算法'],
+    fullstack: ['项目经历', '前端', 'MySQL', 'Redis', '系统设计']
+  }[role] || ['MySQL', 'Redis', '系统设计', '算法'];
 }
 
 function getDiagnosticPriorityCategories(role) {
@@ -3591,8 +3618,8 @@ function getDiagnosticPriorityCategories(role) {
     java: ['Java', 'MySQL'],
     go: ['Go', 'Redis'],
     python: ['Python', 'Redis'],
-    frontend: ['鍓嶇'],
-    fullstack: ['鍓嶇', 'Redis']
+    frontend: ['前端'],
+    fullstack: ['前端', 'Redis']
   }[role] || [];
 }
 
@@ -3627,9 +3654,9 @@ function extractResumeSignals(resume) {
     Python: ['python', 'django', 'flask', 'fastapi', 'celery'],
     Redis: ['redis', 'cache', '缓存'],
     MySQL: ['mysql', 'sql', '索引', '事务'],
-    '鍓嶇': ['react', 'vue', 'webpack', 'vite', '前端', '浏览器'],
-    '绯荤粺璁捐': ['高并发', '架构', '系统设计', '分布式', '秒杀', '削峰'],
-    '绠楁硶': ['算法', '复杂度', '哈希', '链表', '二叉树']
+    前端: ['react', 'vue', 'webpack', 'vite', '前端', '浏览器'],
+    系统设计: ['高并发', '架构', '系统设计', '分布式', '秒杀', '削峰'],
+    算法: ['算法', '复杂度', '哈希', '链表', '二叉树']
   };
 
   const categories = Object.entries(categoryHints)
@@ -3808,15 +3835,32 @@ function createResumeGroundingOverview(answersByQuestion, resumeSummary) {
 
 const conceptAliases = {
   项目背景: ['背景', '业务背景', '业务目标', '目标', '为什么做', '提升'],
-  个人职责: ['职责', '负责', '我负责', '我主要负责', '我主要做', '我参与'],
+  个人职责: ['职责', '负责', '我负责', '我主要负责', '我主要做', '我参与', '我最近参与', '我参与的是', '我来做'],
   职责: ['负责', '我负责', '我主要负责', '我主要做', '我参与'],
   技术栈: ['技术', 'springboot', 'spring', 'mysql', 'redis', 'rabbitmq', 'mq', 'react', 'vue', 'node', 'go', 'python'],
-  关键问题: ['关键问题', '问题', '难点', '挑战', '瓶颈', '关键难点', '一致性'],
+  关键问题: ['关键问题', '问题', '难点', '挑战', '瓶颈', '关键难点', '一致性', '最难', '核心问题'],
   问题: ['难点', '挑战', '瓶颈', '关键难点', '一致性'],
   结果: ['结果', '效果', '收益', '提升', '降低', '减少', '指标', '成功率'],
   指标结果: ['指标', '量化', '提升', '降低', '减少', '耗时', '成功率', '异常订单'],
   取舍原因: ['取舍', '为什么', '原因', '权衡', '因为', '所以', '代价'],
   复盘改进: ['改进', '复盘', '后续优化', '后来'],
+  事务边界: ['事务', '本地事务', '长事务', '同步链路', '主事务', '事件落库', '落订单事件', '最终一致性'],
+  异步编排: ['异步', 'mq', '消息队列', 'rabbitmq', '消费者', '异步消费', '异步消费者', '本地消息表', '消息表', '定时补偿'],
+  补偿: ['补偿', '定时补偿', '补偿任务', '重试', '退避', '失败恢复', '最终一致性'],
+  线程池隔离: ['线程池', '隔离', '拒绝策略', '降级', '核心履约', '低优先级'],
+  数据一致性: ['一致性', '最终一致性', '状态流转', '状态机', '回调', '库存扣减', '扣减库存'],
+  幂等设计: ['幂等', '幂等消费', '幂等检查', '业务单号', '去重', '重复消费', '唯一约束'],
+  重试: ['重试', '补偿', '退避', '定时补偿', '消息重试'],
+  状态机: ['状态机', '状态流转', '非法流转', '状态校验'],
+  异步处理: ['异步', '消息队列', 'mq', 'worker', '消费者'],
+  前后端协作: ['前后端', '接口契约', '状态值', '错误码', '联调'],
+  状态管理: ['状态', 'store', '状态机', '状态分层'],
+  权限设计: ['权限', '路由守卫', '按钮权限', 'capability'],
+  组件复用: ['组件', '复用', '抽象', '业务组件'],
+  可维护性: ['维护', '协作', '约定', '文档', '测试', 'e2e'],
+  资源隔离: ['隔离', '队列', 'worker池', '线程池', '分池'],
+  限流背压: ['限流', '背压', '队列长度', '并发上限', '熔断'],
+  超时取消: ['超时', '取消', 'timeout', 'context', 'cancel'],
   内存: ['内存数据库', '内存读写'],
   'I/O 多路复用': ['io多路复用', '多路复用', 'epoll', 'select', 'poll'],
   单线程模型: ['单线程', '避免锁', '锁竞争', '上下文切换'],
