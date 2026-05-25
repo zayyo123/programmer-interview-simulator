@@ -7,7 +7,7 @@
     "dev": "node src/server.js",
     "start": "node src/server.js",
     "score:smoke": "node scripts/score-smoke.mjs",
-    "smoke": "node scripts/score-smoke.mjs && node scripts/smoke-test.js"
+    "smoke": "node scripts/question-bank-check.mjs && node scripts/score-smoke.mjs && node scripts/smoke-test.js"
   },
   "engines": {
     "node": ">=18"

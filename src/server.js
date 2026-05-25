@@ -43,8 +43,11 @@ const server = createServer(async (request, response) => {
         plan: session.plan.map((item) => ({
           id: item.id,
           category: item.category,
+          skill: item.skill || item.category,
           type: item.type,
-          difficulty: item.difficulty
+          codeKind: item.codeKind || null,
+          difficulty: item.difficulty,
+          planReason: item.planReason || '按本轮训练节奏安排。'
         }))
       });
     }
@@ -122,7 +125,8 @@ function createSession(input) {
     level: input.level || 'middle',
     style: input.style || 'normal',
     resume: input.resume || '',
-    questionCount: Number(input.questionCount || 5)
+    questionCount: Number(input.questionCount || 5),
+    profileAnalysis: input.profileAnalysis || null
   };
   const plan = createInterviewPlan(interviewConfig);
   const firstQuestion = plan[0];

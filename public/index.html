@@ -63,6 +63,14 @@
             ></textarea>
           </label>
 
+          <section id="profileAnalysis" class="profile-analysis empty-profile">
+            <p>不填也可以直接快速练习；填写 JD、简历或项目背景后，会在这里分析岗位关键词和推荐考点。</p>
+          </section>
+
+          <section id="planPreview" class="plan-preview" aria-live="polite">
+            <p>选择配置后，这里会预览本轮训练节奏，不提前暴露具体题目。</p>
+          </section>
+
           <button type="submit" class="primary-button">开始模拟面试</button>
         </form>
 
@@ -70,6 +78,10 @@
           <strong>AI 提供方</strong>
           <span id="providerText">尚未开始</span>
         </div>
+
+        <section id="practiceHistory" class="practice-history" aria-live="polite">
+          <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
+        </section>
       </section>
 
       <section class="interview-panel">
@@ -81,6 +93,10 @@
           <button id="finishButton" class="ghost-button" disabled>结束并生成报告</button>
         </div>
 
+        <section id="interviewProgress" class="interview-progress empty-progress">
+          <p>开始后会展示本轮面试路线：基础题、追问、项目题、场景题和复盘。</p>
+        </section>
+
         <div id="messages" class="messages empty-state">
           <p>面试官会在这里开场，并提出第一道问题。</p>
         </div>
@@ -90,6 +106,9 @@
         </aside>
 
         <form id="answerForm" class="answer-form">
+          <section id="answerGuide" class="answer-guide empty-answer-guide">
+            <p>开始面试后，这里会提示当前题型的作答方式。</p>
+          </section>
           <textarea id="answerInput" rows="4" placeholder="在这里输入你的回答..." disabled></textarea>
           <button type="submit" class="primary-button" disabled>提交回答</button>
         </form>
@@ -108,6 +127,6 @@
       </section>
     </main>
 
-    <script src="/app.js?v=zh-cn-4" type="module"></script>
+    <script src="/app.js?v=zh-cn-8" type="module"></script>
   </body>
 </html>

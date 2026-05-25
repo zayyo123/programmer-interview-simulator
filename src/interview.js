@@ -1,12 +1,12 @@
 import { levelLabels, questionBank, roleLabels, styleLabels } from './questions.js';
 
 const roleTopics = {
-  backend: ['MySQL', 'Redis', '项目经历', '系统设计', '算法'],
+  backend: ['MySQL', 'Redis', '网络', '操作系统', '项目经历', '系统设计', '算法'],
   frontend: ['前端', '算法', '项目经历', '前端', '系统设计'],
   fullstack: ['前端', 'MySQL', '项目经历', '系统设计', '算法'],
-  java: ['Java', 'MySQL', '项目经历', 'Redis', '系统设计', '算法'],
-  go: ['Go', 'Redis', '项目经历', 'MySQL', '系统设计', '算法'],
-  python: ['Python', 'MySQL', '项目经历', 'Redis', '系统设计', '算法']
+  java: ['Java', 'MySQL', '网络', '操作系统', '项目经历', 'Redis', '系统设计', '算法'],
+  go: ['Go', 'Redis', '网络', '操作系统', '项目经历', 'MySQL', '系统设计', '算法'],
+  python: ['Python', 'MySQL', '网络', '操作系统', '项目经历', 'Redis', '系统设计', '算法']
 };
 
 const fillerWords = ['然后', '就是', '那个', '可能', '感觉', '大概', '比较', '这个', '那个时候'];
@@ -60,7 +60,7 @@ export function createInterviewPlan(config) {
   const role = config.role || 'backend';
   const level = config.level || 'middle';
   const targetCount = clamp(Number(config.questionCount || 5), 3, 8);
-  const resumeSignals = extractResumeSignals(config.resume);
+  const resumeSignals = extractResumeSignals(config.resume, config.profileAnalysis);
   const blueprint = createInterviewBlueprint({
     role,
     level,
@@ -69,6 +69,7 @@ export function createInterviewPlan(config) {
   });
   const available = buildCandidateQuestionPool(role, level, resumeSignals, blueprint);
   const selected = [];
+  const selectedStages = [];
 
   for (let index = 0; index < blueprint.length; index += 1) {
     const stage = blueprint[index];
@@ -81,14 +82,18 @@ export function createInterviewPlan(config) {
       level
     });
 
-    if (match) selected.push(match);
+    if (match) {
+      selected.push(match);
+      selectedStages.push(stage);
+    }
   }
 
   while (selected.length < Math.min(targetCount, available.length)) {
+    const stage = createFallbackBlueprintStage(selected.length, role, level, resumeSignals);
     const match = selectBestQuestion({
       available,
       selected,
-      stage: createFallbackBlueprintStage(selected.length, role, level, resumeSignals),
+      stage,
       resumeSignals,
       role,
       level
@@ -96,9 +101,107 @@ export function createInterviewPlan(config) {
 
     if (!match) break;
     selected.push(match);
+    selectedStages.push(stage);
   }
 
-  return selected;
+  return selected.map((item, index) => ({
+    ...item,
+    planReason: createPlanReason(item, selectedStages[index], resumeSignals)
+  }));
+}
+
+function createPlanReason(question, stage = {}, resumeSignals = createEmptyResumeSignals()) {
+  if (isQuestionDrillTarget(question, resumeSignals)) {
+    const target = resumeSignals.questionDrill?.target || question.category || '本题薄弱点';
+    const missedPoint = resumeSignals.questionDrill?.missedPoint;
+    return missedPoint
+      ? `根据单题报告重练「${target}」安排，优先检查是否补齐「${missedPoint}」。`
+      : `根据单题报告重练「${target}」安排，优先验证同类题和定点追问表现。`;
+  }
+
+  const riskMapping = findRelevantRiskMapping(question, resumeSignals.analysisRiskMappings);
+  if (riskMapping) {
+    return `根据 JD/简历风险「${riskMapping.risk}」安排，重点验证${riskMapping.questionType}。`;
+  }
+
+  if (resumeSignals.analysisCategories?.includes(question.category)) {
+    return `根据定制分析中的「${question.category}」信号安排，优先验证基础掌握和追问深度。`;
+  }
+
+  if (question.codeKind && resumeSignals.analysisCodeKinds?.includes(question.codeKind)) {
+    return `根据定制分析中的代码/场景题要求安排，训练${getCodeKindPlanLabel(question.codeKind)}表达。`;
+  }
+
+  if (resumeSignals.categories?.includes(question.category)) {
+    return `结合 JD/简历里出现的「${question.category}」经历安排，检查能否说清原理和落地场景。`;
+  }
+
+  if (question.type === 'project' && resumeSignals.ownership) {
+    return '用于验证项目经历里的个人职责、真实贡献和落地结果。';
+  }
+
+  if (question.type === 'project') {
+    return '用于验证项目经历、个人职责和结果表达。';
+  }
+
+  if (question.type === 'system-design') {
+    return '用于验证场景设计、边界条件和方案取舍。';
+  }
+
+  if (question.type === 'algorithm') {
+    return `用于验证${getCodeKindPlanLabel(question.codeKind)}、边界条件和复杂度表达。`;
+  }
+
+  if (stage.preferredCategory && stage.preferredCategory === question.category) {
+    return `按本轮训练路线安排「${question.category}」基础题，先建立技术面试热身。`;
+  }
+
+  return '按本轮训练节奏安排，用于建立基础八股题热身。';
+}
+
+function createQuestionDrillTarget(planReason) {
+  const text = String(planReason || '');
+  if (!/单题报告重练|本题薄弱点|单题专项/.test(text)) return null;
+
+  const target = text.match(/重练「([^」]+)」/)?.[1] || '本题薄弱点';
+  const missedPoint = text.match(/补齐「([^」]+)」/)?.[1] || '';
+  return {
+    source: '单题报告重练',
+    target,
+    missedPoint,
+    reminder: missedPoint
+      ? `优先补齐「${missedPoint}」，再接受同类追问。`
+      : '优先验证同类题和定点追问表现。'
+  };
+}
+
+function findRelevantRiskMapping(question, mappings = []) {
+  if (!Array.isArray(mappings) || !mappings.length || !question) return null;
+
+  return mappings.find((item) => {
+    const text = normalizeText(`${item.risk || ''} ${item.questionType || ''}`);
+    if (!text) return false;
+    if (question.category && text.includes(normalizeText(question.category))) return true;
+    if (question.type === 'project') return /项目|职责|贡献|结果|指标/.test(text);
+    if (question.type === 'system-design') return /场景|设计|高并发|链路|线上|排查/.test(text);
+    if (question.type === 'knowledge') return /基础|八股|广度|通用/.test(text);
+    if (question.type === 'algorithm') {
+      if (question.codeKind === 'backend') return /后端|幂等|限流|缓存|伪代码|代码/.test(text);
+      if (question.codeKind === 'frontend') return /前端|js|代码|防抖|节流|promise/.test(text);
+      if (question.codeKind === 'sql') return /sql|数据库|查询|分组/.test(text);
+      return /算法|复杂度|代码|边界/.test(text);
+    }
+    return false;
+  }) || null;
+}
+
+function getCodeKindPlanLabel(codeKind) {
+  return {
+    sql: 'SQL 解题思路',
+    frontend: '前端手写题',
+    backend: '后端场景伪代码',
+    algorithm: '算法思路'
+  }[codeKind] || '代码思路';
 }
 
 export function createOpening(config, firstQuestion) {
@@ -314,17 +417,27 @@ export function createReport(session) {
     });
 
     return {
+      questionId: entry.question.id,
       question: entry.question.question,
       category: entry.question.category,
+      skill: getQuestionSkill(entry.question),
+      type: entry.question.type,
+      codeKind: entry.question.codeKind || null,
+      planReason: entry.question.planReason || '按本轮训练节奏安排。',
+      questionDrillTarget: createQuestionDrillTarget(entry.question.planReason),
       attempts: entry.attempts || 1,
       followUpCount,
       endedByInterviewer: Boolean(entry.endedByInterviewer),
       exitReason: entry.exitReason || 'open',
       userAnswer: entry.answer,
       userAnswerSummary: summarizeAnswer(entry.answer),
+      expectedPoints: createExpectedPoints(entry.question),
+      expectedPointCoverage: createExpectedPointCoverage(entry.question, entry.answer),
       referenceAnswer: entry.question.referenceAnswer,
       excellentAnswer: entry.question.excellentAnswer,
+      commonMistakes: entry.question.commonMistakes || [],
       score: evaluation.score,
+      dimensionScores: evaluation.dimensionScores,
       confidence: describeAnswerConfidence(evaluation, entry.attempts || 1, levelProfile),
       interviewerVerdict: createInterviewerVerdict(
         entry.question,
@@ -440,6 +553,27 @@ export function createReport(session) {
   };
 }
 
+function createExpectedPoints(question) {
+  if (Array.isArray(question.expectedPoints) && question.expectedPoints.length) {
+    return question.expectedPoints;
+  }
+
+  const mustHave = question.scoringRubric?.mustHave || [];
+  const goodToHave = question.scoringRubric?.goodToHave || [];
+  return [...new Set([...mustHave, ...goodToHave])].slice(0, 8);
+}
+
+function getQuestionSkill(question) {
+  return question.skill || question.category || '综合能力';
+}
+
+function createExpectedPointCoverage(question, answer) {
+  return createExpectedPoints(question).map((point) => ({
+    point,
+    covered: matchesConcept(answer, point)
+  }));
+}
+
 export function createLiveCoachSnapshot(session, answer = '') {
   const question = getCurrentQuestion(session);
   const levelProfile = getLevelExpectation(session?.config?.level);
@@ -533,6 +667,7 @@ function evaluateAnswer(answer, question, context = {}) {
         goodToHave: []
       },
       levelProfile,
+      dimensionScores: createEmptyDimensionScores(),
       communication: {
         hasStructure: true,
         hasMetrics: false,
@@ -615,8 +750,225 @@ function evaluateAnswer(answer, question, context = {}) {
       goodToHave: goodToHaveHits
     },
     levelProfile,
+    dimensionScores: createDimensionScores({
+      question,
+      rubric,
+      hitKeywords,
+      mustHaveHits,
+      goodToHaveHits,
+      communication,
+      redFlags,
+      score,
+      answer,
+      levelProfile
+    }),
     communication
   };
+}
+
+function createEmptyDimensionScores() {
+  return [
+    {
+      key: 'accuracy',
+      label: '技术准确性',
+      score: 100,
+      detail: '当前没有需要评估的题目。'
+    },
+    {
+      key: 'completeness',
+      label: '回答完整度',
+      score: 100,
+      detail: '当前没有需要补充的要点。'
+    },
+    {
+      key: 'structure',
+      label: '表达结构',
+      score: 100,
+      detail: '当前没有表达结构风险。'
+    },
+    {
+      key: 'depth',
+      label: '技术深度',
+      score: 100,
+      detail: '当前没有深度风险。'
+    }
+  ];
+}
+
+function createDimensionScores({
+  question,
+  rubric,
+  hitKeywords,
+  mustHaveHits,
+  goodToHaveHits,
+  communication,
+  redFlags,
+  score,
+  answer,
+  levelProfile
+}) {
+  if (question.type === 'algorithm') {
+    return createCodeDimensionScores({
+      question,
+      rubric,
+      hitKeywords,
+      mustHaveHits,
+      goodToHaveHits,
+      communication,
+      redFlags,
+      score,
+      answer,
+      levelProfile
+    });
+  }
+
+  const keywordRatio = question.keywords.length ? hitKeywords.length / question.keywords.length : 1;
+  const mustHaveRatio = rubric.mustHave.length ? mustHaveHits.length / rubric.mustHave.length : 1;
+  const goodToHaveRatio = rubric.goodToHave.length ? goodToHaveHits.length / rubric.goodToHave.length : 1;
+  const answerLength = String(answer || '').trim().length;
+  const lengthRatio = clamp(answerLength / Math.max(80, levelProfile.preferredAnswerLength), 0, 1);
+  const redFlagPenalty = Math.min(16, redFlags.length * 5);
+
+  const accuracy = clamp(Math.round((keywordRatio * 45) + (mustHaveRatio * 50) + 5 - redFlagPenalty), 0, 100);
+  const completeness = clamp(Math.round((mustHaveRatio * 58) + (goodToHaveRatio * 22) + (lengthRatio * 20)), 0, 100);
+  const structureSignals = [
+    communication.hasStructure,
+    question.type === 'algorithm' || communication.hasTradeoff,
+    !['project', 'system-design'].includes(question.type) || communication.hasMetrics,
+    question.type === 'knowledge' || communication.hasExample
+  ].filter(Boolean).length;
+  const structure = clamp(Math.round((structureSignals / 4) * 82 + Math.min(18, answerLength / 12)), 0, 100);
+  const depthSignals = [
+    goodToHaveHits.length > 0,
+    communication.hasTradeoff || question.type === 'algorithm',
+    communication.hasExample || question.type === 'knowledge',
+    communication.hasDiagnosisFlow || question.difficulty < 3,
+    communication.hasMetrics || !['project', 'system-design'].includes(question.type)
+  ].filter(Boolean).length;
+  const depth = clamp(Math.round((depthSignals / 5) * 70 + (goodToHaveRatio * 20) + Math.min(10, score / 10)), 0, 100);
+
+  return [
+    {
+      key: 'accuracy',
+      label: '技术准确性',
+      score: accuracy,
+      detail: accuracy >= 80
+        ? '核心概念和关键技术点覆盖较稳。'
+        : `优先补齐：${getMissingDimensionPoints(question.keywords, hitKeywords)}。`
+    },
+    {
+      key: 'completeness',
+      label: '回答完整度',
+      score: completeness,
+      detail: completeness >= 80
+        ? '主干要点比较完整，可以继续补场景和取舍。'
+        : `还缺少：${getMissingDimensionPoints(rubric.mustHave, mustHaveHits)}。`
+    },
+    {
+      key: 'structure',
+      label: '表达结构',
+      score: structure,
+      detail: structure >= 80
+        ? '表达有清晰顺序，面试官容易跟上。'
+        : '建议按“结论 -> 原理/方案 -> 场景 -> 结果或取舍”的顺序重答。'
+    },
+    {
+      key: 'depth',
+      label: '技术深度',
+      score: depth,
+      detail: depth >= 80
+        ? '已经有一定深挖信号，继续补边界和代价会更像真实项目经验。'
+        : '需要补充为什么这样做、边界条件、线上场景、排查路径或量化结果。'
+    }
+  ];
+}
+
+function createCodeDimensionScores({
+  question,
+  rubric,
+  hitKeywords,
+  mustHaveHits,
+  goodToHaveHits,
+  communication,
+  redFlags,
+  score,
+  answer,
+  levelProfile
+}) {
+  const keywordRatio = question.keywords.length ? hitKeywords.length / question.keywords.length : 1;
+  const mustHaveRatio = rubric.mustHave.length ? mustHaveHits.length / rubric.mustHave.length : 1;
+  const goodToHaveRatio = rubric.goodToHave.length ? goodToHaveHits.length / rubric.goodToHave.length : 1;
+  const answerText = String(answer || '');
+  const answerLength = answerText.trim().length;
+  const lengthRatio = clamp(answerLength / Math.max(90, levelProfile.preferredAnswerLength), 0, 1);
+  const redFlagPenalty = Math.min(16, redFlags.length * 5);
+  const hasCodeShape = /```|function|class|select|from|where|for\s*\(|while\s*\(|if\s*\(|return|伪代码|步骤|流程|key|value|cache|redis|ttl/i.test(answerText);
+  const hasBoundary = /边界|异常|空|重复|并发|过期|超时|不存在|null|undefined|空数组|极端|失败|降级|误判|ttl|复杂度/i.test(answerText);
+  const hasComplexityOrTradeoff = /o\(|复杂度|时间复杂度|空间复杂度|权衡|取舍|代价|滑动窗口|令牌桶|布隆过滤器|索引|性能|原子/i.test(answerText);
+  const hasExecutableOrder = communication.hasStructure || /第一|第二|第三|先|再|然后|最后|输入|输出|初始化|遍历|判断/i.test(answerText);
+
+  const idea = clamp(Math.round((keywordRatio * 38) + (mustHaveRatio * 46) + (hasExecutableOrder ? 12 : 0) + 4 - redFlagPenalty), 0, 100);
+  const implementation = clamp(Math.round((mustHaveRatio * 48) + (lengthRatio * 18) + (hasCodeShape ? 22 : 0) + (goodToHaveRatio * 12)), 0, 100);
+  const boundary = clamp(Math.round((goodToHaveRatio * 28) + (hasBoundary ? 42 : 0) + (communication.hasExample ? 12 : 0) + Math.min(18, score / 6)), 0, 100);
+  const complexity = clamp(Math.round((hasComplexityOrTradeoff ? 45 : 0) + (communication.hasTradeoff ? 18 : 0) + (goodToHaveRatio * 22) + Math.min(15, score / 7)), 0, 100);
+
+  return [
+    {
+      key: 'codeIdea',
+      label: '解题思路',
+      score: idea,
+      detail: idea >= 80
+        ? '核心思路比较清楚，面试官能看出你知道为什么这样做。'
+        : `先补清楚关键思路：${getMissingDimensionPoints(question.keywords, hitKeywords)}。`
+    },
+    {
+      key: 'codeImplementation',
+      label: '实现完整度',
+      score: implementation,
+      detail: implementation >= 80
+        ? '实现步骤比较完整，可以继续补可运行细节和变量含义。'
+        : `实现还缺少主干：${getMissingDimensionPoints(rubric.mustHave, mustHaveHits)}。`
+    },
+    {
+      key: 'codeBoundary',
+      label: '边界覆盖',
+      score: boundary,
+      detail: boundary >= 80
+        ? '边界条件和异常情况覆盖较好。'
+        : '需要主动补充空值、重复、并发、异常、极端输入或缓存过期等边界。'
+    },
+    {
+      key: 'codeComplexity',
+      label: getCodeComplexityLabel(question.codeKind),
+      score: complexity,
+      detail: complexity >= 80
+        ? '已经讲到复杂度、性能或方案取舍，代码题说服力更强。'
+        : getCodeComplexitySuggestion(question.codeKind)
+    }
+  ];
+}
+
+function getCodeComplexityLabel(codeKind) {
+  return {
+    sql: '性能意识',
+    frontend: '副作用控制',
+    backend: '方案取舍',
+    algorithm: '复杂度表达'
+  }[codeKind] || '复杂度表达';
+}
+
+function getCodeComplexitySuggestion(codeKind) {
+  return {
+    sql: '需要说明索引、过滤顺序、分组排序成本或数据量变大后的性能风险。',
+    frontend: '需要说明 this、参数透传、定时器清理、返回值或异步副作用。',
+    backend: '需要补充为什么选这个方案，以及并发、一致性、降级和成本取舍。',
+    algorithm: '需要明确时间复杂度、空间复杂度，以及极端输入下是否仍然成立。'
+  }[codeKind] || '需要补充复杂度、性能成本和关键取舍。';
+}
+
+function getMissingDimensionPoints(expected = [], actual = []) {
+  const missing = expected.filter((item) => !actual.includes(item)).slice(0, 4);
+  return missing.length ? missing.join('、') : '更具体的机制、场景和边界条件';
 }
 
 function createFollowUpReply(question, evaluation, style, followUpCount = 0, level = 'middle', interviewContext = {}) {
@@ -1549,6 +1901,7 @@ function createUncoveredQuestionAnalysis(session, answersByQuestion) {
         category: question.category,
         type: question.type,
         difficulty: question.difficulty,
+        planReason: question.planReason || '按本轮训练节奏安排。',
         mustCover,
         interviewerIntent: describeQuestionIntent(question),
         coachingFocus: createUncoveredQuestionCoachingFocus(question, levelProfile),
@@ -3620,13 +3973,17 @@ function createInterviewBlueprint({ role, level, targetCount, resumeSignals = cr
   const difficultyTargets = levelDifficultyTargets[level] || levelDifficultyTargets.middle;
   const preferredCategories = createPreferredCategoryQueue(role, resumeSignals, targetCount, topics);
   const blueprint = [];
+  let technicalCategoryIndex = 0;
 
   for (let index = 0; index < targetCount; index += 1) {
     const preferredType = stages[index] || stages[stages.length - 1] || 'knowledge';
+    const preferredCategory = preferredType === 'project'
+      ? getPreferredProjectCategory(role)
+      : preferredCategories[technicalCategoryIndex] || topics[technicalCategoryIndex] || null;
+    if (preferredType !== 'project') technicalCategoryIndex += 1;
+
     blueprint.push({
-      preferredCategory: preferredType === 'project'
-        ? getPreferredProjectCategory(role)
-        : preferredCategories[index] || topics[index] || null,
+      preferredCategory,
       preferredType,
       preferredRole: role,
       targetDifficulty: difficultyTargets[index] || difficultyTargets[difficultyTargets.length - 1] || 2
@@ -3671,10 +4028,16 @@ function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults
     queue.push(value);
   };
 
+  const roleCategory = getPrimaryCategoryForRole(role);
+  const explicitAnalysisPriority = prioritizeRoleCategory(
+    (resumeSignals.analysisCategories || []).filter((item) => item !== '项目经历'),
+    roleCategory
+  );
+  const resumePriority = (resumeSignals.categories || [])
+    .filter((item) => item !== '项目经历' && !explicitAnalysisPriority.includes(item));
   const rolePriority = getRolePriorityCategories(role);
-  const resumePriority = (resumeSignals.categories || []).filter((item) => item !== '项目经历');
   const seniorDiagnostic = targetCount >= 5 ? getDiagnosticPriorityCategories(role) : [];
-  const technicalPriority = [...rolePriority, ...resumePriority, ...seniorDiagnostic, ...defaults]
+  const technicalPriority = [...explicitAnalysisPriority, ...rolePriority, ...resumePriority, ...seniorDiagnostic, ...defaults]
     .filter((item) => item !== '项目经历');
 
   technicalPriority.forEach(tryPush);
@@ -3689,12 +4052,26 @@ function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults
   return queue.slice(0, targetCount);
 }
 
+function getPrimaryCategoryForRole(role) {
+  return {
+    java: 'Java',
+    go: 'Go',
+    python: 'Python',
+    frontend: '前端'
+  }[role] || null;
+}
+
+function prioritizeRoleCategory(categories, roleCategory) {
+  if (!roleCategory || !categories.includes(roleCategory)) return categories;
+  return [roleCategory, ...categories.filter((item) => item !== roleCategory)];
+}
+
 function getRolePriorityCategories(role) {
   return {
-    backend: ['MySQL', 'Redis', '系统设计', '算法'],
-    java: ['Java', 'MySQL', 'Redis', '系统设计'],
-    go: ['Go', 'Redis', '系统设计', 'MySQL'],
-    python: ['Python', 'MySQL', 'Redis', '系统设计'],
+    backend: ['MySQL', 'Redis', '网络', '操作系统', '系统设计', '算法'],
+    java: ['Java', 'MySQL', 'Redis', '网络', '操作系统', '系统设计'],
+    go: ['Go', 'Redis', '网络', '操作系统', '系统设计', 'MySQL'],
+    python: ['Python', 'MySQL', 'Redis', '网络', '操作系统', '系统设计'],
     frontend: ['前端', '项目经历', '算法'],
     fullstack: ['项目经历', '前端', 'MySQL', 'Redis', '系统设计']
   }[role] || ['MySQL', 'Redis', '系统设计', '算法'];
@@ -3726,9 +4103,9 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function extractResumeSignals(resume) {
+function extractResumeSignals(resume, profileAnalysis = null) {
   const text = String(resume || '').trim();
-  if (!text) return createEmptyResumeSignals();
+  if (!text && !profileAnalysis) return createEmptyResumeSignals();
 
   const snippets = text
     .split(/[\r\n，。,；;、]/)
@@ -3737,12 +4114,14 @@ function extractResumeSignals(resume) {
     .slice(0, 6);
   const normalized = normalizeText(text);
   const categoryHints = {
-    Java: ['java', 'spring', 'jvm', 'hashmap'],
-    Go: ['go', 'golang', 'goroutine', 'gin'],
+    Java: ['java', 'spring', 'jvm', 'hashmap', '线程池', '拒绝策略', '队列堆积', 'callerrunspolicy', 'synchronized', 'reentrantlock', 'volatile', 'concurrenthashmap', '锁竞争'],
+    Go: ['go', 'golang', 'goroutine', 'gin', 'channel', 'context', 'mutex', 'pprof', '锁竞争'],
     Python: ['python', 'django', 'flask', 'fastapi', 'celery'],
     Redis: ['redis', 'cache', '缓存'],
-    MySQL: ['mysql', 'sql', '索引', '事务'],
-    前端: ['react', 'vue', 'webpack', 'vite', '前端', '浏览器'],
+    MySQL: ['mysql', 'sql', '索引', '事务', '窗口函数', 'dense_rank', '第二高薪资', '部门薪资'],
+    操作系统: ['进程', '线程', 'cpu', '内存', '上下文切换', '锁', '虚拟内存', '页缓存', 'swap', 'oom', 'io多路复用', 'i/o多路复用', 'epoll', 'reactor'],
+    网络: ['tcp', 'http', 'https', '网络', '超时', '连接', '带宽', 'dns', 'tls', '连接池', '网关', '负载均衡', '状态码', '幂等', '重试', '退避', 'netty', 'nginx'],
+    前端: ['react', 'vue', 'webpack', 'vite', '前端', '浏览器', 'promise', 'promise.all', '事件循环', '微任务', '宏任务', 'async', 'await', '并发聚合', '失败短路', '并发限制器', '任务队列', '最大并发数', '补位执行', 'throttle', '节流', '时间戳'],
     系统设计: ['高并发', '架构', '系统设计', '分布式', '秒杀', '削峰'],
     算法: ['算法', '复杂度', '哈希', '链表', '二叉树']
   };
@@ -3750,11 +4129,23 @@ function extractResumeSignals(resume) {
   const categories = Object.entries(categoryHints)
     .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
     .map(([category]) => category);
+  const analysisCategories = extractProfileAnalysisCategories(profileAnalysis);
+  const analysisText = [
+    ...(profileAnalysis?.keywords || []),
+    ...(profileAnalysis?.focusTopics || []),
+    ...(profileAnalysis?.recommendedTracks || [])
+  ].join(' ');
+  const questionDrill = extractQuestionDrillSignals(text, profileAnalysis);
 
   return {
     text,
     snippets,
-    categories,
+    categories: [...new Set([...analysisCategories, ...categories])],
+    analysisCategories,
+    analysisCodeKinds: extractProfileAnalysisCodeKinds(profileAnalysis),
+    analysisRiskMappings: normalizeProfileRiskMappings(profileAnalysis?.riskQuestionMappings),
+    analysisText,
+    questionDrill,
     ownership: /(负责|主导|设计|优化|排查|实现|落地)/.test(text),
     metrics: /\d+/.test(text)
   };
@@ -3765,9 +4156,122 @@ function createEmptyResumeSignals() {
     text: '',
     snippets: [],
     categories: [],
+    analysisCategories: [],
+    analysisCodeKinds: [],
+    analysisRiskMappings: [],
+    analysisText: '',
+    questionDrill: createEmptyQuestionDrillSignals(),
     ownership: false,
     metrics: false
   };
+}
+
+function createEmptyQuestionDrillSignals() {
+  return {
+    isQuestionDrill: false,
+    target: '',
+    originalQuestion: '',
+    missedPoint: '',
+    commonMistake: '',
+    followUp: '',
+    source: ''
+  };
+}
+
+function extractQuestionDrillSignals(text, profileAnalysis = null) {
+  const isQuestionDrill = Boolean(profileAnalysis?.isQuestionDrill)
+    || /报告单题重练|本题薄弱点|单题专项重练|原题：|优先补齐要点/.test(text);
+  if (!isQuestionDrill) return createEmptyQuestionDrillSignals();
+
+  const readLine = (label) => {
+    const match = String(text || '').match(new RegExp(`${label}[：:]([^\\r\\n]+)`));
+    return match?.[1]?.trim() || '';
+  };
+  const target = readLine('报告单题重练') || readLine('代码题类型') || profileAnalysis?.focusTopics?.[0] || '';
+  const originalQuestion = readLine('原题');
+  const missedPoint = readLine('优先补齐要点');
+  const commonMistake = readLine('避免扣分点');
+  const followUp = readLine('下一轮追问方向');
+  const source = [
+    target,
+    originalQuestion,
+    missedPoint,
+    commonMistake,
+    followUp,
+    ...(profileAnalysis?.keywords || []),
+    ...(profileAnalysis?.focusTopics || []),
+    ...(profileAnalysis?.recommendedTracks || [])
+  ].filter(Boolean).join(' ');
+
+  return {
+    isQuestionDrill: true,
+    target,
+    originalQuestion,
+    missedPoint,
+    commonMistake,
+    followUp,
+    source
+  };
+}
+
+function normalizeProfileRiskMappings(items) {
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .map((item) => ({
+      risk: String(item?.risk || '').trim(),
+      questionType: String(item?.questionType || '').trim()
+    }))
+    .filter((item) => item.risk && item.questionType)
+    .slice(0, 4);
+}
+
+function extractProfileAnalysisCodeKinds(profileAnalysis) {
+  if (!profileAnalysis) return [];
+
+  const source = [
+    ...(profileAnalysis.keywords || []),
+    ...(profileAnalysis.focusTopics || []),
+    ...(profileAnalysis.recommendedTracks || [])
+  ].join(' ');
+  const normalized = normalizeText(source);
+  const codeKindRules = {
+    sql: ['sql', '分组统计', '查询', 'groupby', '窗口函数', 'dense_rank', 'rank', 'row_number', '第二高薪资', '部门薪资'],
+    frontend: ['前端代码题', '防抖', '节流', 'throttle', '时间戳', 'leading', 'trailing', 'promise', 'promise.all', '数组扁平化', '事件循环', '微任务', '宏任务', '并发聚合', '失败短路', '并发限制器', '任务队列', '最大并发数', '补位执行'],
+    backend: ['后端场景题', '限流器', '接口幂等', '缓存穿透', '令牌桶', '布隆过滤器'],
+    algorithm: ['算法题', 'lru', '括号', '复杂度', '链表']
+  };
+
+  return Object.entries(codeKindRules)
+    .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
+    .map(([codeKind]) => codeKind);
+}
+
+function extractProfileAnalysisCategories(profileAnalysis) {
+  if (!profileAnalysis) return [];
+
+  const source = [
+    ...(profileAnalysis.keywords || []),
+    ...(profileAnalysis.focusTopics || []),
+    ...(profileAnalysis.recommendedTracks || [])
+  ].join(' ');
+  const normalized = normalizeText(source);
+  const categoryRules = {
+    Java: ['java', 'jvm', 'spring', '线程池', '线程池参数', '拒绝策略', '队列堆积', 'callerrunspolicy', 'abortpolicy', 'synchronized', 'reentrantlock', 'volatile', 'concurrenthashmap', '锁竞争', '可见性', 'cas'],
+    Go: ['go', 'goroutine', 'context', 'channel', 'mutex', 'pprof', 'block profile', 'mutex profile', '锁竞争', '背压'],
+    Python: ['python', 'worker', 'gil', 'celery'],
+    Redis: ['redis', '缓存', '热key', '大key', '缓存穿透'],
+    MySQL: ['mysql', '数据库', '索引', '事务', '慢查询', '窗口函数', 'dense_rank', '第二高薪资', '部门薪资'],
+    操作系统: ['操作系统', '进程', '线程', 'cpu', '内存', '上下文切换', '锁竞争', 'jstack', '火焰图', '虚拟内存', '页缓存', 'swap', 'oom', 'rss', 'vsz', 'io多路复用', 'i/o多路复用', 'select', 'poll', 'epoll', 'reactor'],
+    网络: ['网络', 'tcp', 'http', 'https', '三次握手', '四次挥手', '超时', '连接数', '带宽', '负载均衡', 'dns', 'tls', '连接池', '网关', '证书', 'keep-alive', '状态码', '幂等', '重试', '退避', '重试风暴', 'netty', 'nginx'],
+    前端: ['前端', 'react', 'vue', '首屏', '白屏', '工程化', '防抖', '节流', 'throttle', '时间戳', 'leading', 'trailing', '数组扁平化', 'promise', 'promise.all', '事件循环', '微任务', '宏任务', 'async', 'await', '并发聚合', '失败短路', '并发限制', '并发限制器', '任务队列', '最大并发数', '补位执行'],
+    系统设计: ['系统设计', '高并发', '限流', '限流器', '幂等', '接口幂等', '缓存穿透', '补偿', '降级', '分布式'],
+    算法: ['算法', '复杂度', '链表', 'lru', '括号']
+  };
+
+  return Object.entries(categoryRules)
+    .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
+    .map(([category]) => category);
 }
 
 function summarizeResumeForInterview(resume) {
@@ -3776,14 +4280,26 @@ function summarizeResumeForInterview(resume) {
 }
 
 function scoreResumeQuestionMatch(item, resumeSignals) {
-  if (!resumeSignals?.text) return 0;
+  if (!resumeSignals) return 0;
 
   let score = 0;
+  score += scoreQuestionDrillMatch(item, resumeSignals.questionDrill);
   if (resumeSignals.categories.includes(item.category)) score += 18;
+  if (resumeSignals.analysisCategories?.includes(item.category)) score += 14;
+  if (item.codeKind && resumeSignals.analysisCodeKinds?.includes(item.codeKind)) score += 32;
   if (item.type === 'project' && resumeSignals.ownership) score += 8;
   if ((item.type === 'project' || item.type === 'system-design') && resumeSignals.metrics) score += 4;
 
   const itemText = normalizeText([item.category, item.question, ...(item.keywords || [])].join(' '));
+  if (resumeSignals.analysisText && itemText) {
+    const analysisText = normalizeText(resumeSignals.analysisText);
+    if (splitConcept(item.category).some((part) => analysisText.includes(part))) score += 8;
+    const matchedKeywords = (item.keywords || [])
+      .filter((keyword) => analysisText.includes(normalizeText(keyword)));
+    if (matchedKeywords.length) score += 10 + Math.min(12, (matchedKeywords.length - 1) * 3);
+    if (analysisText.includes(normalizeText(item.category))) score += 12;
+  }
+
   if (resumeSignals.snippets.some((snippet) => {
     const normalizedSnippet = normalizeText(snippet);
     return normalizedSnippet && (itemText.includes(normalizedSnippet) || normalizedSnippet.includes(itemText));
@@ -3793,6 +4309,52 @@ function scoreResumeQuestionMatch(item, resumeSignals) {
 
   score += scoreScenarioSpecificResumeMatch(item, resumeSignals.text);
 
+  return score;
+}
+
+function isQuestionDrillTarget(item, resumeSignals = createEmptyResumeSignals()) {
+  return scoreQuestionDrillMatch(item, resumeSignals.questionDrill) >= 24;
+}
+
+function scoreQuestionDrillMatch(item, questionDrill = createEmptyQuestionDrillSignals()) {
+  if (!questionDrill?.isQuestionDrill || !item) return 0;
+
+  let score = 0;
+  const target = normalizeText(questionDrill.target);
+  const drillText = normalizeText(questionDrill.source);
+  const itemText = normalizeText([
+    item.id,
+    item.category,
+    item.skill,
+    item.type,
+    item.question,
+    ...(item.keywords || []),
+    ...(item.expectedPoints || []),
+    ...(item.commonMistakes || [])
+  ].filter(Boolean).join(' '));
+
+  if (target && normalizeText(item.category).includes(target)) score += 30;
+  if (target && normalizeText(item.skill || '').includes(target)) score += 30;
+  if (target && itemText.includes(target)) score += 18;
+  if (questionDrill.originalQuestion && item.question === questionDrill.originalQuestion) score += 42;
+
+  const drillTokens = [
+    questionDrill.missedPoint,
+    questionDrill.commonMistake,
+    questionDrill.followUp
+  ]
+    .flatMap((value) => splitConcept(value || ''))
+    .filter((token) => token.length >= 2);
+  const matchedTokens = drillTokens.filter((token) => itemText.includes(normalizeText(token)));
+  if (matchedTokens.length) score += 16 + Math.min(24, (matchedTokens.length - 1) * 4);
+
+  if (drillText && itemText) {
+    const keywordHits = (item.keywords || [])
+      .filter((keyword) => drillText.includes(normalizeText(keyword))).length;
+    if (keywordHits) score += 10 + Math.min(18, (keywordHits - 1) * 3);
+  }
+
+  if (item.type === 'project' && /项目化表达|个人职责|落地/.test(questionDrill.source || '')) score += 8;
   return score;
 }
 
@@ -3835,6 +4397,11 @@ function scoreScenarioSpecificResumeMatch(item, resumeText) {
   if (item.id === 'go_003') {
     const goConcurrencySignals = ['go', 'goroutine', 'channel', '并发', '背压', '限流', '超时', '取消', 'worker'];
     return hasAny(goConcurrencySignals) ? 26 : 0;
+  }
+
+  if (item.id === 'backend_code_003') {
+    const idempotencySignals = ['接口幂等', '幂等键', '唯一约束', '重复请求', '重复提交', '支付回调', 'mq 重复消费', '消息重投', '状态机'];
+    return hasAny(idempotencySignals) ? 30 : 0;
   }
 
   return 0;
