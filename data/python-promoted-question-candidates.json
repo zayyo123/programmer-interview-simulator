@@ -1,0 +1,1665 @@
+{
+  "generatedAt": "2026-05-26T17:13:00.363Z",
+  "sourceSyncedAt": "2026-05-26T17:12:45.545Z",
+  "summary": {
+    "externalDraftCount": 262,
+    "scoredCount": 14,
+    "candidateCount": 14,
+    "minScore": 40,
+    "includeSignalOnly": true,
+    "byCategory": {
+      "Python": 14
+    },
+    "bySource": {
+      "Stack Overflow 常见技术问答信号": 14
+    }
+  },
+  "scoringRubric": {
+    "license": "可转写授权优先；仅信号源默认不入正式题库。",
+    "interviewValue": "题目必须像真实程序员面试题，覆盖原理、场景、边界或排查。",
+    "coverage": "优先补足 Java、MySQL、Redis、网络、操作系统、算法、前端、系统设计等模块。",
+    "transformReadiness": "候选题会生成 expectedPoints、followUps、commonMistakes 和 scoringRubric 草案。"
+  },
+  "candidates": [
+    {
+      "rank": 1,
+      "id": "external_0245",
+      "title": "Does Python have a ternary conditional operator?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/394809/does-python-have-a-ternary-conditional-operator",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 8125,
+      "tags": [
+        "python",
+        "operators",
+        "conditional-operator",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_does_python_have_a_ternary_conditional_op",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "Does Python have a ternary conditional operator? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "operators",
+          "conditional-operator",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Does Python have a ternary conditional operator?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Does Python have a ternary conditional operator?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Does Python have a ternary conditional operator?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "operators"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/394809/does-python-have-a-ternary-conditional-operator",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 2,
+      "id": "external_0252",
+      "title": "Has Django served an excess of 100k daily visits?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/886221/has-django-served-an-excess-of-100k-daily-visits",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 1225,
+      "tags": [
+        "python",
+        "django",
+        "web-applications",
+        "scalability",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_has_django_served_an_excess_of_100k_daily",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "Has Django served an excess of 100k daily visits? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "web-applications",
+          "scalability",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Has Django served an excess of 100k daily visits?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Has Django served an excess of 100k daily visits?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Has Django served an excess of 100k daily visits?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/886221/has-django-served-an-excess-of-100k-daily-visits",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 3,
+      "id": "external_0253",
+      "title": "How do I do a not equal in Django queryset filtering?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/687295/how-do-i-do-a-not-equal-in-django-queryset-filtering",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 1014,
+      "tags": [
+        "python",
+        "django",
+        "django-models",
+        "django-queryset",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_how_do_i_do_a_not_equal_in_django_queryse",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "How do I do a not equal in Django queryset filtering? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "django-models",
+          "django-queryset",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“How do I do a not equal in Django queryset filtering?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do I do a not equal in Django queryset filtering?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“How do I do a not equal in Django queryset filtering?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/687295/how-do-i-do-a-not-equal-in-django-queryset-filtering",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 4,
+      "id": "external_0249",
+      "title": "How do I execute a program or call a system command?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 6296,
+      "tags": [
+        "python",
+        "shell",
+        "terminal",
+        "subprocess",
+        "command",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_how_do_i_execute_a_program_or_call_a_syst",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "How do I execute a program or call a system command? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "shell",
+          "terminal",
+          "subprocess",
+          "command",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“How do I execute a program or call a system command?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do I execute a program or call a system command?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“How do I execute a program or call a system command?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "shell"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 5,
+      "id": "external_0248",
+      "title": "How do I merge two dictionaries in a single expression in Python?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 7126,
+      "tags": [
+        "python",
+        "dictionary",
+        "merge",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_how_do_i_merge_two_dictionaries_in_a_sing",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "How do I merge two dictionaries in a single expression in Python? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "dictionary",
+          "merge",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“How do I merge two dictionaries in a single expression in Python?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do I merge two dictionaries in a single expression in Python?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“How do I merge two dictionaries in a single expression in Python?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "dictionary"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 6,
+      "id": "external_0254",
+      "title": "Is there a list of Pytz Timezones?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/13866926/is-there-a-list-of-pytz-timezones",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 1005,
+      "tags": [
+        "python",
+        "django",
+        "datetime",
+        "timezone",
+        "pytz",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_is_there_a_list_of_pytz_timezones",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "Is there a list of Pytz Timezones? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "datetime",
+          "timezone",
+          "pytz",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Is there a list of Pytz Timezones?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Is there a list of Pytz Timezones?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Is there a list of Pytz Timezones?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/13866926/is-there-a-list-of-pytz-timezones",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 7,
+      "id": "external_0246",
+      "title": "What are metaclasses in Python?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 7531,
+      "tags": [
+        "python",
+        "oop",
+        "metaclass",
+        "python-class",
+        "python-datamodel",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_what_are_metaclasses_in_python",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "What are metaclasses in Python? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "oop",
+          "metaclass",
+          "python-class",
+          "python-datamodel",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“What are metaclasses in Python?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What are metaclasses in Python?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“What are metaclasses in Python?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "oop"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 8,
+      "id": "external_0244",
+      "title": "What does if name == \"main\": do?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/419163/what-does-if-name-main-do",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 8439,
+      "tags": [
+        "python",
+        "namespaces",
+        "program-entry-point",
+        "python-module",
+        "idioms",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_what_does_if_name_main_do",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "What does if name == \"main\": do? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "namespaces",
+          "program-entry-point",
+          "python-module",
+          "idioms",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“What does if name == \"main\": do?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What does if name == \"main\": do?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“What does if name == \"main\": do?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "namespaces"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/419163/what-does-if-name-main-do",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 9,
+      "id": "external_0243",
+      "title": "What does the \"yield\" keyword do in Python?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do-in-python",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 13134,
+      "tags": [
+        "python",
+        "iterator",
+        "generator",
+        "yield",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_what_does_the_yield_keyword_do_in_python",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "What does the \"yield\" keyword do in Python? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "iterator",
+          "generator",
+          "yield",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“What does the \"yield\" keyword do in Python?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What does the \"yield\" keyword do in Python?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“What does the \"yield\" keyword do in Python?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "iterator"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do-in-python",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 10,
+      "id": "external_0251",
+      "title": "What is the difference between null=True and blank=True in Django?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/8609192/what-is-the-difference-between-null-true-and-blank-true-in-django",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 1429,
+      "tags": [
+        "python",
+        "django",
+        "django-models",
+        "django-admin",
+        "Python"
+      ],
+      "promotionScore": 52,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部热度较高，适合提炼常见误区和追问。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_what_is_the_difference_between_null_true_",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "What is the difference between null=True and blank=True in Django? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "django-models",
+          "django-admin",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“What is the difference between null=True and blank=True in Django?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What is the difference between null=True and blank=True in Django?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“What is the difference between null=True and blank=True in Django?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/8609192/what-is-the-difference-between-null-true-and-blank-true-in-django",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 52,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 11,
+      "id": "external_0255",
+      "title": "How can I temporarily disable a foreign key constraint in MySQL?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/15501673/how-can-i-temporarily-disable-a-foreign-key-constraint-in-mysql",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 865,
+      "tags": [
+        "python",
+        "sql",
+        "mysql",
+        "django",
+        "django-models",
+        "Python"
+      ],
+      "promotionScore": 50,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部有一定讨论热度。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_how_can_i_temporarily_disable_a_foreign_k",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "How can I temporarily disable a foreign key constraint in MySQL? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "sql",
+          "mysql",
+          "django",
+          "django-models",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区",
+          "数据库执行机制和性能影响"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“How can I temporarily disable a foreign key constraint in MySQL?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How can I temporarily disable a foreign key constraint in MySQL?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“How can I temporarily disable a foreign key constraint in MySQL?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "数据库执行机制和性能影响",
+            "Python",
+            "python"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/15501673/how-can-i-temporarily-disable-a-foreign-key-constraint-in-mysql",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 50,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 12,
+      "id": "external_0256",
+      "title": "How to combine multiple QuerySets in Django?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/431628/how-to-combine-multiple-querysets-in-django",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 839,
+      "tags": [
+        "python",
+        "django",
+        "search",
+        "django-queryset",
+        "django-q",
+        "Python"
+      ],
+      "promotionScore": 50,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部有一定讨论热度。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_how_to_combine_multiple_querysets_in_djan",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "How to combine multiple QuerySets in Django? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "search",
+          "django-queryset",
+          "django-q",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“How to combine multiple QuerySets in Django?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How to combine multiple QuerySets in Django?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“How to combine multiple QuerySets in Django?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/431628/how-to-combine-multiple-querysets-in-django",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 50,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 13,
+      "id": "external_0257",
+      "title": "How to revert the last migration?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/32123477/how-to-revert-the-last-migration",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 837,
+      "tags": [
+        "python",
+        "django",
+        "django-migrations",
+        "Python"
+      ],
+      "promotionScore": 50,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部有一定讨论热度。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_how_to_revert_the_last_migration",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "How to revert the last migration? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "django-migrations",
+          "Python 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“How to revert the last migration?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How to revert the last migration?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“How to revert the last migration?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/32123477/how-to-revert-the-last-migration",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 50,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 14,
+      "id": "external_0258",
+      "title": "What is a \"slug\" in Django?",
+      "category": "Python",
+      "skill": "Python",
+      "type": "knowledge",
+      "difficulty": 3,
+      "provider": "Stack Exchange API",
+      "sourceId": "stack-overflow-programmer-interview",
+      "sourceName": "Stack Overflow 常见技术问答信号",
+      "sourceUrl": "https://stackoverflow.com/questions/427102/what-is-a-slug-in-django",
+      "sourcePath": "",
+      "license": "CC BY-SA",
+      "licenseUrl": "https://stackoverflow.com/help/licensing",
+      "attributionRequired": true,
+      "importPolicy": "signal-only",
+      "popularity": 772,
+      "tags": [
+        "python",
+        "django",
+        "url",
+        "django-models",
+        "slug",
+        "Python"
+      ],
+      "promotionScore": 50,
+      "qualityScore": 100,
+      "qualityGrade": "A",
+      "promotionReasons": [
+        "标题天然接近面试问句。",
+        "当前正式题库的 Python 方向仍值得继续扩充。",
+        "外部有一定讨论热度。"
+      ],
+      "promotionRisks": [
+        "该来源仅适合作为追问/误区信号，不建议直接入正式题库。",
+        "授权不适合作为直接入库素材。",
+        "需要在候选题中保留来源署名和许可证链接。"
+      ],
+      "qualityIssues": [],
+      "proposedQuestion": {
+        "id": "candidate_python_what_is_a_slug_in_django",
+        "category": "Python",
+        "skill": "Python",
+        "roles": [
+          "python",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 3,
+        "question": "What is a \"slug\" in Django? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Python",
+          "python",
+          "django",
+          "url",
+          "django-models",
+          "slug",
+          "Python 核心概念",
+          "适用场景"
+        ],
+        "expectedPoints": [
+          "Python 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“What is a \"slug\" in Django?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What is a \"slug\" in Django?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“What is a \"slug\" in Django?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Python 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Python",
+            "python",
+            "django"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "Stack Overflow 常见技术问答信号",
+          "sourceUrl": "https://stackoverflow.com/questions/427102/what-is-a-slug-in-django",
+          "sourcePath": "",
+          "license": "CC BY-SA",
+          "licenseUrl": "https://stackoverflow.com/help/licensing",
+          "attributionRequired": true,
+          "promotionScore": 50,
+          "qualityScore": 100,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    }
+  ]
+}

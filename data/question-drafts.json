@@ -1,0 +1,1783 @@
+{
+  "updatedAt": "2026-05-26T17:15:32.753Z",
+  "drafts": [
+    {
+      "id": "draft_candidate_14_4856084d",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 14,
+        "candidateId": "external_0258",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/427102/what-is-a-slug-in-django",
+        "sourcePath": "",
+        "promotionScore": 50,
+        "qualityScore": 100
+      },
+      "title": "What is a \"slug\" in Django?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "What is a \"slug\" in Django? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "django",
+        "url",
+        "django-models",
+        "slug",
+        "Python 核心概念",
+        "适用场景"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“What is a \"slug\" in Django?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What is a \"slug\" in Django?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“What is a \"slug\" in Django?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/427102/what-is-a-slug-in-django",
+      "reviewNotes": "由候选题 #14 自动转入待审核草稿。；推荐分：50，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部有一定讨论热度。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_13_6d15bc99",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 13,
+        "candidateId": "external_0257",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/32123477/how-to-revert-the-last-migration",
+        "sourcePath": "",
+        "promotionScore": 50,
+        "qualityScore": 100
+      },
+      "title": "How to revert the last migration?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "How to revert the last migration? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "django",
+        "django-migrations",
+        "Python 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How to revert the last migration?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How to revert the last migration?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How to revert the last migration?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/32123477/how-to-revert-the-last-migration",
+      "reviewNotes": "由候选题 #13 自动转入待审核草稿。；推荐分：50，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部有一定讨论热度。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_12_b5db9887",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 12,
+        "candidateId": "external_0256",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/431628/how-to-combine-multiple-querysets-in-django",
+        "sourcePath": "",
+        "promotionScore": 50,
+        "qualityScore": 100
+      },
+      "title": "How to combine multiple QuerySets in Django?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "How to combine multiple QuerySets in Django? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "django",
+        "search",
+        "django-queryset",
+        "django-q",
+        "Python 核心概念",
+        "适用场景"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How to combine multiple QuerySets in Django?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How to combine multiple QuerySets in Django?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How to combine multiple QuerySets in Django?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/431628/how-to-combine-multiple-querysets-in-django",
+      "reviewNotes": "由候选题 #12 自动转入待审核草稿。；推荐分：50，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部有一定讨论热度。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_10_0d8761c9",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 10,
+        "candidateId": "external_0251",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/8609192/what-is-the-difference-between-null-true-and-blank-true-in-django",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "What is the difference between null=True and blank=True in Django?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "What is the difference between null=True and blank=True in Django? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "django",
+        "django-models",
+        "django-admin",
+        "Python 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“What is the difference between null=True and blank=True in Django?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What is the difference between null=True and blank=True in Django?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“What is the difference between null=True and blank=True in Django?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/8609192/what-is-the-difference-between-null-true-and-blank-true-in-django",
+      "reviewNotes": "由候选题 #10 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_9_80b1e21e",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 9,
+        "candidateId": "external_0243",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do-in-python",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "What does the \"yield\" keyword do in Python?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "What does the \"yield\" keyword do in Python? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "iterator",
+        "generator",
+        "yield",
+        "Python 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“What does the \"yield\" keyword do in Python?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What does the \"yield\" keyword do in Python?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“What does the \"yield\" keyword do in Python?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do-in-python",
+      "reviewNotes": "由候选题 #9 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_8_05115632",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 8,
+        "candidateId": "external_0244",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/419163/what-does-if-name-main-do",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "What does if name == \"main\": do?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "What does if name == \"main\": do? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "namespaces",
+        "program-entry-point",
+        "python-module",
+        "idioms",
+        "Python 核心概念",
+        "适用场景"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“What does if name == \"main\": do?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What does if name == \"main\": do?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“What does if name == \"main\": do?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/419163/what-does-if-name-main-do",
+      "reviewNotes": "由候选题 #8 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_7_868ff852",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 7,
+        "candidateId": "external_0246",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "What are metaclasses in Python?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "What are metaclasses in Python? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "oop",
+        "metaclass",
+        "python-class",
+        "python-datamodel",
+        "Python 核心概念",
+        "适用场景"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“What are metaclasses in Python?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What are metaclasses in Python?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“What are metaclasses in Python?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python",
+      "reviewNotes": "由候选题 #7 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_5_fb35d961",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 5,
+        "candidateId": "external_0248",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "How do I merge two dictionaries in a single expression in Python?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "How do I merge two dictionaries in a single expression in Python? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "dictionary",
+        "merge",
+        "Python 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How do I merge two dictionaries in a single expression in Python?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do I merge two dictionaries in a single expression in Python?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How do I merge two dictionaries in a single expression in Python?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python",
+      "reviewNotes": "由候选题 #5 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_4_21851b10",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 4,
+        "candidateId": "external_0249",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "How do I execute a program or call a system command?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "How do I execute a program or call a system command? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "shell",
+        "terminal",
+        "subprocess",
+        "command",
+        "Python 核心概念",
+        "适用场景"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How do I execute a program or call a system command?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do I execute a program or call a system command?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How do I execute a program or call a system command?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command",
+      "reviewNotes": "由候选题 #4 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_3_3dc1df20",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 3,
+        "candidateId": "external_0253",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/687295/how-do-i-do-a-not-equal-in-django-queryset-filtering",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "How do I do a not equal in Django queryset filtering?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "How do I do a not equal in Django queryset filtering? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "django",
+        "django-models",
+        "django-queryset",
+        "Python 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How do I do a not equal in Django queryset filtering?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do I do a not equal in Django queryset filtering?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How do I do a not equal in Django queryset filtering?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/687295/how-do-i-do-a-not-equal-in-django-queryset-filtering",
+      "reviewNotes": "由候选题 #3 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_1_58de9554",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "importedFromCandidate": {
+        "rank": 1,
+        "candidateId": "external_0245",
+        "sourceId": "stack-overflow-programmer-interview",
+        "sourceName": "Stack Overflow 常见技术问答信号",
+        "sourceUrl": "https://stackoverflow.com/questions/394809/does-python-have-a-ternary-conditional-operator",
+        "sourcePath": "",
+        "promotionScore": 52,
+        "qualityScore": 100
+      },
+      "title": "Does Python have a ternary conditional operator?",
+      "category": "Python",
+      "skill": "Python",
+      "roles": [
+        "python",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Does Python have a ternary conditional operator? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Python",
+        "python",
+        "operators",
+        "conditional-operator",
+        "Python 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Python 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Does Python have a ternary conditional operator?”，正式入库前应重写为本地中文参考答案。回答应先给出 Python 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：Stack Overflow 常见技术问答信号，许可证 CC BY-SA。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Does Python have a ternary conditional operator?”的核心结论，再展开 Python 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Does Python have a ternary conditional operator?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Stack Overflow 常见技术问答信号",
+      "license": "CC BY-SA",
+      "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/394809/does-python-have-a-ternary-conditional-operator",
+      "reviewNotes": "由候选题 #1 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+    },
+    {
+      "id": "draft_candidate_24_1689235e",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 24,
+        "candidateId": "external_0158",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "由候选题 #24 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_23_74d691fa",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 23,
+        "candidateId": "external_0159",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Is Go an object-oriented language?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Is Go an object-oriented language? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Is Go an object-oriented language?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Is Go an object-oriented language?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Is Go an object-oriented language?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "由候选题 #23 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_22_0a03ced1",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 22,
+        "candidateId": "external_0145",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Is Go a new language, framework or library?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Is Go a new language, framework or library? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Is Go a new language, framework or library?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Is Go a new language, framework or library?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Is Go a new language, framework or library?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "由候选题 #22 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_21_dee9c628",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 21,
+        "candidateId": "external_0201",
+        "sourceId": "github-shomali11-go-interview",
+        "sourceName": "Go Interview Coding Questions",
+        "sourceUrl": "https://github.com/shomali11/go-interview",
+        "sourcePath": "本地授权种子",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "How would you reverse a linked list in Go?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "How would you reverse a linked list in Go? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How would you reverse a linked list in Go?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How would you reverse a linked list in Go?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How would you reverse a linked list in Go?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Go Interview Coding Questions",
+      "license": "MIT",
+      "attribution": "Go Interview Coding Questions；许可证：MIT；来源：https://github.com/shomali11/go-interview",
+      "reviewNotes": "由候选题 #21 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_20_80cb1ae5",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 20,
+        "candidateId": "external_0203",
+        "sourceId": "github-shomali11-go-interview",
+        "sourceName": "Go Interview Coding Questions",
+        "sourceUrl": "https://github.com/shomali11/go-interview",
+        "sourcePath": "本地授权种子",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "How would you implement a stack or queue in Go?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "How would you implement a stack or queue in Go? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How would you implement a stack or queue in Go?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How would you implement a stack or queue in Go?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How would you implement a stack or queue in Go?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Go Interview Coding Questions",
+      "license": "MIT",
+      "attribution": "Go Interview Coding Questions；许可证：MIT；来源：https://github.com/shomali11/go-interview",
+      "reviewNotes": "由候选题 #20 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_19_2233d928",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 19,
+        "candidateId": "external_0202",
+        "sourceId": "github-shomali11-go-interview",
+        "sourceName": "Go Interview Coding Questions",
+        "sourceUrl": "https://github.com/shomali11/go-interview",
+        "sourcePath": "本地授权种子",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "How do you detect a cycle in a linked list with Go?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "How do you detect a cycle in a linked list with Go? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How do you detect a cycle in a linked list with Go?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do you detect a cycle in a linked list with Go?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How do you detect a cycle in a linked list with Go?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:Go Interview Coding Questions",
+      "license": "MIT",
+      "attribution": "Go Interview Coding Questions；许可证：MIT；来源：https://github.com/shomali11/go-interview",
+      "reviewNotes": "由候选题 #19 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_15_0cd1380f",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 15,
+        "candidateId": "external_0163",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Have you worked with Go 2?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Have you worked with Go 2? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Have you worked with Go 2?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Have you worked with Go 2?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Have you worked with Go 2?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "由候选题 #15 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_10_99fb0220",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "importedFromCandidate": {
+        "rank": 10,
+        "candidateId": "external_0148",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Can you declared multiple types of variables in single declaration in Go?",
+      "category": "Go",
+      "skill": "Go",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Can you declared multiple types of variables in single declaration in Go? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Go",
+        "Go 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Go 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Can you declared multiple types of variables in single declaration in Go?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Can you declared multiple types of variables in single declaration in Go?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Can you declared multiple types of variables in single declaration in Go?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "由候选题 #10 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_18_3651d09f",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "importedFromCandidate": {
+        "rank": 18,
+        "candidateId": "external_0135",
+        "sourceId": "github-sudheerj-react-interview",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "How do you apply vendor prefixes to inline styles in React?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "How do you apply vendor prefixes to inline styles in React? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How do you apply vendor prefixes to inline styles in React?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How do you apply vendor prefixes to inline styles in React?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How do you apply vendor prefixes to inline styles in React?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "由候选题 #18 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_17_0e76b852",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "importedFromCandidate": {
+        "rank": 17,
+        "candidateId": "external_0179",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "How could you check null and undefined in TypeScript?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "How could you check null and undefined in TypeScript? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "操作系统",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How could you check null and undefined in TypeScript?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How could you check null and undefined in TypeScript?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How could you check null and undefined in TypeScript?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "由候选题 #17 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_16_6f990264",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "importedFromCandidate": {
+        "rank": 16,
+        "candidateId": "external_0133",
+        "sourceId": "github-sudheerj-react-interview",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "How can we find the version of React at runtime in the browser?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "How can we find the version of React at runtime in the browser? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“How can we find the version of React at runtime in the browser?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How can we find the version of React at runtime in the browser?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“How can we find the version of React at runtime in the browser?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "由候选题 #16 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_14_7ab7abcc",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "importedFromCandidate": {
+        "rank": 14,
+        "candidateId": "external_0193",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Does TypeScript supports function overloading?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Does TypeScript supports function overloading? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "操作系统",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Does TypeScript supports function overloading?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Does TypeScript supports function overloading?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Does TypeScript supports function overloading?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "由候选题 #14 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_13_851e2a6a",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "importedFromCandidate": {
+        "rank": 13,
+        "candidateId": "external_0178",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Does TypeScript support all object oriented principles?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Does TypeScript support all object oriented principles? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "操作系统",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Does TypeScript support all object oriented principles?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Does TypeScript support all object oriented principles?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Does TypeScript support all object oriented principles?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "由候选题 #13 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_12_a9a386e0",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "importedFromCandidate": {
+        "rank": 12,
+        "candidateId": "external_0171",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Do we need to compile TypeScript files and why?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Do we need to compile TypeScript files and why? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "操作系统",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Do we need to compile TypeScript files and why?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Do we need to compile TypeScript files and why?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Do we need to compile TypeScript files and why?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "由候选题 #12 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_11_7502db1d",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:05.186Z",
+      "updatedAt": "2026-05-26T17:15:05.186Z",
+      "importedFromCandidate": {
+        "rank": 11,
+        "candidateId": "external_0180",
+        "sourceId": "github-faqguru-golang-frontend",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Could we use TypeScript on backend and how?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Could we use TypeScript on backend and how? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "操作系统",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Could we use TypeScript on backend and how?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Could we use TypeScript on backend and how?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Could we use TypeScript on backend and how?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "由候选题 #11 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_9_7209e6c3",
+      "status": "pending",
+      "createdAt": "2026-05-26T17:15:05.172Z",
+      "updatedAt": "2026-05-26T17:15:05.172Z",
+      "importedFromCandidate": {
+        "rank": 9,
+        "candidateId": "external_0121",
+        "sourceId": "github-sudheerj-react-interview",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Are custom DOM attributes supported in React v16?",
+      "category": "前端",
+      "skill": "前端",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Are custom DOM attributes supported in React v16? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "前端",
+        "前端 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "前端 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“Are custom DOM attributes supported in React v16?”，正式入库前应重写为本地中文参考答案。回答应先给出 前端 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Are custom DOM attributes supported in React v16?”的核心结论，再展开 前端 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“Are custom DOM attributes supported in React v16?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "由候选题 #9 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+    },
+    {
+      "id": "draft_candidate_2_d542c955",
+      "status": "pending",
+      "createdAt": "2026-05-26T16:54:38.164Z",
+      "updatedAt": "2026-05-26T16:54:38.164Z",
+      "importedFromCandidate": {
+        "rank": 2,
+        "candidateId": "external_0120",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "异常使用有哪些需要注意的地方？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "异常使用有哪些需要注意的地方？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️异常使用有哪些需要注意的地方？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️异常使用有哪些需要注意的地方？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️异常使用有哪些需要注意的地方？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+      "reviewNotes": "由候选题 #2 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。"
+    },
+    {
+      "id": "draft_candidate_1_f4777664",
+      "status": "pending",
+      "createdAt": "2026-05-26T16:54:38.164Z",
+      "updatedAt": "2026-05-26T16:54:38.164Z",
+      "importedFromCandidate": {
+        "rank": 1,
+        "candidateId": "external_0060",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-01.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "为什么说 Java 语言“编译与解释并存”？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "为什么说 Java 语言“编译与解释并存”？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️为什么说 Java 语言“编译与解释并存”？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️为什么说 Java 语言“编译与解释并存”？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️为什么说 Java 语言“编译与解释并存”？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
+      "reviewNotes": "由候选题 #1 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。"
+    }
+  ]
+}
