@@ -16,6 +16,17 @@ const practiceHistoryEl = document.querySelector('#practiceHistory');
 const profileAnalysisEl = document.querySelector('#profileAnalysis');
 const planPreviewEl = document.querySelector('#planPreview');
 const resumeInput = setupForm.querySelector('textarea[name="resume"]');
+const roleChoiceGrid = document.querySelector('#roleChoiceGrid');
+const levelStepper = document.querySelector('#levelStepper');
+const styleSegmented = document.querySelector('#styleSegmented');
+const aiProviderSelect = document.querySelector('#aiProviderSelect');
+const aiKeyInput = document.querySelector('#aiKeyInput');
+const aiKeyField = document.querySelector('#aiKeyField');
+const aiProviderWarning = document.querySelector('#aiProviderWarning');
+const profileDropzone = document.querySelector('#profileDropzone');
+const profileUploadButton = document.querySelector('#profileUploadButton');
+const profileFileInput = document.querySelector('#profileFileInput');
+const countdownOverlay = document.querySelector('#countdownOverlay');
 const PRACTICE_HISTORY_KEY = 'programmer-interview-practice-history-v1';
 const PRACTICE_HISTORY_LIMIT = 12;
 
@@ -37,6 +48,22 @@ liveCoachEl.addEventListener('click', (event) => {
   renderLiveCoach(latestLiveCoachSnapshot);
 });
 
+document.addEventListener('click', (event) => {
+  const toggle = event.target.closest('[data-toggle-panel]');
+  if (!toggle) return;
+
+  document.body.classList.toggle(`${toggle.dataset.togglePanel}-collapsed`);
+});
+
+answerInput.addEventListener('keydown', (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+    event.preventDefault();
+    if (!answerSubmitButton.disabled) {
+      answerForm.requestSubmit();
+    }
+  }
+});
+
 answerGuideEl.addEventListener('click', (event) => {
   const button = event.target.closest('[data-code-answer-mode]');
   if (!button) return;
@@ -47,6 +74,7 @@ answerGuideEl.addEventListener('click', (event) => {
 
 styleSelect.addEventListener('change', () => {
   renderStyleHint(styleSelect.value);
+  syncChoiceControls();
   renderPlanPreview();
 });
 
@@ -57,7 +85,32 @@ resumeInput.addEventListener('input', () => {
 
 setupForm.addEventListener('change', (event) => {
   if (event.target === resumeInput || event.target === styleSelect) return;
+  syncChoiceControls();
   renderPlanPreview();
+});
+
+aiProviderSelect?.addEventListener('change', renderAiProviderState);
+aiKeyInput?.addEventListener('input', renderAiProviderState);
+profileUploadButton?.addEventListener('click', () => profileFileInput?.click());
+profileFileInput?.addEventListener('change', async () => {
+  const file = profileFileInput.files?.[0];
+  if (file) await importProfileFile(file);
+});
+
+profileDropzone?.addEventListener('dragover', (event) => {
+  event.preventDefault();
+  profileDropzone.classList.add('dragging');
+});
+
+profileDropzone?.addEventListener('dragleave', () => {
+  profileDropzone.classList.remove('dragging');
+});
+
+profileDropzone?.addEventListener('drop', async (event) => {
+  event.preventDefault();
+  profileDropzone.classList.remove('dragging');
+  const file = event.dataTransfer?.files?.[0];
+  if (file) await importProfileFile(file);
 });
 
 practiceHistoryEl.addEventListener('click', (event) => {
@@ -104,6 +157,12 @@ practiceHistoryEl.addEventListener('click', (event) => {
 });
 
 reportEl.addEventListener('click', async (event) => {
+  const routeButton = event.target.closest('[data-apply-report-route]');
+  if (routeButton) {
+    applyReportRoutePlan(routeButton.dataset.applyReportRoute);
+    return;
+  }
+
   const questionDrillButton = event.target.closest('[data-apply-report-question]');
   if (questionDrillButton) {
     const applied = applyReportQuestionDrill(questionDrillButton.dataset.applyReportQuestion);
@@ -138,21 +197,168 @@ reportEl.addEventListener('click', async (event) => {
   await copyReportMarkdown(latestReport);
 });
 
+initializeSetupControls();
 renderStyleHint(styleSelect.value);
 renderProfileAnalysis(resumeInput.value);
 renderPlanPreview();
 renderPracticeHistory();
 renderAnswerGuide(null);
+renderAiProviderState();
+
+function initializeSetupControls() {
+  renderChoiceGrid('role', roleChoiceGrid, {
+    java: 'JVM / Spring',
+    backend: 'API / DB / Redis',
+    frontend: 'Vue / React / JS',
+    fullstack: '端到端链路',
+    go: 'Goroutine / 微服务',
+    python: 'FastAPI / Worker',
+    qa: '测试策略 / 自动化',
+    ops: 'Linux / 网络 / 数据库',
+    devops: 'CI/CD / K8s / 稳定性',
+    data: 'ETL / 数仓 / SQL',
+    ai: '模型 / 特征 / 推理',
+    security: '攻防 / 漏洞 / 加固',
+    architect: '架构 / 取舍 / 治理'
+  });
+  renderChoiceGrid('level', levelStepper, {
+    junior: '基础主线',
+    middle: '细节取舍',
+    senior: '架构治理'
+  }, 'level-step');
+  renderChoiceGrid('style', styleSegmented, {
+    normal: '温和引导',
+    pressure: '严厉追问',
+    coaching: '提示更多'
+  }, 'style-segment');
+  syncChoiceControls();
+}
+
+function renderChoiceGrid(fieldName, container, descriptions = {}, className = 'choice-card') {
+  const select = setupForm.querySelector(`select[name="${fieldName}"]`);
+  if (!select || !container) return;
+
+  container.innerHTML = [...select.options].map((option) => `
+    <button type="button" class="${className}" data-choice-field="${escapeHtml(fieldName)}" data-choice-value="${escapeHtml(option.value)}">
+      <strong>${escapeHtml(option.textContent || option.value)}</strong>
+      <span>${escapeHtml(descriptions[option.value] || '定制面试路线')}</span>
+    </button>
+  `).join('');
+
+  container.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-choice-value]');
+    if (!button) return;
+
+    select.value = button.dataset.choiceValue || select.value;
+    select.dispatchEvent(new Event('change', { bubbles: true }));
+    syncChoiceControls();
+  });
+}
+
+function syncChoiceControls() {
+  document.querySelectorAll('[data-choice-field]').forEach((button) => {
+    const select = setupForm.querySelector(`select[name="${button.dataset.choiceField}"]`);
+    button.classList.toggle('active', Boolean(select && select.value === button.dataset.choiceValue));
+  });
+}
+
+function renderAiProviderState() {
+  if (!aiProviderSelect || !aiProviderWarning || !aiKeyField || !aiKeyInput) return;
+
+  const provider = aiProviderSelect.value;
+  const value = aiKeyInput.value.trim();
+  const needsKey = provider !== 'mock';
+  const missingConfig = needsKey && !value;
+  aiKeyInput.placeholder = provider === 'ollama'
+    ? '例如：http://localhost:11434'
+    : provider === 'mock'
+      ? 'Mock 模式无需填写'
+      : '粘贴 API Key 后启用真实模型';
+  aiKeyField.classList.toggle('warning', missingConfig);
+  aiProviderWarning.classList.toggle('warning', missingConfig);
+  aiProviderWarning.textContent = missingConfig
+    ? '未检测到该引擎配置，将启用本地 Mock 规则保证面试流程可运行。'
+    : provider === 'mock'
+      ? 'Local Mock 已启用，本地规则会保证流程可运行。'
+      : '已填写连接信息。服务端仍以 .env 为准选择真实 AI Provider。';
+}
+
+async function importProfileFile(file) {
+  const name = file.name || '上传资料';
+  const extension = name.split('.').pop()?.toLowerCase() || '';
+  let content = '';
+
+  try {
+    if (extension === 'pdf') {
+      content = `上传文件：${name}\nPDF 文件已接收。当前前端 MVP 不直接解析 PDF 二进制内容，请把关键项目经历或 JD 文本粘贴到这里继续分析。`;
+    } else {
+      content = await file.text();
+    }
+  } catch {
+    content = `上传文件：${name}\n文件读取失败，请直接粘贴简历或项目背景文本。`;
+  }
+
+  resumeInput.value = [resumeInput.value.trim(), content.trim()].filter(Boolean).join('\n\n');
+  renderProfileAnalysis(resumeInput.value);
+  renderPlanPreview();
+  statusText.textContent = `已导入 ${name}，左侧训练计划已根据资料重新计算。`;
+}
+
+async function runLaunchCountdown() {
+  if (!countdownOverlay) return true;
+
+  countdownOverlay.hidden = false;
+  const number = countdownOverlay.querySelector('span');
+  for (const value of [3, 2, 1]) {
+    if (number) number.textContent = String(value);
+    playCountdownTone(value);
+    await wait(720);
+  }
+  if (number) number.textContent = 'GO';
+  playCountdownTone(0);
+  await wait(320);
+  countdownOverlay.hidden = true;
+  return true;
+}
+
+function playCountdownTone(value) {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const context = new AudioContext();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    oscillator.frequency.value = value === 0 ? 720 : 440 + value * 70;
+    oscillator.type = 'sine';
+    gain.gain.setValueAtTime(0.001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.055, context.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.16);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+    oscillator.stop(context.currentTime + 0.18);
+  } catch {
+    // Audio is optional; browsers may block it depending on user settings.
+  }
+}
+
+function wait(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 setupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (busy) return;
+
+  const canStart = await runLaunchCountdown();
+  if (!canStart) return;
 
   const formData = new FormData(setupForm);
   const payload = {
     role: formData.get('role'),
     level: formData.get('level'),
     style: formData.get('style'),
+    questionSource: formData.get('questionSource') || 'local',
     questionCount: Number(formData.get('questionCount') || 5),
     resume: formData.get('resume') || '',
     profileAnalysis: createSerializableProfileAnalysis(formData.get('resume') || '')
@@ -178,7 +384,12 @@ setupForm.addEventListener('submit', async (event) => {
     renderAnswerGuide(getCurrentPlanItem());
     reportEl.className = 'report empty-state';
     reportEl.innerHTML = '<p>面试正在进行中。结束后会生成针对性的复盘反馈。</p>';
-    statusText.textContent = '面试已开始。请像真实技术面一样回答。';
+    const sourceText = data.questionSource === 'ai'
+      ? '本轮题目由 AI 动态生成。'
+      : payload.questionSource === 'ai'
+        ? `AI 出题不可用，已回退本地题库。${data.questionSourceFallbackReason || ''}`.trim()
+        : '本轮题目来自本地题库。';
+    statusText.textContent = `面试已开始。${sourceText}`;
     answerInput.value = '';
     answerInput.disabled = false;
     answerSubmitButton.disabled = false;
@@ -703,6 +914,13 @@ function analyzeProfileText(text) {
     ['Redis', ['redis', '缓存', '分布式锁', '缓存穿透']],
     ['消息队列', ['mq', 'rabbitmq', 'kafka', 'rocketmq', '消息队列']],
     ['微服务', ['微服务', 'dubbo', 'grpc', '服务治理']],
+    ['测试', ['测试', 'qa', '自动化测试', '接口测试', '性能测试', '测试开发', '回归测试']],
+    ['运维', ['运维', 'linux', 'shell', '网络', '监控', '巡检', '数据库备份', 'dba']],
+    ['DevOps', ['devops', 'sre', 'ci/cd', 'jenkins', 'gitlab ci', 'docker', 'k8s', 'kubernetes', '可观测性']],
+    ['数据', ['数据开发', 'etl', '数仓', 'hive', 'spark', 'flink', 'airflow', '数据治理']],
+    ['AI', ['ai', '算法', '机器学习', '深度学习', '大模型', 'rag', '向量数据库', '特征工程', '模型部署']],
+    ['安全', ['安全', '渗透', '漏洞', 'xss', 'sql注入', 'csrf', 'waf', '权限控制', '加固']],
+    ['架构', ['架构', '技术经理', '研发经理', '技术总监', '治理', '容灾', '高可用', '演进']],
     ['算法', ['算法', '复杂度', 'leetcode', '链表', '二叉树', '边界条件', '数据结构']],
     ['系统设计', ['系统设计', '架构', '高并发', '限流', '限流器', '接口幂等', '幂等', '缓存穿透', '熔断', '分布式']]
   ];
@@ -720,6 +938,13 @@ function analyzeProfileText(text) {
     hasAny(['react', 'vue', '前端', 'webpack', 'vite']) ? '前端工程化与性能优化' : '',
     hasAny(['防抖', '节流', '数组扁平化', 'promise']) ? '前端 JS 手写代码题' : '',
     hasAny(['mq', '消息', 'kafka', 'rabbitmq']) ? '异步消息、幂等和补偿' : '',
+    hasAny(['测试', 'qa', '自动化测试', '接口测试', '性能测试']) ? '测试设计与自动化策略' : '',
+    hasAny(['运维', 'linux', 'shell', '网络', '监控', 'dba']) ? 'Linux / 网络 / 数据库运维排障' : '',
+    hasAny(['devops', 'sre', 'ci/cd', 'docker', 'k8s', 'kubernetes']) ? 'DevOps 与稳定性治理' : '',
+    hasAny(['数据开发', 'etl', '数仓', 'hive', 'spark', 'flink']) ? '数据链路与数仓建模' : '',
+    hasAny(['ai', '机器学习', '深度学习', '大模型', 'rag', '向量数据库']) ? 'AI 建模与推理工程化' : '',
+    hasAny(['安全', '渗透', '漏洞', 'xss', 'sql注入', 'csrf']) ? '应用安全与漏洞防护' : '',
+    hasAny(['架构', '治理', '高可用', '容灾', '技术经理']) ? '架构设计与技术治理' : '',
     hasAny(['高并发', '限流', '限流器', '接口幂等', '幂等', '缓存穿透', '熔断', '分布式']) ? '高并发场景设计' : '',
     hasAny(['算法', '复杂度', 'leetcode', '边界条件', '数据结构']) ? '算法复杂度与边界条件' : ''
   ].filter(Boolean);
@@ -730,6 +955,13 @@ function analyzeProfileText(text) {
     hasAny(['优化', '性能', '慢', '延迟', 'qps', '耗时']) ? '需要准备性能定位、指标变化和优化取舍。' : '',
     hasAny(['排查', '故障', '线上', '事故', '白屏']) ? '需要准备线上问题排查顺序和止血方案。' : '',
     hasAny(['高并发', '库存', '支付', '订单', '一致性', '幂等', '缓存穿透', '限流']) ? '需要准备一致性、幂等、重试、限流和缓存保护链路。' : '',
+    hasAny(['测试', 'qa', '自动化测试', '测试开发']) ? '需要准备测试策略、自动化分层和质量门禁。' : '',
+    hasAny(['运维', '监控', 'dba', '巡检', '网络']) ? '需要准备故障排查顺序、容量评估和稳定性基线。' : '',
+    hasAny(['devops', 'sre', 'ci/cd', 'k8s']) ? '需要准备发布流水线、可观测性和故障恢复机制。' : '',
+    hasAny(['数据开发', 'etl', '数仓', '指标']) ? '需要准备口径一致性、调度依赖和数据质量控制。' : '',
+    hasAny(['ai', '机器学习', '大模型', 'rag']) ? '需要准备模型效果评估、数据质量和推理成本控制。' : '',
+    hasAny(['安全', '渗透', '漏洞', '权限']) ? '需要准备漏洞原理、修复方案和安全基线。' : '',
+    hasAny(['架构', '技术经理', '治理', '高可用']) ? '需要准备架构取舍、演进路径和团队协作治理。' : '',
     hasAny(['协作', '跨团队', '推进']) ? '需要说明沟通协作边界和推进结果。' : ''
   ].filter(Boolean);
 
@@ -853,6 +1085,13 @@ function createRecommendedTracks({ keywords, focusTopics, capabilities, hasProje
   if (focusTopics.some((item) => item.includes('前端 JS'))) tracks.push('前端代码题：防抖节流、Promise、数组扁平化。');
   if (hasKeyword('Go')) tracks.push('Go goroutine 协作、context 超时取消和限流背压。');
   if (hasKeyword('Python')) tracks.push('Python worker、任务队列、GIL 与性能排查。');
+  if (hasKeyword('测试')) tracks.push('测试岗：测试用例设计、自动化框架、回归策略和质量门禁。');
+  if (hasKeyword('运维')) tracks.push('运维岗：Linux 排障、网络诊断、数据库备份恢复和监控告警。');
+  if (hasKeyword('DevOps')) tracks.push('DevOps/SRE：CI/CD、K8s 发布、可观测性、容量和故障演练。');
+  if (hasKeyword('数据')) tracks.push('数据岗：ETL 稳定性、数仓分层、指标口径和数据质量。');
+  if (hasKeyword('AI')) tracks.push('AI 岗：模型训练、评估指标、特征/向量检索和推理部署。');
+  if (hasKeyword('安全')) tracks.push('安全岗：常见漏洞原理、修复验证、权限模型和纵深防御。');
+  if (hasKeyword('架构')) tracks.push('架构/管理岗：高可用架构、容量规划、技术债治理和团队决策。');
   if (focusTopics.some((item) => item.includes('高并发'))) tracks.push('高并发场景题：限流、幂等、补偿和降级。');
   if (focusTopics.some((item) => item.includes('高并发')) || hasKeyword('系统设计')) tracks.push('后端场景题：限流器、接口幂等、缓存穿透处理。');
   if (hasKeyword('算法')) tracks.push('算法题：复杂度、边界条件和数据结构选择。');
@@ -933,6 +1172,7 @@ function renderLiveCoach(snapshot) {
   const missingSignals = Array.isArray(normalizedSnapshot.missingSignals) && normalizedSnapshot.missingSignals.length
     ? normalizedSnapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
     : '<span class="pill green">暂无明显缺失信号</span>';
+  const stress = calculateStressLevel(normalizedSnapshot);
   const toggleText = liveCoachDetailsOpen ? '隐藏提示' : '查看提示';
   const detailsHtml = liveCoachDetailsOpen
     ? `
@@ -966,6 +1206,11 @@ function renderLiveCoach(snapshot) {
         ${stagnationMeta}
       </div>
     </div>
+    <div class="stress-gauge echart-card">
+      <div id="stressGaugeChart" class="echart-gauge" aria-label="追问压力仪表盘"></div>
+      <strong>${escapeHtml(stress.label)}</strong>
+      <p>${escapeHtml(stress.detail)}</p>
+    </div>
     <div class="live-coach-actions">
       <button type="button" class="ghost-button live-coach-toggle" data-live-coach-toggle aria-expanded="${liveCoachDetailsOpen}">
         ${toggleText}
@@ -973,6 +1218,139 @@ function renderLiveCoach(snapshot) {
     </div>
     ${detailsHtml}
   `;
+  renderStressGaugeChart(stress);
+}
+
+function calculateStressLevel(snapshot) {
+  const followUps = Number(snapshot.followUpCount || 0);
+  const stagnant = Number(snapshot.stagnantFollowUpCount || 0);
+  const missing = Array.isArray(snapshot.missingSignals) ? snapshot.missingSignals.length : 0;
+  const stagePressure = /pressure|pin_down/.test(String(snapshot.stage || '')) ? 1 : 0;
+  const score = Math.min(100, followUps * 24 + stagnant * 18 + missing * 10 + stagePressure * 22);
+  const angle = Math.round(-58 + score * 1.16);
+
+  if (score >= 72) {
+    return {
+      score,
+      angle,
+      label: '高压追问区',
+      detail: '回答已经触发连续深挖，下一句要直接补关键缺口。'
+    };
+  }
+
+  if (score >= 38) {
+    return {
+      score,
+      angle,
+      label: '承压观察区',
+      detail: '面试官正在确认细节稳定性，建议补边界、指标和取舍。'
+    };
+  }
+
+  return {
+    score,
+    angle,
+    label: '正常推进区',
+    detail: '当前节奏平稳，先保持结论清楚和回答密度。'
+  };
+}
+
+function renderStressGaugeChart(stress) {
+  requestAnimationFrame(() => {
+    const target = document.querySelector('#stressGaugeChart');
+    if (!target || !window.echarts) return;
+
+    const chart = window.echarts.getInstanceByDom(target) || window.echarts.init(target, null, { renderer: 'svg' });
+    chart.setOption({
+      backgroundColor: 'transparent',
+      series: [{
+        type: 'gauge',
+        startAngle: 210,
+        endAngle: -30,
+        min: 0,
+        max: 100,
+        radius: '96%',
+        center: ['50%', '62%'],
+        splitNumber: 4,
+        progress: {
+          show: true,
+          width: 14,
+          roundCap: true,
+          itemStyle: {
+            color: {
+              type: 'linear',
+              x: 0,
+              y: 0,
+              x2: 1,
+              y2: 0,
+              colorStops: [
+                { offset: 0, color: '#28a745' },
+                { offset: 0.52, color: '#f6b73c' },
+                { offset: 1, color: '#ff4d5e' }
+              ]
+            }
+          }
+        },
+        axisLine: {
+          roundCap: true,
+          lineStyle: {
+            width: 14,
+            color: [[1, 'rgba(255, 255, 255, 0.08)']]
+          }
+        },
+        axisTick: {
+          distance: -22,
+          splitNumber: 2,
+          lineStyle: {
+            width: 1,
+            color: 'rgba(244, 247, 251, 0.18)'
+          }
+        },
+        splitLine: {
+          distance: -26,
+          length: 10,
+          lineStyle: {
+            width: 2,
+            color: 'rgba(244, 247, 251, 0.26)'
+          }
+        },
+        axisLabel: {
+          show: false
+        },
+        pointer: {
+          icon: 'path://M4,0 L-4,0 L0,-78 Z',
+          length: '62%',
+          width: 10,
+          offsetCenter: [0, '5%'],
+          itemStyle: {
+            color: '#f4f7fb',
+            shadowBlur: 8,
+            shadowColor: 'rgba(255,255,255,0.45)'
+          }
+        },
+        anchor: {
+          show: true,
+          size: 13,
+          itemStyle: {
+            color: '#f4f7fb',
+            borderColor: '#101115',
+            borderWidth: 3
+          }
+        },
+        detail: {
+          valueAnimation: true,
+          offsetCenter: [0, '56%'],
+          color: '#f4f7fb',
+          fontFamily: 'Cascadia Code, Consolas, monospace',
+          fontSize: 22,
+          fontWeight: 800,
+          formatter: '{value}'
+        },
+        data: [{ value: stress.score }]
+      }]
+    });
+    chart.resize();
+  });
 }
 
 function renderInterviewProgress(plan, currentId, completed = false) {
@@ -2124,6 +2502,47 @@ function applyRecommendationToSetup(recommendation, resumeLines, statusMessage) 
   setupForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
+function applyReportRoutePlan(routeIndex) {
+  const index = Number(routeIndex);
+  const record = createRecommendationRecordFromReport(latestReport);
+  if (!record || !Number.isFinite(index)) return;
+
+  const base = createNextSessionRecommendation(record, [record, ...loadPracticeHistory()]);
+  const routes = [
+    {
+      styleValue: 'normal',
+      focus: `${base.weakArea || '核心基础'}专项突破`,
+      prompt: base.drillPrompt || '先把最低分题按参考答案重答，再接受同类追问。'
+    },
+    {
+      styleValue: 'pressure',
+      focus: '项目架构深挖与抗压追问',
+      prompt: '围绕项目职责、架构取舍、指标结果和线上风险连续追问，要求回答必须落到个人贡献。'
+    },
+    {
+      styleValue: 'coaching',
+      focus: '算法与复杂场景设计补齐',
+      prompt: '用提示式追问补齐解题思路、伪代码、边界条件、复杂度和方案取舍。'
+    }
+  ];
+  const route = routes[index] || routes[0];
+  const recommendation = {
+    ...base,
+    styleValue: route.styleValue,
+    styleLabel: getSelectLabel('style', route.styleValue) || base.styleLabel,
+    weakArea: route.focus,
+    practiceFocus: route.prompt,
+    drillPrompt: route.prompt
+  };
+
+  applyRecommendationToSetup(recommendation, [
+    `通关路线图：第 ${index + 1} 轮`,
+    `训练重点：${route.focus}`,
+    `训练方式：${route.prompt}`,
+    '请按本轮路线图安排基础题、项目深挖、场景设计和代码/算法表达。'
+  ], '已把路线图配置导入左侧，可以直接开启下一轮面试。');
+}
+
 function findLowestScoreQuestion(questions) {
   const scoredQuestions = (Array.isArray(questions) ? questions : [])
     .filter((question) => Number.isFinite(Number(question.score)));
@@ -2457,6 +2876,9 @@ function renderReport(report) {
         </article>
       `).join('')
     : '<p>继续作答后，会生成能力拆解。</p>';
+  const reportRadarHtml = renderReportRadar(report);
+  const badSmellHtml = renderBadSmellWarnings(report);
+  const routeMapHtml = renderRouteMap(report);
 
   const snapshotStats = [
     {
@@ -2502,9 +2924,14 @@ function renderReport(report) {
     const questionDrillTarget = renderQuestionDrillTarget(item.questionDrillTarget);
 
     return `
-      <article class="report-card">
-        <h3>第 ${index + 1} 题 | ${escapeHtml(item.category || '未分类')}</h3>
-        <p>${escapeHtml(item.question || '')}</p>
+      <details class="report-card question-accordion" ${index === 0 ? 'open' : ''}>
+        <summary>
+          <div>
+            <h3>第 ${index + 1} 题 | ${escapeHtml(item.category || '未分类')}</h3>
+            <p>${escapeHtml(item.question || '')}</p>
+          </div>
+          <span class="${getDimensionScoreClass(item.score)}">${escapeHtml(item.score ?? '-')}</span>
+        </summary>
         <div class="meta-row">
           <span class="pill">${escapeHtml(`得分 ${item.score ?? '-'}`)}</span>
           <span class="pill">${escapeHtml(`回答次数 ${item.attempts ?? 1}`)}</span>
@@ -2517,6 +2944,16 @@ function renderReport(report) {
         ${dimensionScores}
         <div class="section-label">你的回答摘要</div>
         <p>${escapeHtml(item.userAnswerSummary || item.userAnswer || '暂无')}</p>
+        <div class="answer-compare-grid">
+          <article>
+            <div class="section-label">我的回答</div>
+            <p>${highlightVagueWords(item.userAnswer || item.userAnswerSummary || '暂无')}</p>
+          </article>
+          <article>
+            <div class="section-label">参考答案</div>
+            <p>${escapeHtml(item.referenceAnswer || '暂无')}</p>
+          </article>
+        </div>
         <div class="section-label">差距分析</div>
         <p>${escapeHtml(item.gapAnalysis || '暂无')}</p>
         ${learningMaterials}
@@ -2578,7 +3015,7 @@ function renderReport(report) {
         ${answerRebuildPlan}
         <div class="section-label">练习任务</div>
         <p>${escapeHtml(item.practiceDrill || '暂无')}</p>
-      </article>
+      </details>
     `;
   }).join('');
 
@@ -2590,6 +3027,7 @@ function renderReport(report) {
         <button type="button" class="mini-button" data-copy-report>复制复盘报告</button>
       </div>
       <div class="snapshot-grid">${snapshotStats}</div>
+      ${reportRadarHtml}
       <div class="section-label">总体总结</div>
       <p>${escapeHtml(overview.summary || '暂无')}</p>
       <div class="section-label">面试官印象</div>
@@ -2631,13 +3069,212 @@ function renderReport(report) {
     </article>
     ${questionsHtml}
     <article class="report-card">
-      <h3>下一步练习</h3>
-      <div class="section-label">分阶段计划</div>
-      ${practicePlanHtml}
-      <div class="section-label">建议练习</div>
+      <h3>差距、误区与改进建议</h3>
+      <div class="section-label">常见误区警示</div>
+      ${badSmellHtml}
+      <div class="section-label">薄弱领域与下一轮推荐</div>
+      <div class="meta-row">${weakAreaHtml}</div>
       ${nextPracticeHtml}
     </article>
+    <article class="report-card">
+      <h3>通关路线图</h3>
+      ${routeMapHtml}
+      <div class="section-label">分阶段计划</div>
+      ${practicePlanHtml}
+    </article>
   `;
+  renderReportRadarChart(report);
+}
+
+function createReportRadarDimensions(report) {
+  const overview = report?.overview || {};
+  const questions = Array.isArray(report?.questions) ? report.questions : [];
+  const averages = calculateAverageDimensionScores(questions);
+  const fallback = [
+    { label: '基础八股', score: overview.score ?? 0 },
+    { label: '项目深度', score: averages[0]?.score ?? overview.score ?? 0 },
+    { label: '工程架构', score: averages[1]?.score ?? overview.score ?? 0 },
+    { label: '抗压沟通', score: averages[2]?.score ?? overview.score ?? 0 }
+  ];
+  const dimensions = averages.length
+    ? averages.slice(0, 4).map((item, index) => ({
+        label: ['基础八股', '项目深度', '工程架构', '抗压沟通'][index] || item.label,
+        score: item.score
+      }))
+    : fallback;
+
+  return dimensions;
+}
+
+function renderReportRadar(report) {
+  const dimensions = createReportRadarDimensions(report);
+
+  return `
+    <div class="radar-card">
+      <div id="reportRadarChart" class="echart-radar" aria-label="四维能力雷达图"></div>
+      <div class="dimension-grid">
+        ${dimensions.map((item) => `
+          <article class="dimension-item">
+            <div class="dimension-head">
+              <strong>${escapeHtml(item.label)}</strong>
+              <span class="${getDimensionScoreClass(item.score)}">${escapeHtml(item.score ?? '-')}</span>
+            </div>
+            <div class="dimension-bar" aria-hidden="true">
+              <i style="width: ${escapeHtml(clampPercent(item.score))}%"></i>
+            </div>
+          </article>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderReportRadarChart(report) {
+  requestAnimationFrame(() => {
+    const target = document.querySelector('#reportRadarChart');
+    if (!target || !window.echarts) return;
+
+    const dimensions = createReportRadarDimensions(report);
+    const chart = window.echarts.getInstanceByDom(target) || window.echarts.init(target, null, { renderer: 'svg' });
+    chart.setOption({
+      backgroundColor: 'transparent',
+      radar: {
+        center: ['50%', '52%'],
+        radius: '68%',
+        splitNumber: 4,
+        indicator: dimensions.map((item) => ({
+          name: item.label,
+          max: 100
+        })),
+        axisName: {
+          color: '#c8d0de',
+          fontSize: 12,
+          fontWeight: 700
+        },
+        axisLine: {
+          lineStyle: {
+            color: 'rgba(0, 123, 255, 0.24)'
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: [
+              'rgba(40, 167, 69, 0.14)',
+              'rgba(0, 123, 255, 0.14)',
+              'rgba(0, 123, 255, 0.22)',
+              'rgba(40, 167, 69, 0.26)'
+            ]
+          }
+        },
+        splitArea: {
+          areaStyle: {
+            color: [
+              'rgba(40, 167, 69, 0.03)',
+              'rgba(0, 123, 255, 0.04)',
+              'rgba(0, 123, 255, 0.07)',
+              'rgba(40, 167, 69, 0.08)'
+            ]
+          }
+        }
+      },
+      series: [{
+        type: 'radar',
+        symbol: 'circle',
+        symbolSize: 5,
+        lineStyle: {
+          width: 2,
+          color: '#007bff'
+        },
+        areaStyle: {
+          color: 'rgba(0, 123, 255, 0.34)'
+        },
+        itemStyle: {
+          color: '#28a745',
+          borderColor: '#d9ffe2',
+          borderWidth: 1
+        },
+        data: [{
+          value: dimensions.map((item) => Number(item.score) || 0),
+          name: '本轮能力画像'
+        }]
+      }]
+    });
+    chart.resize();
+  });
+}
+
+function renderBadSmellWarnings(report) {
+  const mistakes = (report?.questions || [])
+    .flatMap((item) => item.commonMistakes || [])
+    .filter(Boolean)
+    .slice(0, 5);
+  const redFlags = (report?.questions || [])
+    .flatMap((item) => item.redFlags || [])
+    .filter(Boolean)
+    .slice(0, 5);
+  const items = [...new Set([...mistakes, ...redFlags])].slice(0, 6);
+
+  if (!items.length) {
+    return '<p>本轮暂未出现明显黑话误用或常识性扣分点。</p>';
+  }
+
+  return `
+    <div class="history-list">
+      ${items.map((item) => `
+        <article class="history-mistake bad-smell">
+          <strong>Bad Smell</strong>
+          <p>${escapeHtml(item)}</p>
+        </article>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderRouteMap(report) {
+  const record = createRecommendationRecordFromReport(report);
+  if (!record) {
+    return '<p>完成报告后，会生成 3 轮定制练习计划。</p>';
+  }
+
+  const base = createNextSessionRecommendation(record, [record, ...loadPracticeHistory()]);
+  const plans = [
+    {
+      title: `${base.weakArea || '核心基础'}专项突破面试`,
+      styleValue: 'normal',
+      styleLabel: '常规风格',
+      focus: base.practiceFocus || '先把最低分题按通过线重答一遍。'
+    },
+    {
+      title: '大厂项目架构深挖硬核面试',
+      styleValue: 'pressure',
+      styleLabel: '压力风格',
+      focus: '围绕项目职责、指标结果、架构取舍和线上风险连续追问。'
+    },
+    {
+      title: '算法与复杂场景设计模拟',
+      styleValue: 'coaching',
+      styleLabel: '教练风格',
+      focus: '用提示式追问补齐思路、伪代码、边界条件和复杂度表达。'
+    }
+  ];
+
+  return `
+    <div class="route-map">
+      ${plans.map((plan, index) => `
+        <article class="route-card">
+          <span class="pill">${escapeHtml(`第 ${index + 1} 轮 · ${plan.styleLabel}`)}</span>
+          <strong>${escapeHtml(plan.title)}</strong>
+          <p>${escapeHtml(plan.focus)}</p>
+          <button type="button" class="mini-button" data-apply-report-route="${escapeHtml(index)}">一键导入配置并开启</button>
+        </article>
+      `).join('')}
+    </div>
+  `;
+}
+
+function highlightVagueWords(text) {
+  const escaped = escapeHtml(text || '');
+  return escaped.replace(/(可能|大概|比较|差不多|应该|感觉|就是|然后)/g, '<mark>$1</mark>');
 }
 
 async function copyReportMarkdown(report) {

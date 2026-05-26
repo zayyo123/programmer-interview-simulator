@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { generateInterviewerReply } from './ai.js';
+import { generateInterviewerReply, generateInterviewQuestionPlan } from './ai.js';
 import { chooseProvider, loadConfig } from './config.js';
 import {
   buildInterviewPrompt,
@@ -32,12 +32,14 @@ const server = createServer(async (request, response) => {
 
     if (request.method === 'POST' && url.pathname === '/api/interviews') {
       const body = await readJson(request);
-      const session = createSession(body);
+      const session = await createSession(body);
       sessions.set(session.id, session);
 
       return sendJson(response, 201, {
         sessionId: session.id,
         provider: session.provider,
+        questionSource: session.questionSource,
+        questionSourceFallbackReason: session.questionSourceFallbackReason,
         messages: session.messages,
         liveCoach: createLiveCoachSnapshot(session),
         plan: session.plan.map((item) => ({
@@ -119,23 +121,32 @@ server.listen(config.port, () => {
   console.log(`Programmer Interview Simulator running at http://localhost:${config.port}`);
 });
 
-function createSession(input) {
+async function createSession(input) {
   const interviewConfig = {
     role: input.role || 'java',
     level: input.level || 'middle',
     style: input.style || 'normal',
     resume: input.resume || '',
     questionCount: Number(input.questionCount || 5),
-    profileAnalysis: input.profileAnalysis || null
+    profileAnalysis: input.profileAnalysis || null,
+    questionSource: input.questionSource || 'local'
   };
-  const plan = createInterviewPlan(interviewConfig);
+  const localPlan = createInterviewPlan(interviewConfig);
+  const aiPlanResult = interviewConfig.questionSource === 'ai'
+    ? await generateInterviewQuestionPlan({ config, interviewConfig, localPlan })
+    : null;
+  const plan = Array.isArray(aiPlanResult?.questions) && aiPlanResult.questions.length
+    ? aiPlanResult.questions
+    : localPlan;
   const firstQuestion = plan[0];
   const id = randomUUID();
 
   return {
     id,
     config: interviewConfig,
-    provider: chooseProvider(config),
+    provider: aiPlanResult?.provider || chooseProvider(config),
+    questionSource: aiPlanResult?.questions?.length ? 'ai' : 'local',
+    questionSourceFallbackReason: aiPlanResult?.questions?.length ? '' : aiPlanResult?.error || '',
     plan,
     currentIndex: 0,
     answers: [],

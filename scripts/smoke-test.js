@@ -599,12 +599,13 @@ function verifyStalledFollowUpCutoff() {
 
 function verifyFrontendAnswerGuide() {
   const html = readFileSync('public/index.html', 'utf8');
-  const app = readFileSync('public/app.js', 'utf8');
+  const app = readFileSync('public/app.js', 'utf8').replace(/\r\n/g, '\n');
   const styles = readFileSync('public/styles.css', 'utf8');
 
   assert(html.includes('id="answerGuide"'), 'frontend should render the current answer guide container');
   assert(html.includes('id="planPreview"'), 'setup form should render a pre-interview plan preview container');
-  assert(html.includes('/app.js?v=zh-cn-8'), 'index should load the latest frontend bundle version');
+  assert(html.includes('/app.js?v=geek-dark-2'), 'index should load the latest frontend bundle version');
+  assert(html.includes('/vendor/echarts.min.js'), 'index should load ECharts for dashboard charts');
   assert(app.includes('function renderAnswerGuide'), 'frontend should update answer guide from current question state');
   assert(app.includes('function renderQuestionDrillAnswerGuide'), 'answer guide should render single-question drill guidance');
   assert(app.includes('function parseQuestionDrillPlanReason'), 'answer guide should parse single-question drill plan reasons');

@@ -6,7 +6,14 @@ const roleTopics = {
   fullstack: ['前端', 'MySQL', '项目经历', '系统设计', '算法'],
   java: ['Java', 'MySQL', '网络', '操作系统', '项目经历', 'Redis', '系统设计', '算法'],
   go: ['Go', 'Redis', '网络', '操作系统', '项目经历', 'MySQL', '系统设计', '算法'],
-  python: ['Python', 'MySQL', '网络', '操作系统', '项目经历', 'Redis', '系统设计', '算法']
+  python: ['Python', 'MySQL', '网络', '操作系统', '项目经历', 'Redis', '系统设计', '算法'],
+  qa: ['测试', '项目经历', '测试', '系统设计', '算法'],
+  ops: ['运维', '网络', 'MySQL', '操作系统', '项目经历', '系统设计'],
+  devops: ['DevOps', '运维', '网络', '操作系统', '项目经历', '系统设计'],
+  data: ['数据', 'MySQL', '项目经历', '系统设计', '算法'],
+  ai: ['AI', 'Python', '项目经历', '系统设计', '算法'],
+  security: ['安全', '网络', '项目经历', '系统设计', '操作系统'],
+  architect: ['系统设计', '项目经历', '网络', 'MySQL', '操作系统']
 };
 
 const fillerWords = ['然后', '就是', '那个', '可能', '感觉', '大概', '比较', '这个', '那个时候'];
@@ -23,7 +30,14 @@ const roleStageBlueprints = {
   fullstack: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
   java: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
   go: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
-  python: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm']
+  python: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  qa: ['knowledge', 'project', 'knowledge', 'algorithm', 'knowledge'],
+  ops: ['knowledge', 'project', 'knowledge', 'system-design', 'knowledge'],
+  devops: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  data: ['knowledge', 'project', 'knowledge', 'algorithm', 'system-design'],
+  ai: ['knowledge', 'project', 'knowledge', 'system-design', 'algorithm'],
+  security: ['knowledge', 'project', 'knowledge', 'system-design', 'knowledge'],
+  architect: ['project', 'knowledge', 'system-design', 'knowledge', 'project']
 };
 
 const levelExpectations = {
@@ -3932,7 +3946,14 @@ function sharesInterviewTrack(role, roles) {
     go: ['backend', 'fullstack'],
     python: ['backend', 'fullstack'],
     frontend: ['fullstack'],
-    fullstack: ['backend', 'frontend', 'java', 'go', 'python']
+    fullstack: ['backend', 'frontend', 'java', 'go', 'python'],
+    qa: ['backend', 'frontend', 'fullstack'],
+    ops: ['devops', 'backend'],
+    devops: ['ops', 'backend'],
+    data: ['backend', 'python', 'ai'],
+    ai: ['python', 'data', 'backend'],
+    security: ['ops', 'devops', 'backend'],
+    architect: ['backend', 'fullstack', 'devops']
   };
 
   return roles.includes(role) || (relatedRoles[role] || []).some((candidate) => roles.includes(candidate));
@@ -4000,7 +4021,14 @@ function getPreferredProjectCategory(role) {
     go: 'Go',
     python: 'Python',
     frontend: '前端',
-    fullstack: '项目经历'
+    fullstack: '项目经历',
+    qa: '测试',
+    ops: '运维',
+    devops: 'DevOps',
+    data: '数据',
+    ai: 'AI',
+    security: '安全',
+    architect: '项目经历'
   }[role] || '项目经历';
 }
 
@@ -4057,7 +4085,13 @@ function getPrimaryCategoryForRole(role) {
     java: 'Java',
     go: 'Go',
     python: 'Python',
-    frontend: '前端'
+    frontend: '前端',
+    qa: '测试',
+    ops: '运维',
+    devops: 'DevOps',
+    data: '数据',
+    ai: 'AI',
+    security: '安全'
   }[role] || null;
 }
 
@@ -4073,7 +4107,14 @@ function getRolePriorityCategories(role) {
     go: ['Go', 'Redis', '网络', '操作系统', '系统设计', 'MySQL'],
     python: ['Python', 'MySQL', 'Redis', '网络', '操作系统', '系统设计'],
     frontend: ['前端', '项目经历', '算法'],
-    fullstack: ['项目经历', '前端', 'MySQL', 'Redis', '系统设计']
+    fullstack: ['项目经历', '前端', 'MySQL', 'Redis', '系统设计'],
+    qa: ['测试', '项目经历', '前端', '系统设计'],
+    ops: ['运维', '网络', 'MySQL', '操作系统', '系统设计'],
+    devops: ['DevOps', '运维', '网络', '操作系统', '系统设计'],
+    data: ['数据', 'MySQL', '系统设计', '算法'],
+    ai: ['AI', 'Python', '系统设计', '算法'],
+    security: ['安全', '网络', '操作系统', '系统设计'],
+    architect: ['系统设计', '项目经历', '网络', 'MySQL', '操作系统']
   }[role] || ['MySQL', 'Redis', '系统设计', '算法'];
 }
 
@@ -4084,7 +4125,14 @@ function getDiagnosticPriorityCategories(role) {
     go: ['Go', 'Redis'],
     python: ['Python', 'Redis'],
     frontend: ['前端'],
-    fullstack: ['前端', 'Redis']
+    fullstack: ['前端', 'Redis'],
+    qa: ['测试'],
+    ops: ['运维', '网络'],
+    devops: ['DevOps', '运维'],
+    data: ['数据', 'MySQL'],
+    ai: ['AI', 'Python'],
+    security: ['安全', '网络'],
+    architect: ['系统设计', '项目经历']
   }[role] || [];
 }
 
@@ -4117,6 +4165,12 @@ function extractResumeSignals(resume, profileAnalysis = null) {
     Java: ['java', 'spring', 'jvm', 'hashmap', '线程池', '拒绝策略', '队列堆积', 'callerrunspolicy', 'synchronized', 'reentrantlock', 'volatile', 'concurrenthashmap', '锁竞争'],
     Go: ['go', 'golang', 'goroutine', 'gin', 'channel', 'context', 'mutex', 'pprof', '锁竞争'],
     Python: ['python', 'django', 'flask', 'fastapi', 'celery'],
+    测试: ['测试', 'qa', '自动化测试', '接口测试', '测试开发', '性能测试', '回归测试', '用例设计', 'mock'],
+    运维: ['运维', 'linux', 'shell', '巡检', '监控', '告警', 'dba', '备份恢复', '主从切换', '网络排障'],
+    DevOps: ['devops', 'sre', 'ci/cd', 'jenkins', 'gitlab ci', 'docker', 'k8s', 'kubernetes', '发布流水线', '可观测性'],
+    数据: ['数据开发', 'etl', '数仓', 'hive', 'spark', 'flink', 'airflow', '离线', '实时数仓', '维度建模'],
+    AI: ['ai', '机器学习', '深度学习', '大模型', 'rag', '向量数据库', 'prompt', '特征工程', '模型部署', '推理'],
+    安全: ['安全', '渗透', '漏洞', 'xss', 'sql注入', 'csrf', '越权', 'waf', '权限控制', '安全加固'],
     Redis: ['redis', 'cache', '缓存'],
     MySQL: ['mysql', 'sql', '索引', '事务', '窗口函数', 'dense_rank', '第二高薪资', '部门薪资'],
     操作系统: ['进程', '线程', 'cpu', '内存', '上下文切换', '锁', '虚拟内存', '页缓存', 'swap', 'oom', 'io多路复用', 'i/o多路复用', 'epoll', 'reactor'],

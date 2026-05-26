@@ -8,117 +8,190 @@
   </head>
   <body>
     <main class="app-shell">
-      <section class="sidebar">
-        <div class="brand">
-          <div class="brand-mark">AI</div>
-          <div>
-            <h1>程序员模拟面试系统</h1>
-            <p>模拟面试官、真实追问压力和复盘报告，一次完整练习。</p>
+      <section class="setup-dashboard" aria-label="面试配置与准备">
+        <header class="top-command">
+          <div class="brand">
+            <div class="brand-mark">AI</div>
+            <div>
+              <h1>程序员模拟面试系统</h1>
+              <p>Dark IDE style interview cockpit for serious technical practice.</p>
+            </div>
           </div>
-        </div>
+          <section id="practiceHistory" class="practice-history" aria-live="polite">
+            <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
+          </section>
+        </header>
 
         <form id="setupForm" class="setup-form">
-          <label>
-            <span>面试方向</span>
-            <select name="role">
-              <option value="java">Java 后端</option>
-              <option value="backend">后端开发</option>
-              <option value="frontend">前端开发</option>
-              <option value="fullstack">全栈开发</option>
-              <option value="go">Go 后端</option>
-              <option value="python">Python 后端</option>
-            </select>
-          </label>
+          <section class="setup-grid">
+            <aside class="sidebar setup-panel">
+              <div class="panel-kicker">Setup Dashboard</div>
+              <h2>配置本轮面试</h2>
 
-          <label>
-            <span>面试级别</span>
-            <select name="level">
-              <option value="junior">初级</option>
-              <option value="middle" selected>中级</option>
-              <option value="senior">高级</option>
-            </select>
-          </label>
+              <label class="native-field">
+                <span>面试方向</span>
+                <select name="role">
+                  <option value="java">Java 后端</option>
+                  <option value="backend">后端开发</option>
+                  <option value="frontend">前端开发</option>
+                  <option value="fullstack">全栈开发</option>
+                  <option value="go">Go 后端</option>
+                  <option value="python">Python 后端</option>
+                  <option value="qa">测试开发 / QA</option>
+                  <option value="ops">运维 / DBA / 网络</option>
+                  <option value="devops">DevOps / SRE</option>
+                  <option value="data">数据开发 / 数仓</option>
+                  <option value="ai">AI / 算法工程师</option>
+                  <option value="security">安全工程师</option>
+                  <option value="architect">架构师 / 技术管理</option>
+                </select>
+              </label>
+              <div id="roleChoiceGrid" class="choice-grid role-choice-grid" aria-label="方向快捷选择"></div>
 
-          <label>
-            <span>面试风格</span>
-            <select name="style">
-              <option value="normal">常规面试</option>
-              <option value="pressure">压力面试</option>
-              <option value="coaching">教练模式</option>
-            </select>
-          </label>
-          <div id="styleHint" class="style-hint" aria-live="polite"></div>
+              <label class="native-field">
+                <span>面试级别</span>
+                <select name="level">
+                  <option value="junior">初级</option>
+                  <option value="middle" selected>中级</option>
+                  <option value="senior">高级</option>
+                </select>
+              </label>
+              <div id="levelStepper" class="level-stepper" aria-label="级别选择"></div>
 
-          <label>
-            <span>题目数量</span>
-            <input name="questionCount" type="number" min="3" max="6" value="5" />
-          </label>
+              <label class="native-field">
+                <span>面试风格</span>
+                <select name="style">
+                  <option value="normal">常规面试</option>
+                  <option value="pressure">压力面试</option>
+                  <option value="coaching">教练模式</option>
+                </select>
+              </label>
+              <div id="styleSegmented" class="segmented-control" aria-label="面试风格选择"></div>
+              <div id="styleHint" class="style-hint" aria-live="polite"></div>
 
-          <label class="wide">
-            <span>简历或项目背景</span>
-            <textarea
-              name="resume"
-              rows="6"
-              placeholder="示例：负责订单平台，技术栈 Spring Boot、MySQL、Redis、RabbitMQ，主导库存扣减、失败补偿和线上问题排查。"
-            ></textarea>
-          </label>
+              <label class="native-field">
+                <span>AI 引擎</span>
+                <select id="aiProviderSelect" name="aiProvider">
+                  <option value="mock" selected>Local Mock</option>
+                  <option value="gemini">Gemini</option>
+                  <option value="openrouter">OpenRouter</option>
+                  <option value="ollama">Ollama</option>
+                </select>
+              </label>
+              <label id="aiKeyField" class="ai-key-field">
+                <span>API Key / Base URL</span>
+                <input id="aiKeyInput" type="text" placeholder="Mock 模式无需填写" autocomplete="off" />
+              </label>
+              <p id="aiProviderWarning" class="provider-warning">Local Mock 已启用，本地规则会保证流程可运行。</p>
 
-          <section id="profileAnalysis" class="profile-analysis empty-profile">
-            <p>不填也可以直接快速练习；填写 JD、简历或项目背景后，会在这里分析岗位关键词和推荐考点。</p>
+              <label class="native-field">
+                <span>题目来源</span>
+                <select name="questionSource">
+                  <option value="local" selected>本地题库</option>
+                  <option value="ai">AI 动态出题</option>
+                </select>
+              </label>
+
+              <label class="native-field compact-field">
+                <span>题目数量</span>
+                <input name="questionCount" type="number" min="3" max="6" value="5" />
+              </label>
+            </aside>
+
+            <section class="profile-zone">
+              <div class="profile-dropzone" id="profileDropzone">
+                <input id="profileFileInput" type="file" accept=".pdf,.md,.markdown,.json,.txt" />
+                <div class="dropzone-orbit" aria-hidden="true"></div>
+                <div>
+                  <strong>拖拽上传简历 / JD / 项目材料</strong>
+                  <p>支持 PDF、Markdown、JSON、TXT。也可以直接在下方粘贴项目背景。</p>
+                </div>
+                <button type="button" class="mini-button" id="profileUploadButton">选择文件</button>
+              </div>
+
+              <label class="resume-editor">
+                <span>简历或项目背景</span>
+                <textarea
+                  name="resume"
+                  rows="9"
+                  placeholder="示例：负责前端监控平台，技术栈 Vue3、ECharts、Canvas，主导大数据量图表渲染优化、组件封装和首屏性能治理。"
+                ></textarea>
+              </label>
+
+              <section id="profileAnalysis" class="profile-analysis empty-profile">
+                <p>填写或上传背景后，会实时解析能力点、风险点和推荐考点。</p>
+              </section>
+            </section>
           </section>
 
-          <section id="planPreview" class="plan-preview" aria-live="polite">
-            <p>选择配置后，这里会预览本轮训练节奏，不提前暴露具体题目。</p>
+          <section class="launch-strip">
+            <section id="planPreview" class="plan-preview" aria-live="polite">
+              <p>选择配置后，这里会预览本轮训练节奏，不提前暴露具体题目。</p>
+            </section>
+            <div class="launch-actions">
+              <div id="countdownOverlay" class="countdown-overlay" hidden>
+                <span>3</span>
+                <p>全面面试即将开始</p>
+              </div>
+              <button type="submit" class="primary-button launch-button">开启全面面试</button>
+            </div>
           </section>
-
-          <button type="submit" class="primary-button">开始模拟面试</button>
         </form>
-
-        <div class="provider-note">
-          <strong>AI 提供方</strong>
-          <span id="providerText">尚未开始</span>
-        </div>
-
-        <section id="practiceHistory" class="practice-history" aria-live="polite">
-          <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
-        </section>
       </section>
 
-      <section class="interview-panel">
-        <div class="panel-header">
-          <div>
-            <h2>面试对话</h2>
-            <p id="statusText">选择配置后开始。如果没有配置模型，系统会使用本地模拟面试官。</p>
-          </div>
-          <button id="finishButton" class="ghost-button" disabled>结束并生成报告</button>
+      <section class="workplace-shell">
+        <div class="memory-warning">
+          <strong>⚠ 当前会话运行在浏览器内存中</strong>
+          <span>刷新页面将丢失本轮面试进度。</span>
         </div>
 
-        <section id="interviewProgress" class="interview-progress empty-progress">
-          <p>开始后会展示本轮面试路线：基础题、追问、项目题、场景题和复盘。</p>
-        </section>
+        <section class="interview-workplace">
+          <aside class="blueprint-panel collapsible-panel" data-panel="blueprint">
+            <button type="button" class="panel-toggle" data-toggle-panel="blueprint" title="折叠技能蓝图">⌘</button>
+            <section id="interviewProgress" class="interview-progress empty-progress">
+              <p>开始后会展示本轮面试路线：基础题、追问、项目题、场景题和复盘。</p>
+            </section>
+          </aside>
 
-        <div id="messages" class="messages empty-state">
-          <p>面试官会在这里开场，并提出第一道问题。</p>
-        </div>
+          <section class="interview-panel">
+            <div class="panel-header top-status-bar">
+              <div>
+                <h2>面试沉浸式工作台</h2>
+                <p id="statusText">选择配置后开始。如果没有配置模型，系统会使用本地模拟面试官。</p>
+              </div>
+              <div class="status-actions">
+                <span class="provider-note"><strong>AI</strong><span id="providerText">尚未开始</span></span>
+                <button id="finishButton" class="danger-button" disabled>提前结束面试，生成报告</button>
+              </div>
+            </div>
 
-        <aside id="liveCoach" class="live-coach empty-state">
-          <p>开始面试后，这里会显示面试官当前正在考察什么。</p>
-        </aside>
+            <div id="messages" class="messages empty-state">
+              <p>面试官会在这里开场，并提出第一道问题。</p>
+            </div>
 
-        <form id="answerForm" class="answer-form">
-          <section id="answerGuide" class="answer-guide empty-answer-guide">
-            <p>开始面试后，这里会提示当前题型的作答方式。</p>
+            <form id="answerForm" class="answer-form">
+              <section id="answerGuide" class="answer-guide empty-answer-guide">
+                <p>开始面试后，这里会提示当前题型的作答方式。</p>
+              </section>
+              <textarea id="answerInput" rows="4" placeholder="在这里输入你的回答..." disabled></textarea>
+              <button type="submit" class="primary-button" disabled>提交回答</button>
+            </form>
           </section>
-          <textarea id="answerInput" rows="4" placeholder="在这里输入你的回答..." disabled></textarea>
-          <button type="submit" class="primary-button" disabled>提交回答</button>
-        </form>
+
+          <aside class="coach-panel collapsible-panel" data-panel="coach">
+            <button type="button" class="panel-toggle" data-toggle-panel="coach" title="折叠实时教练">◐</button>
+            <section id="liveCoach" class="live-coach empty-state">
+              <p>开始面试后，这里会显示面试官当前正在考察什么。</p>
+            </section>
+          </aside>
+        </section>
       </section>
 
       <section class="report-panel">
-        <div class="panel-header">
+        <div class="panel-header report-header">
           <div>
             <h2>复盘报告</h2>
-            <p>面试结束后查看评分信号、差距分析和更好的回答示例。</p>
+            <p>宏观战绩、逐题拆解、误区和三轮通关路线图。</p>
           </div>
         </div>
         <div id="report" class="report empty-state">
@@ -127,6 +200,7 @@
       </section>
     </main>
 
-    <script src="/app.js?v=zh-cn-8" type="module"></script>
+    <script src="/vendor/echarts.min.js"></script>
+    <script src="/app.js?v=geek-dark-2" type="module"></script>
   </body>
 </html>
