@@ -1,11 +1,4983 @@
 {
-  "updatedAt": "2026-05-26T17:15:32.753Z",
+  "updatedAt": "2026-05-28T00:45:00.000Z",
   "drafts": [
     {
+      "id": "draft_review_external_0009",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0009",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "⭐️整数类型的 UNSIGNED 属性有什么用？",
+      "category": "MySQL",
+      "skill": "字段类型设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "MySQL 整数类型的 UNSIGNED 属性有什么作用？设计字段时什么时候适合使用，什么时候不建议使用？",
+      "keywords": [
+        "MySQL",
+        "UNSIGNED",
+        "整数范围",
+        "字段设计",
+        "数据约束"
+      ],
+      "expectedPoints": [
+        "UNSIGNED 会去掉负数范围并扩大正数上限",
+        "适合天然非负的计数、库存、年龄等字段",
+        "不能替代业务层和约束校验",
+        "说明和 Java/ORM 类型映射的风险",
+        "边界溢出",
+        "迁移兼容性",
+        "可读性"
+      ],
+      "referenceAnswer": "UNSIGNED 表示无符号整数，同样字节数下不再存储负数，正数可表示范围变大。它适合天然不可能为负的字段，例如库存、次数、年龄、状态位等，但不能只靠它承载所有业务规则，仍要配合 CHECK、应用校验或领域模型约束。使用时要注意 ORM 和编程语言类型映射，某些语言没有无符号整型或范围不同，可能出现溢出、序列化不一致或迁移兼容问题。",
+      "excellentAnswer": "我会先判断这个字段在业务语义上是否永远非负，再决定是否用 UNSIGNED。它能让模型语义更清楚，也能扩大上限，但不是越多越好。比如金额通常不用浮点也不一定只靠 UNSIGNED，而要考虑单位、精度和约束；跨语言服务还要确认 Java、Go、前端 JSON 的类型范围。线上改字段时尤其要评估历史数据、索引重建和回滚风险。",
+      "followUps": [
+        "如果在真实项目里遇到 UNSIGNED 整数 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "UNSIGNED 会去掉负数范围并扩大正数上限",
+          "适合天然非负的计数、库存、年龄等字段",
+          "不能替代业务层和约束校验",
+          "说明和 Java/ORM 类型映射的风险"
+        ],
+        "goodToHave": [
+          "边界溢出",
+          "迁移兼容性",
+          "可读性"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_unsigned_int_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0010",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0010",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "CHAR 和 VARCHAR 的区别是什么？",
+      "category": "MySQL",
+      "skill": "字段类型设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "CHAR 和 VARCHAR 的区别是什么？在用户昵称、手机号、固定编码等字段上你会如何选择？",
+      "keywords": [
+        "MySQL",
+        "CHAR",
+        "VARCHAR",
+        "变长字段",
+        "存储设计"
+      ],
+      "expectedPoints": [
+        "CHAR 定长，VARCHAR 变长",
+        "说明存储空间、尾部空格、更新成本差异",
+        "结合字段长度稳定性选择",
+        "考虑字符集和索引长度",
+        "页存储",
+        "行格式",
+        "手机号不要做数值计算"
+      ],
+      "referenceAnswer": "CHAR 是定长字段，适合长度固定或接近固定的编码，例如国家码、MD5 摘要等；VARCHAR 是变长字段，适合昵称、标题、备注这类长度差异明显的数据。选择时不能只看最大长度，还要考虑字符集、索引长度、更新是否会导致行迁移、尾部空格处理以及查询模式。手机号虽然长度固定，但通常更适合字符串，因为它不参与数值计算，还可能包含前导零、区号或格式符。",
+      "excellentAnswer": "我会按业务语义和访问模式选，而不是机械记忆。固定长度、频繁比较的小字段可以用 CHAR；长度波动大的字段用 VARCHAR 更省空间。对高频索引字段，还要考虑 utf8mb4 下每个字符的字节数和联合索引长度。真实项目里我会把手机号、身份证、订单号这类“看起来像数字但不是数值”的字段按字符串处理，并配合格式校验。",
+      "followUps": [
+        "如果在真实项目里遇到 CHAR 和 VARCHAR 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "CHAR 定长，VARCHAR 变长",
+          "说明存储空间、尾部空格、更新成本差异",
+          "结合字段长度稳定性选择",
+          "考虑字符集和索引长度"
+        ],
+        "goodToHave": [
+          "页存储",
+          "行格式",
+          "手机号不要做数值计算"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_char_varchar_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0012",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0012",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "DECIMAL 和 FLOAT/DOUBLE 的区别是什么？",
+      "category": "MySQL",
+      "skill": "字段类型设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "DECIMAL 和 FLOAT/DOUBLE 有什么区别？为什么金额、费率这类字段通常不用浮点数保存？",
+      "keywords": [
+        "MySQL",
+        "DECIMAL",
+        "FLOAT",
+        "DOUBLE",
+        "精度"
+      ],
+      "expectedPoints": [
+        "DECIMAL 是定点精确表示",
+        "FLOAT/DOUBLE 是近似浮点表示",
+        "金额等精确计算字段优先 DECIMAL 或整数分单位",
+        "说明存储、计算和舍入风险",
+        "金融精度",
+        "聚合误差",
+        "ORM 映射"
+      ],
+      "referenceAnswer": "DECIMAL 是定点数，更适合金额、余额、费率等需要精确表示和比较的字段；FLOAT/DOUBLE 是二进制浮点近似值，适合科学计算、监控指标等可接受误差的场景。金额如果用浮点存储，累加、比较和舍入时可能出现精度误差，导致账务不一致。工程上常见做法是用 DECIMAL 指定精度和小数位，或者用整数保存最小货币单位，同时在应用层统一舍入规则。",
+      "excellentAnswer": "我会强调“能不能接受误差”。如果是交易金额、积分、库存扣减价格，就不能用 FLOAT/DOUBLE 赌运气；如果是 CPU 使用率、地图坐标、实验指标，浮点通常可以接受。设计表结构时还要统一 DECIMAL(p,s) 的含义，明确展示、计算、入库的舍入规则，并检查 ORM 是否把 DECIMAL 映射成字符串或高精度类型，避免在应用层又丢精度。",
+      "followUps": [
+        "如果在真实项目里遇到 DECIMAL 和 FLOAT/DOUBLE 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "DECIMAL 是定点精确表示",
+          "FLOAT/DOUBLE 是近似浮点表示",
+          "金额等精确计算字段优先 DECIMAL 或整数分单位",
+          "说明存储、计算和舍入风险"
+        ],
+        "goodToHave": [
+          "金融精度",
+          "聚合误差",
+          "ORM 映射"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_decimal_float_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0014",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0014",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "⭐️DATETIME 和 TIMESTAMP 的区别是什么？如何选择？",
+      "category": "MySQL",
+      "skill": "时间字段设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "DATETIME 和 TIMESTAMP 有什么区别？如果系统面向多时区用户，创建时间和业务发生时间应该怎么设计？",
+      "keywords": [
+        "MySQL",
+        "DATETIME",
+        "TIMESTAMP",
+        "时区",
+        "时间字段"
+      ],
+      "expectedPoints": [
+        "TIMESTAMP 和时区转换相关，DATETIME 保存字面时间",
+        "说明范围、存储和默认值差异",
+        "多时区系统要统一时区策略",
+        "区分系统创建时间和业务发生时间",
+        "UTC",
+        "审计字段",
+        "客户端展示"
+      ],
+      "referenceAnswer": "DATETIME 更像保存一个字面日期时间，通常不随会话时区转换；TIMESTAMP 和时区相关，MySQL 会按连接时区进行转换存储和读取，且可表示范围通常更窄。多时区系统里，创建时间、更新时间这类审计字段通常统一使用 UTC 或明确的服务器时区，展示时再按用户时区转换。业务发生时间要看语义，例如航班当地起飞时间、门店营业时间可能需要保留本地时区信息，不能简单丢掉时区上下文。",
+      "excellentAnswer": "我不会只回答“一个有时区一个没有”。真实系统要先定义时间语义：审计时间追求全局排序和可比较，适合统一 UTC；业务时间追求用户或地点语义，可能要同时保存本地时间、时区 ID 和标准化时间。还要检查连接池时区、数据库默认时区、ORM 序列化、前端展示是否一致，否则线上会出现相差 8 小时、夏令时错误、跨日统计偏差等问题。",
+      "followUps": [
+        "如果在真实项目里遇到 DATETIME 和 TIMESTAMP 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "TIMESTAMP 和时区转换相关，DATETIME 保存字面时间",
+          "说明范围、存储和默认值差异",
+          "多时区系统要统一时区策略",
+          "区分系统创建时间和业务发生时间"
+        ],
+        "goodToHave": [
+          "UTC",
+          "审计字段",
+          "客户端展示"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_datetime_timestamp_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0018",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0018",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "⭐️手机号存储用 INT 还是 VARCHAR？",
+      "category": "MySQL",
+      "skill": "字段类型设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "手机号、身份证号、订单号这类“数字字符串”为什么通常不建议用 INT/BIGINT 存？",
+      "keywords": [
+        "MySQL",
+        "手机号",
+        "字符串",
+        "字段设计",
+        "前导零"
+      ],
+      "expectedPoints": [
+        "这类字段是标识符不是数值",
+        "可能存在前导零、区号、格式符或超出范围",
+        "不参与数学运算",
+        "便于长度和格式校验",
+        "索引选择",
+        "脱敏",
+        "国际化号码"
+      ],
+      "referenceAnswer": "手机号、身份证号、订单号本质上是标识符，不是需要加减乘除的数值。用 INT/BIGINT 存可能丢失前导零，国际号码还可能包含加号、区号或长度变化，部分编号也可能超过数值范围。使用 VARCHAR/CHAR 能保留原始语义，便于做格式校验、脱敏展示和精确匹配。索引上可以根据查询模式建立普通索引或唯一索引，但仍要控制长度和字符集。",
+      "excellentAnswer": "我会把“是否参与数学运算”作为第一判断。如果只是登录、检索、唯一约束和展示，就应按字符串建模。真实项目还要考虑国际化号码、历史格式、脱敏、加密或哈希检索，以及是否需要唯一约束。把它存成数字看似节省空间，但会把格式和兼容性问题推到后面，迁移成本很高。",
+      "followUps": [
+        "如果在真实项目里遇到 手机号存储 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "这类字段是标识符不是数值",
+          "可能存在前导零、区号、格式符或超出范围",
+          "不参与数学运算",
+          "便于长度和格式校验"
+        ],
+        "goodToHave": [
+          "索引选择",
+          "脱敏",
+          "国际化号码"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_phone_storage_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0019",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0019",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "MySQL 支持哪些存储引擎？默认使用哪个？",
+      "category": "MySQL",
+      "skill": "存储引擎",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "MySQL 支持哪些常见存储引擎？为什么业务系统通常默认选择 InnoDB？",
+      "keywords": [
+        "MySQL",
+        "InnoDB",
+        "MyISAM",
+        "事务",
+        "存储引擎"
+      ],
+      "expectedPoints": [
+        "说明 InnoDB、MyISAM 等常见引擎",
+        "InnoDB 支持事务、行锁、崩溃恢复、外键等能力",
+        "MyISAM 不支持事务且并发能力较弱",
+        "选择要结合业务一致性和读写模式",
+        "MVCC",
+        "聚簇索引",
+        "崩溃恢复"
+      ],
+      "referenceAnswer": "MySQL 有 InnoDB、MyISAM、Memory 等存储引擎，现代业务系统通常默认使用 InnoDB。核心原因是 InnoDB 支持事务、行级锁、MVCC、崩溃恢复和更完善的一致性能力，适合大多数在线交易和后台业务。MyISAM 在一些历史读多写少场景中出现过，但不支持事务，表级锁并发写能力弱，崩溃恢复能力也不如 InnoDB。实际选择要看一致性、并发、恢复、索引结构和运维成熟度。",
+      "excellentAnswer": "我会把存储引擎看成数据可靠性和并发模型的选择。只要涉及订单、账户、库存、配置变更这类强一致业务，InnoDB 基本是默认答案。面试里还可以补充 InnoDB 的聚簇索引、redo/undo、MVCC、行锁和外键能力。除非有非常明确的历史兼容或特殊性能理由，否则不建议新业务再选 MyISAM。",
+      "followUps": [
+        "如果在真实项目里遇到 MySQL 存储引擎 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "说明 InnoDB、MyISAM 等常见引擎",
+          "InnoDB 支持事务、行锁、崩溃恢复、外键等能力",
+          "MyISAM 不支持事务且并发能力较弱",
+          "选择要结合业务一致性和读写模式"
+        ],
+        "goodToHave": [
+          "MVCC",
+          "聚簇索引",
+          "崩溃恢复"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_storage_engines_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0021",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0021",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "⭐️MyISAM 和 InnoDB 有什么区别？",
+      "category": "MySQL",
+      "skill": "存储引擎",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "MyISAM 和 InnoDB 的核心区别是什么？如果一个老系统还在用 MyISAM，迁移到 InnoDB 要关注哪些风险？",
+      "keywords": [
+        "MySQL",
+        "MyISAM",
+        "InnoDB",
+        "迁移",
+        "事务"
+      ],
+      "expectedPoints": [
+        "事务支持差异",
+        "锁粒度和并发差异",
+        "崩溃恢复和索引结构差异",
+        "迁移需评估 SQL、索引、数据一致性和停机窗口",
+        "全文索引历史差异",
+        "外键",
+        "压测回滚"
+      ],
+      "referenceAnswer": "MyISAM 不支持事务，主要是表级锁，崩溃恢复能力弱；InnoDB 支持事务、行级锁、MVCC、redo/undo 和崩溃恢复，索引组织也不同。老系统从 MyISAM 迁移到 InnoDB 时，不能只改 ENGINE，要评估表大小、索引重建时间、SQL 执行计划变化、锁等待、字符集和历史数据一致性。迁移前应做备份、灰度、压测和回滚预案。",
+      "excellentAnswer": "我会先确认迁移动机是事务一致性、并发写还是恢复能力。然后抽样检查热点 SQL、索引、表容量和写入峰值，在线 DDL 或影子表迁移要设计切换和回滚。迁完后要看慢查询、锁等待、buffer pool 命中率、磁盘 IO 和业务错误率。这个题的重点不是背差异，而是知道引擎变化会影响可靠性、性能和运维流程。",
+      "followUps": [
+        "如果在真实项目里遇到 MyISAM 和 InnoDB 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "事务支持差异",
+          "锁粒度和并发差异",
+          "崩溃恢复和索引结构差异",
+          "迁移需评估 SQL、索引、数据一致性和停机窗口"
+        ],
+        "goodToHave": [
+          "全文索引历史差异",
+          "外键",
+          "压测回滚"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_myisam_innodb_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0025",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0025",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "MySQL 索引底层数据结构是什么？",
+      "category": "MySQL",
+      "skill": "索引原理",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "MySQL InnoDB 为什么常用 B+Tree 作为索引结构？相比哈希索引和普通 B 树，它适合解决什么问题？",
+      "keywords": [
+        "MySQL",
+        "B+Tree",
+        "索引",
+        "范围查询",
+        "InnoDB"
+      ],
+      "expectedPoints": [
+        "B+Tree 多路平衡降低树高",
+        "叶子节点有序适合范围查询和排序",
+        "非叶子节点只存键更适合磁盘页",
+        "哈希适合等值但不适合范围和排序",
+        "磁盘 IO",
+        "聚簇索引",
+        "回表"
+      ],
+      "referenceAnswer": "InnoDB 常用 B+Tree，是因为数据库索引要面向磁盘页和范围查询。B+Tree 多路平衡，树高较低，能减少磁盘 IO；非叶子节点主要保存键和指针，单页能容纳更多索引项；叶子节点按键有序并通过链表连接，适合范围扫描、排序和最左前缀匹配。哈希索引等值查询快，但不适合范围查询、排序和前缀匹配；普通 B 树数据分散在内部节点和叶子节点，范围扫描没有 B+Tree 友好。",
+      "excellentAnswer": "我会从存储介质和查询模式解释。数据库不是只做单点查找，还大量做 where a between、order by、分页、联合索引范围扫描，所以有序叶子节点非常关键。B+Tree 让一次查询通常只需要少量页访问，和 InnoDB 的页、buffer pool、聚簇索引模型配合得更好。回答时还可以补充二级索引叶子节点保存主键，查非覆盖字段会回表。",
+      "followUps": [
+        "如果在真实项目里遇到 索引底层数据结构 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "B+Tree 多路平衡降低树高",
+          "叶子节点有序适合范围查询和排序",
+          "非叶子节点只存键更适合磁盘页",
+          "哈希适合等值但不适合范围和排序"
+        ],
+        "goodToHave": [
+          "磁盘 IO",
+          "聚簇索引",
+          "回表"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_index_btree_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0028",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0028",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "什么是覆盖索引？",
+      "category": "MySQL",
+      "skill": "索引优化",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是覆盖索引？它为什么能减少回表，设计时又有哪些限制？",
+      "keywords": [
+        "MySQL",
+        "覆盖索引",
+        "回表",
+        "二级索引",
+        "性能优化"
+      ],
+      "expectedPoints": [
+        "查询字段都能从索引中拿到",
+        "减少二级索引回表",
+        "适合高频查询和分页列表",
+        "需要权衡索引宽度和写入成本",
+        "Explain Extra",
+        "Using index",
+        "联合索引"
+      ],
+      "referenceAnswer": "覆盖索引指一次查询需要的过滤字段、排序字段和返回字段都包含在同一个索引里，MySQL 可以直接从索引页得到结果，不必再根据主键回表读取完整行。它能减少随机 IO，特别适合高频列表页、轻量查询和分页场景。限制是索引不能无限加宽，字段越多写入和更新成本越高，占用空间也更大；大字段、低选择性字段和频繁变化字段都要谨慎放入索引。",
+      "excellentAnswer": "我会结合 Explain 看 Extra 是否出现 Using index，再判断是不是我们想要的覆盖。设计时不是把 select 的所有列都塞进索引，而是围绕高频 SQL 的 where、order by、limit 和返回字段做取舍。对于写多读少表，覆盖索引可能得不偿失；对于读多的列表查询，它能明显减少回表和 IO。上线后还要用慢查询、执行计划和索引体积验证收益。",
+      "followUps": [
+        "如果在真实项目里遇到 覆盖索引 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "查询字段都能从索引中拿到",
+          "减少二级索引回表",
+          "适合高频查询和分页列表",
+          "需要权衡索引宽度和写入成本"
+        ],
+        "goodToHave": [
+          "Explain Extra",
+          "Using index",
+          "联合索引"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_covering_index_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0029",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0029",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "请解释一下 MySQL 的联合索引及其最左前缀原则",
+      "category": "MySQL",
+      "skill": "索引优化",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "请解释 MySQL 联合索引和最左前缀原则。为什么索引列顺序会影响查询效果？",
+      "keywords": [
+        "MySQL",
+        "联合索引",
+        "最左前缀",
+        "索引顺序",
+        "查询优化"
+      ],
+      "expectedPoints": [
+        "联合索引按定义列顺序组织",
+        "查询要从最左列连续匹配",
+        "范围条件后续列利用受限",
+        "列顺序要结合过滤、排序和业务查询模式",
+        "等值优先",
+        "order by",
+        "覆盖索引"
+      ],
+      "referenceAnswer": "联合索引会按定义的列顺序构建有序结构，例如 (a,b,c) 先按 a 排，再按 b、c 排。最左前缀原则表示查询条件需要从 a 开始连续使用索引，跳过 a 只查 b 通常无法有效利用该联合索引；遇到范围条件后，后续列对继续定位的作用会受限。设计列顺序时要结合高频 SQL 的等值过滤、范围过滤、排序、分组和返回字段，而不是简单把所有字段拼起来。",
+      "excellentAnswer": "我会拿 (tenant_id, status, created_at) 举例：多租户系统里 tenant_id 是强约束，status 是等值过滤，created_at 用于排序和范围分页，这样顺序就比较合理。但如果查询经常只按 created_at 查，这个索引就不合适。面试里还要说明 Explain 只能验证当前 SQL，真正上线要看慢查询样本、数据分布和索引维护成本。",
+      "followUps": [
+        "如果在真实项目里遇到 联合索引和最左前缀 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "联合索引按定义列顺序组织",
+          "查询要从最左列连续匹配",
+          "范围条件后续列利用受限",
+          "列顺序要结合过滤、排序和业务查询模式"
+        ],
+        "goodToHave": [
+          "等值优先",
+          "order by",
+          "覆盖索引"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_composite_leftmost_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0031",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0031",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "哪些字段适合创建索引？",
+      "category": "MySQL",
+      "skill": "索引设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "哪些字段适合创建索引？高频查询字段是否都应该建索引？",
+      "keywords": [
+        "MySQL",
+        "索引设计",
+        "选择性",
+        "写入成本",
+        "查询模式"
+      ],
+      "expectedPoints": [
+        "适合过滤、连接、排序、分组字段",
+        "关注选择性和数据分布",
+        "索引会增加写入、更新和存储成本",
+        "根据高频 SQL 和执行计划验证",
+        "低基数字段",
+        "联合索引",
+        "慢查询"
+      ],
+      "referenceAnswer": "适合建索引的字段通常出现在 where、join、order by、group by 中，并且有较好的选择性或能配合联合索引减少扫描行数。高频字段不一定都要建索引，例如性别、布尔状态这类低基数字段单独建索引收益可能有限。索引会增加写入、更新、删除成本和存储空间，也会影响优化器选择。设计时应基于慢查询、执行计划、数据分布和业务访问模式，而不是凭感觉。",
+      "excellentAnswer": "我会先收集高频慢 SQL，再看过滤条件、排序方式、返回列和数据基数。单列索引、联合索引和覆盖索引要围绕具体 SQL 设计，还要避免多个相似索引互相重叠。建完索引不是结束，要通过 Explain、扫描行数、响应时间、写入延迟和索引体积验证收益。对于写入压力大的表，少一个无效索引就是实打实的性能收益。",
+      "followUps": [
+        "如果在真实项目里遇到 索引字段选择 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "适合过滤、连接、排序、分组字段",
+          "关注选择性和数据分布",
+          "索引会增加写入、更新和存储成本",
+          "根据高频 SQL 和执行计划验证"
+        ],
+        "goodToHave": [
+          "低基数字段",
+          "联合索引",
+          "慢查询"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_index_field_choice_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0032",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0032",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "索引失效的原因有哪些？",
+      "category": "MySQL",
+      "skill": "索引优化",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "MySQL 中常见的索引失效原因有哪些？线上发现走了全表扫描时你会怎么排查？",
+      "keywords": [
+        "MySQL",
+        "索引失效",
+        "Explain",
+        "全表扫描",
+        "慢查询"
+      ],
+      "expectedPoints": [
+        "函数或表达式包裹索引列可能失效",
+        "隐式类型转换和字符集不一致风险",
+        "最左前缀不满足或范围条件影响",
+        "用 Explain 和数据分布排查",
+        "like 前缀",
+        "or 条件",
+        "优化器成本"
+      ],
+      "referenceAnswer": "常见索引失效包括对索引列使用函数或表达式、隐式类型转换、字符集或排序规则不一致、LIKE 以通配符开头、联合索引不满足最左前缀、范围条件后续列利用受限，以及 OR 条件导致优化器选择全表扫描。线上排查时先用慢查询定位 SQL，再用 Explain 看 type、key、rows、Extra，检查参数类型、数据分布、统计信息和索引设计，必要时改写 SQL 或调整索引。",
+      "excellentAnswer": "我会先确认“没走索引”是不是问题，因为小表或低选择性条件下全表扫描可能更便宜。然后看执行计划和实际扫描行数，检查是否存在函数包裹、类型不一致、排序分页、联合索引顺序不匹配。处理方式可能是改 SQL、加合适联合索引、更新统计信息，或者接受优化器选择。上线变更要灰度并观察慢查询、CPU、IO 和锁等待。",
+      "followUps": [
+        "如果在真实项目里遇到 索引失效 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "函数或表达式包裹索引列可能失效",
+          "隐式类型转换和字符集不一致风险",
+          "最左前缀不满足或范围条件影响",
+          "用 Explain 和数据分布排查"
+        ],
+        "goodToHave": [
+          "like 前缀",
+          "or 条件",
+          "优化器成本"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_index_invalid_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0033",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0033",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "什么是数据库事务？",
+      "category": "MySQL",
+      "skill": "事务机制",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是数据库事务？ACID 四个特性分别解决什么问题？",
+      "keywords": [
+        "MySQL",
+        "事务",
+        "ACID",
+        "一致性",
+        "隔离性"
+      ],
+      "expectedPoints": [
+        "原子性、一致性、隔离性、持久性",
+        "事务用于保护一组操作的整体语义",
+        "隔离级别影响并发读写现象",
+        "持久性依赖日志和刷盘策略",
+        "redo log",
+        "undo log",
+        "MVCC"
+      ],
+      "referenceAnswer": "事务是一组需要作为整体提交或回滚的数据库操作。ACID 中，原子性保证要么都成功要么都失败；一致性保证事务前后数据满足约束和业务不变量；隔离性控制并发事务之间互相可见的程度；持久性保证提交后的结果在故障后仍可恢复。在 MySQL InnoDB 中，undo log、redo log、锁和 MVCC 等机制共同支撑这些能力。",
+      "excellentAnswer": "我会结合转账或库存扣减解释事务。真正难点不是背 ACID，而是知道隔离级别和并发控制会影响性能与一致性。例如可重复读能减少不可重复读问题，但仍要理解快照读、当前读和锁的关系。工程上还要控制事务范围，避免把远程调用、长时间计算和用户交互放进事务里，导致锁等待和吞吐下降。",
+      "followUps": [
+        "如果在真实项目里遇到 数据库事务 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "原子性、一致性、隔离性、持久性",
+          "事务用于保护一组操作的整体语义",
+          "隔离级别影响并发读写现象",
+          "持久性依赖日志和刷盘策略"
+        ],
+        "goodToHave": [
+          "redo log",
+          "undo log",
+          "MVCC"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_transaction_acid_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0034",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0034",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "并发事务带来了哪些问题?",
+      "category": "MySQL",
+      "skill": "事务隔离",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "并发事务会带来哪些典型问题？脏读、不可重复读、幻读分别是什么？",
+      "keywords": [
+        "MySQL",
+        "脏读",
+        "不可重复读",
+        "幻读",
+        "隔离级别"
+      ],
+      "expectedPoints": [
+        "脏读读取未提交数据",
+        "不可重复读同一行前后读取结果变化",
+        "幻读同一范围前后记录集合变化",
+        "隔离级别用于权衡一致性和并发性能",
+        "MVCC",
+        "next-key lock",
+        "当前读"
+      ],
+      "referenceAnswer": "并发事务可能出现脏读、不可重复读和幻读。脏读是读到了其他事务尚未提交的数据；不可重复读是同一事务内两次读取同一行，结果因为其他事务提交而变化；幻读是同一事务内按相同范围条件查询，记录集合发生新增或删除。不同隔离级别通过锁和 MVCC 在一致性和并发性能之间取舍，InnoDB 的可重复读还会结合 next-key lock 等机制处理当前读下的幻读问题。",
+      "excellentAnswer": "我会把“同一行变化”和“范围集合变化”分开讲，避免把不可重复读和幻读混成一个概念。真实业务里要看是快照读还是当前读，是报表一致性、库存扣减还是防重复插入。解决方式不一定总是提高隔离级别，也可能是唯一索引、显式锁、乐观锁、幂等约束或业务补偿。",
+      "followUps": [
+        "如果在真实项目里遇到 并发事务问题 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "脏读读取未提交数据",
+          "不可重复读同一行前后读取结果变化",
+          "幻读同一范围前后记录集合变化",
+          "隔离级别用于权衡一致性和并发性能"
+        ],
+        "goodToHave": [
+          "MVCC",
+          "next-key lock",
+          "当前读"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_concurrent_anomalies_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0035",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0035",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "不可重复读和幻读有什么区别？",
+      "category": "MySQL",
+      "skill": "事务隔离",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "不可重复读和幻读到底怎么区分？在 InnoDB 可重复读隔离级别下还需要担心幻读吗？",
+      "keywords": [
+        "MySQL",
+        "不可重复读",
+        "幻读",
+        "可重复读",
+        "next-key lock"
+      ],
+      "expectedPoints": [
+        "不可重复读关注同一行值变化",
+        "幻读关注范围查询记录集合变化",
+        "快照读和当前读处理不同",
+        "InnoDB 通过 MVCC 和 next-key lock 缓解幻读",
+        "RR",
+        "间隙锁",
+        "唯一约束"
+      ],
+      "referenceAnswer": "不可重复读关注同一行记录的内容前后不一致，幻读关注同一范围条件下记录集合发生变化。InnoDB 可重复读下，普通一致性快照读通过 MVCC 能看到同一个快照，通常不会出现前后结果变化；当前读如 select for update、update、delete 需要加锁，InnoDB 会用 next-key lock、间隙锁等方式避免范围内插入造成幻读。但具体是否加锁、锁范围多大，还和索引、查询条件、唯一约束有关。",
+      "excellentAnswer": "我会用“查同一行”和“查一个范围”来回答，再补 InnoDB 的实现细节。面试官追问时要说明不是所有读都一样：快照读依赖 Read View，当前读读最新并加锁。线上如果出现重复下单、范围内重复插入这类问题，不应该只背隔离级别，而要检查唯一索引、事务边界、加锁 SQL 是否命中索引，以及锁等待指标。",
+      "followUps": [
+        "如果在真实项目里遇到 不可重复读和幻读 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "不可重复读关注同一行值变化",
+          "幻读关注范围查询记录集合变化",
+          "快照读和当前读处理不同",
+          "InnoDB 通过 MVCC 和 next-key lock 缓解幻读"
+        ],
+        "goodToHave": [
+          "RR",
+          "间隙锁",
+          "唯一约束"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_nonrepeatable_phantom_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0039",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0039",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "MySQL 的隔离级别是基于锁实现的吗？",
+      "category": "MySQL",
+      "skill": "事务隔离",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "MySQL 的隔离级别完全是靠锁实现的吗？请说明 MVCC、快照读和当前读的关系。",
+      "keywords": [
+        "MySQL",
+        "隔离级别",
+        "MVCC",
+        "快照读",
+        "当前读"
+      ],
+      "expectedPoints": [
+        "隔离级别不完全依赖锁",
+        "快照读主要依赖 MVCC/Read View",
+        "当前读读取最新数据并可能加锁",
+        "不同隔离级别影响可见性和锁策略",
+        "undo log",
+        "Read View",
+        "next-key lock"
+      ],
+      "referenceAnswer": "MySQL InnoDB 的隔离级别不是完全靠锁实现。普通 select 这类快照读主要依赖 MVCC，通过 Read View 和 undo log 判断版本可见性，减少读写阻塞；update、delete、select for update 等当前读读取最新已提交版本，并通过记录锁、间隙锁、next-key lock 等控制并发修改。不同隔离级别会影响 Read View 生成时机和锁策略，因此要结合 SQL 类型和索引命中情况分析。",
+      "excellentAnswer": "我会强调“读的类型”。如果是普通查询，讨论 MVCC 和一致性视图；如果是扣库存、防重复提交，就要讨论当前读和锁。线上排查事务问题时，我会看隔离级别、SQL 是否命中索引、锁等待、死锁日志和事务持续时间。只说“隔离级别靠锁”太粗，会误导读写性能和一致性风险判断。",
+      "followUps": [
+        "如果在真实项目里遇到 隔离级别和锁/MVCC 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "隔离级别不完全依赖锁",
+          "快照读主要依赖 MVCC/Read View",
+          "当前读读取最新数据并可能加锁",
+          "不同隔离级别影响可见性和锁策略"
+        ],
+        "goodToHave": [
+          "undo log",
+          "Read View",
+          "next-key lock"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_isolation_mvcc_lock_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0040",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0040",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "表级锁和行级锁了解吗？有什么区别？",
+      "category": "MySQL",
+      "skill": "锁机制",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "表级锁和行级锁有什么区别？为什么有时写了行锁语义的 SQL 最后会锁住很多行？",
+      "keywords": [
+        "MySQL",
+        "表级锁",
+        "行级锁",
+        "索引",
+        "锁范围"
+      ],
+      "expectedPoints": [
+        "表锁粒度大开销低但并发差",
+        "行锁粒度小并发好但管理成本高",
+        "InnoDB 行锁依赖索引记录",
+        "未命中合适索引可能扩大锁范围",
+        "间隙锁",
+        "next-key lock",
+        "锁等待"
+      ],
+      "referenceAnswer": "表级锁一次锁整张表，管理开销较低但并发能力差；行级锁锁定索引记录，粒度小、并发更好，但锁管理成本更高。InnoDB 的行锁是加在索引上的，如果条件没有命中合适索引，可能扫描并锁住大量记录，甚至造成接近表锁的效果。在可重复读下，范围条件还可能产生间隙锁或 next-key lock，影响范围内插入。",
+      "excellentAnswer": "我会把锁范围和执行计划联系起来。比如 update user set ... where phone = ?，如果 phone 没索引，就可能扫描大量记录并造成严重锁等待。排查时看 Explain、show engine innodb status、performance_schema 锁等待和事务持续时间。解决可能是补索引、缩短事务、改访问顺序、拆批处理，而不是简单说 InnoDB 有行锁就安全。",
+      "followUps": [
+        "如果在真实项目里遇到 表级锁和行级锁 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "表锁粒度大开销低但并发差",
+          "行锁粒度小并发好但管理成本高",
+          "InnoDB 行锁依赖索引记录",
+          "未命中合适索引可能扩大锁范围"
+        ],
+        "goodToHave": [
+          "间隙锁",
+          "next-key lock",
+          "锁等待"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_table_row_lock_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0045",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0045",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "当前读和快照读有什么区别？",
+      "category": "MySQL",
+      "skill": "MVCC",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "当前读和快照读有什么区别？在库存扣减或防重复提交场景下应该用哪类读？",
+      "keywords": [
+        "MySQL",
+        "当前读",
+        "快照读",
+        "MVCC",
+        "库存扣减"
+      ],
+      "expectedPoints": [
+        "快照读读取一致性视图",
+        "当前读读取最新记录并加锁",
+        "普通 select 通常是快照读",
+        "更新、删除、select for update 属于当前读",
+        "Read View",
+        "乐观锁",
+        "唯一约束"
+      ],
+      "referenceAnswer": "快照读读取的是事务可见的一致性版本，普通 select 在 InnoDB 中通常走 MVCC，不阻塞写；当前读读取最新已提交或待修改记录，并通过加锁保证后续修改安全，update、delete、insert、select for update、select lock in share mode 都属于当前读。库存扣减、防重复提交这类需要基于最新状态做修改的场景，通常不能只靠快照读，要用当前读、条件更新、唯一约束或乐观锁来保证并发正确性。",
+      "excellentAnswer": "我会用“查报表”和“抢库存”对比。报表希望读一致快照，避免阻塞；扣库存要读最新并控制并发，否则两个事务都看到还有库存就会超卖。工程上更推荐原子条件更新，比如 update sku set stock=stock-1 where id=? and stock>0，再检查影响行数；必要时配合唯一键、幂等表和重试。",
+      "followUps": [
+        "如果在真实项目里遇到 当前读和快照读 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "快照读读取一致性视图",
+          "当前读读取最新记录并加锁",
+          "普通 select 通常是快照读",
+          "更新、删除、select for update 属于当前读"
+        ],
+        "goodToHave": [
+          "Read View",
+          "乐观锁",
+          "唯一约束"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_current_snapshot_read_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0049",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0049",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "有哪些常见的 SQL 优化手段？",
+      "category": "MySQL",
+      "skill": "SQL 优化",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "常见 SQL 优化手段有哪些？请按“定位问题、改写 SQL、调整索引、验证效果”的顺序回答。",
+      "keywords": [
+        "MySQL",
+        "SQL 优化",
+        "慢查询",
+        "Explain",
+        "索引"
+      ],
+      "expectedPoints": [
+        "先用慢查询和监控定位",
+        "用 Explain 分析执行计划",
+        "改写 SQL 和减少扫描行数",
+        "调整索引并验证收益",
+        "分页优化",
+        "避免 select *",
+        "批量处理"
+      ],
+      "referenceAnswer": "SQL 优化应先定位问题，查看慢查询日志、调用链耗时、数据库 CPU/IO、锁等待等指标。然后用 Explain 分析访问类型、使用索引、扫描行数、排序和临时表。常见优化包括避免 select *、减少返回列、合理分页、拆分复杂查询、避免函数包裹索引列、改写子查询或 join、建立合适联合索引。最后必须用同等数据量验证响应时间、扫描行数、执行计划和写入成本。",
+      "excellentAnswer": "我会按证据驱动来做，而不是上来就加索引。先确认慢在哪里，是数据库执行慢、网络传输慢，还是应用处理慢；再看 SQL 的过滤条件、排序、分页和数据分布。优化后要压测和灰度，观察 p95、p99、慢查询数量、锁等待和主从延迟。如果新增索引让写入变慢，也要纳入取舍。",
+      "followUps": [
+        "如果在真实项目里遇到 SQL 优化手段 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "先用慢查询和监控定位",
+          "用 Explain 分析执行计划",
+          "改写 SQL 和减少扫描行数",
+          "调整索引并验证收益"
+        ],
+        "goodToHave": [
+          "分页优化",
+          "避免 select *",
+          "批量处理"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_sql_optimization_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0050",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0050",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "如何分析 SQL 的性能？",
+      "category": "MySQL",
+      "skill": "SQL 诊断",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "如何分析一条 SQL 的性能？Explain 里哪些字段最值得关注？",
+      "keywords": [
+        "MySQL",
+        "Explain",
+        "执行计划",
+        "rows",
+        "Extra"
+      ],
+      "expectedPoints": [
+        "关注 type、possible_keys、key、rows、filtered、Extra",
+        "结合慢查询和真实参数",
+        "检查索引、排序、临时表和回表",
+        "执行计划需结合数据分布验证",
+        "analyze",
+        "optimizer trace",
+        "覆盖索引"
+      ],
+      "referenceAnswer": "分析 SQL 性能通常先从慢查询日志和真实参数入手，再使用 Explain 查看执行计划。重点关注 type 表示访问方式，possible_keys/key 表示候选和实际使用索引，rows/filtered 估算扫描量，Extra 中的 Using filesort、Using temporary、Using index 等提示排序、临时表或覆盖索引情况。Explain 是估算结果，还要结合数据分布、实际执行耗时、返回行数、锁等待和数据库资源指标判断。",
+      "excellentAnswer": "我会先复现慢 SQL，确保使用线上同等量级数据和真实参数。Explain 只是起点，MySQL 8 还可以用 Explain Analyze 看实际执行。排查时我会问：过滤条件是否命中合适索引？排序能否利用索引？是否回表过多？是否因为参数类型导致隐式转换？最后用变更前后 p95、扫描行数和资源消耗证明优化有效。",
+      "followUps": [
+        "如果在真实项目里遇到 SQL 性能分析 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "关注 type、possible_keys、key、rows、filtered、Extra",
+          "结合慢查询和真实参数",
+          "检查索引、排序、临时表和回表",
+          "执行计划需结合数据分布验证"
+        ],
+        "goodToHave": [
+          "analyze",
+          "optimizer trace",
+          "覆盖索引"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_explain_performance_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0052",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0052",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "深度分页如何优化？",
+      "category": "MySQL",
+      "skill": "分页优化",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "MySQL 深度分页为什么会慢？如果接口需要翻到第 10000 页，你会怎么优化？",
+      "keywords": [
+        "MySQL",
+        "深度分页",
+        "limit offset",
+        "游标分页",
+        "索引"
+      ],
+      "expectedPoints": [
+        "limit offset 会扫描并丢弃大量前置行",
+        "使用基于游标/上一页最后值的分页",
+        "用覆盖索引或延迟关联减少回表",
+        "说明业务上限制深翻页的取舍",
+        "seek pagination",
+        "排序稳定性",
+        "总数统计"
+      ],
+      "referenceAnswer": "深度分页慢的原因是 limit offset 需要先扫描或排序大量前置记录，再丢弃 offset 之前的数据，offset 越大成本越高。优化可以改成基于游标的 seek pagination，例如按 id 或 created_at+id 记录上一页最后值继续查询；也可以用覆盖索引先查主键，再回表关联需要的列，减少回表量。还要保证排序字段稳定且有索引。很多业务不应该支持无限深翻页，可以通过搜索、筛选、时间范围和最大页数限制改善体验。",
+      "excellentAnswer": "我会先问产品场景：用户真的需要第 10000 页，还是需要找某条记录。技术上优先用游标分页，where (created_at,id) < (?,?) order by created_at desc,id desc limit 20。对于后台导出可以走异步任务或批处理，不走在线分页接口。上线后看扫描行数、响应时间和数据库 IO，避免一个深分页接口拖垮主库。",
+      "followUps": [
+        "如果在真实项目里遇到 深度分页 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "limit offset 会扫描并丢弃大量前置行",
+          "使用基于游标/上一页最后值的分页",
+          "用覆盖索引或延迟关联减少回表",
+          "说明业务上限制深翻页的取舍"
+        ],
+        "goodToHave": [
+          "seek pagination",
+          "排序稳定性",
+          "总数统计"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_deep_pagination_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0047",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0047",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "能用 MySQL 直接存储文件（比如图片）吗？",
+      "category": "MySQL",
+      "skill": "存储设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "能不能把图片、文件这类二进制内容直接存到 MySQL？一般业务系统为什么更常把文件放对象存储？",
+      "keywords": [
+        "MySQL",
+        "BLOB",
+        "对象存储",
+        "文件存储",
+        "架构取舍"
+      ],
+      "expectedPoints": [
+        "技术上可以用 BLOB 存储",
+        "大文件会增加数据库体积、备份、IO 和缓存压力",
+        "对象存储更适合文件分发和容量扩展",
+        "数据库保存元数据和访问地址更常见",
+        "权限控制",
+        "一致性",
+        "CDN"
+      ],
+      "referenceAnswer": "MySQL 技术上可以用 BLOB 存储图片和文件，但一般业务系统不推荐把大量文件直接塞进数据库。大对象会让表和备份急剧膨胀，占用 buffer pool，增加 IO、主从同步和恢复成本，也不利于 CDN 分发。更常见做法是文件放对象存储或文件服务，数据库保存文件元数据、访问地址、哈希、大小、权限和业务关联。需要注意上传成功和元数据写入之间的一致性处理。",
+      "excellentAnswer": "我会按文件大小、访问频率和一致性要求判断。小型配置或极少量二进制也许可以入库，但用户上传图片、附件、视频应优先对象存储。工程上要设计上传流程、回滚清理、权限签名 URL、病毒扫描、CDN 缓存和元数据事务。否则数据库会承担不擅长的容量和分发压力。",
+      "followUps": [
+        "如果在真实项目里遇到 文件存储 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "技术上可以用 BLOB 存储",
+          "大文件会增加数据库体积、备份、IO 和缓存压力",
+          "对象存储更适合文件分发和容量扩展",
+          "数据库保存元数据和访问地址更常见"
+        ],
+        "goodToHave": [
+          "权限控制",
+          "一致性",
+          "CDN"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_file_blob_storage_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0048",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0048",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "MySQL 如何存储 IP 地址？",
+      "category": "MySQL",
+      "skill": "字段类型设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "MySQL 中如何存储 IP 地址？VARCHAR、整数和 VARBINARY 各有什么取舍？",
+      "keywords": [
+        "MySQL",
+        "IP 地址",
+        "IPv4",
+        "IPv6",
+        "字段设计"
+      ],
+      "expectedPoints": [
+        "IPv4 可用整数或字符串，IPv6 需考虑更长地址",
+        "字符串可读性好但空间和比较成本较高",
+        "二进制存储更紧凑适合范围和索引",
+        "要考虑展示、查询和兼容 IPv6",
+        "INET6_ATON",
+        "INET6_NTOA",
+        "范围查询"
+      ],
+      "referenceAnswer": "IP 地址可以用字符串保存，优点是可读性好、调试方便，但空间占用和比较成本较高。IPv4 可以转成无符号整数保存，范围查询较方便，但不适合 IPv6。更通用的方式是用 VARBINARY(16) 保存 IPv4/IPv6 的二进制形式，配合 INET6_ATON、INET6_NTOA 等函数转换。选择时要看是否需要范围查询、地理库匹配、索引效率、展示调试和 IPv6 兼容。",
+      "excellentAnswer": "我会避免只为 IPv4 设计新系统。日志检索可以保留字符串方便排查，核心查询表如果需要范围匹配或高效索引，可以用二进制规范化存储，并在应用层统一转换。还要注意代理链路里的真实客户端 IP、IPv4 映射 IPv6、私网地址和脱敏合规。字段类型只是其中一环。",
+      "followUps": [
+        "如果在真实项目里遇到 IP 地址存储 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 MySQL 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "IPv4 可用整数或字符串，IPv6 需考虑更长地址",
+          "字符串可读性好但空间和比较成本较高",
+          "二进制存储更紧凑适合范围和索引",
+          "要考虑展示、查询和兼容 IPv6"
+        ],
+        "goodToHave": [
+          "INET6_ATON",
+          "INET6_NTOA",
+          "范围查询"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_mysql_ip_storage_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0062",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0062",
+        "sourceName": "Front End Interview Handbook",
+        "sourceUrl": "https://github.com/yangshun/front-end-interview-handbook",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "What happens when you type a URL into the browser address bar?",
+      "category": "前端",
+      "skill": "浏览器与网络",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "从在浏览器地址栏输入 URL 到页面展示，中间发生了哪些关键步骤？请按网络、浏览器渲染和前端资源加载说明。",
+      "keywords": [
+        "浏览器",
+        "DNS",
+        "HTTP",
+        "渲染流程",
+        "资源加载"
+      ],
+      "expectedPoints": [
+        "URL 解析、缓存检查和 DNS 解析",
+        "TCP/TLS/HTTP 请求响应流程",
+        "HTML 解析、CSSOM、DOM、渲染树、布局和绘制",
+        "JS、CSS、图片等资源加载对渲染的影响",
+        "HTTP 缓存",
+        "预加载",
+        "性能指标"
+      ],
+      "referenceAnswer": "浏览器会先解析 URL，检查缓存、HSTS、Service Worker 等策略，然后进行 DNS 解析，建立 TCP 连接，HTTPS 还要完成 TLS 握手，再发送 HTTP 请求并接收响应。拿到 HTML 后，浏览器解析 DOM，加载并解析 CSS 形成 CSSOM，合成渲染树，进行布局、绘制和合成。JavaScript 可能阻塞解析或修改 DOM/CSSOM，CSS、字体、图片等资源也会影响首屏。真实项目里还要关注缓存、压缩、HTTP/2、多路复用、预加载和 Core Web Vitals。",
+      "excellentAnswer": "我会按“请求链路”和“渲染链路”分开讲。请求链路看 DNS、连接复用、TLS、缓存、CDN；渲染链路看 HTML 流式解析、关键 CSS、阻塞脚本、布局绘制和合成。排查首屏慢时，我会用 Performance、Network、LCP、TTFB、CLS 等指标定位是后端慢、网络慢、资源大，还是主线程阻塞。这个题能体现候选人是否把前端当完整链路来理解。",
+      "followUps": [
+        "如果在真实项目里遇到 输入 URL 到页面展示 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "URL 解析、缓存检查和 DNS 解析",
+          "TCP/TLS/HTTP 请求响应流程",
+          "HTML 解析、CSSOM、DOM、渲染树、布局和绘制",
+          "JS、CSS、图片等资源加载对渲染的影响"
+        ],
+        "goodToHave": [
+          "HTTP 缓存",
+          "预加载",
+          "性能指标"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:Front End Interview Handbook",
+      "license": "MIT",
+      "attribution": "Front End Interview Handbook；许可证：MIT；来源：https://github.com/yangshun/front-end-interview-handbook",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_browser_url_flow_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0063",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0063",
+        "sourceName": "Front End Interview Handbook",
+        "sourceUrl": "https://github.com/yangshun/front-end-interview-handbook",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "Explain event delegation in JavaScript and when you would use it.",
+      "category": "前端",
+      "skill": "JavaScript 事件机制",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是事件委托？它适合解决什么问题，在复杂组件里使用时要注意哪些边界？",
+      "keywords": [
+        "JavaScript",
+        "事件委托",
+        "事件冒泡",
+        "DOM",
+        "性能"
+      ],
+      "expectedPoints": [
+        "利用事件冒泡把监听器绑定到父节点",
+        "减少大量子节点监听器",
+        "适合动态列表和表格",
+        "注意 target、stopPropagation、事件类型和可访问性",
+        "捕获阶段",
+        "React 合成事件",
+        "内存占用"
+      ],
+      "referenceAnswer": "事件委托是利用事件冒泡，把事件监听器绑定到父元素或更高层容器上，通过 event.target 判断实际触发的子元素。它适合大量列表项、动态增删节点、表格操作等场景，可以减少监听器数量和重复绑定。使用时要注意某些事件不冒泡或行为特殊，内部组件调用 stopPropagation 会影响委托，target 可能是子节点而不是目标按钮，还要处理键盘交互和可访问性。",
+      "excellentAnswer": "我会说事件委托不是万能性能优化，而是一种事件管理方式。列表操作、菜单、表格行按钮很适合；拖拽、复杂嵌套交互或需要组件隔离时要谨慎。真实项目里我会用 closest 找到声明了 data-action 的元素，避免依赖脆弱的 DOM 层级，并在组件销毁时清理顶层监听器。React 中还要理解合成事件和原生事件的边界。",
+      "followUps": [
+        "如果在真实项目里遇到 事件委托 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "利用事件冒泡把监听器绑定到父节点",
+          "减少大量子节点监听器",
+          "适合动态列表和表格",
+          "注意 target、stopPropagation、事件类型和可访问性"
+        ],
+        "goodToHave": [
+          "捕获阶段",
+          "React 合成事件",
+          "内存占用"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:Front End Interview Handbook",
+      "license": "MIT",
+      "attribution": "Front End Interview Handbook；许可证：MIT；来源：https://github.com/yangshun/front-end-interview-handbook",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_event_delegation_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0064",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0064",
+        "sourceName": "Front End Interview Handbook",
+        "sourceUrl": "https://github.com/yangshun/front-end-interview-handbook",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "How do you optimize the performance of a large frontend page?",
+      "category": "前端",
+      "skill": "前端性能优化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "一个大型前端页面首屏慢、交互卡顿，你会如何系统优化？请区分加载性能、渲染性能和运行时性能。",
+      "keywords": [
+        "前端性能",
+        "首屏",
+        "渲染优化",
+        "代码分割",
+        "性能指标"
+      ],
+      "expectedPoints": [
+        "先用指标和工具定位瓶颈",
+        "加载层面压缩、缓存、分包、预加载",
+        "渲染层面减少重排重绘和虚拟列表",
+        "运行时层面减少主线程长任务和无效渲染",
+        "LCP",
+        "INP",
+        "Performance"
+      ],
+      "referenceAnswer": "大型页面优化要先定位瓶颈，例如用 Lighthouse、Performance、Network、Web Vitals 看 TTFB、LCP、INP、资源体积和主线程长任务。加载层面可以做代码分割、懒加载、压缩、缓存、CDN、图片优化和预加载关键资源。渲染层面减少不必要 DOM、使用虚拟列表、避免频繁布局抖动。运行时层面减少重复计算、无效渲染、长任务和过大的状态更新。优化后要用真实设备和线上指标验证。",
+      "excellentAnswer": "我会先建立基线，不会直接堆优化。首屏慢可能是后端 TTFB、包太大、图片慢、CSS 阻塞，也可能是 JS 执行太久。交互卡顿要看长任务、React render 次数、列表规模和事件处理。方案上会结合路由级分包、资源优先级、SSR/SSG、虚拟滚动、memo、Web Worker 和缓存策略，但每个方案都要用 LCP、INP、错误率和业务转化验证。",
+      "followUps": [
+        "如果在真实项目里遇到 大型前端页面性能优化 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "先用指标和工具定位瓶颈",
+          "加载层面压缩、缓存、分包、预加载",
+          "渲染层面减少重排重绘和虚拟列表",
+          "运行时层面减少主线程长任务和无效渲染"
+        ],
+        "goodToHave": [
+          "LCP",
+          "INP",
+          "Performance",
+          "Bundle 分析"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:Front End Interview Handbook",
+      "license": "MIT",
+      "attribution": "Front End Interview Handbook；许可证：MIT；来源：https://github.com/yangshun/front-end-interview-handbook",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_large_page_performance_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0068",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0068",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are the major features of React?",
+      "category": "前端",
+      "skill": "React 基础",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "React 的核心特性有哪些？为什么它适合构建复杂交互界面？",
+      "keywords": [
+        "React",
+        "组件化",
+        "声明式 UI",
+        "状态驱动",
+        "生态"
+      ],
+      "expectedPoints": [
+        "组件化复用",
+        "声明式 UI",
+        "状态驱动渲染",
+        "生态和工具链支持",
+        "虚拟 DOM",
+        "Hooks",
+        "单向数据流"
+      ],
+      "referenceAnswer": "React 的核心特性包括组件化、声明式 UI、状态驱动渲染和单向数据流。组件化让复杂页面拆成可复用、可测试的单元；声明式写法让开发者描述状态对应的界面，而不是手动操作 DOM；状态变化触发渲染，使 UI 和数据关系更清晰。React 生态还提供路由、状态管理、SSR、测试和构建工具，适合中大型复杂交互应用。",
+      "excellentAnswer": "我会补充 React 的优势来自模型简单和生态成熟，而不是“虚拟 DOM 一定最快”。真实项目里，组件边界、状态归属、数据流、性能优化和可维护性才是关键。Hooks 让逻辑复用更自然，但也要求理解依赖数组、闭包和渲染时机。回答时既要讲特性，也要讲复杂项目里的组织方式。",
+      "followUps": [
+        "如果在真实项目里遇到 React 核心特性 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "组件化复用",
+          "声明式 UI",
+          "状态驱动渲染",
+          "生态和工具链支持"
+        ],
+        "goodToHave": [
+          "虚拟 DOM",
+          "Hooks",
+          "单向数据流"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_features_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0069",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0069",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is JSX?",
+      "category": "前端",
+      "skill": "React 基础",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "JSX 是什么？它和模板语法、React.createElement 之间是什么关系？",
+      "keywords": [
+        "React",
+        "JSX",
+        "createElement",
+        "编译",
+        "组件"
+      ],
+      "expectedPoints": [
+        "JSX 是 JavaScript 的语法扩展",
+        "会被编译成函数调用或 JSX runtime",
+        "可以嵌入表达式而不是语句",
+        "需要注意属性命名和 XSS 转义",
+        "Babel",
+        "自动 runtime",
+        "key"
+      ],
+      "referenceAnswer": "JSX 是 JavaScript 的语法扩展，用类似 XML 的形式描述 UI。它不会被浏览器直接执行，通常由 Babel、TypeScript 或构建工具编译成 React.createElement 调用，或新版 JSX runtime 的 jsx/jsxs 函数调用。JSX 中可以使用表达式、组件和属性，但不能直接写任意语句。React 会默认转义文本内容，降低 XSS 风险，但 dangerouslySetInnerHTML 仍需要谨慎处理。",
+      "excellentAnswer": "我会说明 JSX 的价值是把 UI 结构和相关逻辑放在同一个组件语境中，而不是一种必须的模板语言。它本质还是 JS，所以 map、条件表达式、函数组合都能自然使用。工程上要注意 className、htmlFor、style 对象、key、组件名大写等规则，并理解编译后产物，这样排查构建、类型和运行时问题会更清楚。",
+      "followUps": [
+        "如果在真实项目里遇到 JSX 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "JSX 是 JavaScript 的语法扩展",
+          "会被编译成函数调用或 JSX runtime",
+          "可以嵌入表达式而不是语句",
+          "需要注意属性命名和 XSS 转义"
+        ],
+        "goodToHave": [
+          "Babel",
+          "自动 runtime",
+          "key"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_jsx_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0070",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0070",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is the difference between an Element and a Component?",
+      "category": "前端",
+      "skill": "React 基础",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React Element 和 Component 有什么区别？为什么说 Element 是不可变的 UI 描述？",
+      "keywords": [
+        "React",
+        "Element",
+        "Component",
+        "不可变",
+        "渲染"
+      ],
+      "expectedPoints": [
+        "Element 是描述 UI 的普通对象",
+        "Component 是返回 Element 的函数或类",
+        "Element 不可变，变化通过重新渲染产生新 Element",
+        "组件承载状态、逻辑和生命周期",
+        "JSX 编译",
+        "reconciliation",
+        "props"
+      ],
+      "referenceAnswer": "React Element 是描述 UI 的普通对象，包含 type、props、key 等信息；Component 是函数或类，用来接收 props、管理逻辑并返回 Element。Element 一旦创建就应视为不可变，UI 变化不是修改旧 Element，而是状态或 props 变化后重新执行组件，生成新的 Element 树，再由 React 做协调更新真实 DOM。理解这个区别有助于理解声明式渲染和不可变数据思路。",
+      "excellentAnswer": "我会把 Component 看成“配方”，Element 看成“配方执行后得到的描述”。JSX 写的 <Button /> 最终是一个 Element，而 Button 函数组件负责根据输入返回它。真实项目中我们不直接修改 Element，而是更新状态，让 React 重新计算 UI。这个模型配合 reconciliation，使复杂 UI 可以用数据变化驱动，而不是手动命令式操作 DOM。",
+      "followUps": [
+        "如果在真实项目里遇到 Element 和 Component 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Element 是描述 UI 的普通对象",
+          "Component 是返回 Element 的函数或类",
+          "Element 不可变，变化通过重新渲染产生新 Element",
+          "组件承载状态、逻辑和生命周期"
+        ],
+        "goodToHave": [
+          "JSX 编译",
+          "reconciliation",
+          "props"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_element_component_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0075",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0075",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is state in React?",
+      "category": "前端",
+      "skill": "React 状态管理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "React 中 state 的作用是什么？为什么更新 state 时要避免直接修改原对象？",
+      "keywords": [
+        "React",
+        "state",
+        "不可变更新",
+        "setState",
+        "渲染"
+      ],
+      "expectedPoints": [
+        "state 表示组件内部随时间变化的数据",
+        "通过 setState/useState setter 触发渲染",
+        "避免直接修改原对象或数组",
+        "不可变更新便于比较和追踪变化",
+        "批处理",
+        "闭包旧值",
+        "函数式更新"
+      ],
+      "referenceAnswer": "state 用来描述组件内部会随交互、请求或时间变化的数据。React 依靠 state 和 props 的变化重新渲染 UI，因此更新 state 应使用 setState 或 useState 返回的 setter，而不是直接修改原对象。直接 mutation 可能让引用不变，导致 React 或 memo 化逻辑无法感知变化，也会让调试和回滚困难。更新依赖旧值时应使用函数式更新，避免闭包拿到旧 state。",
+      "excellentAnswer": "我会强调 state 是 UI 的数据源之一。设计 state 时要避免冗余和派生状态，把能从 props 或其他 state 计算出来的值现场计算。对象和数组更新要创建新引用，例如 map/filter/spread。React 18 的批处理会让多次更新合并，写代码时要理解更新是异步调度的，不要在 set 后立刻假设变量已经变了。",
+      "followUps": [
+        "如果在真实项目里遇到 React state 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "state 表示组件内部随时间变化的数据",
+          "通过 setState/useState setter 触发渲染",
+          "避免直接修改原对象或数组",
+          "不可变更新便于比较和追踪变化"
+        ],
+        "goodToHave": [
+          "批处理",
+          "闭包旧值",
+          "函数式更新"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_state_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0077",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0077",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is the difference between state and props?",
+      "category": "前端",
+      "skill": "React 状态管理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 中 state 和 props 有什么区别？什么时候应该把状态提升到父组件？",
+      "keywords": [
+        "React",
+        "state",
+        "props",
+        "状态提升",
+        "单向数据流"
+      ],
+      "expectedPoints": [
+        "props 由父组件传入，state 由组件自身管理",
+        "props 应视为只读",
+        "共享状态应提升到共同父组件",
+        "避免复制 props 到 state 造成不同步",
+        "受控组件",
+        "派生状态",
+        "状态归属"
+      ],
+      "referenceAnswer": "props 是父组件传给子组件的输入，子组件应视为只读；state 是组件内部拥有并更新的数据。决定状态放哪里，要看谁需要读取和修改它。如果多个兄弟组件需要共享同一份数据，通常把状态提升到它们的共同父组件，再通过 props 下发和回调上报变化。不要随意把 props 复制到 state，否则父组件更新后容易出现两份数据不同步。",
+      "excellentAnswer": "我会用“状态归属”回答：谁拥有修改权，谁负责保存；谁只是展示，就通过 props 接收。表单输入是典型受控组件场景，父组件需要统一校验和提交时就提升状态；局部展开收起、hover 这类只影响子组件的状态可以留在本地。复杂项目还要考虑 URL state、服务端缓存 state 和全局客户端 state 的边界。",
+      "followUps": [
+        "如果在真实项目里遇到 state 和 props 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "props 由父组件传入，state 由组件自身管理",
+          "props 应视为只读",
+          "共享状态应提升到共同父组件",
+          "避免复制 props 到 state 造成不同步"
+        ],
+        "goodToHave": [
+          "受控组件",
+          "派生状态",
+          "状态归属"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_state_props_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0078",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0078",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is the difference between HTML and React event handling?",
+      "category": "前端",
+      "skill": "React 事件机制",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 事件处理和原生 HTML/DOM 事件处理有什么区别？",
+      "keywords": [
+        "React",
+        "事件处理",
+        "合成事件",
+        "DOM",
+        "事件委托"
+      ],
+      "expectedPoints": [
+        "React 使用 camelCase 事件名",
+        "传入函数而不是字符串",
+        "合成事件封装浏览器差异",
+        "事件委托和批处理会影响更新时机",
+        "preventDefault",
+        "stopPropagation",
+        "原生事件边界"
+      ],
+      "referenceAnswer": "React 事件使用 camelCase 命名，例如 onClick，并传入函数引用而不是 HTML 字符串。React 会通过合成事件封装不同浏览器差异，并在内部使用事件委托机制管理监听器。事件回调中调用 setState 会进入 React 的调度和批处理流程。阻止默认行为要使用 event.preventDefault，而不是 return false。某些需要直接接触 DOM 或第三方库的场景，要注意 React 合成事件和原生事件的边界。",
+      "excellentAnswer": "我会补充 React 的事件不是简单等同于 addEventListener。它服务于 React 的渲染和调度模型，所以更新可能被批处理，事件传播也可能受到组件树和原生 DOM 的共同影响。大多数业务代码用 React 事件即可；在 document、window、第三方组件、拖拽或埋点场景中使用原生事件时，要负责清理监听器，并理解两套事件可能交错。",
+      "followUps": [
+        "如果在真实项目里遇到 React 事件处理 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "React 使用 camelCase 事件名",
+          "传入函数而不是字符串",
+          "合成事件封装浏览器差异",
+          "事件委托和批处理会影响更新时机"
+        ],
+        "goodToHave": [
+          "preventDefault",
+          "stopPropagation",
+          "原生事件边界"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_event_html_diff_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0082",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0082",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is Virtual DOM?",
+      "category": "前端",
+      "skill": "React 渲染机制",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是 Virtual DOM？它解决了什么问题，为什么不能简单说 Virtual DOM 一定比手写 DOM 快？",
+      "keywords": [
+        "React",
+        "Virtual DOM",
+        "diff",
+        "渲染",
+        "性能"
+      ],
+      "expectedPoints": [
+        "Virtual DOM 是 UI 的轻量描述",
+        "通过 diff/reconciliation 计算更新",
+        "提升声明式开发和跨平台抽象",
+        "不保证绝对比手写 DOM 快",
+        "批量更新",
+        "Fiber",
+        "真实瓶颈"
+      ],
+      "referenceAnswer": "Virtual DOM 是用 JavaScript 对象描述 UI 树的抽象。状态变化后，React 生成新的描述树，通过协调算法比较前后差异，再把必要变更提交到真实 DOM。它的核心价值不只是性能，而是让开发者用声明式模型管理复杂 UI，同时为跨平台渲染、批量更新和调度提供基础。手写 DOM 在小范围精确更新时可能更快，但复杂应用中手写维护一致性成本很高。",
+      "excellentAnswer": "我会避免“虚拟 DOM 更快”这种绝对说法。Virtual DOM 的优势是抽象和可维护性，配合 diff、批处理和 Fiber 调度，让大规模 UI 更新更可控。真正性能问题常来自组件重复渲染、列表过大、主线程长任务、布局抖动，而不是有没有 Virtual DOM。面试里能讲出这个取舍，比背定义更有价值。",
+      "followUps": [
+        "如果在真实项目里遇到 Virtual DOM 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Virtual DOM 是 UI 的轻量描述",
+          "通过 diff/reconciliation 计算更新",
+          "提升声明式开发和跨平台抽象",
+          "不保证绝对比手写 DOM 快"
+        ],
+        "goodToHave": [
+          "批量更新",
+          "Fiber",
+          "真实瓶颈"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_virtual_dom_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0085",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0085",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is React Fiber?",
+      "category": "前端",
+      "skill": "React 渲染机制",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "React Fiber 的主要目标是什么？它和可中断渲染、优先级调度有什么关系？",
+      "keywords": [
+        "React",
+        "Fiber",
+        "调度",
+        "并发渲染",
+        "优先级"
+      ],
+      "expectedPoints": [
+        "Fiber 是 React 的内部节点和调度架构",
+        "把渲染工作拆成可暂停、恢复、丢弃的小单元",
+        "支持优先级和并发能力",
+        "提交阶段仍需要一次性提交副作用",
+        "render phase",
+        "commit phase",
+        "用户交互优先"
+      ],
+      "referenceAnswer": "Fiber 是 React 重新设计的协调架构，每个 Fiber 节点代表一段可管理的渲染工作。它让 React 可以把渲染拆成小单元，根据优先级暂停、恢复或丢弃某些工作，从而让用户输入、动画等高优先级任务更及时。Fiber 支撑并发渲染、时间切片和更细粒度调度。但需要注意，render 阶段可以被中断，commit 阶段涉及真实 DOM 和副作用提交，必须保持一致性。",
+      "excellentAnswer": "我会把 Fiber 解释成 React 为了解决大组件树同步递归渲染卡顿而引入的工作单元模型。它不等于某个公开 API，但影响了 Suspense、并发特性和自动批处理等能力。工程上要知道 render 阶段可能被重复执行，所以不要在渲染过程中写副作用；副作用应放到 effect 或事件里。性能排查仍要看真实渲染次数和主线程长任务。",
+      "followUps": [
+        "如果在真实项目里遇到 React Fiber 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Fiber 是 React 的内部节点和调度架构",
+          "把渲染工作拆成可暂停、恢复、丢弃的小单元",
+          "支持优先级和并发能力",
+          "提交阶段仍需要一次性提交副作用"
+        ],
+        "goodToHave": [
+          "render phase",
+          "commit phase",
+          "用户交互优先"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_fiber_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0087",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0087",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are controlled components?",
+      "category": "前端",
+      "skill": "React 表单",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 受控组件是什么？它适合哪些表单场景，又会带来什么性能和复杂度问题？",
+      "keywords": [
+        "React",
+        "受控组件",
+        "表单",
+        "state",
+        "校验"
+      ],
+      "expectedPoints": [
+        "表单值由 React state 控制",
+        "输入变化通过 onChange 更新 state",
+        "便于校验、联动、提交和回显",
+        "大表单可能有渲染性能和状态复杂度",
+        "防抖",
+        "表单库",
+        "非受控组件"
+      ],
+      "referenceAnswer": "受控组件指表单元素的 value、checked 等值由 React state 控制，用户输入通过 onChange 更新 state，再由 state 驱动视图。它适合需要实时校验、字段联动、统一提交、回显和权限控制的表单。代价是每次输入都会触发状态更新和渲染，大型表单可能出现性能问题，状态结构也会变复杂。可以通过字段级组件、memo、防抖、表单库或局部非受控优化。",
+      "excellentAnswer": "我会说受控组件让数据流清晰，但不是所有输入都必须完全受控。登录、搜索、配置表单通常很适合；富文本、大文件上传、超大动态表单可能要结合非受控、refs 或专门表单库。工程上要避免整个页面因一个字段输入而重渲染，校验逻辑也要区分即时校验、失焦校验和提交校验。",
+      "followUps": [
+        "如果在真实项目里遇到 受控组件 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "表单值由 React state 控制",
+          "输入变化通过 onChange 更新 state",
+          "便于校验、联动、提交和回显",
+          "大表单可能有渲染性能和状态复杂度"
+        ],
+        "goodToHave": [
+          "防抖",
+          "表单库",
+          "非受控组件"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_controlled_component_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0089",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0089",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are uncontrolled components?",
+      "category": "前端",
+      "skill": "React 表单",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 非受控组件是什么？什么时候使用 ref 读取表单值比完全受控更合适？",
+      "keywords": [
+        "React",
+        "非受控组件",
+        "ref",
+        "表单",
+        "DOM"
+      ],
+      "expectedPoints": [
+        "表单值主要由 DOM 自身维护",
+        "通过 ref 在需要时读取值",
+        "适合简单表单、文件输入或第三方组件",
+        "不适合复杂实时联动和强校验",
+        "defaultValue",
+        "文件上传",
+        "表单库"
+      ],
+      "referenceAnswer": "非受控组件中，表单值主要由 DOM 元素自身维护，React 不在每次输入时同步保存 value，而是在提交或特定时机通过 ref 读取。它适合简单表单、文件上传、第三方非 React 组件集成，或对输入性能要求较高但不需要实时联动的场景。缺点是数据流不如受控组件清晰，实时校验、跨字段联动、统一状态回放会更麻烦。",
+      "excellentAnswer": "我会按业务需求选择，而不是站队。文件 input 本身就更适合非受控；大型表单也可以让底层字段非受控，提交时统一收集，减少输入时渲染压力。但如果有实时预览、条件展示、权限控制和复杂校验，受控更容易维护。无论哪种，都要避免 defaultValue 和 value 混乱导致状态不同步。",
+      "followUps": [
+        "如果在真实项目里遇到 非受控组件 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "表单值主要由 DOM 自身维护",
+          "通过 ref 在需要时读取值",
+          "适合简单表单、文件输入或第三方组件",
+          "不适合复杂实时联动和强校验"
+        ],
+        "goodToHave": [
+          "defaultValue",
+          "文件上传",
+          "表单库"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_uncontrolled_component_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0091",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0091",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is Lifting State Up in React?",
+      "category": "前端",
+      "skill": "React 状态管理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是 Lifting State Up？如何判断一个状态应该放在子组件、父组件、URL 还是全局状态里？",
+      "keywords": [
+        "React",
+        "状态提升",
+        "状态归属",
+        "URL state",
+        "全局状态"
+      ],
+      "expectedPoints": [
+        "共享状态提升到共同父组件",
+        "本地状态留在使用范围最小处",
+        "URL 适合可分享和可恢复状态",
+        "全局状态适合跨页面或跨模块共享",
+        "服务端缓存",
+        "状态最小化",
+        "派生状态"
+      ],
+      "referenceAnswer": "Lifting State Up 是把多个组件需要共享的状态移动到它们最近的共同父组件，由父组件持有状态并通过 props 和回调协调子组件。判断状态位置要看作用域和生命周期：只影响单个组件就留本地；兄弟组件共享就提升；需要刷新保留、可分享或浏览器前进后退的筛选条件适合放 URL；跨页面用户信息、主题等才考虑全局状态。服务端数据缓存又是另一类状态，不应和 UI 本地状态混在一起。",
+      "excellentAnswer": "我会追求状态放在“刚好够用”的地方。过早全局化会让依赖关系变乱，过度本地化又会造成数据不同步。真实项目里常把筛选和分页放 URL，把弹窗开关放局部，把登录用户放全局，把接口数据交给 React Query 这类服务端状态工具。这个题考的是状态建模能力。",
+      "followUps": [
+        "如果在真实项目里遇到 状态提升 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "共享状态提升到共同父组件",
+          "本地状态留在使用范围最小处",
+          "URL 适合可分享和可恢复状态",
+          "全局状态适合跨页面或跨模块共享"
+        ],
+        "goodToHave": [
+          "服务端缓存",
+          "状态最小化",
+          "派生状态"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_lifting_state_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0092",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0092",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are Higher-Order Components?",
+      "category": "前端",
+      "skill": "React 逻辑复用",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 高阶组件（HOC）是什么？它和 Hooks、render props 相比适合解决什么问题？",
+      "keywords": [
+        "React",
+        "HOC",
+        "Hooks",
+        "render props",
+        "逻辑复用"
+      ],
+      "expectedPoints": [
+        "HOC 是接收组件返回增强组件的函数",
+        "适合横切逻辑复用和能力注入",
+        "Hooks 更适合函数组件内部逻辑复用",
+        "注意 props 透传、displayName 和包装层级",
+        "权限",
+        "埋点",
+        "兼容类组件"
+      ],
+      "referenceAnswer": "高阶组件是一个函数，接收一个组件并返回增强后的新组件，用于复用权限控制、埋点、数据注入、主题等横切逻辑。Hooks 更适合在函数组件内部复用状态逻辑，render props 通过函数子节点暴露渲染控制。HOC 在兼容类组件或封装框架能力时仍有价值，但容易带来包装层级、props 命名冲突、ref 转发和调试困难。",
+      "excellentAnswer": "我会说 HOC 是 React 早期非常常见的逻辑复用模式，现在业务代码里很多场景会优先用 Hooks，但 HOC 没有消失。权限守卫、路由增强、错误边界封装、兼容老组件时仍可能使用。写 HOC 要透传无关 props，设置 displayName，必要时 forwardRef，并避免在 render 里动态创建 HOC。",
+      "followUps": [
+        "如果在真实项目里遇到 高阶组件 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "HOC 是接收组件返回增强组件的函数",
+          "适合横切逻辑复用和能力注入",
+          "Hooks 更适合函数组件内部逻辑复用",
+          "注意 props 透传、displayName 和包装层级"
+        ],
+        "goodToHave": [
+          "权限",
+          "埋点",
+          "兼容类组件"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_hoc_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0095",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0095",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is reconciliation?",
+      "category": "前端",
+      "skill": "React 渲染机制",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "React reconciliation 是什么？key 在列表 diff 中为什么重要？",
+      "keywords": [
+        "React",
+        "reconciliation",
+        "diff",
+        "key",
+        "列表渲染"
+      ],
+      "expectedPoints": [
+        "reconciliation 比较新旧元素树决定更新",
+        "不同 type 通常重建子树",
+        "同级列表通过 key 匹配身份",
+        "稳定 key 可减少错误复用和无效更新",
+        "索引 key 风险",
+        "状态保留",
+        "性能"
+      ],
+      "referenceAnswer": "Reconciliation 是 React 根据新旧 Element 树计算如何更新 UI 的过程。React 基于一些启发式规则，例如不同 type 的元素通常会重建子树，同级列表通过 key 判断元素身份。key 的作用不是给数组消警告，而是帮助 React 在插入、删除、排序时正确复用组件实例和 DOM。使用不稳定 key，尤其是会重排的列表中使用 index，可能导致状态错位、输入框内容错乱和多余渲染。",
+      "excellentAnswer": "我会强调 key 代表业务身份。列表项有数据库 id 就用 id，临时项也要生成稳定 id。index key 只适合静态、不排序、不插入删除的列表。理解 reconciliation 后，也能解释为什么改变组件 type 会丢状态，为什么同一个位置的组件可能复用状态。这个题能连接渲染机制、性能和真实 bug。",
+      "followUps": [
+        "如果在真实项目里遇到 Reconciliation 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "reconciliation 比较新旧元素树决定更新",
+          "不同 type 通常重建子树",
+          "同级列表通过 key 匹配身份",
+          "稳定 key 可减少错误复用和无效更新"
+        ],
+        "goodToHave": [
+          "索引 key 风险",
+          "状态保留",
+          "性能"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_reconciliation_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0099",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0099",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are portals in React?",
+      "category": "前端",
+      "skill": "React 组件模式",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React Portals 是什么？为什么弹窗、Tooltip、下拉菜单常用 Portal 实现？",
+      "keywords": [
+        "React",
+        "Portal",
+        "弹窗",
+        "层叠上下文",
+        "事件冒泡"
+      ],
+      "expectedPoints": [
+        "Portal 可把子节点渲染到父 DOM 层级之外",
+        "适合突破 overflow 和 stacking context 限制",
+        "React 事件仍按组件树冒泡",
+        "注意焦点管理、滚动锁定和可访问性",
+        "modal root",
+        "z-index",
+        "SSR"
+      ],
+      "referenceAnswer": "Portal 允许把 React 子节点渲染到当前父组件 DOM 层级之外的容器中，例如 document.body 下的 modal root。它常用于弹窗、Tooltip、Dropdown，因为这些浮层需要突破父容器的 overflow hidden、transform 或 z-index 层叠上下文限制。Portal 中的节点虽然在 DOM 位置变了，但 React 事件仍会沿 React 组件树传播。实现时要处理焦点陷阱、Esc 关闭、滚动锁定、层级管理和可访问性。",
+      "excellentAnswer": "我会把 Portal 当成浮层系统的基础能力，而不只是 API。复杂项目里要统一管理 z-index、滚动穿透、点击外部关闭、键盘导航和 aria 属性。SSR 场景还要注意 document 不存在以及挂载容器的创建时机。使用 Portal 后，样式隔离和事件边界也要重新检查。",
+      "followUps": [
+        "如果在真实项目里遇到 Portals 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Portal 可把子节点渲染到父 DOM 层级之外",
+          "适合突破 overflow 和 stacking context 限制",
+          "React 事件仍按组件树冒泡",
+          "注意焦点管理、滚动锁定和可访问性"
+        ],
+        "goodToHave": [
+          "modal root",
+          "z-index",
+          "SSR"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_portal_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0106",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0106",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is ReactDOMServer?",
+      "category": "前端",
+      "skill": "SSR",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "ReactDOMServer 的作用是什么？SSR 能解决哪些问题，又会带来哪些工程复杂度？",
+      "keywords": [
+        "React",
+        "ReactDOMServer",
+        "SSR",
+        "水合",
+        "首屏"
+      ],
+      "expectedPoints": [
+        "ReactDOMServer 在服务端把组件渲染为 HTML",
+        "SSR 可改善首屏和 SEO",
+        "客户端需要 hydration 绑定事件",
+        "带来服务端成本、数据预取和一致性问题",
+        "流式渲染",
+        "同构代码",
+        "缓存"
+      ],
+      "referenceAnswer": "ReactDOMServer 用于在服务端把 React 组件渲染成 HTML 字符串或流，浏览器先拿到可展示内容，再由客户端 React hydration 绑定事件并接管交互。SSR 可以改善首屏白屏、SEO 和弱网体验，但会增加服务端渲染成本、数据预取复杂度、缓存策略、同构代码兼容和 hydration mismatch 风险。是否使用 SSR 要看页面类型、性能瓶颈和运维成本。",
+      "excellentAnswer": "我会区分 SSR、SSG、CSR 和流式渲染。内容型、营销页、搜索入口更适合 SSR/SSG；高度个性化后台系统未必收益明显。工程上要解决服务端没有 window、接口鉴权、数据注水、错误边界、缓存失效和监控。SSR 不是免费首屏优化，它把一部分计算从客户端转移到了服务端。",
+      "followUps": [
+        "如果在真实项目里遇到 ReactDOMServer 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "ReactDOMServer 在服务端把组件渲染为 HTML",
+          "SSR 可改善首屏和 SEO",
+          "客户端需要 hydration 绑定事件",
+          "带来服务端成本、数据预取和一致性问题"
+        ],
+        "goodToHave": [
+          "流式渲染",
+          "同构代码",
+          "缓存"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_dom_server_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0107",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0107",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "How to use innerHTML in React?",
+      "category": "前端",
+      "skill": "前端安全",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 中如何使用 innerHTML？为什么 dangerouslySetInnerHTML 名字里带 dangerously，如何避免 XSS？",
+      "keywords": [
+        "React",
+        "dangerouslySetInnerHTML",
+        "XSS",
+        "HTML 注入",
+        "安全"
+      ],
+      "expectedPoints": [
+        "React 默认转义文本内容",
+        "dangerouslySetInnerHTML 可直接插入 HTML",
+        "未净化用户输入会造成 XSS",
+        "需要可信来源、白名单净化和 CSP 等防护",
+        "DOMPurify",
+        "富文本",
+        "服务端清洗"
+      ],
+      "referenceAnswer": "React 默认会转义文本内容，减少 XSS 风险。如果确实需要插入 HTML，比如富文本内容，可以使用 dangerouslySetInnerHTML。它危险是因为会绕过 React 的默认转义，未净化的用户输入可能执行恶意脚本、注入事件属性或危险链接。安全做法是只渲染可信内容，或使用成熟 HTML sanitizer 做白名单清洗，服务端和客户端都要有策略，并配合 CSP、链接协议校验和内容审核。",
+      "excellentAnswer": "我会先问 HTML 来自哪里。如果是后台运营富文本，也要经过白名单清洗，而不是相信“内部用户”。如果是用户评论，必须严格过滤标签、属性和 URL 协议。工程上可用 DOMPurify 这类库，但要配置白名单、定期升级，并考虑服务端渲染一致性。dangerouslySetInnerHTML 不是不能用，而是必须把安全边界说清楚。",
+      "followUps": [
+        "如果在真实项目里遇到 dangerouslySetInnerHTML 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "React 默认转义文本内容",
+          "dangerouslySetInnerHTML 可直接插入 HTML",
+          "未净化用户输入会造成 XSS",
+          "需要可信来源、白名单净化和 CSP 等防护"
+        ],
+        "goodToHave": [
+          "DOMPurify",
+          "富文本",
+          "服务端清洗"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_innerhtml_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0113",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0113",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "How do you memoize a component?",
+      "category": "前端",
+      "skill": "React 性能优化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 中如何 memoize 一个组件？React.memo、useMemo、useCallback 分别解决什么问题？",
+      "keywords": [
+        "React",
+        "React.memo",
+        "useMemo",
+        "useCallback",
+        "性能优化"
+      ],
+      "expectedPoints": [
+        "React.memo 跳过 props 未变的组件重渲染",
+        "useMemo 缓存计算结果",
+        "useCallback 缓存函数引用",
+        "优化前应先测量并注意依赖正确性",
+        "浅比较",
+        "闭包",
+        "过度优化"
+      ],
+      "referenceAnswer": "React.memo 用来包装组件，当 props 浅比较没有变化时跳过该组件渲染。useMemo 用来缓存昂贵计算的结果，useCallback 用来缓存函数引用，常用于传给 memo 子组件或 effect 依赖。它们解决的是重复渲染和引用变化问题，但不是默认都要加。错误依赖会造成旧数据闭包，过度 memo 也会增加比较和维护成本。优化前应通过 Profiler 或性能指标确认瓶颈。",
+      "excellentAnswer": "我会先找重渲染来源：父组件状态变化、props 引用每次新建、列表项过多，还是计算太重。React.memo 适合纯展示且 props 稳定的子组件；useMemo 适合昂贵计算；useCallback 不是让函数执行更快，而是让引用稳定。真实项目里我会先拆分状态和组件边界，再局部 memo，而不是满屏加 hook。",
+      "followUps": [
+        "如果在真实项目里遇到 组件 memo 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "React.memo 跳过 props 未变的组件重渲染",
+          "useMemo 缓存计算结果",
+          "useCallback 缓存函数引用",
+          "优化前应先测量并注意依赖正确性"
+        ],
+        "goodToHave": [
+          "浅比较",
+          "闭包",
+          "过度优化"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_memo_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0114",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0114",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "How you implement Server Side Rendering or SSR?",
+      "category": "前端",
+      "skill": "SSR 工程化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "如果让你实现一个 React SSR 页面，你会如何组织路由、数据预取、HTML 注水和客户端 hydration？",
+      "keywords": [
+        "React",
+        "SSR",
+        "数据预取",
+        "hydration",
+        "路由"
+      ],
+      "expectedPoints": [
+        "服务端根据路由匹配组件和数据需求",
+        "先获取数据再渲染 HTML",
+        "把初始数据安全注入页面",
+        "客户端用相同数据 hydration",
+        "流式渲染",
+        "缓存",
+        "错误降级"
+      ],
+      "referenceAnswer": "实现 React SSR 通常先在服务端根据请求 URL 匹配路由和组件，收集页面所需数据并完成鉴权、重定向等逻辑，然后用 ReactDOMServer 渲染 HTML。服务端要把初始数据安全地注入页面，客户端启动时用同一份数据 hydration，避免重复请求和 hydration mismatch。还要处理 CSS 收集、代码分割资源清单、缓存、错误降级、流式渲染和服务端监控。",
+      "excellentAnswer": "我会把 SSR 当成一条完整链路：请求进入 Node/BFF，匹配路由，预取数据，渲染 shell 和内容，注入序列化状态和资源标签，客户端加载对应 chunk 后 hydrate。难点在数据一致性、安全序列化、服务端无浏览器 API、性能缓存和错误隔离。上线要看 TTFB、LCP、hydration 错误、服务端 CPU 和降级成功率。",
+      "followUps": [
+        "如果在真实项目里遇到 SSR 实现 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "服务端根据路由匹配组件和数据需求",
+          "先获取数据再渲染 HTML",
+          "把初始数据安全注入页面",
+          "客户端用相同数据 hydration"
+        ],
+        "goodToHave": [
+          "流式渲染",
+          "缓存",
+          "错误降级"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_ssr_implementation_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0116",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0116",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "Do Hooks replace render props and higher order components?",
+      "category": "前端",
+      "skill": "React 逻辑复用",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Hooks 出现后是否完全替代 render props 和 HOC？在项目里如何选择逻辑复用方式？",
+      "keywords": [
+        "React",
+        "Hooks",
+        "HOC",
+        "render props",
+        "逻辑复用"
+      ],
+      "expectedPoints": [
+        "Hooks 简化函数组件逻辑复用",
+        "HOC/render props 仍在库和老代码中存在",
+        "选择取决于组件类型、封装边界和兼容性",
+        "注意 Hooks 规则和依赖",
+        "自定义 Hook",
+        "类组件兼容",
+        "包装层级"
+      ],
+      "referenceAnswer": "Hooks 大幅简化了函数组件中的状态逻辑复用，自定义 Hook 通常比 render props 和 HOC 更直接，不会增加额外组件层级。但它没有完全替代后两者：HOC 仍适合封装权限、路由、错误边界或兼容类组件，render props 适合把渲染控制权交给调用方。项目选择时要考虑老代码、第三方库、类型表达、调试成本和团队习惯。Hooks 必须遵守调用顺序规则，并正确维护依赖数组。",
+      "excellentAnswer": "我会优先用自定义 Hook 复用纯逻辑，用普通组件复用 UI，用 HOC 做横切增强或兼容，用 render props 处理需要调用方决定渲染结构的能力。重要的是不要为了模式而模式。真实项目里还要关注 Hook 依赖、闭包旧值、测试方式和组件边界，否则复用逻辑会变成隐藏耦合。",
+      "followUps": [
+        "如果在真实项目里遇到 Hooks 与复用模式 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Hooks 简化函数组件逻辑复用",
+          "HOC/render props 仍在库和老代码中存在",
+          "选择取决于组件类型、封装边界和兼容性",
+          "注意 Hooks 规则和依赖"
+        ],
+        "goodToHave": [
+          "自定义 Hook",
+          "类组件兼容",
+          "包装层级"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_hooks_hoc_render_props_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0125",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0125",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is the difference between React and ReactDOM?",
+      "category": "前端",
+      "skill": "React 架构",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 和 ReactDOM 有什么区别？为什么 ReactDOM 被拆成独立包？",
+      "keywords": [
+        "React",
+        "ReactDOM",
+        "Renderer",
+        "跨平台",
+        "DOM"
+      ],
+      "expectedPoints": [
+        "React 提供组件、元素、Hooks 等核心抽象",
+        "ReactDOM 是面向浏览器 DOM 的渲染器",
+        "拆分有利于跨平台渲染",
+        "不同 renderer 共享 React 核心",
+        "React Native",
+        "createRoot",
+        "hydrateRoot"
+      ],
+      "referenceAnswer": "React 包提供组件模型、Element、Hooks、Context 等核心抽象；ReactDOM 是面向浏览器 DOM 的 renderer，负责把 React 的描述提交到真实 DOM，并提供 createRoot、hydrateRoot、createPortal 等能力。拆分 React 和 ReactDOM 是为了让 React 核心与具体平台解耦，同一套组件思想可以由 ReactDOM、React Native 或其他 renderer 渲染到不同目标。",
+      "excellentAnswer": "我会用“核心 reconciler + 平台 renderer”解释。React 负责描述 UI 和调度更新，ReactDOM 负责浏览器平台的 DOM 操作、事件系统和 hydration。这样设计让跨平台成为可能，也让服务端渲染、原生渲染和测试渲染有不同入口。工程上升级 React 版本时，也要注意 React 和 ReactDOM 版本匹配。",
+      "followUps": [
+        "如果在真实项目里遇到 React 和 ReactDOM 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "React 提供组件、元素、Hooks 等核心抽象",
+          "ReactDOM 是面向浏览器 DOM 的渲染器",
+          "拆分有利于跨平台渲染",
+          "不同 renderer 共享 React 核心"
+        ],
+        "goodToHave": [
+          "React Native",
+          "createRoot",
+          "hydrateRoot"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_reactdom_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0131",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0131",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "Why can't you update props in React?",
+      "category": "前端",
+      "skill": "React 数据流",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "为什么 React 子组件不能直接修改 props？如果子组件需要改变父组件数据，应该怎么设计？",
+      "keywords": [
+        "React",
+        "props",
+        "单向数据流",
+        "不可变",
+        "回调"
+      ],
+      "expectedPoints": [
+        "props 是父组件传入的只读数据",
+        "单向数据流便于追踪变化",
+        "子组件通过回调或事件通知父组件",
+        "共享状态由共同拥有者维护",
+        "受控组件",
+        "状态提升",
+        "不可变更新"
+      ],
+      "referenceAnswer": "props 是父组件传给子组件的输入，子组件应视为只读。React 的单向数据流依赖父组件拥有状态并决定如何更新，子组件直接修改 props 会破坏数据来源，导致 UI 不可预测，也可能因为引用未变而无法触发正确渲染。如果子组件需要改变父组件数据，应由父组件传入回调，子组件用事件参数通知父组件，父组件再更新 state 并重新下发 props。",
+      "excellentAnswer": "我会把它解释成所有权问题：谁拥有状态，谁负责修改。表单输入中，父组件传 value 和 onChange，子组件只负责展示和触发。复杂场景可以提升状态、使用 Context 或状态管理库，但原则仍是明确数据写入路径。这样调试时能顺着事件和状态变化找到来源。",
+      "followUps": [
+        "如果在真实项目里遇到 props 不可变 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "props 是父组件传入的只读数据",
+          "单向数据流便于追踪变化",
+          "子组件通过回调或事件通知父组件",
+          "共享状态由共同拥有者维护"
+        ],
+        "goodToHave": [
+          "受控组件",
+          "状态提升",
+          "不可变更新"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_props_immutable_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0138",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0138",
+        "sourceName": "ReactJS Interview Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are the common folder structures for React?",
+      "category": "前端",
+      "skill": "前端工程化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 项目常见目录结构如何设计？按技术类型分层和按业务模块分层各有什么取舍？",
+      "keywords": [
+        "React",
+        "目录结构",
+        "模块化",
+        "工程化",
+        "可维护性"
+      ],
+      "expectedPoints": [
+        "小项目可按 components/hooks/utils 分层",
+        "中大型项目更适合按业务模块或 feature 组织",
+        "公共组件和领域组件要区分",
+        "目录结构服务于边界、依赖和协作",
+        "barrel exports",
+        "依赖规则",
+        "monorepo"
+      ],
+      "referenceAnswer": "React 项目可以按技术类型分层，例如 components、hooks、utils、services；小项目简单直观。中大型业务更常按 feature 或 domain 组织，把页面、组件、hooks、api、types、测试放在同一业务模块下，降低跨目录跳转和隐式耦合。公共基础组件、业务领域组件和页面组件应区分边界。目录结构没有唯一答案，关键是依赖方向清晰、命名稳定、团队协作成本低。",
+      "excellentAnswer": "我会根据项目规模演进。早期不用过度设计；业务模块多起来后，按 feature 收敛会更好维护。还要配合 lint 规则限制跨模块私有文件引用，公共能力沉淀到 shared 或 packages。目录结构不是为了好看，而是让新人能找到代码、让重构影响范围可控、让模块边界不被随手打穿。",
+      "followUps": [
+        "如果在真实项目里遇到 React 目录结构 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "小项目可按 components/hooks/utils 分层",
+          "中大型项目更适合按业务模块或 feature 组织",
+          "公共组件和领域组件要区分",
+          "目录结构服务于边界、依赖和协作"
+        ],
+        "goodToHave": [
+          "barrel exports",
+          "依赖规则",
+          "monorepo"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:ReactJS Interview Questions",
+      "license": "MIT",
+      "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_react_folder_structure_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0141",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0141",
+        "sourceName": "JavaScript Questions",
+        "sourceUrl": "https://github.com/lydiahallie/javascript-questions",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "What is the difference between var, let, and const?",
+      "category": "前端",
+      "skill": "JavaScript 基础",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "JavaScript 中 var、let、const 有什么区别？请结合作用域、提升、暂时性死区和可变性说明。",
+      "keywords": [
+        "JavaScript",
+        "var",
+        "let",
+        "const",
+        "作用域"
+      ],
+      "expectedPoints": [
+        "var 是函数作用域，let/const 是块级作用域",
+        "var 存在变量提升并初始化为 undefined",
+        "let/const 有暂时性死区",
+        "const 限制绑定不可重新赋值但对象内容可变",
+        "全局对象属性",
+        "循环闭包",
+        "代码规范"
+      ],
+      "referenceAnswer": "var 是函数作用域，存在变量提升，声明会提升并初始化为 undefined；let 和 const 是块级作用域，也会提升但在声明前处于暂时性死区，访问会报错。const 表示绑定不可重新赋值，不代表对象内部属性不可变。现代代码通常优先使用 const，确实需要重新赋值时用 let，尽量避免 var，以减少作用域泄漏和循环闭包问题。",
+      "excellentAnswer": "我会补充实际 bug 场景：for 循环里用 var 绑定异步回调可能拿到同一个变量，let 每轮有新的词法绑定；全局 var 还可能成为全局对象属性。const 能表达意图，但对象仍需 Object.freeze 或不可变数据策略才能限制内部修改。这个题看似基础，但能看出候选人是否理解 JS 词法环境。",
+      "followUps": [
+        "如果在真实项目里遇到 var let const 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "var 是函数作用域，let/const 是块级作用域",
+          "var 存在变量提升并初始化为 undefined",
+          "let/const 有暂时性死区",
+          "const 限制绑定不可重新赋值但对象内容可变"
+        ],
+        "goodToHave": [
+          "全局对象属性",
+          "循环闭包",
+          "代码规范"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaScript Questions",
+      "license": "MIT",
+      "attribution": "JavaScript Questions；许可证：MIT；来源：https://github.com/lydiahallie/javascript-questions",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_js_var_let_const_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0142",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0142",
+        "sourceName": "JavaScript Questions",
+        "sourceUrl": "https://github.com/lydiahallie/javascript-questions",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "How does the JavaScript event loop work?",
+      "category": "前端",
+      "skill": "JavaScript 运行时",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "JavaScript 事件循环如何工作？宏任务、微任务、渲染时机和 async/await 之间有什么关系？",
+      "keywords": [
+        "JavaScript",
+        "事件循环",
+        "宏任务",
+        "微任务",
+        "async/await"
+      ],
+      "expectedPoints": [
+        "调用栈清空后事件循环取任务执行",
+        "微任务在当前宏任务结束后优先清空",
+        "Promise/await 后续通常进入微任务",
+        "浏览器渲染穿插在任务和微任务之后",
+        "setTimeout",
+        "requestAnimationFrame",
+        "长任务"
+      ],
+      "referenceAnswer": "JavaScript 主线程一次执行一个任务。同步代码进入调用栈执行，栈清空后事件循环从任务队列取宏任务；每个宏任务结束后，会清空微任务队列，例如 Promise then、await 后续逻辑通常作为微任务执行。浏览器会在合适时机进行样式计算、布局和绘制，长任务或连续微任务会阻塞渲染和用户输入。setTimeout 是宏任务，requestAnimationFrame 通常在下一帧绘制前执行。",
+      "excellentAnswer": "我会用一段代码解释输出顺序，但更重要的是工程影响。大量同步计算、递归微任务或过大的 Promise 链会卡住主线程，导致点击无响应和动画掉帧。优化时可以拆任务、用 requestIdleCallback、Web Worker 或服务端处理。async/await 只是 Promise 的语法糖，不能把 CPU 密集任务变成非阻塞。",
+      "followUps": [
+        "如果在真实项目里遇到 事件循环 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "调用栈清空后事件循环取任务执行",
+          "微任务在当前宏任务结束后优先清空",
+          "Promise/await 后续通常进入微任务",
+          "浏览器渲染穿插在任务和微任务之后"
+        ],
+        "goodToHave": [
+          "setTimeout",
+          "requestAnimationFrame",
+          "长任务"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaScript Questions",
+      "license": "MIT",
+      "attribution": "JavaScript Questions；许可证：MIT；来源：https://github.com/lydiahallie/javascript-questions",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_js_event_loop_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0143",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0143",
+        "sourceName": "JavaScript Questions",
+        "sourceUrl": "https://github.com/lydiahallie/javascript-questions",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "What are closures in JavaScript and where are they useful?",
+      "category": "前端",
+      "skill": "JavaScript 基础",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是 JavaScript 闭包？它常用于哪些场景，又可能带来哪些内存或状态问题？",
+      "keywords": [
+        "JavaScript",
+        "闭包",
+        "词法作用域",
+        "状态封装",
+        "内存"
+      ],
+      "expectedPoints": [
+        "闭包是函数引用其词法作用域中的变量",
+        "可用于封装状态、函数工厂、回调和模块化",
+        "变量生命周期可能被延长",
+        "注意循环、旧值和内存泄漏",
+        "React Hooks",
+        "防抖节流",
+        "私有变量"
+      ],
+      "referenceAnswer": "闭包指函数即使在定义它的外层作用域执行结束后，仍然可以访问该词法作用域中的变量。它常用于封装私有状态、函数工厂、回调、防抖节流和模块化。闭包会延长被引用变量的生命周期，如果引用了大对象、DOM 节点或过期状态，可能造成内存泄漏或逻辑旧值问题。React Hooks 中的依赖数组和旧闭包问题也是闭包在工程里的典型体现。",
+      "excellentAnswer": "我会用“函数带着它出生时的作用域”来解释。闭包本身不是坏事，JS 异步和函数式写法大量依赖它。真正要小心的是意外捕获：比如循环变量、定时器、事件监听器没有清理，或者 useEffect 依赖漏写导致读取旧 state。能把闭包和实际 bug 联系起来，说明理解不是停留在定义。",
+      "followUps": [
+        "如果在真实项目里遇到 闭包 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "闭包是函数引用其词法作用域中的变量",
+          "可用于封装状态、函数工厂、回调和模块化",
+          "变量生命周期可能被延长",
+          "注意循环、旧值和内存泄漏"
+        ],
+        "goodToHave": [
+          "React Hooks",
+          "防抖节流",
+          "私有变量"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:JavaScript Questions",
+      "license": "MIT",
+      "attribution": "JavaScript Questions；许可证：MIT；来源：https://github.com/lydiahallie/javascript-questions",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_js_closure_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0169",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0169",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "Explain generics in TypeScript",
+      "category": "前端",
+      "skill": "TypeScript 类型系统",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "TypeScript 泛型解决什么问题？在封装 API 请求、组件 props 或工具函数时如何避免泛型滥用？",
+      "keywords": [
+        "TypeScript",
+        "泛型",
+        "类型约束",
+        "API",
+        "组件"
+      ],
+      "expectedPoints": [
+        "泛型用于在调用时传递类型信息",
+        "保持输入输出类型关系",
+        "可用 extends 约束泛型能力",
+        "避免无意义泛型和过度抽象",
+        "默认泛型",
+        "keyof",
+        "类型推断"
+      ],
+      "referenceAnswer": "泛型让函数、类型或组件在定义时不固定具体类型，而是在使用时由调用方传入或由编译器推断，从而保持输入和输出之间的类型关系。例如请求函数可以用泛型表示响应数据结构，工具函数 identity<T> 能返回和输入一致的类型。泛型可以用 extends 约束必须具备的属性，也可以设置默认类型。滥用泛型会让类型签名复杂且难以理解，若泛型没有参与多个位置的关系表达，往往没有必要。",
+      "excellentAnswer": "我会判断泛型是否表达了真实关系。比如 function pick<T, K extends keyof T> 能表达从对象中选键；但 function getData<T> 如果只是把服务端未知 JSON 强行断言成 T，就可能制造虚假安全，需要运行时校验。组件 props 泛型适合表格列、选择器等数据结构可变的场景，但业务组件过度泛型化会降低可读性。",
+      "followUps": [
+        "如果在真实项目里遇到 TypeScript 泛型 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "泛型用于在调用时传递类型信息",
+          "保持输入输出类型关系",
+          "可用 extends 约束泛型能力",
+          "避免无意义泛型和过度抽象"
+        ],
+        "goodToHave": [
+          "默认泛型",
+          "keyof",
+          "类型推断"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_generics_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0174",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0174",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is Interface in TypeScript?",
+      "category": "前端",
+      "skill": "TypeScript 类型系统",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "TypeScript interface 的作用是什么？它适合描述哪些契约，和类实现有什么关系？",
+      "keywords": [
+        "TypeScript",
+        "interface",
+        "契约",
+        "结构类型",
+        "implements"
+      ],
+      "expectedPoints": [
+        "interface 用于描述对象结构和能力契约",
+        "TS 是结构类型系统",
+        "类可以 implements interface",
+        "interface 主要是编译期约束，运行时会擦除",
+        "声明合并",
+        "API DTO",
+        "小接口"
+      ],
+      "referenceAnswer": "interface 用来描述对象、函数或类实例应具备的结构和能力契约。TypeScript 是结构类型系统，只要形状匹配就可以认为满足接口，不要求显式继承。类可以 implements interface 来约束实例成员，但 interface 本身主要存在于编译期，编译后通常被擦除。它适合定义 API DTO、组件 props、领域能力和依赖抽象，尤其适合小而稳定的契约。",
+      "excellentAnswer": "我会强调 interface 是协作边界，而不是运行时校验工具。比如定义 Repository、Logger、UserDTO 都很自然，但接口返回的数据仍需要 zod 或其他方式校验。interface 的声明合并适合扩展第三方类型，但滥用会让来源不清。真实项目里我倾向于使用小接口，让调用方依赖能力而不是具体实现。",
+      "followUps": [
+        "如果在真实项目里遇到 interface 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "interface 用于描述对象结构和能力契约",
+          "TS 是结构类型系统",
+          "类可以 implements interface",
+          "interface 主要是编译期约束，运行时会擦除"
+        ],
+        "goodToHave": [
+          "声明合并",
+          "API DTO",
+          "小接口"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_interface_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0175",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0175",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "When to use interfaces and when to use classes in TypeScript?",
+      "category": "前端",
+      "skill": "TypeScript 类型设计",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "TypeScript 中什么时候用 interface，什么时候用 class？为什么不能把类型建模都写成 class？",
+      "keywords": [
+        "TypeScript",
+        "interface",
+        "class",
+        "类型建模",
+        "运行时"
+      ],
+      "expectedPoints": [
+        "interface 描述静态结构，不产生运行时代码",
+        "class 同时有类型和运行时构造函数",
+        "DTO、props、纯数据结构常用 interface/type",
+        "需要实例行为、继承或运行时构造时用 class",
+        "序列化",
+        "装饰器",
+        "领域模型"
+      ],
+      "referenceAnswer": "interface 主要描述编译期结构，不产生运行时代码，适合 DTO、组件 props、配置对象、函数参数等纯数据契约。class 同时存在类型和运行时值，会生成构造函数和原型方法，适合需要实例行为、封装方法、继承、装饰器或运行时反射的场景。把所有类型都建成 class 会增加运行时代码和序列化复杂度，也可能把简单数据结构过度面向对象化。",
+      "excellentAnswer": "我会按“是否需要运行时行为”选择。接口响应、表单值、Redux state 这类数据用 interface/type 更轻；领域对象如果需要方法和不变量，可以考虑 class。NestJS 等后端框架中 class 常和装饰器、验证、反射结合，这是框架需求。前端业务里滥用 class 反而会让数据转换和测试更麻烦。",
+      "followUps": [
+        "如果在真实项目里遇到 interface 和 class 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "interface 描述静态结构，不产生运行时代码",
+          "class 同时有类型和运行时构造函数",
+          "DTO、props、纯数据结构常用 interface/type",
+          "需要实例行为、继承或运行时构造时用 class"
+        ],
+        "goodToHave": [
+          "序列化",
+          "装饰器",
+          "领域模型"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_interface_class_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0182",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0182",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is \"Decorators\" in TypeScript?",
+      "category": "前端",
+      "skill": "TypeScript 高级特性",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "TypeScript Decorator 是什么？它适合哪些框架场景，使用时有哪些稳定性和可维护性风险？",
+      "keywords": [
+        "TypeScript",
+        "Decorator",
+        "元数据",
+        "框架",
+        "反射"
+      ],
+      "expectedPoints": [
+        "Decorator 可给类、方法、属性等附加元信息或包装逻辑",
+        "常见于 NestJS、Angular、ORM、验证框架",
+        "依赖编译配置和提案版本",
+        "过度使用会隐藏控制流和增加调试成本",
+        "reflect-metadata",
+        "experimentalDecorators",
+        "运行时元数据"
+      ],
+      "referenceAnswer": "Decorator 是一种在类、方法、属性或参数上附加元信息或包装逻辑的语法，常见于 NestJS、Angular、ORM、依赖注入和验证框架。它可以让框架通过元数据完成路由注册、依赖注入、字段验证等工作。风险是 TypeScript 装饰器长期受提案和编译配置影响，不同版本语义可能不同；过度使用会隐藏控制流，让代码行为不容易从函数调用中直接看出，也增加测试和调试成本。",
+      "excellentAnswer": "我会说 Decorator 很适合框架层声明式配置，但业务逻辑不要滥用。比如 @Controller、@Get、@Column 能减少样板代码；但如果把权限、缓存、事务、重试都堆成装饰器，排查线上问题时调用链会变暗。工程上要统一 tsconfig、reflect-metadata 使用方式、装饰器执行顺序和测试策略。",
+      "followUps": [
+        "如果在真实项目里遇到 Decorators 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Decorator 可给类、方法、属性等附加元信息或包装逻辑",
+          "常见于 NestJS、Angular、ORM、验证框架",
+          "依赖编译配置和提案版本",
+          "过度使用会隐藏控制流和增加调试成本"
+        ],
+        "goodToHave": [
+          "reflect-metadata",
+          "experimentalDecorators",
+          "运行时元数据"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_decorators_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0195",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0195",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is the difference between \"interface vs type\" statements?",
+      "category": "前端",
+      "skill": "TypeScript 类型设计",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "TypeScript 中 interface 和 type 有什么区别？项目里如何制定使用约定？",
+      "keywords": [
+        "TypeScript",
+        "interface",
+        "type",
+        "声明合并",
+        "类型别名"
+      ],
+      "expectedPoints": [
+        "interface 更适合对象契约并支持声明合并",
+        "type 可表示联合、交叉、映射、条件等复杂类型",
+        "二者很多对象场景可互换",
+        "团队应按扩展性和复杂度制定约定",
+        "公共 API",
+        "组件 props",
+        "可读性"
+      ],
+      "referenceAnswer": "interface 更适合描述对象形状和可扩展契约，支持声明合并和 extends；type 是类型别名，可以表示联合类型、交叉类型、元组、条件类型、映射类型等更复杂表达。很多对象 props 或 DTO 场景二者都能用。项目约定可以是：公开可扩展对象契约优先 interface，复杂组合类型、联合类型和工具类型优先 type，同时避免同一层代码风格混乱。",
+      "excellentAnswer": "我会避免把它讲成绝对优劣。interface 的声明合并对扩展第三方类型有用，但也可能让定义来源分散；type 表达能力强，但复杂类型堆叠会降低可读性。团队规范比个人偏好更重要，尤其是组件 props、API 类型和领域模型要保持一致。真正的重点是类型是否清晰表达业务约束。",
+      "followUps": [
+        "如果在真实项目里遇到 interface vs type 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "interface 更适合对象契约并支持声明合并",
+          "type 可表示联合、交叉、映射、条件等复杂类型",
+          "二者很多对象场景可互换",
+          "团队应按扩展性和复杂度制定约定"
+        ],
+        "goodToHave": [
+          "公共 API",
+          "组件 props",
+          "可读性"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_interface_type_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0198",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0198",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "Explain when to use \"declare\" keyword in TypeScript",
+      "category": "前端",
+      "skill": "TypeScript 工程化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "TypeScript 中 declare 关键字什么时候使用？它和真实运行时代码有什么区别？",
+      "keywords": [
+        "TypeScript",
+        "declare",
+        "类型声明",
+        "全局变量",
+        "运行时"
+      ],
+      "expectedPoints": [
+        "declare 用于告诉编译器某个值或模块在运行时已存在",
+        "不会生成运行时代码",
+        "常用于全局变量、第三方库声明和 .d.ts",
+        "声明必须和真实运行时保持一致",
+        "ambient declaration",
+        "window 扩展",
+        "模块声明"
+      ],
+      "referenceAnswer": "declare 用来声明某个变量、函数、类、模块或全局扩展在运行时已经由其他脚本或环境提供，让 TypeScript 编译器获得类型信息。它只影响类型检查，通常不会生成运行时代码。常见场景包括为全局变量 window.xxx、无类型第三方库、环境注入变量或 .d.ts 文件补充声明。风险是声明和真实运行时不一致时，编译能过但运行会报错。",
+      "excellentAnswer": "我会强调 declare 是“承诺”，不是实现。比如 declare const APP_VERSION: string 只是告诉 TS 有这个值，构建工具或 HTML 脚本必须真的提供它。给第三方库写声明时要尽量贴近实际 API，并用最小范围声明，避免 any 扩散。全局声明还要放在合适的 .d.ts 中，保证模块作用域和全局作用域不混乱。",
+      "followUps": [
+        "如果在真实项目里遇到 declare 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "declare 用于告诉编译器某个值或模块在运行时已存在",
+          "不会生成运行时代码",
+          "常用于全局变量、第三方库声明和 .d.ts",
+          "声明必须和真实运行时保持一致"
+        ],
+        "goodToHave": [
+          "ambient declaration",
+          "window 扩展",
+          "模块声明"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_declare_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0200",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0200",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "Is it possible to generate TypeScript declaration files from JS library?",
+      "category": "前端",
+      "skill": "TypeScript 工程化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "能否从 JavaScript 库生成 TypeScript 声明文件？生成的 .d.ts 为什么仍然需要人工审核？",
+      "keywords": [
+        "TypeScript",
+        ".d.ts",
+        "声明文件",
+        "JavaScript 库",
+        "类型维护"
+      ],
+      "expectedPoints": [
+        "可以通过 tsc allowJs/checkJs、JSDoc 或工具生成声明",
+        "生成结果依赖源码和注释质量",
+        "复杂动态 API 很难完全准确",
+        "发布前需要人工校验公共 API",
+        "declaration",
+        "emitDeclarationOnly",
+        "DefinitelyTyped"
+      ],
+      "referenceAnswer": "可以从 JavaScript 库生成 TypeScript 声明文件，例如使用 JSDoc 标注配合 tsc 的 allowJs、checkJs、declaration、emitDeclarationOnly，或使用构建工具生成 .d.ts。但生成质量取决于源码结构和注释质量，动态属性、函数重载、插件机制、运行时扩展等很难自动准确表达。声明文件是公共 API 契约，发布前必须人工审核示例、边界和兼容性。",
+      "excellentAnswer": "我会把 .d.ts 当成库的用户体验。自动生成可以覆盖基础结构，但不能替代 API 设计。对于 JS 库，最好逐步补 JSDoc、测试类型用例，并在 CI 中跑 tsc 验证。复杂库也可以手写声明或提交到 DefinitelyTyped。错误声明比没有声明更危险，因为它会给调用方虚假的类型安全。",
+      "followUps": [
+        "如果在真实项目里遇到 声明文件生成 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 前端 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "可以通过 tsc allowJs/checkJs、JSDoc 或工具生成声明",
+          "生成结果依赖源码和注释质量",
+          "复杂动态 API 很难完全准确",
+          "发布前需要人工校验公共 API"
+        ],
+        "goodToHave": [
+          "declaration",
+          "emitDeclarationOnly",
+          "DefinitelyTyped"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_frontend_typescript_declaration_files_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0149",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0149",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What is a pointer?",
+      "category": "Go",
+      "skill": "指针与内存模型",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Go 中指针的作用是什么？什么时候方法接收者应该使用指针接收者？",
+      "keywords": [
+        "Go",
+        "指针",
+        "方法接收者",
+        "值拷贝",
+        "可变状态"
+      ],
+      "expectedPoints": [
+        "指针保存变量地址，可避免大对象拷贝或修改原值",
+        "Go 不支持指针运算",
+        "指针接收者可修改接收者状态",
+        "大结构体、一致性和含锁类型通常用指针接收者",
+        "逃逸分析",
+        "nil 指针",
+        "接口方法集"
+      ],
+      "referenceAnswer": "Go 指针保存变量地址，可以让函数或方法修改原对象，也能避免大结构体拷贝。Go 支持取地址和解引用，但不支持 C 风格指针运算。方法接收者是否用指针，要看是否需要修改接收者、结构体是否较大、是否包含 mutex 等不能复制的字段，以及方法集一致性。若某些方法用指针接收者，通常同一类型的方法保持一致更清晰。",
+      "excellentAnswer": "我会补充接口方法集：值类型的方法集只包含值接收者方法，指针类型包含值和指针接收者方法，这会影响接口实现判断。指针不是越多越好，小的不可变值用值接收者更简单。工程上还要注意 nil 指针 panic、逃逸到堆和并发共享可变状态。",
+      "followUps": [
+        "如果在真实项目里遇到 Go 指针 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 Go 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "指针保存变量地址，可避免大对象拷贝或修改原值",
+          "Go 不支持指针运算",
+          "指针接收者可修改接收者状态",
+          "大结构体、一致性和含锁类型通常用指针接收者"
+        ],
+        "goodToHave": [
+          "逃逸分析",
+          "nil 指针",
+          "接口方法集"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_go_pointer_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0156",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0156",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "Does Go have exceptions?",
+      "category": "Go",
+      "skill": "错误处理",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Go 有异常吗？Go 的 error、panic、recover 分别适合什么场景？",
+      "keywords": [
+        "Go",
+        "error",
+        "panic",
+        "recover",
+        "错误处理"
+      ],
+      "expectedPoints": [
+        "Go 没有 Java 式异常机制",
+        "普通可预期失败用 error 返回",
+        "panic 用于不可恢复或程序错误",
+        "recover 只应在边界层兜底",
+        "错误包装",
+        "errors.Is/As",
+        "defer"
+      ],
+      "referenceAnswer": "Go 没有 Java 那种 try/catch 异常机制。普通可预期失败，例如文件不存在、网络超时、参数非法，通常通过 error 返回并由调用方显式处理。panic 表示程序进入不应继续的状态，例如数组越界、nil 指针或严重不变量破坏。recover 可以在 defer 中捕获 panic，但通常只应在 goroutine 边界、HTTP middleware 等边界层兜底，记录日志并避免整个进程崩溃。",
+      "excellentAnswer": "我会强调 error 是业务控制流的一部分，panic 不是。Go 1.13 以后可以用 errors.Is/As 和 %w 做错误链判断，既保留上下文又支持分类处理。服务端项目里，每个 goroutine 都要考虑 panic 边界，否则子协程 panic 可能拖垮进程。recover 后也不能假装一切正常，要有指标、日志和降级策略。",
+      "followUps": [
+        "如果在真实项目里遇到 Go 错误处理 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 Go 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Go 没有 Java 式异常机制",
+          "普通可预期失败用 error 返回",
+          "panic 用于不可恢复或程序错误",
+          "recover 只应在边界层兜底"
+        ],
+        "goodToHave": [
+          "错误包装",
+          "errors.Is/As",
+          "defer"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_go_error_no_exception_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0157",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0157",
+        "sourceName": "FAQGURU Go and Frontend Questions",
+        "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+        "sourcePath": "README.md",
+        "qualityScore": 100
+      },
+      "title": "What are Goroutines?",
+      "category": "Go",
+      "skill": "并发编程",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Goroutine 是什么？它和操作系统线程有什么区别，使用时如何避免泄漏？",
+      "keywords": [
+        "Go",
+        "goroutine",
+        "并发",
+        "调度器",
+        "泄漏"
+      ],
+      "expectedPoints": [
+        "goroutine 是 Go 运行时调度的轻量执行单元",
+        "由 GMP 调度到 OS 线程上运行",
+        "创建成本低但不是免费",
+        "通过 context、channel 关闭和等待机制避免泄漏",
+        "WaitGroup",
+        "背压",
+        "panic 边界"
+      ],
+      "referenceAnswer": "Goroutine 是 Go 运行时管理的轻量并发执行单元，比直接创建操作系统线程成本更低，由 Go 调度器把大量 goroutine 映射到较少 OS 线程上执行。它适合并发 IO、后台任务和流水线处理，但不是免费资源。常见泄漏来自 channel 永远阻塞、context 未取消、生产速度大于消费速度、后台 goroutine 没有退出条件。应使用 context、WaitGroup、关闭 channel、超时和背压控制生命周期。",
+      "excellentAnswer": "我会说 Go 并发容易创建，更要认真关闭。每启动一个 goroutine，都要知道它什么时候退出、谁取消它、panic 怎么处理、结果怎么回收。线上排查泄漏可以看 goroutine dump、pprof、阻塞栈和内存增长。高并发场景还要控制并发度，不能为每个请求无限派生后台任务。",
+      "followUps": [
+        "如果在真实项目里遇到 Goroutine 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 Go 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "goroutine 是 Go 运行时调度的轻量执行单元",
+          "由 GMP 调度到 OS 线程上运行",
+          "创建成本低但不是免费",
+          "通过 context、channel 关闭和等待机制避免泄漏"
+        ],
+        "goodToHave": [
+          "WaitGroup",
+          "背压",
+          "panic 边界"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:FAQGURU Go and Frontend Questions",
+      "license": "MIT",
+      "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_go_goroutine_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
+      "id": "draft_review_external_0002",
+      "status": "approved",
+      "createdAt": "2026-05-28T00:45:00.000Z",
+      "updatedAt": "2026-05-28T00:45:00.000Z",
+      "importedFromCandidate": {
+        "candidateId": "external_0002",
+        "sourceName": "Big Companies Interview Questions",
+        "sourceUrl": "https://github.com/realabbas/big-companies-interview-questions",
+        "sourcePath": "本地授权种子",
+        "qualityScore": 100
+      },
+      "title": "How does garbage collection work in Java?",
+      "category": "Java",
+      "skill": "JVM 内存与 GC",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Java 垃圾回收大致如何工作？线上出现频繁 Full GC 或长暂停时你会如何排查？",
+      "keywords": [
+        "Java",
+        "JVM",
+        "GC",
+        "Full GC",
+        "内存排查"
+      ],
+      "expectedPoints": [
+        "GC 通过可达性分析识别存活对象",
+        "分代收集基于对象生命周期假设",
+        "不同收集器在吞吐、延迟和内存间取舍",
+        "排查要看 GC 日志、堆 dump、分配速率和对象存活",
+        "G1/ZGC",
+        "MAT",
+        "内存泄漏"
+      ],
+      "referenceAnswer": "Java GC 通常通过 GC Roots 可达性分析判断对象是否存活，并根据对象生命周期采用分代收集思路。新生代对象多数朝生夕死，老年代对象存活更久；不同收集器在吞吐、暂停时间、内存占用和 CPU 成本之间取舍。线上频繁 Full GC 或长暂停时，应先查看 GC 日志、堆使用曲线、分配速率、晋升失败、老年代占用和停顿时间，再结合 heap dump 分析大对象、缓存、集合持有和类加载器泄漏。",
+      "excellentAnswer": "我会按证据排查：先确认是内存泄漏、分配速率过高、堆太小、晋升过快，还是收集器参数不合适。工具上看 GC log、jstat、jmap、JFR、MAT 和应用指标。处理方案可能是修复对象持有、限制缓存、减少临时对象、调整堆和收集器，或拆分流量。不能一上来就盲目加内存，因为那可能只是延后 Full GC。",
+      "followUps": [
+        "如果在真实项目里遇到 Java GC 相关问题，你会先看哪些指标或现象？",
+        "这个问题在 Java 方向里最容易踩的边界是什么？",
+        "如果面试官要求你给出落地方案，你会如何验证方案有效？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释机制、边界和取舍。",
+        "没有结合真实项目或线上排查场景说明影响。",
+        "忽略异常情况、性能风险或维护成本。"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "GC 通过可达性分析识别存活对象",
+          "分代收集基于对象生命周期假设",
+          "不同收集器在吞吐、延迟和内存间取舍",
+          "排查要看 GC 日志、堆 dump、分配速率和对象存活"
+        ],
+        "goodToHave": [
+          "G1/ZGC",
+          "MAT",
+          "内存泄漏"
+        ],
+        "redFlags": [
+          "只背结论，不解释机制、边界和取舍。",
+          "没有结合真实项目或线上排查场景说明影响。",
+          "忽略异常情况、性能风险或维护成本。"
+        ]
+      },
+      "source": "external-candidate:Big Companies Interview Questions",
+      "license": "CC0-1.0",
+      "attribution": "Big Companies Interview Questions；许可证：CC0-1.0；来源：https://github.com/realabbas/big-companies-interview-questions",
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题并加入正式题库。",
+      "approvedQuestionId": "approved_java_gc_workflow_001",
+      "reviewedAt": "2026-05-28T00:45:00.000Z"
+    },
+    {
       "id": "draft_candidate_14_4856084d",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 14,
         "candidateId": "external_0258",
@@ -63,13 +5035,14 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/427102/what-is-a-slug-in-django",
-      "reviewNotes": "由候选题 #14 自动转入待审核草稿。；推荐分：50，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部有一定讨论热度。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "题目过于偏 Django URL 术语，训练价值有限，暂不进入正式题库。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_13_6d15bc99",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 13,
         "candidateId": "external_0257",
@@ -126,13 +5099,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/32123477/how-to-revert-the-last-migration",
-      "reviewNotes": "由候选题 #13 自动转入待审核草稿。；推荐分：50，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部有一定讨论热度。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_django_revert_migration_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_12_b5db9887",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 12,
         "candidateId": "external_0256",
@@ -190,13 +5165,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/431628/how-to-combine-multiple-querysets-in-django",
-      "reviewNotes": "由候选题 #12 自动转入待审核草稿。；推荐分：50，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部有一定讨论热度。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_django_combine_querysets_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_10_0d8761c9",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 10,
         "candidateId": "external_0251",
@@ -254,13 +5231,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/8609192/what-is-the-difference-between-null-true-and-blank-true-in-django",
-      "reviewNotes": "由候选题 #10 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_django_null_blank_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_9_80b1e21e",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 9,
         "candidateId": "external_0243",
@@ -318,13 +5297,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/231767/what-does-the-yield-keyword-do-in-python",
-      "reviewNotes": "由候选题 #9 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_python_yield_generator_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_8_05115632",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 8,
         "candidateId": "external_0244",
@@ -382,13 +5363,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/419163/what-does-if-name-main-do",
-      "reviewNotes": "由候选题 #8 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_python_main_guard_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_7_868ff852",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 7,
         "candidateId": "external_0246",
@@ -446,13 +5429,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/100003/what-are-metaclasses-in-python",
-      "reviewNotes": "由候选题 #7 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_python_metaclass_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_5_fb35d961",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 5,
         "candidateId": "external_0248",
@@ -509,13 +5494,14 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/38987/how-do-i-merge-two-dictionaries-in-a-single-expression-in-python",
-      "reviewNotes": "由候选题 #5 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "Python 字典合并偏语法细节，和当前岗位缺口不匹配，暂不进入正式题库。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_4_21851b10",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 4,
         "candidateId": "external_0249",
@@ -573,13 +5559,14 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command",
-      "reviewNotes": "由候选题 #4 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "题目容易导向系统命令执行 API 记忆，安全边界复杂，暂不进入本轮正式题库。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_3_3dc1df20",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 3,
         "candidateId": "external_0253",
@@ -637,13 +5624,15 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/687295/how-do-i-do-a-not-equal-in-django-queryset-filtering",
-      "reviewNotes": "由候选题 #3 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_django_not_equal_queryset_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_1_58de9554",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:32.749Z",
-      "updatedAt": "2026-05-26T17:15:32.749Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 1,
         "candidateId": "external_0245",
@@ -700,13 +5689,14 @@
       "source": "external-candidate:Stack Overflow 常见技术问答信号",
       "license": "CC BY-SA",
       "attribution": "Stack Overflow 常见技术问答信号；许可证：CC BY-SA；来源：https://stackoverflow.com/questions/394809/does-python-have-a-ternary-conditional-operator",
-      "reviewNotes": "由候选题 #1 自动转入待审核草稿。；推荐分：52，结构质量：100；标题天然接近面试问句。；当前正式题库的 Python 方向仍值得继续扩充。；外部热度较高，适合提炼常见误区和追问。；风险：该来源仅适合作为追问/误区信号，不建议直接入正式题库。；风险：授权不适合作为直接入库素材。"
+      "reviewNotes": "三元表达式偏基础语法，当前优先补工程化和运行时机制题。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_24_1689235e",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 24,
         "candidateId": "external_0158",
@@ -760,13 +5750,15 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
-      "reviewNotes": "由候选题 #24 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_go_zero_value_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_23_74d691fa",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 23,
         "candidateId": "external_0159",
@@ -820,13 +5812,15 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
-      "reviewNotes": "由候选题 #23 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_go_object_oriented_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_22_0a03ced1",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 22,
         "candidateId": "external_0145",
@@ -880,13 +5874,14 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
-      "reviewNotes": "由候选题 #22 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "Go 是否是新语言/框架/库过于概念化，面试训练价值低。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_21_dee9c628",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 21,
         "candidateId": "external_0201",
@@ -940,13 +5935,15 @@
       "source": "external-candidate:Go Interview Coding Questions",
       "license": "MIT",
       "attribution": "Go Interview Coding Questions；许可证：MIT；来源：https://github.com/shomali11/go-interview",
-      "reviewNotes": "由候选题 #21 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_go_reverse_linked_list_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_20_80cb1ae5",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 20,
         "candidateId": "external_0203",
@@ -1000,13 +5997,14 @@
       "source": "external-candidate:Go Interview Coding Questions",
       "license": "MIT",
       "attribution": "Go Interview Coding Questions；许可证：MIT；来源：https://github.com/shomali11/go-interview",
-      "reviewNotes": "由候选题 #20 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "标题同时包含 stack/queue 两类实现，题目边界不清，后续可拆分后再入库。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_19_2233d928",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 19,
         "candidateId": "external_0202",
@@ -1060,13 +6058,15 @@
       "source": "external-candidate:Go Interview Coding Questions",
       "license": "MIT",
       "attribution": "Go Interview Coding Questions；许可证：MIT；来源：https://github.com/shomali11/go-interview",
-      "reviewNotes": "由候选题 #19 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_go_linked_list_cycle_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_15_0cd1380f",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 15,
         "candidateId": "external_0163",
@@ -1120,13 +6120,14 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
-      "reviewNotes": "由候选题 #15 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "Go 2 相关问题过时且不稳定，不适合作为正式面试题。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_10_99fb0220",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:25.186Z",
-      "updatedAt": "2026-05-26T17:15:25.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 10,
         "candidateId": "external_0148",
@@ -1180,13 +6181,14 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
-      "reviewNotes": "由候选题 #10 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "英文标题语法质量较差，且变量声明基础题和零值题存在覆盖重叠。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_18_3651d09f",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:19.384Z",
-      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 18,
         "candidateId": "external_0135",
@@ -1239,13 +6241,14 @@
       "source": "external-candidate:ReactJS Interview Questions",
       "license": "MIT",
       "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
-      "reviewNotes": "由候选题 #18 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "React inline style vendor prefix 问题过细且实践价值有限。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_17_0e76b852",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:19.384Z",
-      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 17,
         "candidateId": "external_0179",
@@ -1299,13 +6302,15 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
-      "reviewNotes": "由候选题 #17 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_frontend_typescript_null_undefined_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_16_6f990264",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:19.384Z",
-      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 16,
         "candidateId": "external_0133",
@@ -1358,13 +6363,14 @@
       "source": "external-candidate:ReactJS Interview Questions",
       "license": "MIT",
       "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
-      "reviewNotes": "由候选题 #16 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "运行时查看 React 版本偏工具细节，不适合作为正式训练题。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_14_7ab7abcc",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:19.384Z",
-      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 14,
         "candidateId": "external_0193",
@@ -1418,13 +6424,15 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
-      "reviewNotes": "由候选题 #14 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_frontend_typescript_overload_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_13_851e2a6a",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:19.384Z",
-      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 13,
         "candidateId": "external_0178",
@@ -1478,13 +6486,14 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
-      "reviewNotes": "由候选题 #13 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "面向对象原则问题过泛，容易变成概念背诵，暂不入库。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_12_a9a386e0",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:19.384Z",
-      "updatedAt": "2026-05-26T17:15:19.384Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 12,
         "candidateId": "external_0171",
@@ -1538,13 +6547,15 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
-      "reviewNotes": "由候选题 #12 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_frontend_typescript_compile_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_11_7502db1d",
-      "status": "pending",
+      "status": "approved",
       "createdAt": "2026-05-26T17:15:05.186Z",
-      "updatedAt": "2026-05-26T17:15:05.186Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 11,
         "candidateId": "external_0180",
@@ -1598,13 +6609,15 @@
       "source": "external-candidate:FAQGURU Go and Frontend Questions",
       "license": "MIT",
       "attribution": "FAQGURU Go and Frontend Questions；许可证：MIT；来源：https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/typeScript.md",
-      "reviewNotes": "由候选题 #11 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "人工审核通过：已重写为完整中文面试题。",
+      "approvedQuestionId": "approved_frontend_typescript_backend_001",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_9_7209e6c3",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T17:15:05.172Z",
-      "updatedAt": "2026-05-26T17:15:05.172Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 9,
         "candidateId": "external_0121",
@@ -1657,13 +6670,14 @@
       "source": "external-candidate:ReactJS Interview Questions",
       "license": "MIT",
       "attribution": "ReactJS Interview Questions；许可证：MIT；来源：https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/README.md",
-      "reviewNotes": "由候选题 #9 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：MIT。；标题天然接近面试问句。"
+      "reviewNotes": "React v16 自定义 DOM 属性偏版本细节，当前版本语境下训练价值有限。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_2_d542c955",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T16:54:38.164Z",
-      "updatedAt": "2026-05-26T16:54:38.164Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 2,
         "candidateId": "external_0120",
@@ -1717,13 +6731,14 @@
       "source": "external-candidate:JavaGuide 中文面试知识库",
       "license": "Apache-2.0",
       "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-      "reviewNotes": "由候选题 #2 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。"
+      "reviewNotes": "同主题已在 approved-questions 中有人工重写版，拒绝重复草稿。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     },
     {
       "id": "draft_candidate_1_f4777664",
-      "status": "pending",
+      "status": "rejected",
       "createdAt": "2026-05-26T16:54:38.164Z",
-      "updatedAt": "2026-05-26T16:54:38.164Z",
+      "updatedAt": "2026-05-27T16:04:51.559Z",
       "importedFromCandidate": {
         "rank": 1,
         "candidateId": "external_0060",
@@ -1777,7 +6792,8 @@
       "source": "external-candidate:JavaGuide 中文面试知识库",
       "license": "Apache-2.0",
       "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
-      "reviewNotes": "由候选题 #1 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。"
+      "reviewNotes": "同主题已在 approved-questions 中有人工重写版，拒绝重复草稿。",
+      "reviewedAt": "2026-05-27T16:04:51.559Z"
     }
   ]
 }

@@ -429,8 +429,8 @@ async function main() {
       }
     });
     assert(
-      goProfileSession.plan[0]?.id === 'go_004',
-      `go profile session should start with go_004 when role-specific concurrency signals match, got: ${goProfileSession.plan.map((item) => item.id).join(', ')}`
+      ['go_004', 'approved_go_goroutine_001'].includes(goProfileSession.plan[0]?.id),
+      `go profile session should start with a Go concurrency governance question when role-specific concurrency signals match, got: ${goProfileSession.plan.map((item) => item.id).join(', ')}`
     );
 
     const pythonSession = await request('/api/interviews', {
