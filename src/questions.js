@@ -343,7 +343,7 @@ export const questionBank = [
     }
   },
   {
-    id: 'java_006',
+    id: 'java_007',
     category: 'Java',
     skill: 'Java',
     roles: ['backend', 'java'],
@@ -1324,6 +1324,7 @@ export const questionBank = [
       mustHave: ['告警发现', '排查链路', '止血动作', '根因分析'],
       goodToHave: ['影响范围', '时间线', '监控治理', '自动化预案'],
       redFlags: ['没有时间线', '只讲结论不讲排查过程', '没有后续治理']
+
     }
   },
   {
@@ -1554,6 +1555,7 @@ export const questionBank = [
       mustHave: ['背景', '决策依据', '推进阻力', '结果'],
       goodToHave: ['指标', '阶段性治理', '团队协作', '风险排序'],
       redFlags: ['空谈管理', '没有技术决策依据', '没有结果或复盘']
+
     }
   }
 ];

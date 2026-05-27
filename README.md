@@ -530,11 +530,37 @@ Gemini -> OpenRouter -> Ollama -> Mock
 ## Project Structure
 
 ```text
-src/server.js       HTTP server and routes
+src/server.js       HTTP server and API routes
 src/config.js       environment loading and provider selection
-src/ai.js           provider adapters and fallback logic
+src/ai.js           provider adapters, fallback logic, and AI question planning
 src/interview.js    interview flow, evaluation, and report generation
 src/questions.js    built-in question bank and scoring metadata
-public/             frontend UI
-scripts/            smoke checks
+src/externalSources.js external question source adapters and draft conversion
+src/questionGovernance.js question-bank catalog, quality gates, and review workflow
+public/             browser UI
+scripts/            smoke checks and question-source utilities
 ```
+
+## External Question Sources
+
+The app can sync external question-source drafts without mixing them directly into the curated local question bank:
+
+```bash
+npm run sync:external
+```
+
+The sync writes `data/external-question-drafts.json` with source, license, attribution, import policy, and Chinese training-draft notes.
+
+- GitHub CC0 sources are marked `can-transform`: they can be rewritten, deduplicated, scored, and reviewed before entering `src/questions.js`.
+- JavaGuide Chinese sources are marked `can-transform` under Apache-2.0: they can seed Chinese interview drafts with attribution retained.
+- Stack Exchange / Stack Overflow API results are marked `signal-only`: the app stores titles, tags, links, and popularity as follow-up or mistake signals, not answer bodies.
+- The main interview flow does not depend on external network calls; external sync is explicit and optional.
+
+To turn screened candidates into pending review drafts, run:
+
+```bash
+npm run promote:drafts -- --limit=30 --min-score=70
+npm run import:candidates -- --ranks=1,2
+```
+
+`import:candidates` writes to `data/question-drafts.json` with `pending` status. It does not modify `src/questions.js`.

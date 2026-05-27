@@ -545,6 +545,144 @@ button:hover:not(:disabled) {
   gap: 7px;
 }
 
+.question-ops {
+  display: grid;
+  gap: 11px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #12141a;
+  color: #d8dee9;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.empty-question-ops {
+  color: var(--muted);
+}
+
+.question-ops-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.question-ops-header div {
+  display: grid;
+  gap: 3px;
+}
+
+.question-ops-header span,
+.question-template-card span,
+.question-bank-stats span,
+.question-draft span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.question-bank-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.question-bank-stats div,
+.question-template-card,
+.question-draft {
+  display: grid;
+  gap: 6px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #171a22;
+}
+
+.question-bank-stats strong {
+  font-size: 18px;
+}
+
+.question-template-card p,
+.question-draft p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.question-template-mix,
+.question-draft-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.question-draft-panel {
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #171a22;
+}
+
+.question-draft-panel summary {
+  cursor: pointer;
+  color: #8fc7ff;
+  font-weight: 800;
+}
+
+.question-draft-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.question-draft-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.question-draft-list {
+  display: grid;
+  gap: 8px;
+}
+
+.question-draft > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.question-quality-pass,
+.question-quality-issues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.question-quality-pass,
+.question-quality-issues span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(80, 200, 120, 0.14);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.question-quality-issues span {
+  background: rgba(255, 180, 60, 0.14);
+  color: var(--amber);
+}
+
+.question-quality-issues span.blocker {
+  background: rgba(255, 90, 90, 0.14);
+  color: var(--red);
+}
+
+label {
+  display: grid;
+  gap: 7px;
+}
+
 .plan-preview-steps span,
 .next-session-stages span {
   padding: 6px 9px;

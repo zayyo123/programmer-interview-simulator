@@ -15,6 +15,7 @@ const styleHint = document.querySelector('#styleHint');
 const practiceHistoryEl = document.querySelector('#practiceHistory');
 const profileAnalysisEl = document.querySelector('#profileAnalysis');
 const planPreviewEl = document.querySelector('#planPreview');
+const questionOpsEl = document.querySelector('#questionOps');
 const resumeInput = setupForm.querySelector('textarea[name="resume"]');
 const roleChoiceGrid = document.querySelector('#roleChoiceGrid');
 const levelStepper = document.querySelector('#levelStepper');
@@ -76,6 +77,7 @@ styleSelect.addEventListener('change', () => {
   renderStyleHint(styleSelect.value);
   syncChoiceControls();
   renderPlanPreview();
+  loadQuestionBankSnapshot();
 });
 
 resumeInput.addEventListener('input', () => {
@@ -87,6 +89,7 @@ setupForm.addEventListener('change', (event) => {
   if (event.target === resumeInput || event.target === styleSelect) return;
   syncChoiceControls();
   renderPlanPreview();
+  loadQuestionBankSnapshot();
 });
 
 aiProviderSelect?.addEventListener('change', renderAiProviderState);
@@ -198,6 +201,25 @@ reportEl.addEventListener('click', async (event) => {
 });
 
 initializeSetupControls();
+questionOpsEl?.addEventListener('click', async (event) => {
+  const refreshButton = event.target.closest('[data-refresh-question-bank]');
+  if (refreshButton) {
+    await loadQuestionBankSnapshot();
+    return;
+  }
+
+  const reviewButton = event.target.closest('[data-review-draft]');
+  if (reviewButton) {
+    await reviewDraftQuestion(reviewButton.dataset.reviewDraft, reviewButton.dataset.reviewAction || 'approve');
+  }
+});
+
+questionOpsEl?.addEventListener('submit', async (event) => {
+  const form = event.target.closest('[data-question-draft-form]');
+  if (!form) return;
+  event.preventDefault();
+  await submitQuestionDraft(form);
+});
 renderStyleHint(styleSelect.value);
 renderProfileAnalysis(resumeInput.value);
 renderPlanPreview();
@@ -345,6 +367,7 @@ function playCountdownTone(value) {
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+loadQuestionBankSnapshot();
 
 setupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
@@ -486,6 +509,209 @@ function setBusy(nextBusy) {
 function getCurrentPlanItem() {
   if (!currentQuestionId) return null;
   return currentPlan.find((item) => item.id === currentQuestionId) || null;
+}
+
+async function loadQuestionBankSnapshot() {
+  if (!questionOpsEl) return;
+
+  const formData = new FormData(setupForm);
+  const params = new URLSearchParams({
+    role: formData.get('role') || '',
+    level: formData.get('level') || ''
+  });
+  questionOpsEl.classList.add('loading');
+
+  try {
+    const [catalog, paper] = await Promise.all([
+      requestJson(`/api/question-bank?${params.toString()}`),
+      requestJson('/api/question-paper', {
+        method: 'POST',
+        body: JSON.stringify({
+          role: formData.get('role'),
+          level: formData.get('level'),
+          style: formData.get('style'),
+          questionCount: Number(formData.get('questionCount') || 5),
+          resume: formData.get('resume') || '',
+          profileAnalysis: createSerializableProfileAnalysis(formData.get('resume') || '')
+        })
+      })
+    ]);
+    renderQuestionOps(catalog, paper);
+  } catch (error) {
+    questionOpsEl.className = 'question-ops empty-question-ops';
+    questionOpsEl.innerHTML = `<p>${escapeHtml(`题库治理加载失败：${error.message}`)}</p>`;
+  }
+}
+
+function renderQuestionOps(catalog, paper) {
+  if (!questionOpsEl) return;
+
+  const summary = catalog?.summary || {};
+  const pendingDrafts = Array.isArray(catalog?.pendingDrafts) ? catalog.pendingDrafts : [];
+  const template = selectTemplateForCurrentSetup(catalog?.templates || []);
+  const draftList = pendingDrafts.length
+    ? pendingDrafts.slice(0, 3).map((draft) => `
+      <article class="question-draft">
+        <div>
+          <strong>${escapeHtml(draft.title || draft.question || '待审核题')}</strong>
+          <span>${escapeHtml(`${draft.category || '综合能力'} · ${getPlanTypeLabel(draft.type)} · ${getDifficultyLabel(draft.difficulty)} · 质量 ${draft.quality?.score ?? '-'} ${draft.quality?.grade || ''}`)}</span>
+        </div>
+        <p>${escapeHtml(draft.question || '')}</p>
+        ${renderQuestionQualityIssues(draft.quality)}
+        <div class="question-draft-actions">
+          <button type="button" class="mini-button" data-review-draft="${escapeHtml(draft.id)}" data-review-action="approve">通过入库</button>
+          <button type="button" class="mini-button subtle-button" data-review-draft="${escapeHtml(draft.id)}" data-review-action="reject">驳回</button>
+        </div>
+      </article>
+    `).join('')
+    : '<p>暂无待审核题。可以先提交一题，审核通过后会进入后续模拟面试抽题池。</p>';
+
+  questionOpsEl.className = 'question-ops';
+  questionOpsEl.innerHTML = `
+    <div class="question-ops-header">
+      <div>
+        <strong>题库与组卷</strong>
+        <span>结构化题库 · 人工审核 · 规则抽题</span>
+      </div>
+      <button type="button" class="mini-button subtle-button" data-refresh-question-bank>刷新</button>
+    </div>
+
+    <div class="question-bank-stats">
+      <div><span>已审核</span><strong>${escapeHtml(summary.approvedCount ?? 0)}</strong></div>
+      <div><span>待审核</span><strong>${escapeHtml(summary.pendingReviewCount ?? 0)}</strong></div>
+      <div><span>标签</span><strong>${escapeHtml(summary.tagCount ?? 0)}</strong></div>
+      <div><span>质量</span><strong>${escapeHtml(summary.qualityScore ?? '-')}</strong></div>
+    </div>
+
+    <div class="question-template-card">
+      <span>当前组卷模板</span>
+      <strong>${escapeHtml(template?.name || '通用均衡面')}</strong>
+      <p>${escapeHtml((template?.rules || ['按岗位、级别、题型、难度和简历信号综合抽题']).join('；'))}</p>
+      <div class="question-template-mix">
+        ${renderPills(formatPaperMix(paper), '暂无组卷预览')}
+      </div>
+    </div>
+
+    <details class="question-draft-panel">
+      <summary>提交新题草稿</summary>
+      <form data-question-draft-form class="question-draft-form">
+        <label>
+          <span>题目</span>
+          <textarea name="question" rows="3" placeholder="例如：Redis 缓存击穿和缓存穿透有什么区别？"></textarea>
+        </label>
+        <label>
+          <span>参考答案</span>
+          <textarea name="referenceAnswer" rows="4" placeholder="写出审核用参考答案，至少包含核心机制、边界和落地建议。"></textarea>
+        </label>
+        <div class="question-draft-grid">
+          <label>
+            <span>分类</span>
+            <input name="category" placeholder="Redis / MySQL / Java" />
+          </label>
+          <label>
+            <span>标签</span>
+            <input name="tagsText" placeholder="缓存击穿，互斥锁，逻辑过期" />
+          </label>
+        </div>
+        <button type="submit" class="mini-button">提交待审核</button>
+      </form>
+    </details>
+
+    <div class="section-label">待审核题目</div>
+    <div class="question-draft-list">${draftList}</div>
+  `;
+}
+
+function renderQuestionQualityIssues(quality) {
+  if (!quality?.issues?.length) {
+    return '<div class="question-quality-pass">质量门禁暂无明显问题</div>';
+  }
+
+  return `
+    <div class="question-quality-issues">
+      ${quality.issues.slice(0, 3).map((issue) => `
+        <span class="${issue.severity === 'blocker' ? 'blocker' : ''}">${escapeHtml(issue.message)}</span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function selectTemplateForCurrentSetup(templates) {
+  const formData = new FormData(setupForm);
+  const role = formData.get('role');
+  const level = formData.get('level');
+  return templates.find((item) => item.roles?.includes(role) && item.levels?.includes(level))
+    || templates.find((item) => item.roles?.includes(role))
+    || templates[0]
+    || null;
+}
+
+function formatPaperMix(paper) {
+  const items = [];
+  const typeLabels = {
+    knowledge: '基础题',
+    project: '项目题',
+    'system-design': '场景题',
+    algorithm: '代码题'
+  };
+  Object.entries(paper?.typeMix || {}).forEach(([type, count]) => {
+    items.push(`${typeLabels[type] || type} ${count}`);
+  });
+  Object.entries(paper?.difficultyMix || {}).forEach(([difficulty, count]) => {
+    items.push(`${getDifficultyLabel(difficulty)} ${count}`);
+  });
+  return items.slice(0, 6);
+}
+
+async function submitQuestionDraft(form) {
+  const formData = new FormData(form);
+  const setupData = new FormData(setupForm);
+  const question = String(formData.get('question') || '').trim();
+  const referenceAnswer = String(formData.get('referenceAnswer') || '').trim();
+  if (!question || !referenceAnswer) {
+    statusText.textContent = '提交草稿失败：题目和参考答案都要填写。';
+    return;
+  }
+
+  try {
+    await requestJson('/api/question-bank/drafts', {
+      method: 'POST',
+      body: JSON.stringify({
+        question,
+        title: question.slice(0, 32),
+        referenceAnswer,
+        excellentAnswer: referenceAnswer,
+        category: formData.get('category') || '',
+        tagsText: formData.get('tagsText') || '',
+        roles: [setupData.get('role') || 'backend'],
+        levels: [setupData.get('level') || 'middle'],
+        type: 'knowledge',
+        difficulty: setupData.get('level') === 'senior' ? 3 : 2,
+        source: 'manual-ui'
+      })
+    });
+    form.reset();
+    statusText.textContent = '题目草稿已提交，等待人工审核。';
+    await loadQuestionBankSnapshot();
+  } catch (error) {
+    statusText.textContent = `提交草稿失败：${error.message}`;
+  }
+}
+
+async function reviewDraftQuestion(id, action) {
+  if (!id) return;
+  try {
+    const result = await requestJson(`/api/question-bank/drafts/${encodeURIComponent(id)}/review`, {
+      method: 'POST',
+      body: JSON.stringify({ action })
+    });
+    statusText.textContent = result.approvedQuestion
+      ? '题目已人工审核通过，并进入后续模拟面试抽题池。'
+      : '题目已驳回，未进入正式题库。';
+    await loadQuestionBankSnapshot();
+  } catch (error) {
+    statusText.textContent = `审核失败：${error.message}`;
+  }
 }
 
 function renderAnswerGuide(question, completed = false) {
@@ -1996,6 +2222,8 @@ function renderHistoryQuestionDrillProgress(records) {
           </div>
           <strong>${escapeHtml(item.target || '本题薄弱点')}</strong>
           <p>${escapeHtml(item.reminder || '继续围绕该目标重答并接受同类追问。')}</p>
+          <p>${escapeHtml(item.passStandard)}</p>
+          <p>${escapeHtml(item.weakestDimensionText)}</p>
           <small>${escapeHtml(`最高分 ${item.bestScore ?? '-'}，最近题目：${item.latestQuestion || '暂无题目'}`)}</small>
           ${item.passed ? '' : `<button type="button" class="mini-button" data-apply-question-drill="${escapeHtml(item.key)}">继续补练这个目标</button>`}
         </article>
@@ -2027,15 +2255,19 @@ function calculateQuestionDrillProgress(records) {
         bestScore: score,
         latestScore: score,
         latestQuestion: question.question || '',
-        latestTime: question.recordTime || ''
+        latestTime: question.recordTime || '',
+        latestDimensionScores: [],
+        dimensionTotals: new Map()
       };
       current.count += 1;
+      collectQuestionDrillDimensionScores(current, question.dimensionScores);
       if (score !== null) {
         current.bestScore = current.bestScore === null ? score : Math.max(current.bestScore, score);
         if (!current.latestTime || String(question.recordTime || '') >= String(current.latestTime)) {
           current.latestScore = score;
           current.latestQuestion = question.question || current.latestQuestion;
           current.latestTime = question.recordTime || current.latestTime;
+          current.latestDimensionScores = normalizeQuestionDrillDimensionScores(question.dimensionScores);
         }
       }
       map.set(key, current);
@@ -2045,9 +2277,59 @@ function calculateQuestionDrillProgress(records) {
   return [...grouped.values()]
     .map((item) => ({
       ...item,
-      passed: Number.isFinite(Number(item.bestScore)) && Number(item.bestScore) >= 75
+      passed: Number.isFinite(Number(item.bestScore)) && Number(item.bestScore) >= 75,
+      passStandard: createQuestionDrillPassStandard(item),
+      weakestDimension: findQuestionDrillWeakestDimension(item),
+      weakestDimensionText: createQuestionDrillWeakestDimensionText(item)
     }))
     .sort((left, right) => Number(left.passed) - Number(right.passed) || (right.latestTime || '').localeCompare(left.latestTime || ''));
+}
+
+function collectQuestionDrillDimensionScores(target, dimensionScores) {
+  for (const item of normalizeQuestionDrillDimensionScores(dimensionScores)) {
+    const current = target.dimensionTotals.get(item.label) || { label: item.label, total: 0, count: 0 };
+    current.total += item.score;
+    current.count += 1;
+    target.dimensionTotals.set(item.label, current);
+  }
+}
+
+function normalizeQuestionDrillDimensionScores(dimensionScores) {
+  return (Array.isArray(dimensionScores) ? dimensionScores : [])
+    .filter((item) => item?.label && Number.isFinite(Number(item.score)))
+    .map((item) => ({
+      label: item.label,
+      score: Number(item.score)
+    }));
+}
+
+function findQuestionDrillWeakestDimension(item) {
+  const latestScores = normalizeQuestionDrillDimensionScores(item.latestDimensionScores);
+  const sourceScores = latestScores.length
+    ? latestScores
+    : [...(item.dimensionTotals || new Map()).values()]
+      .filter((score) => score.count)
+      .map((score) => ({
+        label: score.label,
+        score: Math.round(score.total / score.count)
+      }));
+
+  return sourceScores
+    .sort((left, right) => left.score - right.score || String(left.label).localeCompare(String(right.label), 'zh-Hans-CN'))[0] || null;
+}
+
+function createQuestionDrillPassStandard(item) {
+  const scoreText = Number.isFinite(Number(item.bestScore)) ? `当前最高 ${item.bestScore} 分` : '当前还没有有效得分';
+  const nextStep = item.passed ? '可以进入下一轮巩固追问。' : '建议继续补练到 75 分以上。';
+  return `达标标准：最高分达到 75 分，表示该薄弱点已能较稳定覆盖核心要点；${scoreText}，${nextStep}`;
+}
+
+function createQuestionDrillWeakestDimensionText(item) {
+  const weakest = item.weakestDimension || findQuestionDrillWeakestDimension(item);
+  if (!weakest) {
+    return '当前最弱维度：暂无四维评分，完成一次专项重练后会自动识别。';
+  }
+  return `当前最弱维度：${weakest.label} ${weakest.score} 分，下次回答优先补齐这一项。`;
 }
 
 function renderFrequentFollowUps(records) {

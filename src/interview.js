@@ -1,4 +1,4 @@
-import { levelLabels, questionBank, roleLabels, styleLabels } from './questions.js';
+import { levelLabels, questionBank as defaultQuestionBank, roleLabels, styleLabels } from './questions.js';
 
 const roleTopics = {
   backend: ['MySQL', 'Redis', '网络', '操作系统', '项目经历', '系统设计', '算法'],
@@ -70,18 +70,22 @@ const levelExpectations = {
   }
 };
 
-export function createInterviewPlan(config) {
+export function createInterviewPlan(config, options = {}) {
   const role = config.role || 'backend';
   const level = config.level || 'middle';
   const targetCount = clamp(Number(config.questionCount || 5), 3, 8);
+  const questionSource = Array.isArray(options.questionBank) && options.questionBank.length
+    ? options.questionBank
+    : defaultQuestionBank;
   const resumeSignals = extractResumeSignals(config.resume, config.profileAnalysis);
   const blueprint = createInterviewBlueprint({
     role,
     level,
     targetCount,
-    resumeSignals
+    resumeSignals,
+    questionBank: questionSource
   });
-  const available = buildCandidateQuestionPool(role, level, resumeSignals, blueprint);
+  const available = buildCandidateQuestionPool(role, level, resumeSignals, blueprint, questionSource);
   const selected = [];
   const selectedStages = [];
 
@@ -103,7 +107,7 @@ export function createInterviewPlan(config) {
   }
 
   while (selected.length < Math.min(targetCount, available.length)) {
-    const stage = createFallbackBlueprintStage(selected.length, role, level, resumeSignals);
+    const stage = createFallbackBlueprintStage(selected.length, role, level, resumeSignals, questionSource);
     const match = selectBestQuestion({
       available,
       selected,
@@ -3920,12 +3924,12 @@ function selectBestQuestion({ available, selected, stage = {}, resumeSignals = c
   return ranked[0]?.item || null;
 }
 
-function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals(), blueprint = []) {
+function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals(), blueprint = [], questionSource = defaultQuestionBank) {
   const blueprintCategories = new Set(blueprint.map((item) => item.preferredCategory).filter(Boolean));
   const blueprintTypes = new Set(blueprint.map((item) => item.preferredType).filter(Boolean));
-  const exactMatches = questionBank.filter((item) => item.roles.includes(role) && item.levels.includes(level));
-  const sameRoleFallback = questionBank.filter((item) => item.roles.includes(role) && !exactMatches.includes(item));
-  const adjacentRoleFallback = questionBank.filter((item) => {
+  const exactMatches = questionSource.filter((item) => item.roles.includes(role) && item.levels.includes(level));
+  const sameRoleFallback = questionSource.filter((item) => item.roles.includes(role) && !exactMatches.includes(item));
+  const adjacentRoleFallback = questionSource.filter((item) => {
     return !exactMatches.includes(item)
       && !sameRoleFallback.includes(item)
       && item.levels.includes(level)
@@ -3988,11 +3992,11 @@ function scoreQuestionFit(item, {
   return score;
 }
 
-function createInterviewBlueprint({ role, level, targetCount, resumeSignals = createEmptyResumeSignals() }) {
+function createInterviewBlueprint({ role, level, targetCount, resumeSignals = createEmptyResumeSignals(), questionBank = defaultQuestionBank }) {
   const topics = roleTopics[role] || roleTopics.backend;
   const stages = roleStageBlueprints[role] || roleStageBlueprints.backend;
   const difficultyTargets = levelDifficultyTargets[level] || levelDifficultyTargets.middle;
-  const preferredCategories = createPreferredCategoryQueue(role, resumeSignals, targetCount, topics);
+  const preferredCategories = createPreferredCategoryQueue(role, resumeSignals, targetCount, topics, questionBank);
   const blueprint = [];
   let technicalCategoryIndex = 0;
 
@@ -4032,12 +4036,13 @@ function getPreferredProjectCategory(role) {
   }[role] || '项目经历';
 }
 
-function createFallbackBlueprintStage(index, role, level, resumeSignals = createEmptyResumeSignals()) {
+function createFallbackBlueprintStage(index, role, level, resumeSignals = createEmptyResumeSignals(), questionBank = defaultQuestionBank) {
   return createInterviewBlueprint({
     role,
     level,
     targetCount: Math.max(index + 1, 3),
-    resumeSignals
+    resumeSignals,
+    questionBank
   })[index] || {
     preferredCategory: null,
     preferredType: 'knowledge',
@@ -4046,7 +4051,7 @@ function createFallbackBlueprintStage(index, role, level, resumeSignals = create
   };
 }
 
-function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults) {
+function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults, questionSource = defaultQuestionBank) {
   const queue = [];
   const used = new Set();
 
@@ -4074,7 +4079,7 @@ function createPreferredCategoryQueue(role, resumeSignals, targetCount, defaults
   while (queue.length < targetCount) {
     defaults.forEach(tryPush);
     if (queue.length >= targetCount) break;
-    questionBank.map((item) => item.category).forEach(tryPush);
+    questionSource.map((item) => item.category).forEach(tryPush);
   }
 
   return queue.slice(0, targetCount);

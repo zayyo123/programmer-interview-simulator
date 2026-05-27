@@ -1,0 +1,1871 @@
+{
+  "updatedAt": "2026-05-27T00:00:00.000Z",
+  "questions": [
+    {
+      "id": "approved_java_compile_interpret_001",
+      "category": "Java",
+      "skill": "Java 运行机制",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "为什么说 Java 语言是“编译与解释并存”？请结合字节码、JIT 和跨平台说明。",
+      "keywords": [
+        "字节码",
+        "JVM",
+        "解释执行",
+        "JIT",
+        "跨平台"
+      ],
+      "expectedPoints": [
+        "Java 源码先编译成字节码",
+        "JVM 可以解释执行字节码",
+        "热点代码会被 JIT 编译成本地机器码",
+        "字节码和 JVM 实现跨平台",
+        "说明启动速度和运行期优化取舍"
+      ],
+      "referenceAnswer": "Java 源码会先被 javac 编译成平台无关的字节码，字节码运行在不同平台的 JVM 上，所以具备“一次编译，到处运行”的跨平台特性。运行时 JVM 可以解释执行字节码，也会通过 JIT 编译器把热点代码编译成本地机器码，提高长期运行性能。因此 Java 不是单纯解释型语言，也不是传统一次性编译成本地程序的语言，而是编译和解释、运行期优化结合的体系。面试中要注意区分源码到字节码的编译，以及字节码到机器码的运行期编译。",
+      "excellentAnswer": "我会分两层说。第一层，Java 源码经过 javac 编译成 .class 字节码，这一步是编译；字节码不直接绑定某个操作系统或 CPU，而是交给目标机器上的 JVM 执行，这也是 Java 跨平台的基础。第二层，JVM 启动时可以解释执行字节码，但程序运行一段时间后，热点方法会被 JIT 编译成本地机器码，减少解释开销。所以 Java 的执行模型是先编译成字节码，再由 JVM 解释执行并对热点路径做即时编译优化。真实项目里，长时间运行的服务通常能从 JIT 优化中获益，但冷启动和预热阶段性能可能不稳定。",
+      "commonMistakes": [
+        "只说 Java 是解释型语言。",
+        "把 javac 编译和 JIT 编译混为一谈。",
+        "只背跨平台，不解释字节码和 JVM 的关系。"
+      ],
+      "followUps": [
+        "JIT 编译为什么需要预热？",
+        "字节码跨平台和 JVM 跨平台分别是什么意思？",
+        "AOT 编译和 JIT 编译有什么取舍？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "字节码",
+          "JVM",
+          "解释执行",
+          "JIT"
+        ],
+        "goodToHave": [
+          "跨平台",
+          "热点代码",
+          "预热",
+          "机器码"
+        ],
+        "redFlags": [
+          "认为 Java 只解释执行",
+          "不了解字节码",
+          "混淆 javac 和 JIT"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：已改写为本系统原创面试问法、参考答案、追问和评分点。"
+      }
+    },
+    {
+      "id": "approved_java_exception_usage_001",
+      "category": "Java",
+      "skill": "异常处理",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Java 异常使用有哪些需要注意的地方？请结合业务异常、日志、事务回滚和异常吞掉的风险说明。",
+      "keywords": [
+        "异常处理",
+        "业务异常",
+        "日志",
+        "事务回滚",
+        "异常吞掉"
+      ],
+      "expectedPoints": [
+        "区分业务异常和系统异常",
+        "不要吞掉异常",
+        "日志要有上下文且避免重复打印",
+        "注意事务回滚规则",
+        "不要用异常做正常流程控制"
+      ],
+      "referenceAnswer": "Java 异常处理要先区分业务可预期异常和系统不可预期异常。业务异常通常用于表达参数不合法、状态不允许等可理解的失败；系统异常更偏向数据库、网络、依赖超时或程序 bug。代码里不要 catch 后只打印日志不处理，这会吞掉异常，可能导致上层认为成功，也可能让事务正常提交。日志应带业务 id、请求 id 和关键上下文，但不要每一层都重复打印。异常也不适合做普通流程控制，因为会降低可读性并增加性能和维护成本。",
+      "excellentAnswer": "我会从可恢复性和可观测性说。异常不是越多越好，业务异常要有清晰错误码和提示，系统异常要保留堆栈和上下文。catch 异常时必须明确目的：是转换成业务错误、补偿、降级，还是继续抛给上层；最危险的是 catch 后只 log 不 throw，导致调用方以为成功，Spring 事务也可能提交。日志上我会在边界层统一打印，带 traceId、订单号等上下文，避免每层重复打同一个异常。对于事务方法，还要确认默认只回滚运行时异常，受检异常需要 rollbackFor。最后，不建议用异常表达 if/else 这种正常分支。",
+      "commonMistakes": [
+        "catch 后只打印日志，不继续处理或抛出。",
+        "每一层重复打印同一个异常。",
+        "不知道受检异常默认不触发 Spring 事务回滚。"
+      ],
+      "followUps": [
+        "为什么 catch 后不抛出可能导致事务提交？",
+        "业务异常和系统异常你会如何设计错误码？",
+        "日志在哪一层打印更合适？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "异常吞掉",
+          "日志上下文",
+          "业务异常",
+          "事务回滚"
+        ],
+        "goodToHave": [
+          "错误码",
+          "统一异常处理",
+          "降级",
+          "rollbackFor"
+        ],
+        "redFlags": [
+          "catch 后不处理",
+          "异常做流程控制",
+          "重复打印堆栈"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：保留考点，重写为工程化异常处理题。"
+      }
+    },
+    {
+      "id": "approved_java_string_builder_001",
+      "category": "Java",
+      "skill": "字符串与性能",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Java 字符串拼接什么时候用“+”，什么时候用 StringBuilder？请说明编译器优化、循环拼接和可读性取舍。",
+      "keywords": [
+        "String",
+        "StringBuilder",
+        "字符串拼接",
+        "编译器优化",
+        "循环拼接"
+      ],
+      "expectedPoints": [
+        "简单拼接可以用 +",
+        "编译期常量会被优化",
+        "循环中大量拼接应使用 StringBuilder",
+        "StringBuilder 非线程安全",
+        "不要过度优化牺牲可读性"
+      ],
+      "referenceAnswer": "少量、简单的字符串拼接用 + 通常没有问题，现代 Java 编译器和运行时会做一定优化，例如编译期常量可以直接合并，非循环场景也可能转换为 StringBuilder 或 invokedynamic 形式。真正需要注意的是循环或高频路径中的大量拼接，如果每次都生成新字符串，会带来额外对象和 GC 压力，这时显式使用 StringBuilder 更合适。StringBuilder 不是线程安全的，但大多数局部变量拼接场景不需要线程安全；如果跨线程共享要重新设计或使用同步机制。",
+      "excellentAnswer": "我不会简单说一律用 StringBuilder。普通日志、SQL 片段或少量变量拼接，用 + 可读性更好，而且编译器会优化一部分场景。需要显式用 StringBuilder 的典型场景是循环里不断追加，比如构造大文本、批量导出或高频请求中的字符串组装，因为 String 不可变，每次拼接可能产生新对象。StringBuilder 适合单线程局部构造，StringBuffer 有同步开销现在较少直接使用。工程上还要注意日志拼接，最好用参数化日志，避免 debug 关闭时仍然提前拼接字符串。",
+      "commonMistakes": [
+        "认为任何字符串拼接都必须用 StringBuilder。",
+        "在循环中大量使用 + 造成对象膨胀。",
+        "忽略日志参数化带来的延迟拼接收益。"
+      ],
+      "followUps": [
+        "StringBuilder 和 StringBuffer 的区别是什么？",
+        "为什么 String 不可变会影响大量拼接性能？",
+        "日志里为什么推荐参数化而不是直接拼接？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "+",
+          "StringBuilder",
+          "循环拼接",
+          "编译器优化"
+        ],
+        "goodToHave": [
+          "String 不可变",
+          "GC 压力",
+          "参数化日志",
+          "线程安全"
+        ],
+        "redFlags": [
+          "一律 StringBuilder",
+          "不了解循环拼接成本",
+          "混淆 StringBuilder 和 StringBuffer"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：补充编译器优化、循环拼接和日志场景。"
+      }
+    },
+    {
+      "id": "approved_java_proxy_001",
+      "category": "Java",
+      "skill": "动态代理",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "JDK 动态代理和 CGLIB 动态代理有什么区别？Spring AOP 在实际项目中如何选择？",
+      "keywords": [
+        "JDK 动态代理",
+        "CGLIB",
+        "Spring AOP",
+        "接口",
+        "字节码增强"
+      ],
+      "expectedPoints": [
+        "JDK 代理基于接口",
+        "CGLIB 通过继承生成子类",
+        "final 类或方法限制 CGLIB",
+        "Spring 根据目标对象和配置选择代理方式",
+        "说明 AOP 场景和自调用问题"
+      ],
+      "referenceAnswer": "JDK 动态代理基于接口生成代理对象，要求目标类实现接口；CGLIB 通过字节码增强生成目标类的子类，因此不要求接口，但 final 类或 final 方法无法被正常代理。Spring AOP 里，如果目标对象有接口，默认通常可以使用 JDK 动态代理；如果没有接口或配置强制使用类代理，则使用 CGLIB。实际项目中它们常用于事务、权限、日志、监控等横切逻辑。需要注意 Spring AOP 是代理机制，同类内部自调用不会经过代理，因此事务或切面可能不生效。",
+      "excellentAnswer": "我会从代理对象怎么生成说起。JDK 动态代理依赖接口，运行时生成实现相同接口的代理类，调用会进入 InvocationHandler；CGLIB 则生成目标类的子类，方法调用通过拦截器增强，所以没有接口也能代理，但 final 类、final 方法和 private 方法会受限制。Spring AOP 选择时主要看是否有接口以及 proxyTargetClass 配置。性能差异现在通常不是首要矛盾，更重要的是代理边界：只有从代理对象进入的方法才会被增强，所以 this.xxx() 自调用会绕过事务、缓存或日志切面。",
+      "commonMistakes": [
+        "只背 JDK 基于接口、CGLIB 基于继承，不知道实际限制。",
+        "忽略 final 方法和自调用导致切面失效。",
+        "把 AOP 当成能增强所有方法调用。"
+      ],
+      "followUps": [
+        "为什么 self-invocation 会导致 Spring 事务失效？",
+        "CGLIB 遇到 final 方法会怎样？",
+        "Spring Boot 里什么时候会强制使用 CGLIB？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "JDK 动态代理",
+          "CGLIB",
+          "接口",
+          "继承"
+        ],
+        "goodToHave": [
+          "final 限制",
+          "Spring AOP",
+          "自调用",
+          "InvocationHandler"
+        ],
+        "redFlags": [
+          "不知道代理边界",
+          "不知道 CGLIB 限制",
+          "混淆代理和继承"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：补充 Spring AOP 真实失效场景。"
+      }
+    },
+    {
+      "id": "approved_network_tcp_udp_stream_001",
+      "category": "网络",
+      "skill": "TCP/UDP",
+      "roles": [
+        "backend",
+        "frontend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "为什么说 TCP 是面向字节流，UDP 是面向报文？这对粘包、拆包和应用层协议设计有什么影响？",
+      "keywords": [
+        "TCP",
+        "UDP",
+        "字节流",
+        "报文",
+        "粘包拆包"
+      ],
+      "expectedPoints": [
+        "TCP 不保留应用写入边界",
+        "UDP 保留数据报边界",
+        "TCP 需要应用层协议解决粘包拆包",
+        "UDP 有报文大小和丢包风险",
+        "说明长度字段或分隔符等设计"
+      ],
+      "referenceAnswer": "TCP 提供可靠、有序的字节流传输，它不保留应用层每次 write 的消息边界。发送方写两次，接收方可能一次读到，也可能分多次读到，所以应用层需要通过固定长度、长度字段、分隔符或协议头来解决粘包和拆包。UDP 则以数据报为单位，发送一次通常对应接收一次报文边界，但它不保证可靠、不保证顺序，也可能丢包或被截断。这个差异决定了 TCP 应用要设计消息边界，UDP 应用要处理丢包、乱序、重传或幂等。",
+      "excellentAnswer": "我会把“传输可靠性”和“消息边界”分开说。TCP 可靠、有序，但它给应用的是连续字节流，不知道你业务上哪一段是一条消息，所以会出现粘包和拆包。解决方式一般是在应用层协议里加长度字段、魔数、版本、消息类型，或者用分隔符，但分隔符要考虑转义。UDP 是面向报文，天然保留单个 datagram 的边界，适合 DNS、音视频、实时游戏等能容忍部分丢包或自己处理可靠性的场景。但 UDP 报文过大可能分片，丢包和乱序也要应用层处理。",
+      "commonMistakes": [
+        "把 TCP 粘包理解成 TCP 的 bug。",
+        "认为 UDP 一定可靠保留所有报文。",
+        "只说 TCP 可靠 UDP 不可靠，不谈消息边界。"
+      ],
+      "followUps": [
+        "TCP 应用层协议如何设计长度字段？",
+        "UDP 报文过大为什么有风险？",
+        "HTTP/2 或 WebSocket 如何处理消息边界？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "字节流",
+          "报文",
+          "粘包拆包",
+          "应用层协议"
+        ],
+        "goodToHave": [
+          "长度字段",
+          "分隔符",
+          "UDP 丢包",
+          "乱序",
+          "分片"
+        ],
+        "redFlags": [
+          "认为粘包是 TCP bug",
+          "忽略消息边界",
+          "认为 UDP 可靠"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：改写为协议设计和真实网络问题题。"
+      }
+    },
+    {
+      "id": "approved_network_http_rpc_001",
+      "category": "网络",
+      "skill": "HTTP 与 RPC",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "有了 HTTP，为什么很多微服务还会使用 RPC？请从协议语义、性能、治理和可观测性角度说明取舍。",
+      "keywords": [
+        "HTTP",
+        "RPC",
+        "微服务",
+        "序列化",
+        "服务治理"
+      ],
+      "expectedPoints": [
+        "HTTP 偏通用资源语义",
+        "RPC 偏本地调用体验",
+        "序列化和传输效率差异",
+        "服务发现负载均衡和超时重试治理",
+        "说明可观测性和耦合取舍"
+      ],
+      "referenceAnswer": "HTTP 是通用应用层协议，生态成熟、跨语言、对外开放友好；RPC 更强调像调用本地方法一样调用远程服务，通常配套 IDL、代码生成、二进制序列化、连接复用、服务发现、负载均衡、超时、重试和熔断等治理能力。内部微服务使用 RPC 可以获得更明确的接口契约和更好的性能，但也会增加框架依赖和服务间耦合。对外 API 通常更适合 HTTP/REST，内部高频服务调用可以考虑 gRPC、Dubbo 等 RPC 框架。关键不是 HTTP 和 RPC 谁更高级，而是场景、治理能力和团队成本。",
+      "excellentAnswer": "我会先说明 HTTP 和 RPC 不是完全对立。HTTP 更适合开放接口和资源语义，调试、网关、缓存和浏览器生态都成熟；RPC 更适合内部服务间调用，因为它通常有 IDL 契约、代码生成、二进制序列化、长连接复用、服务发现和负载均衡。性能上 RPC 不一定永远比 HTTP 快，但在高频内部调用和强接口治理场景中更容易做统一超时、重试、熔断、追踪和版本管理。取舍上，对外我倾向 HTTP，对内核心链路可以 RPC，但必须控制重试风暴、超时预算、接口兼容和可观测性。",
+      "commonMistakes": [
+        "认为 RPC 一定比 HTTP 高级。",
+        "只谈性能，不谈服务治理。",
+        "忽略 RPC 重试和超时可能放大故障。"
+      ],
+      "followUps": [
+        "gRPC 为什么常用 HTTP/2？",
+        "RPC 重试如何避免重试风暴？",
+        "对外接口为什么通常不直接暴露内部 RPC？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "HTTP",
+          "RPC",
+          "序列化",
+          "服务治理"
+        ],
+        "goodToHave": [
+          "IDL",
+          "服务发现",
+          "超时重试",
+          "熔断",
+          "链路追踪"
+        ],
+        "redFlags": [
+          "只说 RPC 快",
+          "忽略治理",
+          "不区分内外部接口"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：改写为微服务通信取舍题。"
+      }
+    },
+    {
+      "id": "approved_network_https_rsa_ecdhe_001",
+      "category": "网络",
+      "skill": "HTTPS/TLS",
+      "roles": [
+        "backend",
+        "frontend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "HTTPS 握手里的 RSA 和 ECDHE 有什么区别？为什么现代 TLS 更推荐 ECDHE？",
+      "keywords": [
+        "HTTPS",
+        "TLS",
+        "RSA",
+        "ECDHE",
+        "前向保密"
+      ],
+      "expectedPoints": [
+        "RSA 可用于身份认证和旧式密钥交换",
+        "ECDHE 用于协商临时会话密钥",
+        "ECDHE 支持前向保密",
+        "证书仍用于身份认证",
+        "说明性能和安全取舍"
+      ],
+      "referenceAnswer": "早期 TLS 可以使用 RSA 做密钥交换，客户端生成预主密钥后用服务端公钥加密发送，服务端用私钥解密。如果服务端私钥未来泄露，历史抓包可能被解密。ECDHE 使用临时椭圆曲线 Diffie-Hellman 协商会话密钥，服务端证书主要用于身份认证和签名握手参数，最终会话密钥不会直接由长期私钥加密传输，因此具备前向保密。现代 TLS 更推荐 ECDHE，是因为它在安全性和性能上更适合互联网场景，能降低长期私钥泄露对历史流量的影响。",
+      "excellentAnswer": "我会先把身份认证和密钥交换分开。证书里的公钥用于证明服务端身份，RSA 也曾用于密钥交换：客户端把预主密钥用服务端公钥加密，服务端私钥解密。问题是如果私钥后来泄露，攻击者拿到历史流量就可能回放解密。ECDHE 则是双方用临时密钥协商出会话密钥，服务端用证书对握手参数签名证明身份，长期私钥不直接决定历史会话密钥，所以有前向保密。真实排查 HTTPS 问题时还要看 TLS 版本、密码套件、证书链和握手耗时。",
+      "commonMistakes": [
+        "把证书认证和会话密钥协商混为一谈。",
+        "不知道前向保密的意义。",
+        "认为 HTTPS 安全只取决于是否用了证书。"
+      ],
+      "followUps": [
+        "什么是前向保密？",
+        "TLS 1.3 为什么简化了密码套件选择？",
+        "HTTPS 握手慢时你会看哪些指标？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "RSA",
+          "ECDHE",
+          "会话密钥",
+          "前向保密"
+        ],
+        "goodToHave": [
+          "证书认证",
+          "签名",
+          "TLS 1.3",
+          "密码套件",
+          "握手耗时"
+        ],
+        "redFlags": [
+          "混淆认证和加密",
+          "不了解前向保密",
+          "只说 HTTPS 有证书"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：改写为 TLS 握手安全性题。"
+      }
+    },
+    {
+      "id": "approved_mysql_sql_nosql_001",
+      "category": "MySQL",
+      "skill": "SQL 与 NoSQL 选型",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "SQL 和 NoSQL 数据库有什么区别？在真实项目里你会如何做技术选型？",
+      "keywords": [
+        "SQL",
+        "NoSQL",
+        "关系模型",
+        "事务",
+        "数据模型"
+      ],
+      "expectedPoints": [
+        "SQL 强调关系模型和结构化查询",
+        "NoSQL 数据模型更灵活",
+        "事务一致性和查询能力差异",
+        "结合访问模式选型",
+        "说明混合使用场景"
+      ],
+      "referenceAnswer": "SQL 数据库通常基于关系模型，表结构清晰，支持 SQL 查询、事务、约束和复杂关联，适合订单、支付、库存、财务等强一致和结构化数据场景。NoSQL 是一类非关系型数据库，包括键值、文档、列族、图数据库等，通常在扩展性、灵活 schema、高吞吐或特定访问模式上有优势。选型时不能只看性能，要看数据模型、查询模式、一致性要求、事务边界、运维能力和团队经验。真实项目里经常混合使用：核心交易数据进关系库，缓存、搜索、日志、画像或图关系用更适合的专用存储。",
+      "excellentAnswer": "我会从访问模式和一致性倒推。关系型数据库适合结构稳定、需要事务和复杂查询的核心业务数据，比如订单和支付，能用约束、索引、事务保证正确性。NoSQL 范围很大，Redis 偏键值和缓存，MongoDB 偏文档，Elasticsearch 偏搜索，Cassandra/HBase 偏宽表和大规模写入。它们通常牺牲一部分通用查询或强事务，换扩展性和模型灵活性。选型时我会问：数据怎么读写、是否需要跨实体事务、查询是否复杂、容量增长和一致性要求是什么。不是用 NoSQL 替代 SQL，而是按场景组合。",
+      "commonMistakes": [
+        "认为 NoSQL 一定比 SQL 快。",
+        "把所有非关系数据库混为一类。",
+        "忽略事务和一致性要求。"
+      ],
+      "followUps": [
+        "哪些业务数据不适合只放 NoSQL？",
+        "Redis、MongoDB、Elasticsearch 分别适合什么场景？",
+        "混合使用多种存储时如何保证数据一致性？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "SQL",
+          "NoSQL",
+          "事务",
+          "数据模型"
+        ],
+        "goodToHave": [
+          "访问模式",
+          "一致性",
+          "专用存储",
+          "混合架构",
+          "运维成本"
+        ],
+        "redFlags": [
+          "NoSQL 万能论",
+          "只看性能",
+          "不谈一致性"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：改写为数据库选型题。"
+      }
+    },
+    {
+      "id": "approved_mysql_database_design_001",
+      "category": "MySQL",
+      "skill": "数据库设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "设计一套业务数据库表结构时，你通常会按哪些步骤推进？如何兼顾范式、索引、扩展性和线上演进？",
+      "keywords": [
+        "数据库设计",
+        "范式",
+        "索引",
+        "扩展性",
+        "线上演进"
+      ],
+      "expectedPoints": [
+        "梳理业务实体和关系",
+        "设计表结构和约束",
+        "按查询模式设计索引",
+        "权衡范式和反范式",
+        "考虑迁移和灰度演进"
+      ],
+      "referenceAnswer": "数据库设计通常先从业务场景出发，识别核心实体、关系、生命周期和状态流转，再设计表、字段、主键、唯一约束、外键或逻辑约束。然后根据实际查询和写入路径设计索引，而不是先拍脑袋建索引。范式能减少冗余和更新异常，但在高频查询或报表场景可能需要适度反范式、冗余字段或汇总表。还要考虑数据量增长、冷热数据、分表可能性、字段扩展、审计字段、软删除和幂等约束。线上演进时要保证新旧代码兼容，支持灰度、回填、校验和回滚。",
+      "excellentAnswer": "我会按“业务模型、数据正确性、访问路径、演进成本”推进。先和业务确认实体，比如订单、支付、库存，以及它们的状态机和唯一业务键；再设计字段类型、主键、唯一约束、金额精度、时间字段和审计字段。然后根据接口和报表查询设计联合索引，关注选择性、排序、分页和覆盖索引。范式不是教条，核心交易数据尽量保持清晰约束，高频读可以用冗余字段或汇总表，但要有同步和校验机制。最后还要考虑线上变更，新增字段、索引和回填都要兼容发布，避免一次设计把后续演进锁死。",
+      "commonMistakes": [
+        "只按页面字段建表，不分析业务状态和约束。",
+        "先建很多索引，不看真实查询路径。",
+        "只谈范式，不考虑性能和线上演进。"
+      ],
+      "followUps": [
+        "金额字段为什么不建议用 float/double？",
+        "联合索引字段顺序如何决定？",
+        "冗余字段带来的一致性问题怎么处理？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "业务实体",
+          "表结构",
+          "约束",
+          "索引"
+        ],
+        "goodToHave": [
+          "范式",
+          "反范式",
+          "状态机",
+          "灰度变更",
+          "数据校验"
+        ],
+        "redFlags": [
+          "只按页面建表",
+          "索引拍脑袋",
+          "不考虑线上演进"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：改写为数据库设计流程题。"
+      }
+    },
+    {
+      "id": "approved_java_arraylist_001",
+      "category": "Java",
+      "skill": "集合框架",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "ArrayList 和 LinkedList 有什么区别？请结合底层结构、随机访问、插入删除和真实项目选型说明。",
+      "keywords": [
+        "ArrayList",
+        "LinkedList",
+        "数组",
+        "链表",
+        "随机访问"
+      ],
+      "expectedPoints": [
+        "ArrayList 基于动态数组",
+        "LinkedList 基于链表",
+        "ArrayList 随机访问快",
+        "LinkedList 非随机定位成本高",
+        "结合实际访问模式选型"
+      ],
+      "referenceAnswer": "ArrayList 底层是动态数组，内存连续，按下标随机访问快，扩容时需要创建新数组并复制元素。LinkedList 底层是双向链表，节点不连续，按下标访问需要从头或尾遍历，随机访问性能较差；它在已经定位到节点的情况下插入删除成本较低，但普通按 index 插入仍然需要先遍历定位。真实项目里，大多数场景读多、遍历多、按下标访问多，ArrayList 更常用；LinkedList 并不因为插入删除就一定更快，要结合数据量、访问模式和内存开销判断。",
+      "excellentAnswer": "我会避免简单说 ArrayList 查快、LinkedList 增删快。ArrayList 是动态数组，CPU cache 友好，随机访问 O(1)，尾部追加通常很快，但扩容会复制数组。LinkedList 是双向链表，插入删除如果已经拿到节点是 O(1)，但 Java 里按 index 操作通常先要 O(n) 遍历，而且每个节点还多存前后指针，内存开销更大。工程里除非明确需要队列/双端队列语义，否则我通常优先 ArrayList；需要队列时也会考虑 ArrayDeque，而不是默认 LinkedList。",
+      "commonMistakes": [
+        "机械地说 LinkedList 增删一定快。",
+        "忽略 LinkedList 按下标访问需要遍历。",
+        "忽略链表节点带来的内存和缓存局部性问题。"
+      ],
+      "followUps": [
+        "ArrayList 扩容机制大致是什么？",
+        "为什么 ArrayDeque 常比 LinkedList 更适合做队列？",
+        "LinkedList 在什么场景下仍然有价值？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "动态数组",
+          "双向链表",
+          "随机访问",
+          "插入删除"
+        ],
+        "goodToHave": [
+          "扩容复制",
+          "缓存局部性",
+          "内存开销",
+          "ArrayDeque"
+        ],
+        "redFlags": [
+          "LinkedList 增删一定快",
+          "不知道按 index 遍历成本",
+          "不结合场景"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：候选题分类纠偏为 Java 集合框架，并补充真实选型。"
+      }
+    },
+    {
+      "id": "approved_network_http_https_001",
+      "category": "网络",
+      "skill": "HTTP/HTTPS",
+      "roles": [
+        "backend",
+        "frontend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "HTTP 和 HTTPS 有什么区别？为什么 HTTPS 更安全，线上排查 HTTPS 问题时你会看哪些信号？",
+      "keywords": [
+        "HTTP",
+        "HTTPS",
+        "TLS",
+        "证书",
+        "加密"
+      ],
+      "expectedPoints": [
+        "HTTP 明文传输",
+        "HTTPS 基于 TLS 提供加密和身份认证",
+        "证书链校验",
+        "握手带来额外耗时",
+        "排查证书、TLS 版本和握手耗时"
+      ],
+      "referenceAnswer": "HTTP 默认明文传输，请求和响应可能被窃听或篡改；HTTPS 在 HTTP 之上加入 TLS，通过证书验证服务端身份，并协商会话密钥对传输内容加密，同时借助 MAC/AEAD 保证完整性。HTTPS 更安全不是因为 URL 变成 https，而是因为有身份认证、加密和完整性保护。线上排查时要看证书是否过期、证书链是否完整、域名是否匹配、TLS 版本和密码套件是否兼容、握手耗时、连接复用和 CDN/网关配置。",
+      "excellentAnswer": "我会从安全目标讲：HTTP 没有加密和身份认证，中间人可以看内容甚至改内容；HTTPS 通过 TLS 解决三个问题：用证书证明你连的是正确服务端，用密钥协商生成会话密钥加密内容，用完整性校验防篡改。代价是握手更复杂，首次连接会增加 RTT 和 CPU 成本，所以要配合连接复用、会话恢复和合理的证书链。线上如果 HTTPS 异常，我会先看证书过期、域名不匹配、TLS 版本兼容、握手失败日志和 CDN 回源配置。",
+      "commonMistakes": [
+        "只说 HTTPS 加密，不提身份认证和完整性。",
+        "认为证书存在就一定安全。",
+        "排查 HTTPS 问题只看应用日志，不看握手和证书链。"
+      ],
+      "followUps": [
+        "证书链不完整会导致什么问题？",
+        "HTTPS 首次连接为什么比 HTTP 慢？",
+        "TLS 版本不兼容时客户端通常会看到什么现象？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "TLS",
+          "加密",
+          "身份认证",
+          "证书"
+        ],
+        "goodToHave": [
+          "完整性",
+          "握手耗时",
+          "连接复用",
+          "证书链",
+          "密码套件"
+        ],
+        "redFlags": [
+          "只说加密",
+          "不懂证书校验",
+          "不看 TLS 握手"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：从候选 HTTP/HTTPS 题改写，补充线上排查信号。"
+      }
+    },
+    {
+      "id": "approved_network_time_wait_001",
+      "category": "网络",
+      "skill": "TCP 状态",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "TCP TIME_WAIT 为什么存在？TIME_WAIT 过多会不会出问题，线上你会如何判断和治理？",
+      "keywords": [
+        "TIME_WAIT",
+        "TCP",
+        "四次挥手",
+        "2MSL",
+        "端口耗尽"
+      ],
+      "expectedPoints": [
+        "TIME_WAIT 出现在主动关闭方",
+        "等待 2MSL 处理迟到报文",
+        "保证对端能收到最后 ACK",
+        "评估端口和连接数风险",
+        "通过连接复用、调整架构和参数治理"
+      ],
+      "referenceAnswer": "TIME_WAIT 通常出现在主动关闭连接的一方，主要作用是等待网络中迟到的旧报文自然消失，避免污染后续复用的连接，同时保证最后一个 ACK 如果丢失，对端重发 FIN 时还能再次 ACK。TIME_WAIT 多不一定就是故障，要结合端口耗尽、连接创建失败、QPS、短连接比例和系统参数判断。治理上优先减少短连接，使用连接池和 HTTP keep-alive，避免服务端频繁主动关闭；必要时调整端口范围和内核参数，但不能只靠参数掩盖连接模型问题。",
+      "excellentAnswer": "我会先判断 TIME_WAIT 在谁身上多，因为主动关闭方会进入 TIME_WAIT。如果客户端机器短连接很多，可能出现本地端口耗尽；如果服务端主动关连接，也可能在服务端堆积。TIME_WAIT 的价值是处理迟到包和最后 ACK 丢失，所以不是看到多就删除。线上我会看 ss/netstat、端口使用率、连接建立错误、keep-alive 配置、LB 和网关超时，以及是不是代码每次请求都新建连接。治理优先连接复用和合理超时，再考虑扩大 ephemeral port 范围或调整安全参数。",
+      "commonMistakes": [
+        "看到 TIME_WAIT 多就认为必须立刻清理。",
+        "不知道 TIME_WAIT 通常在主动关闭方。",
+        "只调内核参数，不修短连接模型。"
+      ],
+      "followUps": [
+        "为什么 TIME_WAIT 要等待 2MSL？",
+        "服务端 TIME_WAIT 多和客户端 TIME_WAIT 多分别说明什么？",
+        "HTTP keep-alive 如何影响 TIME_WAIT 数量？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "主动关闭方",
+          "2MSL",
+          "迟到报文",
+          "最后 ACK"
+        ],
+        "goodToHave": [
+          "端口耗尽",
+          "连接池",
+          "keep-alive",
+          "短连接",
+          "内核参数"
+        ],
+        "redFlags": [
+          "一味清理 TIME_WAIT",
+          "不知道主动关闭方",
+          "忽略连接复用"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：改写为 TCP 状态和线上治理题。"
+      }
+    },
+    {
+      "id": "approved_java_serialization_protocol_001",
+      "category": "Java",
+      "skill": "序列化",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "常见序列化协议有哪些？在 RPC、缓存和消息队列场景中你会如何选择 JSON、Protobuf、Avro 或 Java 原生序列化？",
+      "keywords": [
+        "序列化",
+        "JSON",
+        "Protobuf",
+        "Avro",
+        "Java 原生序列化"
+      ],
+      "expectedPoints": [
+        "说明序列化目的",
+        "比较可读性和性能",
+        "考虑 schema 演进",
+        "跨语言兼容",
+        "安全和兼容性风险"
+      ],
+      "referenceAnswer": "序列化是把对象转换成可存储或传输的字节或文本形式，反序列化则还原对象。JSON 可读性好、生态广，适合开放接口和调试，但体积和解析性能一般；Protobuf 体积小、性能好、跨语言强，适合 RPC 和高频内部通信，但需要维护 IDL；Avro 常用于数据平台和流式场景，强调 schema 演进；Java 原生序列化使用方便但性能、兼容性和安全性都不理想，一般不推荐作为跨服务协议。选型要看性能、可读性、跨语言、schema 演进和安全风险。",
+      "excellentAnswer": "我会按场景选。对外 API 和日志排查重视可读性，JSON 很合适；内部 RPC 高 QPS、跨语言调用，Protobuf 更常见，因为有明确 schema、体积小、解析快；数据湖或消息流里，如果关心 schema 演进和批量数据处理，可以考虑 Avro。Java 原生序列化我会非常谨慎，因为它和 Java 类强耦合，跨语言差，版本演进麻烦，还有反序列化安全风险。缓存和 MQ 里还要考虑字段兼容、灰度发布时新旧版本能否互相读取，以及反序列化失败后的降级处理。",
+      "commonMistakes": [
+        "只比较速度，不考虑 schema 演进。",
+        "在跨语言服务中使用 Java 原生序列化。",
+        "忽略反序列化安全和版本兼容。"
+      ],
+      "followUps": [
+        "Protobuf 删除字段为什么要谨慎？",
+        "Java 原生反序列化有哪些安全风险？",
+        "灰度发布时如何保证新旧消息格式兼容？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "JSON",
+          "Protobuf",
+          "跨语言",
+          "schema"
+        ],
+        "goodToHave": [
+          "Avro",
+          "Java 原生序列化",
+          "安全风险",
+          "版本兼容",
+          "消息队列"
+        ],
+        "redFlags": [
+          "只看性能",
+          "忽略跨语言",
+          "不考虑兼容和安全"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：候选序列化协议题改写为协议选型题。"
+      }
+    },
+    {
+      "id": "approved_java_reflection_001",
+      "category": "Java",
+      "skill": "反射",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Java 反射有什么优缺点？Spring、ORM 或测试框架为什么会大量使用反射？",
+      "keywords": [
+        "反射",
+        "Class",
+        "运行时",
+        "框架",
+        "性能"
+      ],
+      "expectedPoints": [
+        "运行时获取类和成员信息",
+        "动态创建对象和调用方法",
+        "提升框架通用性",
+        "性能和安全成本",
+        "破坏封装和类型检查风险"
+      ],
+      "referenceAnswer": "反射允许程序在运行时获取类、字段、方法、注解等元信息，并动态创建对象或调用方法。它让框架可以在不知道具体业务类的情况下完成依赖注入、ORM 映射、序列化、测试 Mock 等通用能力。缺点是反射调用通常比直接调用慢，代码可读性和类型安全较差，可能绕过封装访问私有成员，也会带来安全和权限控制问题。实际项目里应把反射封装在框架或基础设施层，并通过缓存 Method、Constructor 等元数据降低开销。",
+      "excellentAnswer": "我会把反射理解为运行时元编程能力。Spring 可以扫描注解、创建 Bean、注入字段；ORM 可以根据实体字段映射数据库列；测试框架可以动态构造对象和调用方法。这些都依赖反射带来的通用性。代价是直接调用变成运行时解析，性能和可维护性都差一些，也绕过了编译期类型检查和封装边界。工程上我不会在业务代码里随意反射，而是把它封装起来，缓存元数据，控制 accessible，并对异常和安全权限做处理。",
+      "commonMistakes": [
+        "只说反射慢，不知道它解决的框架通用性问题。",
+        "在业务代码里大量散落反射逻辑。",
+        "忽略反射绕过封装和安全控制。"
+      ],
+      "followUps": [
+        "Spring 依赖注入里反射通常用在哪些环节？",
+        "如何降低反射性能开销？",
+        "反射和动态代理有什么关系和区别？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "运行时",
+          "类元信息",
+          "动态调用",
+          "框架"
+        ],
+        "goodToHave": [
+          "注解",
+          "ORM",
+          "性能开销",
+          "缓存元数据",
+          "安全"
+        ],
+        "redFlags": [
+          "只说慢",
+          "不知道框架场景",
+          "忽略类型安全"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：反射候选题改写并补充框架落地。"
+      }
+    },
+    {
+      "id": "approved_java_generics_001",
+      "category": "Java",
+      "skill": "泛型",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Java 泛型有什么作用？请说明类型安全、类型擦除、通配符上界和下界的使用场景。",
+      "keywords": [
+        "泛型",
+        "类型安全",
+        "类型擦除",
+        "上界通配符",
+        "下界通配符"
+      ],
+      "expectedPoints": [
+        "泛型提升编译期类型安全",
+        "减少强制类型转换",
+        "运行期存在类型擦除",
+        "extends 适合生产者读取",
+        "super 适合消费者写入"
+      ],
+      "referenceAnswer": "泛型让集合、接口和方法可以在编译期约束类型，减少强制转换和 ClassCastException 风险。例如 List<String> 能保证放入和取出的元素按 String 使用。Java 泛型主要通过类型擦除实现，运行期很多泛型信息会被擦掉，因此不能直接 new T，也不能用基本类型作为泛型参数。通配符里 ? extends T 表示上界，适合只读取 T 或其子类的生产者；? super T 表示下界，适合写入 T 或其子类的消费者，常用 PECS 原则理解。",
+      "excellentAnswer": "我会先说泛型解决的是编译期类型安全和 API 复用。比如 Repository<T>、Result<T>、List<String> 都能让调用者少写强转，也让错误更早暴露。Java 泛型是类型擦除，所以运行期不能像模板那样保留所有类型信息，这也是不能 new T、不能 List<int> 的原因。通配符上界 extends 适合读取，比如从 List<? extends Number> 里读 Number；下界 super 适合写入，比如把 Integer 放进 List<? super Integer>。真实项目里泛型常用于统一响应、DAO、事件处理和策略注册。",
+      "commonMistakes": [
+        "认为泛型运行期一定保留完整类型信息。",
+        "分不清 extends 和 super 的读写场景。",
+        "把泛型只理解为集合语法糖。"
+      ],
+      "followUps": [
+        "什么是类型擦除？",
+        "为什么不能 new T？",
+        "PECS 原则是什么意思？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "类型安全",
+          "类型擦除",
+          "extends",
+          "super"
+        ],
+        "goodToHave": [
+          "PECS",
+          "减少强转",
+          "统一响应",
+          "DAO",
+          "策略注册"
+        ],
+        "redFlags": [
+          "不了解类型擦除",
+          "混淆上界下界",
+          "只会写 List<T>"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：合并泛型与通配符候选，改写为完整泛型题。"
+      }
+    },
+    {
+      "id": "approved_java_try_with_resources_001",
+      "category": "Java",
+      "skill": "资源管理",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "try-with-resources 相比 try-catch-finally 有什么优势？哪些资源适合用它管理？",
+      "keywords": [
+        "try-with-resources",
+        "AutoCloseable",
+        "资源释放",
+        "异常抑制",
+        "finally"
+      ],
+      "expectedPoints": [
+        "自动关闭实现 AutoCloseable 的资源",
+        "减少 finally 手动关闭代码",
+        "避免资源泄漏",
+        "处理关闭异常和业务异常",
+        "适合流、连接、Statement 等资源"
+      ],
+      "referenceAnswer": "try-with-resources 可以自动关闭实现 AutoCloseable 或 Closeable 的资源，例如文件流、网络流、数据库连接、Statement、ResultSet 等。相比 try-catch-finally，它减少手动关闭样板代码，也降低忘记关闭或关闭顺序错误导致资源泄漏的风险。如果业务逻辑抛异常，同时 close 也抛异常，Java 会把关闭异常作为 suppressed exception 挂到主异常上，便于排查。它不适合管理不需要关闭生命周期的普通对象，也不能替代连接池、事务和超时控制。",
+      "excellentAnswer": "我会说它主要解决资源释放的可靠性和可读性问题。传统 finally 里手动 close 容易写出嵌套判空、重复异常处理，甚至 close 抛异常覆盖原始异常。try-with-resources 会在代码块结束时按声明的逆序自动 close，并保留 suppressed exception。文件流、Socket、JDBC Connection/Statement/ResultSet、锁包装类等实现 AutoCloseable 的资源都适合。项目里还要注意连接从连接池拿出来后 close 通常是归还连接，而不是物理关闭。",
+      "commonMistakes": [
+        "finally 里 close 抛异常覆盖真正业务异常。",
+        "忘记关闭流或数据库资源。",
+        "不知道 close 对连接池资源通常是归还连接。"
+      ],
+      "followUps": [
+        "suppressed exception 是什么？",
+        "多个资源声明时关闭顺序是什么？",
+        "JDBC 连接池里 close 的语义是什么？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "AutoCloseable",
+          "自动关闭",
+          "资源泄漏",
+          "finally"
+        ],
+        "goodToHave": [
+          "suppressed exception",
+          "关闭顺序",
+          "JDBC",
+          "连接池"
+        ],
+        "redFlags": [
+          "不知道 AutoCloseable",
+          "忽略 close 异常",
+          "资源不关闭"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：try-with-resources 候选题改写为资源管理题。"
+      }
+    },
+    {
+      "id": "approved_java_class_loading_error_001",
+      "category": "Java",
+      "skill": "类加载",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "ClassNotFoundException 和 NoClassDefFoundError 有什么区别？线上启动或运行时报类缺失时你会怎么排查？",
+      "keywords": [
+        "ClassNotFoundException",
+        "NoClassDefFoundError",
+        "类加载",
+        "classpath",
+        "依赖冲突"
+      ],
+      "expectedPoints": [
+        "ClassNotFoundException 通常是显式加载找不到类",
+        "NoClassDefFoundError 常见于编译期存在运行期缺失或初始化失败",
+        "检查依赖和 classpath",
+        "排查版本冲突",
+        "关注打包和容器环境差异"
+      ],
+      "referenceAnswer": "ClassNotFoundException 是受检异常，常见于 Class.forName、ClassLoader.loadClass 等显式加载类时找不到目标类。NoClassDefFoundError 是 Error，常见于编译时类存在，但运行时类路径缺失、依赖包没打进去、版本冲突，或者类初始化失败后再次使用。线上排查要看完整异常栈、缺失类名、打包产物、依赖树、classpath、容器镜像和运行环境差异。还要检查 shade、provided 依赖、插件化类加载器和多版本 jar 冲突。",
+      "excellentAnswer": "我会先看异常发生时机和栈。ClassNotFoundException 多是代码显式按名字加载类失败，比如 JDBC driver、SPI 或反射加载。NoClassDefFoundError 更像运行期链接阶段发现类不可用，可能是 jar 没带上、版本不一致、类初始化失败或容器 classloader 隔离导致。排查时我会先定位缺失类属于哪个 jar，用 mvn dependency:tree 或 gradle dependencies 查依赖树，再看最终 fat jar、Docker 镜像和启动 classpath。线上还要关注本地能跑、容器不能跑这种环境差异。",
+      "commonMistakes": [
+        "把两个异常都简单说成找不到类。",
+        "只看类名，不查依赖树和打包产物。",
+        "忽略 provided scope、shade 和容器 classloader。"
+      ],
+      "followUps": [
+        "NoClassDefFoundError 可能由类初始化失败触发吗？",
+        "如何定位缺失类属于哪个 jar？",
+        "为什么本地运行正常但容器里缺类？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "ClassNotFoundException",
+          "NoClassDefFoundError",
+          "classpath",
+          "依赖"
+        ],
+        "goodToHave": [
+          "依赖树",
+          "fat jar",
+          "provided",
+          "classloader",
+          "初始化失败"
+        ],
+        "redFlags": [
+          "混为一谈",
+          "不查打包产物",
+          "不看完整栈"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：候选异常题改写为线上依赖排查题。"
+      }
+    },
+    {
+      "id": "approved_java_blocking_queue_001",
+      "category": "Java",
+      "skill": "并发队列",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "ArrayBlockingQueue、LinkedBlockingQueue 和 ConcurrentLinkedQueue 有什么区别？线程池队列选型时你会如何取舍？",
+      "keywords": [
+        "ArrayBlockingQueue",
+        "LinkedBlockingQueue",
+        "ConcurrentLinkedQueue",
+        "线程池",
+        "背压"
+      ],
+      "expectedPoints": [
+        "ArrayBlockingQueue 有界数组阻塞队列",
+        "LinkedBlockingQueue 链表阻塞队列且容量要谨慎",
+        "ConcurrentLinkedQueue 非阻塞无界队列",
+        "线程池需要背压和拒绝策略",
+        "结合内存和延迟取舍"
+      ],
+      "referenceAnswer": "ArrayBlockingQueue 是基于数组的有界阻塞队列，容量固定，适合需要明确背压的线程池场景；LinkedBlockingQueue 基于链表，构造时如果不指定容量可能接近无界，容易在生产快于消费时积压内存；ConcurrentLinkedQueue 是非阻塞无界队列，不提供阻塞等待语义，适合高并发普通队列，但不适合作为需要容量控制的线程池阻塞队列。线程池队列选型要结合任务耗时、流量峰值、内存上限、拒绝策略和降级要求。",
+      "excellentAnswer": "我会先看是否需要阻塞和容量控制。线程池里我通常偏向有界队列，因为它能形成背压，配合拒绝策略保护系统。ArrayBlockingQueue 内存结构紧凑、容量固定；LinkedBlockingQueue 吞吐可能不错，但如果不设容量，任务堆积会把内存打满。ConcurrentLinkedQueue 是 lock-free 非阻塞队列，没有 put/take 阻塞语义，也没有天然容量限制，不适合直接表达线程池的排队上限。真实线上问题里，队列无界往往会把延迟和内存风险藏起来，直到 OOM 或请求超时才暴露。",
+      "commonMistakes": [
+        "线程池使用无界 LinkedBlockingQueue 导致内存堆积。",
+        "把 ConcurrentLinkedQueue 当成阻塞队列用。",
+        "只看吞吐，不考虑背压和拒绝策略。"
+      ],
+      "followUps": [
+        "线程池队列过长会如何影响接口延迟？",
+        "为什么有界队列需要配合拒绝策略？",
+        "LinkedBlockingQueue 默认容量有什么风险？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "有界队列",
+          "阻塞队列",
+          "无界风险",
+          "背压"
+        ],
+        "goodToHave": [
+          "拒绝策略",
+          "线程池",
+          "内存风险",
+          "非阻塞队列",
+          "延迟"
+        ],
+        "redFlags": [
+          "无界队列无风险",
+          "混淆阻塞和非阻塞",
+          "不考虑拒绝策略"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：合并并发队列候选，改写为线程池队列选型题。"
+      }
+    },
+    {
+      "id": "approved_go_zero_value_001",
+      "category": "Go",
+      "skill": "Go 基础",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Go 里的 zero value 是什么？它对结构体设计、map/slice/channel 使用有什么影响？",
+      "keywords": [
+        "Go",
+        "zero value",
+        "map",
+        "slice",
+        "channel"
+      ],
+      "expectedPoints": [
+        "变量声明后有默认零值",
+        "数值、bool、string、指针等零值不同",
+        "nil map 不能写入",
+        "nil slice 可以 append",
+        "结构体应尽量零值可用"
+      ],
+      "referenceAnswer": "Go 变量声明后即使没有显式初始化，也会有对应类型的零值：数字是 0，bool 是 false，string 是空字符串，指针、map、slice、channel、function、interface 的零值通常是 nil。这个设计让很多结构体可以开箱即用，但也要注意 nil map 不能直接写入，必须 make；nil slice 可以 append；nil channel 会永久阻塞收发。设计结构体时，如果零值就是一个可用状态，会减少初始化成本和误用风险。",
+      "excellentAnswer": "我会把 zero value 当成 Go API 设计的一部分。比如 sync.Mutex 的零值可用，所以结构体里直接嵌一个 Mutex 不需要初始化；bytes.Buffer 零值也可用。基础类型零值比较直观，容易踩坑的是引用类型：nil slice 可以 len、range、append，但 nil map 写入会 panic；nil channel 收发会阻塞，常用于 select 里动态关闭某个 case。项目里我会尽量让自定义类型零值可用，或者在构造函数里明确初始化 map/channel 等必须 make 的字段。",
+      "commonMistakes": [
+        "认为所有 nil 容器都能写入。",
+        "不知道 nil channel 会阻塞。",
+        "设计结构体时零值不可用但没有构造函数约束。"
+      ],
+      "followUps": [
+        "nil slice 和空 slice 有什么区别？",
+        "为什么 nil map 写入会 panic？",
+        "哪些标准库类型零值就是可用的？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "zero value",
+          "nil map",
+          "nil slice",
+          "nil channel"
+        ],
+        "goodToHave": [
+          "结构体设计",
+          "sync.Mutex",
+          "append",
+          "select"
+        ],
+        "redFlags": [
+          "混淆 nil slice/map",
+          "不知道 nil channel 阻塞",
+          "忽略零值可用设计"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "Big Companies Interview Questions",
+        "sourceUrl": "https://github.com/realabbas/big-companies-interview-questions",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://raw.githubusercontent.com/realabbas/big-companies-interview-questions/master/LICENSE",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：英文 Go zero value 候选改写为中文 Go 基础题。"
+      }
+    },
+    {
+      "id": "approved_go_stack_queue_001",
+      "category": "Go",
+      "skill": "Go 数据结构",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "algorithm",
+      "codeKind": "algorithm",
+      "difficulty": 2,
+      "question": "请用 Go 思路实现一个栈或队列，并说明 slice 扩容、内存保留和并发安全需要注意什么。",
+      "keywords": [
+        "Go",
+        "栈",
+        "队列",
+        "slice",
+        "并发安全"
+      ],
+      "expectedPoints": [
+        "栈可以用 slice append/pop",
+        "队列可以用头尾下标或环形数组",
+        "注意 slice 底层数组保留",
+        "说明复杂度",
+        "并发场景需要锁或 channel"
+      ],
+      "referenceAnswer": "Go 里栈可以用 slice 实现，push 用 append，pop 取最后一个元素并缩短切片，均摊 O(1)。队列也可以用 slice 加头尾下标实现，但如果一直 q = q[1:]，底层数组可能被引用导致内存不能释放；更稳的方式是维护 head index、定期压缩，或用环形数组。普通 slice 实现不是并发安全的，多 goroutine 访问需要 mutex、channel 或专门的并发结构。回答时还要说明空栈/空队列边界、扩容成本和空间复杂度。",
+      "excellentAnswer": "我会先给简单栈：items []T，Push append，Pop 判断 len 后取 items[len-1]，再把 slice 截短。队列如果直接每次切掉头部，短期简单，但高频场景会有底层数组保留和拷贝问题，所以我更倾向用 head/tail 或 ring buffer。复杂度上 push/pop 均摊 O(1)，队列出入队也应做到 O(1)。如果是并发队列，不能直接多个 goroutine 读写同一个 slice，要用 mutex 保护，或者如果语义合适就用 channel。还要注意返回被移除元素时清空引用，帮助 GC 回收。",
+      "commonMistakes": [
+        "队列一直 q = q[1:] 导致底层数组长期保留。",
+        "没有处理空栈/空队列。",
+        "认为 slice append 天然并发安全。"
+      ],
+      "followUps": [
+        "slice 扩容会带来什么成本？",
+        "为什么出队后有时要把元素置零？",
+        "channel 能完全替代队列吗？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "slice",
+          "push/pop",
+          "队列",
+          "复杂度"
+        ],
+        "goodToHave": [
+          "环形数组",
+          "内存保留",
+          "GC",
+          "mutex",
+          "channel"
+        ],
+        "redFlags": [
+          "不处理空边界",
+          "忽略并发安全",
+          "不知道 slice 底层数组"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "Big Companies Interview Questions",
+        "sourceUrl": "https://github.com/realabbas/big-companies-interview-questions",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://raw.githubusercontent.com/realabbas/big-companies-interview-questions/master/LICENSE",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：英文 Go 数据结构候选改写为代码思路题。"
+      }
+    },
+    {
+      "id": "approved_go_reverse_linked_list_001",
+      "category": "Go",
+      "skill": "链表算法",
+      "roles": [
+        "go",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "algorithm",
+      "codeKind": "algorithm",
+      "difficulty": 2,
+      "question": "请用 Go 实现或说明如何反转单链表，并分析边界条件、时间复杂度和空间复杂度。",
+      "keywords": [
+        "Go",
+        "链表",
+        "反转链表",
+        "指针",
+        "复杂度"
+      ],
+      "expectedPoints": [
+        "维护 prev/current/next 指针",
+        "逐个反转 next",
+        "处理空链表和单节点",
+        "时间 O(n)",
+        "空间 O(1)"
+      ],
+      "referenceAnswer": "反转单链表可以用三个指针迭代完成：prev 初始为 nil，current 指向 head；每轮先保存 next := current.Next，再把 current.Next 指向 prev，然后 prev = current，current = next。循环结束后 prev 就是新头节点。空链表和单节点链表自然可以处理。整个过程每个节点访问一次，时间复杂度 O(n)，只使用常数个指针，空间复杂度 O(1)。Go 实现时要注意 nil 判断和指针字段修改顺序，避免断链。",
+      "excellentAnswer": "我会先说不变量：prev 表示已经反转好的前半段头部，current 表示待处理节点。每次处理 current 前必须先保存 next，否则把 current.Next 指向 prev 后就找不到后续节点了。伪代码是 for current != nil { next := current.Next; current.Next = prev; prev = current; current = next }，最后返回 prev。边界上 head 为 nil 返回 nil，只有一个节点也能返回自身。这个题重点不是语法，而是指针顺序和不丢链。",
+      "commonMistakes": [
+        "没有先保存 next，导致链表断掉。",
+        "循环结束后返回了 current 而不是 prev。",
+        "没有处理空链表。"
+      ],
+      "followUps": [
+        "如何递归反转链表？",
+        "如何反转链表的一段区间？",
+        "为什么迭代解法空间复杂度是 O(1)？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "prev",
+          "current",
+          "next",
+          "指针反转"
+        ],
+        "goodToHave": [
+          "空链表",
+          "单节点",
+          "O(n)",
+          "O(1)",
+          "不变量"
+        ],
+        "redFlags": [
+          "断链",
+          "返回错误头节点",
+          "复杂度不清"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "Big Companies Interview Questions",
+        "sourceUrl": "https://github.com/realabbas/big-companies-interview-questions",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://raw.githubusercontent.com/realabbas/big-companies-interview-questions/master/LICENSE",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：英文 Go 链表候选改写为算法题。"
+      }
+    },
+    {
+      "id": "approved_frontend_react_key_001",
+      "category": "前端",
+      "skill": "React 渲染",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "React 列表渲染里的 key 有什么作用？为什么不推荐在可变列表中直接使用数组下标作为 key？",
+      "keywords": [
+        "React",
+        "key",
+        "列表渲染",
+        "diff",
+        "状态错乱"
+      ],
+      "expectedPoints": [
+        "key 帮助 React 识别元素身份",
+        "影响 diff 和复用",
+        "下标 key 在插入删除排序时会错配",
+        "可能导致组件状态错乱",
+        "应使用稳定唯一业务 id"
+      ],
+      "referenceAnswer": "React 的 key 用来标识列表中元素的稳定身份，帮助 diff 算法判断哪些节点可以复用、移动或销毁。使用稳定唯一的 key 可以减少错误复用和不必要渲染。如果在会插入、删除或排序的列表里使用数组下标作为 key，当元素位置变化时，React 会把原位置的组件实例复用给另一个数据项，可能导致输入框内容、组件内部状态、动画或焦点错乱。更好的做法是使用数据库 id、业务唯一键或稳定生成的 id。",
+      "excellentAnswer": "我会把 key 解释成虚拟 DOM diff 时的身份标识，而不是只是为了消除 warning。稳定 key 能让 React 知道同一个业务项在列表变化后还是同一个组件。数组下标在静态列表里问题不大，但只要列表会插入、删除、过滤或排序，下标就会变，React 可能错误复用组件，导致状态和数据对不上，比如输入框内容串行。真实项目里我会优先用后端 id；如果没有 id，就在数据进入前生成稳定 id，而不是每次 render 用 Math.random。",
+      "commonMistakes": [
+        "认为 key 只是去掉控制台警告。",
+        "在可变列表里使用 index 作为 key。",
+        "每次 render 用随机数作为 key，导致组件反复重建。"
+      ],
+      "followUps": [
+        "什么情况下 index key 可以接受？",
+        "为什么随机 key 会让性能变差？",
+        "key 是否会作为 props 传给子组件？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "key",
+          "diff",
+          "稳定身份",
+          "index 风险"
+        ],
+        "goodToHave": [
+          "状态错乱",
+          "业务 id",
+          "随机 key",
+          "组件复用"
+        ],
+        "redFlags": [
+          "只说去 warning",
+          "乱用 index",
+          "每次随机 key"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "Big Companies Interview Questions",
+        "sourceUrl": "https://github.com/realabbas/big-companies-interview-questions",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://raw.githubusercontent.com/realabbas/big-companies-interview-questions/master/LICENSE",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：React key 候选纠偏为前端渲染题。"
+      }
+    },
+    {
+      "id": "approved_mysql_index_cost_001",
+      "category": "MySQL",
+      "skill": "索引成本",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "索引越多越好吗？请说明索引对查询、写入、存储、锁和执行计划的影响。",
+      "keywords": [
+        "索引成本",
+        "写入放大",
+        "存储空间",
+        "执行计划",
+        "锁"
+      ],
+      "expectedPoints": [
+        "索引能提升部分查询",
+        "索引会增加写入维护成本",
+        "占用额外存储",
+        "可能影响优化器选择",
+        "需要结合业务查询和写入频率评估"
+      ],
+      "referenceAnswer": "索引不是越多越好。合适的索引可以减少扫描行数、提升过滤、排序和覆盖查询效率，但每次 insert、update、delete 都要维护相关索引，索引越多写入成本越高，占用的磁盘和 buffer pool 也越多。低选择性或很少使用的索引收益有限，还可能让优化器选择不理想的执行计划。索引也会影响锁范围，尤其在 InnoDB 中是否命中合适索引会影响扫描和加锁范围。设计索引要结合慢日志、Explain、查询频率、写入频率和业务 SLA 做取舍。",
+      "excellentAnswer": "我会先说索引的收益是减少扫描，而成本是维护和空间。一个订单表如果给每个字段都建索引，查询看似方便，但写入时每个索引都要更新 B+ 树，页分裂、redo、buffer pool 压力都会增加；存储也变大，缓存命中率可能下降。索引选择还要看选择性和组合顺序，低选择性字段单独建索引可能没什么价值。线上我会用慢日志和 Explain 找真正高频慢 SQL，再通过联合索引、覆盖索引或 SQL 改写解决，而不是盲目堆索引。新索引上线后也要观察写入延迟和执行计划变化。",
+      "commonMistakes": [
+        "慢查询一律加索引。",
+        "忽略写入成本和存储成本。",
+        "不看 Explain 和查询频率。"
+      ],
+      "followUps": [
+        "低选择性字段为什么不一定适合单独建索引？",
+        "新增索引后为什么执行计划可能反而变差？",
+        "联合索引如何兼顾过滤和排序？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "查询收益",
+          "写入成本",
+          "存储成本",
+          "执行计划"
+        ],
+        "goodToHave": [
+          "选择性",
+          "覆盖索引",
+          "buffer pool",
+          "锁范围",
+          "慢日志"
+        ],
+        "redFlags": [
+          "索引越多越好",
+          "不看执行计划",
+          "忽略写入"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "Big Companies Interview Questions",
+        "sourceUrl": "https://github.com/realabbas/big-companies-interview-questions",
+        "license": "CC0-1.0",
+        "licenseUrl": "https://raw.githubusercontent.com/realabbas/big-companies-interview-questions/master/LICENSE",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：索引影响候选改写为 MySQL 索引成本题。"
+      }
+    },
+    {
+      "id": "approved_java_value_passing_001",
+      "category": "Java",
+      "skill": "参数传递",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "为什么说 Java 只有值传递？对象作为参数传入方法后，修改字段和重新赋值有什么区别？",
+      "keywords": [
+        "值传递",
+        "引用副本",
+        "对象参数",
+        "重新赋值",
+        "字段修改"
+      ],
+      "expectedPoints": [
+        "Java 参数传递都是值传递",
+        "对象参数传递的是引用值的副本",
+        "通过副本可以修改同一对象字段",
+        "重新赋值不会改变调用方引用",
+        "结合例子说明"
+      ],
+      "referenceAnswer": "Java 方法参数传递都是值传递。基本类型传递的是具体值的副本；对象参数传递的是引用值的副本，也就是两个引用变量指向同一个对象。因此在方法里通过参数引用修改对象字段，调用方能看到变化；但如果在方法里把参数重新赋值为另一个对象，只是改变了参数这个局部变量保存的引用副本，不会改变调用方原来的引用。这个区别经常在集合修改、DTO 填充和方法封装中出现。",
+      "excellentAnswer": "我会用一句话概括：Java 传的是值，只是对象变量的值本身是引用地址。比如 User u 传进方法后，参数 p 拿到的是 u 里引用值的一份拷贝，p.setName 会改同一个 User 对象，所以外面能看到；但 p = new User() 只是让 p 指向新对象，外面的 u 不变。这个问题的关键是区分“修改对象内容”和“修改引用变量本身”。所以 Java 没有 C++ 那种引用传递语义，也不能通过给参数重新赋值来替换调用方对象。",
+      "commonMistakes": [
+        "说对象是引用传递。",
+        "分不清修改字段和重新赋值。",
+        "用结果现象代替参数传递机制解释。"
+      ],
+      "followUps": [
+        "为什么 swap(a, b) 不能交换两个对象引用？",
+        "String 作为参数时为什么看起来更容易误解？",
+        "集合传入方法后 add 元素调用方能看到吗？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "值传递",
+          "引用值副本",
+          "字段修改",
+          "重新赋值"
+        ],
+        "goodToHave": [
+          "swap 示例",
+          "基本类型",
+          "对象引用",
+          "String"
+        ],
+        "redFlags": [
+          "说 Java 引用传递",
+          "混淆字段修改和赋值",
+          "不能举例"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：Java 值传递候选改写为易错机制题。"
+      }
+    },
+    {
+      "id": "approved_java_annotation_001",
+      "category": "Java",
+      "skill": "注解",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Java 注解是如何被解析和使用的？请结合编译期处理、运行时反射和 Spring 注解说明。",
+      "keywords": [
+        "注解",
+        "反射",
+        "APT",
+        "Retention",
+        "Spring"
+      ],
+      "expectedPoints": [
+        "注解本身是元数据",
+        "Retention 决定保留阶段",
+        "编译期可以用注解处理器生成代码",
+        "运行时可通过反射读取",
+        "Spring 通过扫描和代理使用注解"
+      ],
+      "referenceAnswer": "注解本身是附加在类、方法、字段等元素上的元数据，是否能在运行时读取取决于 Retention 策略。SOURCE 注解只在源码阶段存在，CLASS 会进入 class 文件但运行时不一定可见，RUNTIME 可以通过反射读取。编译期可以用注解处理器处理注解并生成代码，例如 Lombok、MapStruct 一类工具；运行时框架可以通过反射扫描注解，例如 Spring 根据 @Component 创建 Bean，根据 @Transactional 生成代理增强事务。使用注解时要注意扫描范围、代理边界和运行时开销。",
+      "excellentAnswer": "我会分编译期和运行期。编译期注解处理器可以在 javac 阶段读取注解并生成代码，优点是运行时开销低，但调试和构建链路更复杂。运行期注解需要 RetentionPolicy.RUNTIME，框架通过反射读取元数据，再配合代理、拦截器或 BeanPostProcessor 实现功能。Spring 里很多注解不是注解自己有魔法，而是容器扫描到它后注册 Bean 或创建代理。比如 @Transactional 只有方法从代理对象进入才生效，自调用仍会绕过代理。",
+      "commonMistakes": [
+        "认为注解本身会自动执行业务逻辑。",
+        "不知道 Retention 会影响运行时读取。",
+        "忽略 Spring 注解背后的扫描和代理机制。"
+      ],
+      "followUps": [
+        "RetentionPolicy.RUNTIME 和 CLASS 有什么区别？",
+        "Lombok 和 Spring 注解处理方式有什么不同？",
+        "@Transactional 为什么会有自调用失效问题？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "注解元数据",
+          "Retention",
+          "反射",
+          "编译期处理"
+        ],
+        "goodToHave": [
+          "APT",
+          "Spring 扫描",
+          "代理",
+          "BeanPostProcessor",
+          "Lombok"
+        ],
+        "redFlags": [
+          "注解自动执行逻辑",
+          "不了解 Retention",
+          "不懂代理边界"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide",
+        "license": "Apache-2.0",
+        "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+        "attributionRequired": true,
+        "approvedAt": "2026-05-27T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：注解解析候选改写为编译期/运行期机制题。"
+      }
+    }
+  ]
+}

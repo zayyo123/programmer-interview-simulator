@@ -1,4 +1,9 @@
 import {
+  createExternalQuestionDraftsFromSignals,
+  syncExternalQuestionDrafts
+} from '../src/externalSources.js';
+import { createExternalQuestionCandidateReport } from '../src/questionGovernance.js';
+import {
   createFallbackInterviewerReply,
   createInterviewPlan,
   createReport,
@@ -9,6 +14,8 @@ import {
 import { questionBank } from '../src/questions.js';
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const port = 3210;
 const baseUrl = `http://127.0.0.1:${port}`;
@@ -17,6 +24,7 @@ async function main() {
   verifyStalledFollowUpCutoff();
   verifyFrontendAnswerGuide();
   verifyCodeDimensionScores();
+  await verifyExternalQuestionSources();
 
   const server = spawn(process.execPath, ['src/server.js'], {
     cwd: process.cwd(),
@@ -119,6 +127,22 @@ async function main() {
       `single-question drill plan should explain the report origin, got: ${questionDrillSession.plan.map((item) => item.planReason).join(' | ')}`
     );
 
+    const externalDrafts = await request('/api/external-question-drafts');
+    assert(
+      externalDrafts.summary && Array.isArray(externalDrafts.sources) && Array.isArray(externalDrafts.drafts),
+      `external question draft API should expose cached summary, sources and drafts, got: ${JSON.stringify(externalDrafts)}`
+    );
+
+    const externalCandidates = await request('/api/external-question-candidates?limit=5&minScore=60');
+    assert(
+      externalCandidates.summary?.candidateCount <= 5 && Array.isArray(externalCandidates.candidates),
+      `external candidate API should return limited ranked candidates, got: ${JSON.stringify(externalCandidates.summary)}`
+    );
+    assert(
+      externalCandidates.candidates.every((item) => item.promotionScore >= 60 && item.proposedQuestion?.scoringRubric?.mustHave?.length),
+      `external candidates should include promotion scores and proposed question structures, got: ${JSON.stringify(externalCandidates.candidates?.[0])}`
+    );
+
     const codingSession = await request('/api/interviews', {
       method: 'POST',
       body: {
@@ -134,14 +158,14 @@ async function main() {
         }
       }
     });
+    const lightweightCodingQuestions = codingSession.plan
+      .filter((item) => ['sql', 'algorithm'].includes(item.codeKind));
     assert(
-      codingSession.plan.some((item) => item.id === 'sql_001' || item.id === 'algorithm_002'),
-      `profile analysis should be able to schedule a lightweight coding question, got: ${codingSession.plan.map((item) => `${item.category}:${item.id}`).join(', ')}`
+      lightweightCodingQuestions.length > 0,
+      `profile analysis should be able to schedule a lightweight coding question, got: ${codingSession.plan.map((item) => `${item.category}:${item.id}:${item.codeKind || '-'}`).join(', ')}`
     );
     assert(
-      codingSession.plan
-        .filter((item) => item.id === 'sql_001' || item.id === 'algorithm_002')
-        .every((item) => item.codeKind),
+      lightweightCodingQuestions.every((item) => item.codeKind),
       `coding questions in the plan should expose codeKind, got: ${JSON.stringify(codingSession.plan)}`
     );
 
@@ -722,6 +746,10 @@ function verifyFrontendAnswerGuide() {
   assert(app.includes('继续补练这个目标'), 'single-question drill progress action should use Chinese training copy');
   assert(app.includes('继续补练'), 'single-question drill progress should show unfinished status');
   assert(app.includes('已达标'), 'single-question drill progress should show completed status');
+  assert(app.includes('达标标准：最高分达到 75 分'), 'single-question drill progress should explain the pass threshold');
+  assert(app.includes('当前最弱维度'), 'single-question drill progress should surface the weakest dimension');
+  assert(app.includes('function findQuestionDrillWeakestDimension'), 'frontend should calculate weakest dimension for single-question drills');
+  assert(app.includes('function createQuestionDrillPassStandard'), 'frontend should format the single-question drill pass standard');
   assert(app.includes('function calculateWeakQuestions'), 'frontend should reuse weak question analytics for recommendations');
   assert(app.includes('function calculateWeakSkills'), 'frontend should reuse weak skill analytics for recommendations');
   assert(app.includes('createWeakQuestionDrillPrompt'), 'next-session recommendation should build drills from concrete weak questions');
@@ -812,6 +840,125 @@ function verifyCodeDimensionScores() {
     backendLabels.includes('方案取舍') && backendLabels.includes('边界覆盖'),
     `backend scenario dimensions should emphasize tradeoff and boundary, got: ${backendLabels.join(', ')}`
   );
+}
+
+async function verifyExternalQuestionSources() {
+  const stackDrafts = createExternalQuestionDraftsFromSignals([
+    {
+      title: 'How to explain Java thread pool rejection policy in an interview?',
+      tags: ['java', 'concurrency'],
+      link: 'https://stackoverflow.com/questions/1/example',
+      score: 42
+    }
+  ], {
+    id: 'stack-overflow-test',
+    name: 'Stack Overflow 测试信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackoverflow.com/help/licensing',
+    attributionRequired: true,
+    url: 'https://api.stackexchange.com/2.3/search/advanced'
+  });
+
+  assert(stackDrafts.length === 1, 'Stack Exchange signal should become one external draft');
+  assert(stackDrafts[0].importPolicy === 'signal-only', 'Stack Exchange drafts should be signal-only because of CC BY-SA');
+  assert(stackDrafts[0].attributionRequired, 'Stack Exchange drafts should keep attribution requirement');
+  assert(stackDrafts[0].trainingDraft?.commonMistakes?.length >= 1, 'external drafts should include Chinese training notes');
+
+  const mockFetch = async (url) => {
+    if (String(url).includes('api.github.com/repos/realabbas')) {
+      return createMockResponse([
+        {
+          type: 'file',
+          name: 'java.md',
+          path: 'java.md',
+          download_url: 'https://raw.githubusercontent.com/mock/java.md',
+          html_url: 'https://github.com/mock/java.md'
+        }
+      ]);
+    }
+
+    if (String(url).includes('raw.githubusercontent.com/mock/java.md')) {
+      return createMockResponse([
+        '# Java',
+        '- What is the difference between HashMap and ConcurrentHashMap?',
+        '- How does JVM garbage collection work?'
+      ].join('\n'), false);
+    }
+
+    if (String(url).includes('api.github.com/repos/Snailclimb/JavaGuide/contents/docs')) {
+      return createMockResponse([
+        {
+          type: 'file',
+          name: 'java-basic-questions-01.md',
+          path: 'docs/java/basis/java-basic-questions-01.md',
+          download_url: 'https://raw.githubusercontent.com/mock/javaguide-java.md',
+          html_url: 'https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md'
+        }
+      ]);
+    }
+
+    if (String(url).includes('raw.githubusercontent.com/mock/javaguide-java.md')) {
+      return createMockResponse([
+        '# Java 基础常见面试题总结',
+        '## HashMap 和 ConcurrentHashMap 有什么区别？',
+        '## JVM 垃圾回收的基本原理是什么？'
+      ].join('\n'), false);
+    }
+
+    if (String(url).includes('api.stackexchange.com')) {
+      return createMockResponse({
+        quota_remaining: 9999,
+        items: [
+          {
+            title: 'How to design Redis cache invalidation for interview?',
+            tags: ['redis', 'caching'],
+            link: 'https://stackoverflow.com/questions/2/example',
+            score: 30
+          }
+        ]
+      });
+    }
+
+    throw new Error(`unexpected mock url: ${url}`);
+  };
+
+  const payload = await syncExternalQuestionDrafts({
+    fetchImpl: mockFetch,
+    outputPath: join(tmpdir(), `programmer-interview-external-${Date.now()}.json`)
+  });
+  assert(payload.summary.draftCount >= 3, `mock external sync should produce drafts, got: ${payload.summary.draftCount}`);
+  assert(payload.summary.readyForImportCount >= 2, 'GitHub CC0 drafts should be marked ready for transformation');
+  assert(payload.summary.chineseGithubDraftCount >= 2, 'Chinese GitHub sources should produce transformable Chinese drafts');
+  assert(payload.summary.attributionRequiredCount >= 1, 'Stack Exchange drafts should keep attribution count');
+  assert(
+    payload.drafts.some((item) => item.license === 'CC0-1.0' && item.importPolicy === 'can-transform'),
+    'GitHub CC0 source should create transformable drafts'
+  );
+  assert(
+    payload.drafts.some((item) => item.license === 'Apache-2.0' && item.provider === 'GitHub 中文题库' && item.importPolicy === 'can-transform'),
+    'JavaGuide Apache-2.0 source should create transformable Chinese drafts'
+  );
+
+  const candidateReport = await createExternalQuestionCandidateReport({
+    limit: 6,
+    minScore: 60
+  });
+  assert(candidateReport.summary.candidateCount <= 6, 'external candidate report should respect the limit');
+  assert(candidateReport.candidates.length >= 1, 'external candidate report should rank at least one cached draft');
+  assert(
+    candidateReport.candidates.every((item) => item.promotionReasons.length && item.proposedQuestion?.expectedPoints?.length >= 3),
+    'external candidate report should explain promotion reasons and generate structured question candidates'
+  );
+}
+
+function createMockResponse(payload, json = true) {
+  return {
+    ok: true,
+    status: 200,
+    json: async () => payload,
+    text: async () => String(payload)
+  };
 }
 
 async function waitForHealth(timeoutMs = 8000) {

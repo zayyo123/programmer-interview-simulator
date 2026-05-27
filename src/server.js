@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { generateInterviewerReply, generateInterviewQuestionPlan } from './ai.js';
 import { chooseProvider, loadConfig } from './config.js';
+import { loadExternalQuestionDrafts, syncExternalQuestionDrafts } from './externalSources.js';
 import {
   buildInterviewPrompt,
   createLiveCoachSnapshot,
@@ -17,6 +18,17 @@ import {
   maybeAdvanceQuestion,
   recordAnswerForCurrentQuestion
 } from './interview.js';
+import {
+  createPaperBlueprint,
+  createExternalQuestionCandidateReport,
+  createQuestionQualityReport,
+  getQuestionBankCatalog,
+  importPromotedCandidatesToDrafts,
+  loadRuntimeQuestionBank,
+  reviewQuestionDraft,
+  runAutomaticQuestionScreening,
+  submitQuestionDraft
+} from './questionGovernance.js';
 
 const config = loadConfig();
 const sessions = new Map();
@@ -28,6 +40,63 @@ const server = createServer(async (request, response) => {
 
     if (request.method === 'GET' && url.pathname === '/api/health') {
       return sendJson(response, 200, { ok: true });
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/external-question-drafts') {
+      const payload = await loadExternalQuestionDrafts();
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/external-question-drafts/sync') {
+      const payload = await syncExternalQuestionDrafts();
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/external-question-candidates') {
+      const payload = await createExternalQuestionCandidateReport(Object.fromEntries(url.searchParams.entries()));
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/external-question-candidates/auto-screen') {
+      const body = await readJson(request);
+      const payload = await runAutomaticQuestionScreening(body);
+      return sendJson(response, 200, payload.automation);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/external-question-candidates/import') {
+      const body = await readJson(request);
+      const payload = await importPromotedCandidatesToDrafts(body);
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/question-bank') {
+      const payload = await getQuestionBankCatalog(Object.fromEntries(url.searchParams.entries()));
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'GET' && url.pathname === '/api/question-bank/quality') {
+      const payload = await createQuestionQualityReport(Object.fromEntries(url.searchParams.entries()));
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/question-bank/drafts') {
+      const body = await readJson(request);
+      const draft = await submitQuestionDraft(body);
+      return sendJson(response, 201, { draft });
+    }
+
+    if (request.method === 'POST' && url.pathname.match(/^\/api\/question-bank\/drafts\/[^/]+\/review$/)) {
+      const draftId = url.pathname.split('/')[4];
+      const body = await readJson(request);
+      const payload = await reviewQuestionDraft(draftId, body);
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/question-paper') {
+      const body = await readJson(request);
+      const runtimeQuestionBank = await loadRuntimeQuestionBank();
+      const plan = createInterviewPlan(body, { questionBank: runtimeQuestionBank });
+      return sendJson(response, 200, createPaperBlueprint(plan));
     }
 
     if (request.method === 'POST' && url.pathname === '/api/interviews') {
@@ -113,7 +182,7 @@ const server = createServer(async (request, response) => {
     return sendJson(response, 404, { error: '未找到请求的内容' });
   } catch (error) {
     console.error(error);
-    return sendJson(response, 500, { error: '服务器内部错误' });
+    return sendJson(response, error.statusCode || 500, { error: error.statusCode ? error.message : '服务器内部错误' });
   }
 });
 
@@ -131,7 +200,8 @@ async function createSession(input) {
     profileAnalysis: input.profileAnalysis || null,
     questionSource: input.questionSource || 'local'
   };
-  const localPlan = createInterviewPlan(interviewConfig);
+  const runtimeQuestionBank = await loadRuntimeQuestionBank();
+  const localPlan = createInterviewPlan(interviewConfig, { questionBank: runtimeQuestionBank });
   const aiPlanResult = interviewConfig.questionSource === 'ai'
     ? await generateInterviewQuestionPlan({ config, interviewConfig, localPlan })
     : null;
