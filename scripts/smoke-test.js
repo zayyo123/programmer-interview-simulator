@@ -2,7 +2,10 @@ import {
   createExternalQuestionDraftsFromSignals,
   syncExternalQuestionDrafts
 } from '../src/externalSources.js';
-import { createExternalQuestionCandidateReport } from '../src/questionGovernance.js';
+import {
+  createExternalQuestionCandidateReport,
+  importPromotedCandidatesToDrafts
+} from '../src/questionGovernance.js';
 import {
   createFallbackInterviewerReply,
   createInterviewPlan,
@@ -13,7 +16,7 @@ import {
 } from '../src/interview.js';
 import { questionBank } from '../src/questions.js';
 import { spawn } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -950,6 +953,20 @@ async function verifyExternalQuestionSources() {
     candidateReport.candidates.every((item) => item.promotionReasons.length && item.proposedQuestion?.expectedPoints?.length >= 3),
     'external candidate report should explain promotion reasons and generate structured question candidates'
   );
+
+  const lowQualityCandidatePath = join(tmpdir(), `programmer-interview-low-quality-candidate-${Date.now()}.json`);
+  const lowQualityDraftPath = join(tmpdir(), `programmer-interview-low-quality-draft-${Date.now()}.json`);
+  const lowQualityCandidate = candidateReport.candidates.find((item) => item.qualityIssues?.some((issue) => issue.severity === 'blocker'));
+  if (lowQualityCandidate) {
+    writeFileSync(lowQualityCandidatePath, JSON.stringify({ candidates: [lowQualityCandidate] }, null, 2));
+    writeFileSync(lowQualityDraftPath, JSON.stringify({ drafts: [] }, null, 2));
+    const importResult = await importPromotedCandidatesToDrafts({
+      inputPath: lowQualityCandidatePath,
+      outputPath: lowQualityDraftPath,
+      ranks: String(lowQualityCandidate.rank)
+    });
+    assert(importResult.summary.importedCount === 0, 'low-quality candidate drafts should not be imported by default');
+  }
 }
 
 function createMockResponse(payload, json = true) {

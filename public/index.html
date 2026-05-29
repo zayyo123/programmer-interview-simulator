@@ -8,19 +8,36 @@
   </head>
   <body>
     <main class="app-shell">
-      <section class="setup-dashboard" aria-label="面试配置与准备">
-        <header class="top-command">
-          <div class="brand">
-            <div class="brand-mark">AI</div>
-            <div>
-              <h1>程序员模拟面试系统</h1>
-              <p>Dark IDE style interview cockpit for serious technical practice.</p>
-            </div>
+      <header class="top-command">
+        <div class="brand">
+          <div class="brand-mark">AI</div>
+          <div>
+            <h1>程序员模拟面试系统</h1>
+            <p>Dark IDE style interview cockpit for serious technical practice.</p>
           </div>
-          <section id="practiceHistory" class="practice-history" aria-live="polite">
-            <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
-          </section>
-        </header>
+        </div>
+        <section id="practiceHistory" class="practice-history" aria-live="polite">
+          <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
+        </section>
+      </header>
+
+      <nav class="workflow-stepper" aria-label="面试流程">
+        <button type="button" class="workflow-step-button active" data-step-target="setup">
+          <span>1</span>
+          <strong>面试配置</strong>
+        </button>
+        <button type="button" class="workflow-step-button locked" data-step-target="interview" aria-disabled="true">
+          <span>2</span>
+          <strong>模拟面试</strong>
+        </button>
+        <button type="button" class="workflow-step-button locked" data-step-target="report" aria-disabled="true">
+          <span>3</span>
+          <strong>复盘报告</strong>
+        </button>
+      </nav>
+      <p id="workflowStatus" class="workflow-status" aria-live="polite">先完成本轮面试配置，然后进入模拟面试。</p>
+
+      <section class="setup-dashboard workflow-step" data-workflow-step="setup" aria-label="面试配置与准备">
 
         <form id="setupForm" class="setup-form">
           <section class="setup-grid">
@@ -143,7 +160,7 @@
         </form>
       </section>
 
-      <section class="workplace-shell">
+      <section class="workplace-shell workflow-step" data-workflow-step="interview" hidden>
         <div class="memory-warning">
           <strong>⚠ 当前会话运行在浏览器内存中</strong>
           <span>刷新页面将丢失本轮面试进度。</span>
@@ -191,7 +208,7 @@
         </section>
       </section>
 
-      <section class="report-panel">
+      <section class="report-panel workflow-step" data-workflow-step="report" hidden>
         <div class="panel-header report-header">
           <div>
             <h2>复盘报告</h2>

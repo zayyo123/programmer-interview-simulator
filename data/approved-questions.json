@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-05-28T00:45:00.000Z",
+  "updatedAt": "2026-05-29T00:00:00.000Z",
   "questions": [
     {
       "id": "approved_mysql_unsigned_int_001",
@@ -7538,6 +7538,2630 @@
         "approvedAt": "2026-05-27T00:00:00.000Z",
         "approvedBy": "codex-reviewer",
         "reviewNotes": "人工审核通过：注解解析候选改写为编译期/运行期机制题。"
+      }
+    },
+    {
+      "id": "approved_redis_hotkey_bigkey_001",
+      "category": "Redis",
+      "skill": "缓存排障",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "线上 Redis 出现延迟升高，你如何区分热 key、大 key、慢命令和网络抖动？分别怎么治理？",
+      "keywords": [
+        "Redis",
+        "热 key",
+        "大 key",
+        "慢命令",
+        "延迟排查"
+      ],
+      "expectedPoints": [
+        "观察延迟和慢日志",
+        "识别热 key 与大 key",
+        "区分命令耗时和网络耗时",
+        "说明治理手段",
+        "关注指标和回滚风险"
+      ],
+      "referenceAnswer": "Redis 延迟升高要先确认影响范围，是单实例、单业务还是全局异常。可以看 slowlog、latency doctor、命令分布、实例 CPU、网络 RTT、连接数、内存碎片和带宽。热 key 往往表现为少数 key 请求量极高，可通过本地缓存、读写拆分、key 分片或限流缓解；大 key 会导致单命令阻塞、网络包过大和删除卡顿，需要拆分结构、渐进式删除和控制 value 大小。慢命令要看是否用了 keys、hgetall、大范围 zrange 等高复杂度命令，网络抖动则要结合客户端超时、重传和跨机房链路判断。治理要灰度验证，避免迁移或删除带来更大抖动。",
+      "excellentAnswer": "我会先把问题拆成服务端执行慢、数据结构过大、访问热点和网络链路四类。第一步看 Redis 自身指标和 slowlog，如果 slowlog 明显有大范围命令，就先收敛命令复杂度；如果 CPU 和带宽被少数 key 打满，就用采样、代理层统计或业务日志定位热 key；如果单个 key 的 value 很大，就评估拆 key、分页读取、压缩和异步清理。治理上热 key 可以加本地缓存和分片，大 key 要避免一次性读写和删除，慢命令要改访问模式。最后用 p99 延迟、超时率、实例 CPU、带宽和命令 QPS 验证是否真的改善。",
+      "commonMistakes": [
+        "只说扩容 Redis，不定位具体瓶颈。",
+        "用 keys 扫描线上实例。",
+        "一次性删除大 key 导致阻塞。"
+      ],
+      "followUps": [
+        "如何在线上安全发现大 key？",
+        "热 key 为什么可能导致单分片压力很高？",
+        "删除大 key 时 lazyfree 和渐进删除分别适合什么场景？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "慢日志和延迟指标",
+          "热 key",
+          "大 key",
+          "治理手段"
+        ],
+        "goodToHave": [
+          "latency doctor",
+          "本地缓存",
+          "key 分片",
+          "渐进删除",
+          "网络 RTT"
+        ],
+        "redFlags": [
+          "不看指标直接扩容",
+          "线上 keys 扫全库",
+          "忽略删除和迁移风险"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_redis_cache_consistency_001",
+      "category": "Redis",
+      "skill": "缓存一致性",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "订单详情接口使用 Redis 缓存时，如何设计数据库与缓存的一致性策略？如果更新后短时间读到旧值，你怎么排查和改进？",
+      "keywords": [
+        "Redis",
+        "缓存一致性",
+        "旁路缓存",
+        "双删",
+        "失效",
+        "回源"
+      ],
+      "expectedPoints": [
+        "说明旁路缓存流程",
+        "更新数据库后删除缓存",
+        "处理并发读写竞态",
+        "设计过期和补偿机制",
+        "说明监控与排查指标"
+      ],
+      "referenceAnswer": "常见做法是旁路缓存：读请求先查缓存，未命中再查数据库并回写缓存；写请求先更新数据库，再删除缓存，让后续读回源获取新值。难点在并发读写竞态，例如删除缓存后旧读回源又写回旧值，或者消息通知失败导致缓存未删。可以结合合理 TTL、延迟双删、版本号或更新时间校验、binlog/MQ 失效通知、幂等补偿任务来降低不一致窗口。排查时要看更新链路日志、缓存删除是否成功、回源写缓存时间、TTL、主从延迟和客户端本地缓存。",
+      "excellentAnswer": "我不会承诺强一致，而是先和业务确认可接受的不一致窗口。订单详情这类读多写少场景通常用 cache aside，写库成功后删除缓存，并给缓存设置 TTL 兜底。高并发下要防止旧请求回源覆盖新值，可以在缓存 value 里带版本号或更新时间，回写前比较版本，也可以对热点订单做短暂互斥回源。若通过 MQ 或 binlog 异步删缓存，要有消费幂等、失败重试和补偿扫描。线上读到旧值时，我会按时间线对齐数据库更新时间、缓存写入时间、删除日志和客户端本地缓存，判断是删失败、回写覆盖、主从延迟还是多级缓存问题。",
+      "commonMistakes": [
+        "认为先删缓存再写库一定安全。",
+        "不设置 TTL，删除失败后永久脏读。",
+        "忽略本地缓存或 CDN 等多级缓存。"
+      ],
+      "followUps": [
+        "为什么更新数据库后通常选择删除缓存而不是直接更新缓存？",
+        "延迟双删解决什么竞态，局限是什么？",
+        "如果订单是强一致读，是否还适合走缓存？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "旁路缓存",
+          "写库后删缓存",
+          "并发竞态",
+          "TTL"
+        ],
+        "goodToHave": [
+          "版本号",
+          "binlog 通知",
+          "补偿任务",
+          "多级缓存",
+          "主从延迟"
+        ],
+        "redFlags": [
+          "承诺缓存强一致但无机制",
+          "无过期兜底",
+          "不分析时间线"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_redis_persistence_ha_001",
+      "category": "Redis",
+      "skill": "高可用",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Redis RDB、AOF、主从复制、哨兵和 Cluster 分别解决什么问题？线上选择时你会关注哪些风险？",
+      "keywords": [
+        "RDB",
+        "AOF",
+        "主从复制",
+        "哨兵",
+        "Cluster"
+      ],
+      "expectedPoints": [
+        "区分持久化和高可用",
+        "说明 RDB 与 AOF 取舍",
+        "说明主从和哨兵作用",
+        "说明 Cluster 分片能力",
+        "关注数据丢失和故障切换风险"
+      ],
+      "referenceAnswer": "RDB 和 AOF 主要解决数据持久化问题，RDB 是周期性快照，恢复快但可能丢失最近写入；AOF 记录写命令，数据丢失窗口更小但文件更大、重写有成本。主从复制解决读扩展和副本冗余，但主挂后需要故障转移；哨兵负责监控、选主和通知客户端；Cluster 通过分片扩展容量和吞吐，同时提供一定高可用能力。线上选择要关注写入量、恢复时间、可接受数据丢失、故障切换时间、客户端重连、脑裂、跨机房延迟和备份恢复演练。",
+      "excellentAnswer": "我会先把问题分成持久化、复制和分片。单机持久化不能等同于高可用，RDB/AOF 能帮助重启恢复，但机器故障时还要靠副本和自动切换。对核心缓存，如果允许短时间重建，可以弱化持久化；如果 Redis 承载队列或重要状态，就要谨慎评估 AOF fsync 策略和丢失窗口。哨兵适合主从高可用，Cluster 适合容量或吞吐需要分片的场景，但会带来 slot 迁移、multi-key 限制和客户端兼容问题。生产上必须做故障切换和恢复演练，不能只看配置项。",
+      "commonMistakes": [
+        "把持久化当成高可用。",
+        "只说哨兵能自动切换，不提客户端和数据丢失。",
+        "忽略 Cluster 的 multi-key 和 slot 限制。"
+      ],
+      "followUps": [
+        "AOF fsync always/everysec/no 有什么取舍？",
+        "哨兵误判或脑裂会带来什么风险？",
+        "Cluster 下多 key 操作为什么可能受限？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "RDB",
+          "AOF",
+          "主从复制",
+          "哨兵或 Cluster"
+        ],
+        "goodToHave": [
+          "RTO/RPO",
+          "脑裂",
+          "slot 迁移",
+          "客户端重连",
+          "演练"
+        ],
+        "redFlags": [
+          "混淆持久化和高可用",
+          "不提数据丢失窗口",
+          "忽略客户端兼容"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_os_cpu_high_001",
+      "category": "操作系统",
+      "skill": "性能排查",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "线上服务 CPU 使用率突然升高，你会如何从系统层和应用层定位？",
+      "keywords": [
+        "CPU",
+        "load average",
+        "线程",
+        "火焰图",
+        "上下文切换"
+      ],
+      "expectedPoints": [
+        "确认影响范围和 CPU 类型",
+        "查看进程和线程",
+        "区分用户态/内核态/IO wait",
+        "结合应用栈或火焰图",
+        "说明止血和验证"
+      ],
+      "referenceAnswer": "CPU 升高要先确认是单机还是集群、单核还是多核、用户态高还是内核态高，不能只看一个 top。系统层可以看 top、pidstat、vmstat、sar，关注 user/sys/iowait、load average、上下文切换、run queue。应用层要定位具体进程和线程，例如 Java 用 top -H、jstack、async-profiler，Go 用 pprof，Python 看采样 profiler 或任务队列。常见原因包括死循环、热点计算、锁竞争、GC、日志爆量、序列化或压缩。止血可以限流、摘流量、回滚、扩容或关闭异常任务，最后用 CPU、延迟、错误率和调用量验证。",
+      "excellentAnswer": "我会先看业务是否受影响，再分层定位。第一步看监控时间线，确认 CPU 高是否和发布、流量、定时任务或下游异常相关。第二步在机器上看 user/sys/iowait 和 load，如果 user 高就抓应用热点栈或火焰图，如果 sys 高就看网络、文件、上下文切换和锁，如果 iowait 高则转向磁盘或网络等待。第三步映射到代码，比如某个线程一直在 JSON 序列化、正则、加密或 GC。止血上先保护核心链路，必要时回滚或降级；复盘时补压测、限流和热点函数监控。",
+      "commonMistakes": [
+        "只说 top 看 CPU，不会继续定位线程和栈。",
+        "把 load 高都理解成 CPU 计算高。",
+        "排查时不关联发布、流量和错误率。"
+      ],
+      "followUps": [
+        "load average 很高但 CPU 不高可能是什么原因？",
+        "Java 线程 id 如何和 jstack 里的 nid 对应？",
+        "CPU sys 高和 user 高的排查方向有什么区别？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "系统指标",
+          "进程线程定位",
+          "应用栈",
+          "止血"
+        ],
+        "goodToHave": [
+          "火焰图",
+          "GC",
+          "上下文切换",
+          "发布关联",
+          "iowait"
+        ],
+        "redFlags": [
+          "只会 top",
+          "不区分 CPU 类型",
+          "没有止血动作"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_os_memory_oom_001",
+      "category": "操作系统",
+      "skill": "内存排查",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Linux 机器出现 OOM 或内存持续上涨时，你会怎么区分应用内存泄漏、页缓存增长和容器限制问题？",
+      "keywords": [
+        "OOM",
+        "RSS",
+        "page cache",
+        "cgroup",
+        "内存泄漏"
+      ],
+      "expectedPoints": [
+        "区分系统内存和进程内存",
+        "关注 RSS/VSS/page cache",
+        "检查 OOM 日志和 cgroup 限制",
+        "结合语言运行时工具",
+        "提出止血和长期治理"
+      ],
+      "referenceAnswer": "内存问题要先看 OOM 日志、dmesg、容器事件和监控，确认是宿主机 OOM、容器 cgroup OOM 还是进程主动退出。系统层要区分 used、available、buff/cache，页缓存增长不一定是泄漏；进程层看 RSS、VSS、匿名内存、文件映射和增长趋势。Java 可看 heap、direct memory、metaspace 和 GC 日志，Go 可看 heap、goroutine 和 pprof，Python 可看对象引用和 worker 积压。止血可以重启、扩容、限制并发、关闭异常任务，长期要补内存水位告警、dump 分析、压测和资源限制配置。",
+      "excellentAnswer": "我会先确定 OOM 的执行者和边界：是内核杀进程，还是 Kubernetes 因超过 limit 杀容器。然后看内存组成，available 低、swap、RSS 增长、cache 增长代表不同方向。页缓存因为大量文件读写上涨通常可回收，不应直接当泄漏；RSS 持续随请求增长且 GC 后不回落，才更像应用泄漏或堆外内存问题。语言层要用对应工具拿证据，例如 heap dump、native memory tracking、pprof。处理时先止血保服务，再保留现场数据，否则重启后根因很难找。",
+      "commonMistakes": [
+        "看到 used 高就判断内存泄漏。",
+        "忽略容器 limit 和宿主机内存的区别。",
+        "重启止血前不保留 dump 和日志。"
+      ],
+      "followUps": [
+        "RSS 和 VSS 有什么区别？",
+        "page cache 为什么可能让 used 看起来很高？",
+        "容器 OOMKilled 和宿主机 OOM 怎么区分？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "OOM 日志",
+          "RSS",
+          "page cache",
+          "cgroup"
+        ],
+        "goodToHave": [
+          "heap dump",
+          "direct memory",
+          "pprof",
+          "保留现场",
+          "资源 limit"
+        ],
+        "redFlags": [
+          "把 used 高等同泄漏",
+          "不看 OOM 事件",
+          "只会重启"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_os_file_descriptor_001",
+      "category": "操作系统",
+      "skill": "资源限制",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "线上服务报 too many open files 时，文件描述符是什么？你会如何定位泄漏还是限额过小？",
+      "keywords": [
+        "文件描述符",
+        "ulimit",
+        "lsof",
+        "连接泄漏",
+        "资源释放"
+      ],
+      "expectedPoints": [
+        "说明文件描述符含义",
+        "检查进程 fd 数和系统限制",
+        "用 lsof 分类资源",
+        "判断泄漏或容量问题",
+        "修复资源关闭和连接池配置"
+      ],
+      "referenceAnswer": "文件描述符是进程访问文件、socket、pipe 等内核对象的句柄。too many open files 可能是进程 ulimit 太低，也可能是文件或连接没有及时关闭。排查时先看进程 fd 数、ulimit -n、/proc/<pid>/fd、lsof 输出，按 socket、日志文件、临时文件等分类。如果 fd 持续增长且不回落，更像泄漏；如果只在流量峰值接近上限，可能是连接池、并发和限额配置不匹配。修复要确保 finally/defer/try-with-resources 关闭资源，调整连接池和系统 limit，并加 fd 使用率告警。",
+      "excellentAnswer": "我会先看这是容量问题还是泄漏问题。容量问题一般和并发连接数、keep-alive、连接池上限有关，峰值过去后 fd 会下降；泄漏则表现为 fd 单调上涨，lsof 里可能看到大量 CLOSE_WAIT、重复打开的文件或未释放临时文件。代码侧要检查 HTTP 客户端响应体是否关闭、数据库连接是否归还、文件流是否关闭。配置侧要评估 ulimit、systemd LimitNOFILE 和容器限制。只调大 limit 可以止血，但如果是泄漏，会把故障推迟而不是解决。",
+      "commonMistakes": [
+        "只调大 ulimit，不查泄漏。",
+        "不知道 socket 也占用文件描述符。",
+        "忽略 CLOSE_WAIT 和连接池归还问题。"
+      ],
+      "followUps": [
+        "CLOSE_WAIT 大量出现说明什么？",
+        "Linux 下如何查看某进程当前打开了哪些 fd？",
+        "为什么 HTTP response body 不关闭会导致连接泄漏？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "文件描述符含义",
+          "ulimit",
+          "lsof 或 /proc",
+          "泄漏判断"
+        ],
+        "goodToHave": [
+          "CLOSE_WAIT",
+          "连接池",
+          "systemd limit",
+          "资源关闭模式"
+        ],
+        "redFlags": [
+          "只调 limit",
+          "不知道 socket 占 fd",
+          "不看增长趋势"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_system_rate_limit_001",
+      "category": "系统设计",
+      "skill": "限流降级",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "请设计一个接口限流方案，说明固定窗口、滑动窗口、漏桶、令牌桶的取舍，以及如何避免误伤核心用户。",
+      "keywords": [
+        "限流",
+        "令牌桶",
+        "滑动窗口",
+        "降级",
+        "误伤"
+      ],
+      "expectedPoints": [
+        "说明常见限流算法",
+        "按维度设计限流 key",
+        "区分全局和局部限流",
+        "设计降级响应和监控",
+        "说明误伤控制和灰度"
+      ],
+      "referenceAnswer": "限流目标是保护系统而不是简单拒绝请求。固定窗口实现简单但边界突刺明显；滑动窗口更平滑但存储和计算成本高；漏桶强调稳定出流量；令牌桶允许一定突发，更适合多数接口。设计时要按接口、用户、租户、IP、业务等级等维度组合限流，区分网关全局限流、服务实例本地限流和下游依赖限流。核心用户可配置更高配额或白名单，但仍要防止无限绕过。被限流时要返回明确错误码、重试建议或降级结果，并监控限流量、通过量、延迟、错误率和误伤反馈。",
+      "excellentAnswer": "我会先定义保护对象和公平性目标。秒杀入口可能按用户和商品限流，开放 API 可能按租户和 appId 限流，核心写接口还要看下游数据库能力。算法上令牌桶比较适合允许短突发但控制平均速率；滑动窗口适合统计更准确的配额；固定窗口只适合低风险场景。落地上限流配置要可灰度、可回滚，有默认保护值和动态开关。为了避免误伤，要做分层限流、核心用户配额、告警阈值和审计日志，不能把所有 429 都当成攻击。",
+      "commonMistakes": [
+        "只背算法，不说明业务维度。",
+        "所有用户一个阈值导致误伤。",
+        "限流后没有错误码、监控和降级策略。"
+      ],
+      "followUps": [
+        "分布式限流为什么比单机限流复杂？",
+        "令牌桶和漏桶的核心差异是什么？",
+        "如何验证限流规则没有误伤正常流量？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "限流算法",
+          "限流维度",
+          "降级响应",
+          "监控"
+        ],
+        "goodToHave": [
+          "分布式限流",
+          "灰度",
+          "租户配额",
+          "误伤控制",
+          "动态配置"
+        ],
+        "redFlags": [
+          "只有算法没有业务策略",
+          "无监控",
+          "一刀切限流"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_system_idempotency_001",
+      "category": "系统设计",
+      "skill": "幂等设计",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "支付回调或订单创建接口如何做幂等？请说明幂等键、唯一约束、状态机和重试之间的关系。",
+      "keywords": [
+        "幂等",
+        "唯一约束",
+        "状态机",
+        "支付回调",
+        "重试"
+      ],
+      "expectedPoints": [
+        "定义幂等目标",
+        "设计幂等键或业务唯一号",
+        "使用唯一约束防重复写",
+        "用状态机限制非法流转",
+        "处理重试和并发竞态"
+      ],
+      "referenceAnswer": "幂等的目标是同一业务请求重复到达时只产生一次业务效果，并能返回一致结果。订单创建可使用客户端请求号、业务单号或幂等键，服务端用唯一索引或幂等表记录处理结果；支付回调通常以支付平台交易号或商户订单号去重。唯一约束负责防重复落库，状态机负责防止已支付订单再次扣款或从终态回退。重试要配合查询已有处理结果、事务边界和锁，避免并发重复创建。还要记录幂等冲突、重复回调次数和异常补偿。",
+      "excellentAnswer": "我会把幂等分成入口去重、业务状态和结果复用三层。入口层要求每次业务操作有稳定 idempotency key；数据层用唯一约束保证并发下不会插入两条；业务层用状态机限制 CREATED -> PAID -> SHIPPED 这类合法流转，重复回调如果发现已处理就直接返回成功或已有结果。实现时不能先查再插而没有唯一约束，否则并发下仍会穿透。对于处理中状态，要考虑超时恢复和补偿，不能让幂等记录永久卡住。",
+      "commonMistakes": [
+        "只靠前端防重复点击。",
+        "先查后插但没有唯一约束。",
+        "重复请求直接报错，导致上游不断重试。"
+      ],
+      "followUps": [
+        "幂等键应该由客户端生成还是服务端生成？",
+        "处理中状态超时后如何恢复？",
+        "唯一索引冲突时应该返回什么结果？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "幂等键",
+          "唯一约束",
+          "状态机",
+          "重复请求返回一致结果"
+        ],
+        "goodToHave": [
+          "事务边界",
+          "处理中状态",
+          "补偿",
+          "回调去重",
+          "并发竞态"
+        ],
+        "redFlags": [
+          "只靠前端",
+          "没有数据库约束",
+          "不考虑重试"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_system_mq_consistency_001",
+      "category": "系统设计",
+      "skill": "消息一致性",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "订单创建后需要异步通知库存和物流，如何设计消息可靠投递、幂等消费和失败补偿？",
+      "keywords": [
+        "消息队列",
+        "可靠投递",
+        "幂等消费",
+        "补偿",
+        "最终一致性"
+      ],
+      "expectedPoints": [
+        "本地事务和消息记录",
+        "可靠投递确认",
+        "消费者幂等",
+        "失败重试和死信",
+        "补偿和监控"
+      ],
+      "referenceAnswer": "订单创建与消息发送不能简单分成两个无保护步骤，否则可能订单写成功但消息丢失。常见方案是本地消息表或事务消息：订单和待发送消息在同一事务落库，再由投递任务发送到 MQ，成功后标记状态。消费者要用业务唯一键、消费记录或状态机做幂等，避免重复扣减库存或重复通知物流。失败要有重试、退避、死信队列和人工/自动补偿。监控要覆盖消息积压、投递失败、消费失败、补偿次数和订单状态长时间未推进。",
+      "excellentAnswer": "我会强调这是最终一致性问题。生产者侧先保证业务事件不丢，本地消息表是比较朴素可靠的做法：订单事务提交时同步写事件，后台扫描发送，MQ ack 后更新事件状态。消费者侧默认消息至少一次投递，所以必须幂等，库存扣减可以基于订单号唯一约束或状态机判断。失败处理不能无限立即重试，要指数退避、死信和补偿任务。最后还要有对账，例如订单已支付但库存未锁定超过阈值要告警并自动修复。",
+      "commonMistakes": [
+        "订单落库后直接发 MQ，失败没有补偿。",
+        "消费者假设消息只会消费一次。",
+        "只有重试，没有死信、告警和对账。"
+      ],
+      "followUps": [
+        "本地消息表和事务消息各有什么取舍？",
+        "消费者幂等记录应该放在哪里？",
+        "如何发现订单状态长时间卡在中间态？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "本地消息表或事务消息",
+          "可靠投递",
+          "幂等消费",
+          "补偿"
+        ],
+        "goodToHave": [
+          "死信队列",
+          "退避重试",
+          "对账",
+          "状态机",
+          "积压监控"
+        ],
+        "redFlags": [
+          "假设 MQ 不丢不重",
+          "没有补偿",
+          "没有幂等"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_system_multi_region_001",
+      "category": "系统设计",
+      "skill": "高可用架构",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "devops",
+        "architect"
+      ],
+      "levels": [
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "如果核心接口要求跨机房高可用，你会如何设计流量切换、数据一致性、故障检测和演练机制？",
+      "keywords": [
+        "跨机房",
+        "高可用",
+        "流量切换",
+        "数据一致性",
+        "故障演练"
+      ],
+      "expectedPoints": [
+        "定义可用性目标和故障模型",
+        "设计流量调度和切换",
+        "说明数据复制和一致性取舍",
+        "设计健康检查和回滚",
+        "定期演练和监控"
+      ],
+      "referenceAnswer": "跨机房高可用要先明确 RTO、RPO、读写模型和故障范围。流量层可以用 DNS、GSLB、网关或服务发现做就近访问和故障切换；服务层要保证无状态或状态外置；数据层需要选择主备、双写、多活或异步复制，不同方案在一致性、延迟和冲突处理上差异很大。故障检测不能只靠机器存活，要看业务成功率、延迟、错误率和依赖健康。切换要有预案、权限、回滚和演练，避免真正故障时没人敢操作。",
+      "excellentAnswer": "我会先问这个核心接口是读多还是写多，是否允许短时间只读或降级。如果是强一致写链路，跨机房多活成本很高，可能选择同城双活加单主写、异步备份和快速切换；如果是读链路，可以更积极做多地缓存和读副本。流量切换要分层：入口切流、服务摘除、下游隔离和数据保护。最难的是数据冲突和故障误判，所以要有 fencing、版本号、幂等和回放能力。平时用演练验证 RTO/RPO，而不是文档上写高可用。",
+      "commonMistakes": [
+        "一上来就说多活，不分析一致性和冲突。",
+        "只做机器健康检查，不看业务指标。",
+        "没有演练和回滚机制。"
+      ],
+      "followUps": [
+        "RTO 和 RPO 分别代表什么？",
+        "双写为什么容易产生冲突？",
+        "如何避免网络分区时两个机房同时写导致数据错乱？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "RTO/RPO",
+          "流量切换",
+          "数据一致性",
+          "故障检测"
+        ],
+        "goodToHave": [
+          "单主写",
+          "多活冲突",
+          "fencing",
+          "演练",
+          "业务指标"
+        ],
+        "redFlags": [
+          "空喊多活",
+          "不谈数据冲突",
+          "没有演练"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_system_observability_001",
+      "category": "系统设计",
+      "skill": "可观测性",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "devops",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "一个微服务链路偶发慢请求，如何设计日志、指标和链路追踪，让团队能快速定位问题？",
+      "keywords": [
+        "可观测性",
+        "日志",
+        "指标",
+        "链路追踪",
+        "慢请求"
+      ],
+      "expectedPoints": [
+        "统一 traceId 和上下文",
+        "设计 RED/USE 指标",
+        "结构化日志",
+        "链路追踪采样",
+        "告警和仪表盘"
+      ],
+      "referenceAnswer": "可观测性要围绕定位问题设计。日志应结构化并带 traceId、spanId、用户或租户、接口、错误码和关键业务字段；指标层关注请求量、错误率、延迟分位数、资源使用和依赖耗时；链路追踪还原跨服务调用路径，帮助发现慢点在网关、服务、数据库还是下游依赖。采样要兼顾成本和问题保留，可对错误和慢请求提高采样率。告警应基于 SLO、p95/p99、错误率和依赖异常，配合标准仪表盘和排障入口。",
+      "excellentAnswer": "我会先让每个请求有统一 traceId，从入口网关透传到所有服务、MQ 消费和数据库访问日志。指标用 RED 看服务请求量、错误率、耗时，用 USE 看资源饱和度。日志不追求越多越好，而是关键路径结构化、能按 traceId 聚合。链路追踪要记录每段耗时和下游状态，慢请求和错误请求强制采样。这样偶发慢请求出现时，可以从告警进入某个 trace，看到是连接池等待、SQL 慢、远程调用重试还是队列积压。最后要考虑采集成本和字段规范，否则数据多但查不到。",
+      "commonMistakes": [
+        "只堆日志，没有统一 traceId。",
+        "只看平均延迟，不看 p95/p99。",
+        "采样策略导致错误请求没有 trace。"
+      ],
+      "followUps": [
+        "RED 和 USE 指标分别适合看什么？",
+        "异步 MQ 消费如何延续 trace 上下文？",
+        "如何控制日志和 trace 的存储成本？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "traceId",
+          "结构化日志",
+          "延迟指标",
+          "链路追踪"
+        ],
+        "goodToHave": [
+          "SLO",
+          "p99",
+          "错误强采样",
+          "成本控制",
+          "仪表盘"
+        ],
+        "redFlags": [
+          "无关联字段",
+          "只看平均值",
+          "没有下游依赖视角"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_arch_tech_debt_001",
+      "category": "项目经历",
+      "skill": "架构治理",
+      "roles": [
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "project",
+      "difficulty": 3,
+      "question": "请讲一次你治理技术债或推进架构改造的经历，重点说明问题证据、优先级排序、推进阻力、收益指标和复盘。",
+      "keywords": [
+        "技术债",
+        "架构治理",
+        "优先级",
+        "推进阻力",
+        "收益指标"
+      ],
+      "expectedPoints": [
+        "说明业务和技术背景",
+        "用数据证明问题",
+        "拆分阶段和优先级",
+        "处理协作阻力",
+        "给出结果和复盘"
+      ],
+      "referenceAnswer": "这类项目题要体现架构判断和推进能力。回答应说明技术债造成了什么具体问题，例如发布失败率高、故障定位慢、交付周期长或成本上升；再说明如何用故障记录、变更数据、性能指标或研发效率指标排序优先级。治理动作应分阶段推进，例如先补观测和发布回滚，再处理高风险模块边界和数据一致性，避免大爆炸式重构。还要说明阻力来自业务排期、团队习惯或历史兼容，最终用稳定性、效率、成本或故障指标证明收益。",
+      "excellentAnswer": "我会讲成一个完整决策过程，而不是泛泛说重构。比如核心系统发布失败率高，我先统计近三个月故障、回滚和定位耗时，发现问题集中在订单状态、缓存和消息补偿。于是我没有要求全量重写，而是先补 trace、告警和发布检查清单，再把订单状态机和消息补偿边界收敛，最后逐步拆出高频变更模块。推进中业务担心影响排期，我用阶段目标和风险清单对齐，每阶段都有回滚方案。结果可以用故障数、MTTR、发布成功率或需求交付周期说明。",
+      "commonMistakes": [
+        "只说做了重构，不说明为什么。",
+        "没有指标证明收益。",
+        "把团队推进问题说成纯技术问题。"
+      ],
+      "followUps": [
+        "如何判断技术债是否值得现在治理？",
+        "治理中业务方不愿投入时你怎么沟通？",
+        "如果架构改造一段时间没有收益，你会如何调整？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "问题证据",
+          "优先级",
+          "阶段推进",
+          "结果指标"
+        ],
+        "goodToHave": [
+          "回滚方案",
+          "协作阻力",
+          "风险清单",
+          "MTTR",
+          "发布成功率"
+        ],
+        "redFlags": [
+          "空谈重构",
+          "没有数据",
+          "没有复盘"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_qa_test_strategy_001",
+      "category": "测试",
+      "skill": "测试策略",
+      "roles": [
+        "qa"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "拿到一个新需求后，你如何设计测试策略？请说明需求评审、风险分析、用例设计、自动化和上线验证。",
+      "keywords": [
+        "测试策略",
+        "需求评审",
+        "风险分析",
+        "用例设计",
+        "上线验证"
+      ],
+      "expectedPoints": [
+        "参与需求评审",
+        "识别风险和影响范围",
+        "设计正反边界用例",
+        "区分手工和自动化",
+        "上线后验证和回归"
+      ],
+      "referenceAnswer": "测试策略不是把页面点一遍，而是从需求目标和风险出发。首先在需求评审阶段确认业务规则、异常分支、兼容性和验收标准；然后分析影响范围，包括接口、数据、权限、历史兼容和上下游依赖。用例设计要覆盖正向流程、反向流程、边界值、权限、并发和异常恢复。自动化适合稳定、高频、回归价值高的路径；探索性测试适合新功能和风险未知区域。上线前要做冒烟和回归，上线后看日志、监控、核心指标和用户反馈。",
+      "excellentAnswer": "我会先把需求拆成业务规则、数据变化、接口变化和用户路径，再按风险排序。高风险路径先写清楚验收标准和回归范围，例如支付、权限、库存这类不能只看前端展示。用例上不只写正常成功，还要覆盖空值、边界、重复提交、权限绕过、下游失败和历史数据。自动化上优先沉淀接口和核心流程，不会为了覆盖率把不稳定页面操作全塞进去。上线后我会和研发一起看错误率、关键转化、告警和回滚预案。",
+      "commonMistakes": [
+        "只按需求文档逐条点，不做风险分析。",
+        "只测正常流程。",
+        "盲目追求自动化覆盖率。"
+      ],
+      "followUps": [
+        "如何判断哪些用例适合自动化？",
+        "需求文档不清楚时你会怎么推进？",
+        "上线后发现指标异常，你会如何配合定位？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "需求评审",
+          "风险分析",
+          "用例设计",
+          "回归验证"
+        ],
+        "goodToHave": [
+          "边界值",
+          "权限",
+          "自动化分层",
+          "上线监控",
+          "验收标准"
+        ],
+        "redFlags": [
+          "只测正常流程",
+          "没有风险意识",
+          "自动化目标不清"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_qa_flaky_tests_001",
+      "category": "测试",
+      "skill": "自动化稳定性",
+      "roles": [
+        "qa"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "自动化测试经常出现偶发失败，你会如何判断是产品缺陷、环境问题、数据污染还是用例本身不稳定？",
+      "keywords": [
+        "自动化测试",
+        "flaky test",
+        "环境隔离",
+        "测试数据",
+        "稳定性"
+      ],
+      "expectedPoints": [
+        "收集失败模式和频率",
+        "区分环境/数据/时序/真实缺陷",
+        "保证测试数据隔离",
+        "减少硬等待和顺序依赖",
+        "建立隔离和治理机制"
+      ],
+      "referenceAnswer": "偶发失败要先收集失败日志、截图、接口响应、执行环境、失败频率和最近变更，判断是否有稳定复现路径。产品缺陷通常能在相同条件下复现；环境问题可能集中在某些节点、浏览器、网络或依赖服务；数据污染表现为用例互相影响、脏数据残留或并发执行冲突；用例不稳定常见于硬等待、选择器脆弱、异步状态未等待和执行顺序依赖。治理上要隔离测试数据、清理环境、使用显式等待、减少共享状态、失败自动重跑但不能掩盖真实问题，并统计 flaky 用例优先修复。",
+      "excellentAnswer": "我会把 flaky 当成质量债治理，而不是简单加重跑。第一步给每次失败保留证据，按错误类型聚类；第二步看是否和环境节点、时间段、浏览器版本或并发执行有关；第三步检查测试数据是否唯一、是否有前置依赖和清理逻辑。对于 UI 自动化，我会避免 sleep，改成等待明确的 DOM 状态或接口完成；对于接口自动化，要隔离租户、账号和订单号。重跑只能用于降低流水线噪声，最终仍要给每类 flaky 建 owner 和修复 SLA。",
+      "commonMistakes": [
+        "所有偶发失败都直接重跑。",
+        "测试数据共用导致互相污染。",
+        "大量 sleep 掩盖时序问题。"
+      ],
+      "followUps": [
+        "重跑机制应该怎么设置才不掩盖真实缺陷？",
+        "并行执行自动化时如何保证测试数据隔离？",
+        "如何衡量自动化测试稳定性？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "失败证据",
+          "环境区分",
+          "数据隔离",
+          "用例稳定性"
+        ],
+        "goodToHave": [
+          "显式等待",
+          "失败聚类",
+          "owner",
+          "SLA",
+          "并行隔离"
+        ],
+        "redFlags": [
+          "只加重跑",
+          "无日志截图",
+          "不清理数据"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_qa_performance_test_001",
+      "category": "测试",
+      "skill": "性能测试",
+      "roles": [
+        "qa"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "你会如何设计一次接口性能测试？请说明压测目标、场景建模、数据准备、指标观察和瓶颈定位。",
+      "keywords": [
+        "性能测试",
+        "压测",
+        "场景建模",
+        "瓶颈定位",
+        "容量评估"
+      ],
+      "expectedPoints": [
+        "明确性能目标和 SLA",
+        "建模真实流量场景",
+        "准备隔离数据和环境",
+        "观察端到端和资源指标",
+        "定位瓶颈并复测"
+      ],
+      "referenceAnswer": "性能测试要先明确目标，例如峰值 QPS、p95/p99 延迟、错误率、资源水位和容量余量。场景建模要贴近真实业务比例，区分登录、查询、下单、支付等路径，而不是只压一个接口。数据准备要避免缓存全命中或数据量过小造成误判，环境要尽量接近生产并隔离风险。观察指标包括客户端成功率、响应时间分位数、服务 CPU/内存/线程池、数据库慢查询、连接池、缓存命中率和下游依赖。发现瓶颈后要一次只改一个变量，复测确认收益。",
+      "excellentAnswer": "我会先和业务确认压测问题：是容量摸底、上线准入还是瓶颈优化。然后按生产流量比例设计混合场景，包含读写比例、用户分布、热点数据和思考时间。压测过程中不只看平均响应，而要看 p95/p99、错误码、超时和资源饱和点。瓶颈定位要沿链路看网关、应用线程池、数据库、缓存和下游服务。压测结束要给出容量结论、风险点、扩容建议和回滚阈值，不能只给一张 QPS 图。",
+      "commonMistakes": [
+        "只压单接口，不建模业务场景。",
+        "只看平均响应时间。",
+        "压测数据太少导致缓存命中过高。"
+      ],
+      "followUps": [
+        "为什么 p99 比平均耗时更重要？",
+        "如何避免压测影响生产？",
+        "压测发现数据库瓶颈后你会怎么继续定位？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "目标",
+          "场景模型",
+          "数据准备",
+          "指标观察"
+        ],
+        "goodToHave": [
+          "p99",
+          "混合流量",
+          "容量结论",
+          "瓶颈复测",
+          "风险隔离"
+        ],
+        "redFlags": [
+          "只看 QPS",
+          "无真实场景",
+          "不看下游资源"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_qa_bug_triage_001",
+      "category": "测试",
+      "skill": "缺陷分析",
+      "roles": [
+        "qa"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "project",
+      "difficulty": 2,
+      "question": "请讲一次你发现并推动解决复杂缺陷的经历，重点说明复现条件、定位证据、沟通推进和防复发措施。",
+      "keywords": [
+        "复杂缺陷",
+        "复现条件",
+        "定位证据",
+        "沟通推进",
+        "防复发"
+      ],
+      "expectedPoints": [
+        "说明业务影响",
+        "给出稳定复现路径",
+        "提供日志/数据/截图证据",
+        "推动责任方协作",
+        "补充防复发措施"
+      ],
+      "referenceAnswer": "好的缺陷案例要讲清楚影响范围、复现路径和证据链。首先说明问题影响的是核心流程、少量用户还是边界场景；然后给出环境、账号、数据、操作步骤、接口响应和日志等复现条件。定位时要能区分前端展示、接口返回、数据库状态和异步任务问题。推进时要和研发、产品确认优先级、修复方案和验证范围。防复发包括补自动化用例、监控告警、数据校验或需求验收规则。",
+      "excellentAnswer": "我会讲一个完整闭环：例如发现优惠券偶发重复使用，我先通过订单号、券码和接口日志证明不是用户误操作，而是并发提交下状态更新没有原子保护。复现时构造同一账号并发请求，拿到数据库前后状态和服务日志。推进研发修复时，我同步说明影响金额和复现概率，帮助排优先级。修复后除了回归正常和并发场景，还补了接口自动化、唯一约束校验和监控，避免同类问题再次上线。",
+      "commonMistakes": [
+        "只说发现了 bug，没有复现和证据。",
+        "只关注修复，不说验证范围。",
+        "没有防复发动作。"
+      ],
+      "followUps": [
+        "如果研发认为不是 bug，你会怎么沟通？",
+        "偶发问题无法稳定复现时你怎么推进？",
+        "修复上线后你会如何验证没有引入回归？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "复现路径",
+          "定位证据",
+          "影响范围",
+          "防复发"
+        ],
+        "goodToHave": [
+          "日志",
+          "数据快照",
+          "优先级沟通",
+          "自动化补充",
+          "监控"
+        ],
+        "redFlags": [
+          "无证据",
+          "无验证",
+          "只甩锅研发"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ops_load_troubleshooting_001",
+      "category": "运维",
+      "skill": "Linux 排障",
+      "roles": [
+        "ops",
+        "devops",
+        "backend"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "Linux load average 很高时一定是 CPU 不够吗？你会如何定位是 CPU、IO、锁等待还是进程堆积？",
+      "keywords": [
+        "load average",
+        "CPU",
+        "IO wait",
+        "进程状态",
+        "排障"
+      ],
+      "expectedPoints": [
+        "解释 load average 含义",
+        "区分 CPU 和不可中断等待",
+        "查看进程状态",
+        "结合 vmstat/iostat/pidstat",
+        "提出止血动作"
+      ],
+      "referenceAnswer": "load average 表示一段时间内可运行和不可中断睡眠的任务数量，并不等同于 CPU 使用率。load 高可能是 CPU 计算排队，也可能是磁盘 IO、网络文件系统、锁等待或大量进程阻塞。排查时先看 CPU 核数和 load 比例，再用 top、vmstat、pidstat、iostat、ps 查看 user/sys/iowait、run queue、进程状态 D/R/S 和上下文切换。如果 iowait 高，要看磁盘延迟和吞吐；如果 R 状态多，可能 CPU 饱和；如果 D 状态多，往往是 IO 或内核等待。止血可以限流、迁移任务、扩容或隔离异常进程。",
+      "excellentAnswer": "我会先避免一个误区：load 高不是 CPU 高的同义词。比如 8 核机器 load 30，同时 CPU idle 还很多，可能大量任务卡在 D 状态等磁盘或网络存储。我的顺序是看核心数、CPU 分布、run queue、iowait 和进程状态，再定位具体进程和资源。对业务机器还要关联请求延迟和错误率，判断是否需要摘流量。处理完成后要补磁盘、线程池、连接池或定时任务监控，避免只在机器层看到 load 才发现问题。",
+      "commonMistakes": [
+        "load 高就直接加 CPU。",
+        "不知道 D 状态进程也计入 load。",
+        "只看 top 不看 iowait 和进程状态。"
+      ],
+      "followUps": [
+        "D 状态进程通常代表什么？",
+        "load 和 CPU 核数应该如何一起看？",
+        "iostat 里 await 和 util 能说明什么？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "load 含义",
+          "CPU 核数",
+          "进程状态",
+          "IO wait"
+        ],
+        "goodToHave": [
+          "vmstat",
+          "iostat",
+          "pidstat",
+          "D 状态",
+          "止血"
+        ],
+        "redFlags": [
+          "把 load 等同 CPU",
+          "不看进程状态",
+          "没有业务影响判断"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ops_nginx_502_001",
+      "category": "运维",
+      "skill": "网关排障",
+      "roles": [
+        "ops",
+        "devops",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Nginx 网关大量 502/504 时，你会如何区分上游服务异常、连接池耗尽、超时配置和网络问题？",
+      "keywords": [
+        "Nginx",
+        "502",
+        "504",
+        "upstream",
+        "超时"
+      ],
+      "expectedPoints": [
+        "区分 502 和 504",
+        "查看 access/error log",
+        "检查 upstream 状态",
+        "分析连接和超时配置",
+        "关联服务端和网络指标"
+      ],
+      "referenceAnswer": "502 通常表示网关从上游拿到无效响应或连接失败，504 更偏上游响应超时。排查要先看 Nginx access log、error log、upstream_addr、upstream_status、upstream_response_time 和 request_time，确认是所有 upstream 还是个别实例。上游服务异常要看实例健康、崩溃、线程池、连接池和应用日志；连接问题要看 keepalive、最大连接数、端口耗尽、SYN backlog；超时配置要看 proxy_connect_timeout、proxy_read_timeout 与服务实际耗时是否匹配；网络问题要看丢包、RTT 和跨机房链路。止血可以摘除异常 upstream、扩容、回滚或临时降级。",
+      "excellentAnswer": "我会先用日志把 502/504 分桶，而不是直接重启 Nginx。比如 upstream_status 是 502 且 error log 有 connection refused，多半是上游实例不可达或端口没监听；如果是 upstream timed out，则看服务处理慢、连接池等待或下游依赖慢；如果只有某个 upstream_addr 异常，先摘掉这个实例。还要看 Nginx 到上游的连接复用和超时配置是否和应用连接池匹配。最终要用网关错误率、上游 p99、实例健康和网络指标对齐时间线。",
+      "commonMistakes": [
+        "看到 502 就只重启 Nginx。",
+        "不看 upstream 字段，无法定位具体实例。",
+        "盲目调大超时掩盖上游慢。"
+      ],
+      "followUps": [
+        "502 和 504 的排查方向有什么不同？",
+        "upstream_response_time 和 request_time 有什么区别？",
+        "为什么盲目调大超时可能让故障扩大？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "access/error log",
+          "upstream 状态",
+          "502/504 区分",
+          "上游健康"
+        ],
+        "goodToHave": [
+          "keepalive",
+          "连接耗尽",
+          "超时配置",
+          "摘除实例",
+          "网络 RTT"
+        ],
+        "redFlags": [
+          "只重启",
+          "不看 upstream",
+          "只调超时"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ops_backup_restore_001",
+      "category": "运维",
+      "skill": "备份恢复",
+      "roles": [
+        "ops",
+        "devops",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "你会如何设计数据库备份和恢复方案？请说明全量、增量、binlog、恢复演练、RPO/RTO 和权限隔离。",
+      "keywords": [
+        "备份恢复",
+        "全量备份",
+        "增量备份",
+        "binlog",
+        "RPO/RTO"
+      ],
+      "expectedPoints": [
+        "定义 RPO/RTO",
+        "组合全量/增量/binlog",
+        "定期恢复演练",
+        "备份加密和权限隔离",
+        "监控备份成功率和可恢复性"
+      ],
+      "referenceAnswer": "备份方案要以恢复目标为中心。RPO 定义最多可丢多少数据，RTO 定义多久恢复服务。常见组合是定期全量备份、增量备份或 binlog 归档，用于恢复到指定时间点。备份文件要异地保存、校验完整性、加密并限制访问权限，避免备份本身成为安全风险。更关键的是定期恢复演练，验证备份可用、恢复脚本可执行、账号权限和依赖配置完整。监控要覆盖备份任务成功率、备份大小异常、binlog 连续性、恢复耗时和保留周期。",
+      "excellentAnswer": "我会先问业务能接受的数据丢失和恢复时间，然后反推备份频率和架构。如果 RPO 要接近 0，只靠每天全备不够，要有 binlog 或同步复制；如果 RTO 很短，还要准备热备、自动化恢复和切换预案。备份不等于恢复能力，所以必须做演练，并记录从拿到备份、恢复实例、回放日志、校验数据到切流的全流程耗时。权限上备份账号应最小权限，备份文件加密和异地存储，防止误删、勒索和内部越权。",
+      "commonMistakes": [
+        "只配置备份任务，从不做恢复演练。",
+        "不知道 RPO/RTO。",
+        "备份和生产使用同一权限且未加密。"
+      ],
+      "followUps": [
+        "如何恢复到误删数据前的一分钟？",
+        "为什么备份成功不代表能恢复成功？",
+        "备份文件应该如何做权限和加密控制？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "RPO/RTO",
+          "全量或增量",
+          "binlog",
+          "恢复演练"
+        ],
+        "goodToHave": [
+          "异地备份",
+          "加密",
+          "完整性校验",
+          "时间点恢复",
+          "最小权限"
+        ],
+        "redFlags": [
+          "无演练",
+          "只谈备份不谈恢复",
+          "忽略权限安全"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ops_incident_response_001",
+      "category": "DevOps",
+      "skill": "SRE 故障响应",
+      "roles": [
+        "ops",
+        "devops",
+        "backend",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "project",
+      "difficulty": 3,
+      "question": "请讲一次你参与线上故障处理的经历，重点说明告警发现、影响评估、止血动作、根因定位、复盘和自动化改进。",
+      "keywords": [
+        "线上故障",
+        "告警",
+        "止血",
+        "根因定位",
+        "复盘"
+      ],
+      "expectedPoints": [
+        "说明故障背景和影响范围",
+        "建立时间线",
+        "先止血再根因",
+        "给出证据链",
+        "复盘和自动化改进"
+      ],
+      "referenceAnswer": "故障经历题要讲清楚时间线和决策。首先说明告警如何发现、影响哪些用户或业务指标、是否有收入或 SLA 损失。处理上要先止血，例如回滚、摘流量、降级、扩容、限流或切换，再保留现场继续定位。根因分析要有证据链，关联发布、配置、依赖、资源和日志。复盘不能只写“加强测试”，而要落到监控补齐、预案自动化、发布门禁、容量评估或代码修复。优秀回答还会说明沟通机制和责任分工。",
+      "excellentAnswer": "我会按时间线讲：几点收到什么告警，哪些指标异常，谁负责指挥，谁定位，谁对外同步。比如一次网关 5xx 暴涨，我先确认影响范围并摘除异常 upstream，同时回滚最新配置；止血后通过 Nginx upstream 日志和应用错误栈确认是连接池配置变更导致耗尽。复盘里不仅修配置，还补了灰度规则、连接池水位告警、变更前压测和一键回滚。这样的回答能体现我不是只会救火，而是在把故障变成系统能力。",
+      "commonMistakes": [
+        "没有时间线。",
+        "先讲根因不讲止血。",
+        "复盘只写人为注意。"
+      ],
+      "followUps": [
+        "故障处理中如何决定回滚还是继续定位？",
+        "如何避免多人同时操作造成二次故障？",
+        "复盘行动项如何保证真的落地？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "告警发现",
+          "影响评估",
+          "止血动作",
+          "根因证据"
+        ],
+        "goodToHave": [
+          "时间线",
+          "指挥协同",
+          "回滚",
+          "自动化预案",
+          "复盘行动项"
+        ],
+        "redFlags": [
+          "无时间线",
+          "无止血",
+          "无防复发"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_devops_k8s_rollout_001",
+      "category": "DevOps",
+      "skill": "Kubernetes 发布",
+      "roles": [
+        "devops",
+        "ops",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Kubernetes 中如何设计一次安全的应用发布？请说明 readiness、liveness、滚动更新、回滚和灰度验证。",
+      "keywords": [
+        "Kubernetes",
+        "readiness",
+        "liveness",
+        "滚动更新",
+        "回滚"
+      ],
+      "expectedPoints": [
+        "区分 readiness 和 liveness",
+        "配置滚动更新策略",
+        "设置资源和探针",
+        "设计灰度和回滚",
+        "观察发布指标"
+      ],
+      "referenceAnswer": "安全发布要保证新 Pod 真正准备好再接流量。readinessProbe 用于判断是否可以加入服务端点，livenessProbe 用于判断进程是否需要重启，两者不能混用。滚动更新要配置 maxUnavailable、maxSurge、资源请求限制、启动时间和优雅终止，避免容量瞬间不足。灰度可以通过分批副本、标签路由、网关权重或 Argo Rollouts 等实现。发布后要看错误率、延迟、重启次数、readiness 失败、资源水位和业务指标；异常时快速回滚镜像、配置或流量。",
+      "excellentAnswer": "我会先确保应用有正确的健康检查：readiness 失败时不接流量，liveness 只在进程不可恢复时重启，避免慢启动被反复杀掉。滚动更新要结合容量算 maxUnavailable，核心服务不能一次下掉太多副本。发布前检查镜像、配置、数据库兼容和资源 limit；发布中看 Pod 状态、网关 5xx、p99 和业务指标；灰度阶段小流量验证，再逐步放量。回滚不只回镜像，还要考虑配置、数据库变更和消息兼容。",
+      "commonMistakes": [
+        "把 readiness 和 liveness 配成同一个接口。",
+        "没有容量预算就滚动更新。",
+        "只会 kubectl rollout undo，不考虑配置和数据库。"
+      ],
+      "followUps": [
+        "readiness 失败和 liveness 失败分别会发生什么？",
+        "maxUnavailable 设置过大有什么风险？",
+        "数据库变更如何做到可回滚或兼容发布？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "readiness",
+          "liveness",
+          "滚动更新",
+          "回滚"
+        ],
+        "goodToHave": [
+          "灰度",
+          "优雅终止",
+          "资源限制",
+          "业务指标",
+          "数据库兼容"
+        ],
+        "redFlags": [
+          "探针混用",
+          "无灰度",
+          "不看指标"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_devops_config_secret_001",
+      "category": "DevOps",
+      "skill": "配置与密钥",
+      "roles": [
+        "devops",
+        "ops",
+        "security",
+        "backend"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "配置和密钥应该如何管理？为什么不应该把数据库密码、Token 或私钥直接提交到代码仓库？",
+      "keywords": [
+        "配置管理",
+        "密钥管理",
+        "Secret",
+        "最小权限",
+        "轮换"
+      ],
+      "expectedPoints": [
+        "区分配置和密钥",
+        "密钥不入代码仓库",
+        "使用 Secret/KMS/环境注入",
+        "权限最小化",
+        "支持轮换和审计"
+      ],
+      "referenceAnswer": "普通配置和敏感密钥要分开管理。数据库密码、Token、私钥一旦进入代码仓库，很容易通过历史提交、构建日志、镜像或开发机泄漏，删除最新文件也不能清除历史记录。更安全的方式是使用 Secret 管理、KMS、Vault、云厂商密钥服务或 CI/CD 安全变量，在运行时注入，并按环境隔离。权限要最小化，生产密钥不应给所有开发可见。还要支持密钥轮换、访问审计、泄漏扫描和应急吊销。",
+      "excellentAnswer": "我会把配置分成非敏感配置、敏感密钥和运行时动态配置。非敏感配置可以版本化，敏感密钥必须放专门的密钥系统，并通过服务身份在运行时读取或注入。CI/CD 里要避免把密钥打印到日志，镜像构建也不能把密钥 bake 进去。真实团队还要有密钥轮换周期、离职权限回收、泄漏扫描和应急预案。如果密钥已经提交过仓库，不能只删文件，要吊销旧密钥并清理历史暴露风险。",
+      "commonMistakes": [
+        "把 .env 或私钥提交到仓库。",
+        "删除文件后认为泄漏已经解决。",
+        "所有环境共用同一套密钥。"
+      ],
+      "followUps": [
+        "如果密钥已经提交到 Git 历史里，你会怎么处理？",
+        "Kubernetes Secret 默认是否等同于强加密？",
+        "密钥轮换如何避免业务中断？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "密钥不入库",
+          "Secret/KMS",
+          "最小权限",
+          "轮换"
+        ],
+        "goodToHave": [
+          "审计",
+          "泄漏扫描",
+          "环境隔离",
+          "CI 日志保护",
+          "吊销"
+        ],
+        "redFlags": [
+          "硬编码密钥",
+          "无轮换",
+          "共用生产密钥"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_devops_pipeline_gate_001",
+      "category": "DevOps",
+      "skill": "流水线门禁",
+      "roles": [
+        "devops",
+        "qa",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "如何为生产发布流水线设计质量门禁？请说明代码检查、测试、制品一致性、安全扫描、审批和紧急发布例外。",
+      "keywords": [
+        "CI/CD",
+        "质量门禁",
+        "制品一致性",
+        "安全扫描",
+        "审批"
+      ],
+      "expectedPoints": [
+        "代码和依赖检查",
+        "单测/集成/冒烟测试",
+        "制品一次构建多环境部署",
+        "安全扫描和合规",
+        "审批与紧急例外流程"
+      ],
+      "referenceAnswer": "流水线门禁要覆盖质量、安全和变更风险。代码提交后做格式、静态检查、单元测试和依赖漏洞扫描；合并后构建不可变制品，测试、预发、生产使用同一制品，避免环境重新构建不一致。进入生产前要跑集成测试、冒烟测试、配置检查和数据库变更检查，高风险发布需要审批和变更记录。紧急修复可以有例外通道，但必须保留审计、补测和复盘，不能让例外变成常态。门禁还要可观测，知道失败集中在哪些阶段。",
+      "excellentAnswer": "我会按风险分层设计门禁，而不是所有项目一套死规则。核心服务要求更高：必须通过单测、接口契约测试、镜像扫描、配置校验和预发冒烟；低风险内部工具可以简化。制品一致性很关键，生产不应该重新 build。安全扫描要覆盖依赖漏洞、密钥泄漏和镜像基线。审批不是走形式，审批人要能看到变更范围、回滚方案和监控指标。紧急发布可以跳过部分非关键门禁，但事后必须补齐测试和复盘。",
+      "commonMistakes": [
+        "每个环境重新构建制品。",
+        "审批只是点按钮，没有风险信息。",
+        "紧急发布长期绕过门禁。"
+      ],
+      "followUps": [
+        "为什么强调一次构建多环境部署？",
+        "流水线太慢时如何优化而不牺牲关键门禁？",
+        "紧急发布绕过门禁后如何补偿风险？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "代码检查",
+          "测试门禁",
+          "制品一致性",
+          "审批"
+        ],
+        "goodToHave": [
+          "安全扫描",
+          "数据库变更检查",
+          "审计",
+          "紧急例外",
+          "门禁指标"
+        ],
+        "redFlags": [
+          "生产重新构建",
+          "无回滚信息",
+          "例外无审计"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_data_quality_monitoring_001",
+      "category": "数据",
+      "skill": "数据质量",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "你会如何设计数据质量监控？请说明完整性、唯一性、准确性、及时性、波动检测和告警处理闭环。",
+      "keywords": [
+        "数据质量",
+        "完整性",
+        "唯一性",
+        "及时性",
+        "波动检测"
+      ],
+      "expectedPoints": [
+        "定义质量维度",
+        "设置规则和阈值",
+        "覆盖分区和主键校验",
+        "监控指标波动",
+        "建立告警处理闭环"
+      ],
+      "referenceAnswer": "数据质量监控要围绕业务可用性设计。完整性关注分区是否产出、字段是否为空、上游是否缺表；唯一性关注主键重复和明细去重；准确性关注口径、枚举值和关联关系；及时性关注调度是否延迟；波动检测关注核心指标同比、环比或阈值异常。告警不能只发消息，要有负责人、影响范围、处理 SLA、补数方案和复盘记录。核心报表和下游依赖要有更严格的规则，避免错误数据流入 ADS 或业务决策。",
+      "excellentAnswer": "我会先和业务确认哪些指标错了会产生决策风险，比如 GMV、订单数、留存。然后在 ODS/DWD/DWS 不同层设置不同规则：ODS 看到数和分区，DWD 看主键、枚举和关联，DWS 看口径和波动。质量规则要版本化，阈值要能区分节假日和活动峰值。告警后要能一键看到血缘、上游任务、最近变更和补数入口。否则监控很多但没人处理，最后质量体系会失效。",
+      "commonMistakes": [
+        "只检查任务成功，不检查数据内容。",
+        "告警没有负责人和 SLA。",
+        "阈值固定导致活动日大量误报。"
+      ],
+      "followUps": [
+        "数据质量告警很多但没人处理怎么办？",
+        "核心指标波动如何区分真实业务变化和数据异常？",
+        "补数时如何避免覆盖正确数据？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "完整性",
+          "唯一性",
+          "及时性",
+          "波动检测"
+        ],
+        "goodToHave": [
+          "血缘",
+          "SLA",
+          "补数",
+          "规则分层",
+          "节假日阈值"
+        ],
+        "redFlags": [
+          "只看任务成功",
+          "无处理闭环",
+          "无业务优先级"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_data_realtime_stream_001",
+      "category": "数据",
+      "skill": "实时数据链路",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "请设计一条实时订单指标链路，从业务库变更到实时看板，如何保证低延迟、可恢复和口径一致？",
+      "keywords": [
+        "实时链路",
+        "CDC",
+        "Kafka",
+        "Flink",
+        "口径一致"
+      ],
+      "expectedPoints": [
+        "说明 CDC 或日志采集",
+        "使用消息队列缓冲",
+        "流式计算和状态管理",
+        "处理乱序和迟到",
+        "保证口径、幂等和恢复"
+      ],
+      "referenceAnswer": "实时链路通常从业务库 binlog/CDC 或埋点日志采集数据，写入 Kafka 等消息队列，再由 Flink/Spark Streaming 做清洗、关联、聚合，结果写入 OLAP、缓存或实时数仓服务看板。低延迟依赖采集延迟、队列积压、计算并行度和下游写入能力。可恢复要依赖 checkpoint、offset 管理、幂等写入和状态后端。口径一致要和离线指标统一维表、过滤规则、时间口径和去重逻辑。还要处理乱序、迟到、撤单退款和上游 schema 变更。",
+      "excellentAnswer": "我会先定义实时指标的业务语义，比如订单创建数、支付 GMV、退款是否冲减、按事件时间还是处理时间统计。链路上 CDC 进 Kafka，Flink 按事件时间开窗口，使用 watermark 处理迟到，状态里做订单幂等和维表关联，结果写 ClickHouse 或 Redis。恢复上依赖 checkpoint 和两阶段提交或幂等 upsert，避免故障重放导致重复统计。最后要和离线 T+1 做对账，发现偏差能定位是采集、计算、维表还是口径问题。",
+      "commonMistakes": [
+        "只说用 Flink，不讲事件时间和迟到。",
+        "实时口径和离线口径不一致。",
+        "故障重放后重复累计。"
+      ],
+      "followUps": [
+        "watermark 解决什么问题？",
+        "实时和离线指标不一致时如何排查？",
+        "Flink checkpoint 恢复后如何避免重复写结果？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "CDC/Kafka",
+          "流式计算",
+          "事件时间",
+          "恢复机制"
+        ],
+        "goodToHave": [
+          "watermark",
+          "checkpoint",
+          "幂等写入",
+          "离线对账",
+          "schema 变更"
+        ],
+        "redFlags": [
+          "无口径定义",
+          "不处理迟到",
+          "不考虑重复消费"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_data_scd_001",
+      "category": "数据",
+      "skill": "数仓建模",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "什么是缓慢变化维？用户等级、门店归属这类维度变化时，数仓应该如何保留历史口径？",
+      "keywords": [
+        "缓慢变化维",
+        "SCD",
+        "拉链表",
+        "历史口径",
+        "维度建模"
+      ],
+      "expectedPoints": [
+        "解释维度变化问题",
+        "区分覆盖和保留历史",
+        "说明拉链表设计",
+        "使用生效/失效时间",
+        "结合指标口径选择"
+      ],
+      "referenceAnswer": "缓慢变化维指维度属性会随时间变化，但变化频率不如事实数据高。若直接覆盖用户等级或门店归属，历史订单按当前维度回看会失真。常见处理包括 Type 1 直接覆盖、Type 2 保留历史版本，也就是拉链表，记录业务键、属性、生效时间、失效时间和当前标识。事实表关联维度时要按业务发生时间落到对应版本。是否保留历史取决于业务口径，例如财务报表通常要求按发生时口径，运营看当前归属可能使用当前维表。",
+      "excellentAnswer": "我会先问指标要按历史归属还是当前归属。比如订单发生时门店属于 A 区，后来划到 B 区，历史 GMV 如果按当前归属统计就会变化。拉链表能保留每次维度变更的版本，通过 start_time/end_time 或版本号做时间范围关联。设计时要处理同一天多次变更、开闭区间、当前记录标识和补数重跑。一个成熟数仓通常会同时支持历史口径和当前口径，但字段和指标名要清楚，避免业务误用。",
+      "commonMistakes": [
+        "所有维度都直接覆盖。",
+        "事实表不按业务时间关联维度版本。",
+        "指标没有说明历史口径还是当前口径。"
+      ],
+      "followUps": [
+        "拉链表如何处理同一天多次变更？",
+        "为什么补数时维度版本可能影响历史结果？",
+        "Type 1 和 Type 2 分别适合什么场景？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "SCD",
+          "历史版本",
+          "生效失效时间",
+          "事实表按时间关联"
+        ],
+        "goodToHave": [
+          "拉链表",
+          "当前标识",
+          "补数",
+          "口径说明",
+          "Type 1/2"
+        ],
+        "redFlags": [
+          "直接覆盖历史",
+          "不区分口径",
+          "关联当前维表"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_data_skew_001",
+      "category": "数据",
+      "skill": "大数据计算",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Spark 或 Hive 任务出现数据倾斜时，通常有哪些表现？你会如何定位倾斜 key 并选择治理方案？",
+      "keywords": [
+        "数据倾斜",
+        "Spark",
+        "Hive",
+        "shuffle",
+        "热点 key"
+      ],
+      "expectedPoints": [
+        "识别任务长尾和单 reducer 慢",
+        "定位热点 key",
+        "区分 join/group by 倾斜",
+        "选择加盐/拆分/广播等方案",
+        "评估正确性和成本"
+      ],
+      "referenceAnswer": "数据倾斜常表现为大部分 task 很快结束，少数 task 长时间运行，shuffle 数据量或单 reducer 输入异常大。定位可以看 Spark UI、任务日志、shuffle read/write、key 分布采样和中间表统计。group by 倾斜可用两阶段聚合、加盐、热点 key 单独处理；join 倾斜要看大表小表还是双大表，小表可广播，大表热点 key 可拆分、加盐扩散或单独计算后 union。治理时要保证结果正确，不能简单随机打散导致 join 语义错误，还要评估资源成本。",
+      "excellentAnswer": "我会先从 Spark UI 看 stage 是否长尾，再看慢 task 的 shuffle read 和 input records。如果确认是某些 key 占比极高，就按算子处理。聚合倾斜可以先局部加盐聚合再全局汇总；join 倾斜如果维表很小就 broadcast，若热点 key 特别大，可以把热点 key 拆出来单独 join，非热点走普通流程。加盐要确保两边 key 同步扩展，最后去盐聚合。治理后要对总数、金额和样本结果做校验，避免性能好了但口径错了。",
+      "commonMistakes": [
+        "看到任务慢就盲目加资源。",
+        "随机加盐导致 join 结果错误。",
+        "不做结果校验。"
+      ],
+      "followUps": [
+        "如何判断是数据倾斜还是资源不足？",
+        "广播 join 适合什么条件？",
+        "两阶段聚合为什么能缓解 group by 倾斜？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "长尾 task",
+          "热点 key",
+          "shuffle",
+          "治理方案"
+        ],
+        "goodToHave": [
+          "Spark UI",
+          "加盐",
+          "广播 join",
+          "两阶段聚合",
+          "结果校验"
+        ],
+        "redFlags": [
+          "只加资源",
+          "不定位 key",
+          "不校验正确性"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ai_rag_hallucination_001",
+      "category": "AI",
+      "skill": "RAG 应用",
+      "roles": [
+        "ai"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "知识库问答系统经常回答得很自信但事实错误，你会如何从检索、重排、提示词、引用和评估体系上治理幻觉？",
+      "keywords": [
+        "RAG",
+        "幻觉",
+        "检索",
+        "重排",
+        "评估"
+      ],
+      "expectedPoints": [
+        "区分检索失败和生成失败",
+        "改进切片和召回",
+        "使用重排和引用",
+        "提示模型基于证据回答",
+        "建立离线和线上评估"
+      ],
+      "referenceAnswer": "RAG 幻觉要先区分是没有检索到正确资料，还是检索到了但生成时编造。检索侧要优化文档清洗、切片粒度、元数据、向量和关键词混合召回；重排侧提高相关片段排序质量；生成侧要求模型基于证据回答，不足时明确说不知道，并输出引用来源。评估上要有人工标注问答集，分别看召回率、引用命中、答案事实性和拒答准确性，线上看用户反馈、转人工率和高风险问题拦截。敏感领域还要加规则校验和人工审核。",
+      "excellentAnswer": "我会把链路拆成 query 理解、召回、重排、生成和验真。很多幻觉其实是召回阶段没拿到正确上下文，所以先看 topK 里是否有答案证据；如果有证据但模型没用，就优化 prompt、上下文排序和引用约束。切片不能过长也不能过碎，要保留标题、章节和权限元数据。对于没有证据的问题，系统应该拒答或引导用户补充，而不是编答案。最后用一套固定评测集持续回归，每次更新知识库、embedding 或模型都要比较。",
+      "commonMistakes": [
+        "只换更大的模型，不看检索质量。",
+        "没有引用来源，无法验真。",
+        "所有问题都强行回答。"
+      ],
+      "followUps": [
+        "如何判断问题出在召回还是生成？",
+        "为什么混合检索可能比纯向量检索更稳？",
+        "拒答策略如何避免过度保守？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "检索质量",
+          "重排",
+          "引用",
+          "评估体系"
+        ],
+        "goodToHave": [
+          "混合检索",
+          "拒答",
+          "元数据",
+          "事实性评估",
+          "线上反馈"
+        ],
+        "redFlags": [
+          "只换模型",
+          "无引用",
+          "无评测集"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ai_feature_drift_001",
+      "category": "AI",
+      "skill": "模型监控",
+      "roles": [
+        "ai",
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "模型上线后效果逐渐变差，你会如何区分数据漂移、概念漂移、特征缺失、埋点变化和模型本身退化？",
+      "keywords": [
+        "模型漂移",
+        "数据漂移",
+        "概念漂移",
+        "特征监控",
+        "线上评估"
+      ],
+      "expectedPoints": [
+        "监控输入特征分布",
+        "对比训练和线上数据",
+        "检查标签和业务目标变化",
+        "排查特征管道和埋点",
+        "设计重训和回滚策略"
+      ],
+      "referenceAnswer": "模型效果退化要先看线上业务指标和模型指标，再拆原因。数据漂移是输入特征分布变了，例如用户来源、商品结构、季节性变化；概念漂移是特征与标签关系变了，例如风控攻击方式变化；特征缺失或埋点变化会导致线上特征默认值、空值或口径突变；模型本身退化可能来自服务版本、依赖、阈值或后处理变化。排查要对比训练集、近期线上样本、特征分布、PSI/KS、空值率、延迟、标签回流和 A/B 结果。治理包括告警、阈值调整、重训、灰度、回滚和特征管道校验。",
+      "excellentAnswer": "我会先确认退化是全局还是某些人群、渠道或时间段。然后看特征监控，空值率、分布和取值范围是否从某天开始突变；如果特征正常，再看标签延迟、业务策略和用户行为是否变化。概念漂移通常不能靠修管道解决，需要新样本重训或调整目标。线上模型还要检查版本、阈值、特征服务延迟和 fallback 比例。成熟系统应在上线前就有训练/线上特征一致性校验和模型效果监控，而不是等业务投诉才查。",
+      "commonMistakes": [
+        "只怀疑模型参数，不看数据管道。",
+        "离线指标正常就认为线上没问题。",
+        "没有分人群分析。"
+      ],
+      "followUps": [
+        "PSI 能帮助判断什么问题？",
+        "标签回流延迟会如何影响模型监控？",
+        "如何设计模型回滚和灰度？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "特征分布",
+          "数据漂移",
+          "概念漂移",
+          "特征管道"
+        ],
+        "goodToHave": [
+          "PSI",
+          "空值率",
+          "A/B",
+          "标签回流",
+          "灰度回滚"
+        ],
+        "redFlags": [
+          "只看模型代码",
+          "不看线上特征",
+          "无监控"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ai_serving_latency_001",
+      "category": "AI",
+      "skill": "模型服务",
+      "roles": [
+        "ai"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "模型推理服务延迟过高时，你会从模型、特征、批处理、硬件、缓存和降级策略哪些方面优化？",
+      "keywords": [
+        "推理延迟",
+        "模型服务",
+        "批处理",
+        "缓存",
+        "降级"
+      ],
+      "expectedPoints": [
+        "拆分特征耗时和推理耗时",
+        "优化模型和运行时",
+        "使用 batch 或并发控制",
+        "缓存高频结果",
+        "设计降级和监控"
+      ],
+      "referenceAnswer": "推理延迟要先拆分特征获取、预处理、模型推理、后处理和网络传输。模型侧可以做量化、蒸馏、裁剪、ONNX/TensorRT 优化或选择更小模型；服务侧可用动态 batch、并发池、GPU/CPU 资源隔离和连接复用；特征侧要优化特征服务、缓存高频特征和减少跨服务调用；业务侧可缓存热门请求、异步化非关键推理或降级到规则/小模型。优化时要同时看 p95/p99、吞吐、错误率、资源利用和效果损失，不能只追求平均延迟。",
+      "excellentAnswer": "我会先用 trace 或 profiling 证明慢在哪里。如果 70% 时间花在特征查询，换模型没用；如果 GPU 利用率低，可能需要 batch 和调度优化；如果 p99 高，可能是队列排队或冷启动。对大模型应用，还可以控制上下文长度、检索 topK、流式输出和缓存。降级策略要分层，例如超时后返回热门结果、小模型结果或人工兜底。每个优化都要评估效果指标，避免把延迟降下来但准确率或召回率不可接受。",
+      "commonMistakes": [
+        "只压缩模型，不看特征链路。",
+        "只看平均延迟，不看 p99。",
+        "没有效果损失评估。"
+      ],
+      "followUps": [
+        "动态 batch 为什么可能提升吞吐但增加单请求等待？",
+        "模型量化可能带来什么风险？",
+        "如何设计推理服务超时降级？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "耗时拆分",
+          "模型优化",
+          "特征优化",
+          "降级策略"
+        ],
+        "goodToHave": [
+          "batch",
+          "GPU 利用率",
+          "缓存",
+          "p99",
+          "效果损失"
+        ],
+        "redFlags": [
+          "不拆链路",
+          "只看平均值",
+          "不评估准确率"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_ai_data_leakage_001",
+      "category": "AI",
+      "skill": "模型评估",
+      "roles": [
+        "ai",
+        "data"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 2,
+      "question": "什么是训练数据泄漏？为什么离线指标异常高反而要警惕？你会如何发现和避免？",
+      "keywords": [
+        "数据泄漏",
+        "离线评估",
+        "训练集",
+        "验证集",
+        "时间穿越"
+      ],
+      "expectedPoints": [
+        "解释数据泄漏含义",
+        "识别时间穿越和标签泄漏",
+        "正确划分训练验证测试",
+        "检查特征生成时间",
+        "用线上实验验证"
+      ],
+      "referenceAnswer": "训练数据泄漏是模型在训练或验证时使用了预测时不可能获得的信息，导致离线指标虚高。常见形式包括标签直接或间接进入特征、用未来数据预测过去、同一用户或样本泄漏到训练和测试两侧、预处理在全量数据上 fit 后再切分。发现方法包括检查特征生成时间、特征重要性异常、训练/验证差距异常、按时间切分复评和模拟线上特征可用性。避免方法是按业务时间切分数据，严格区分训练、验证、测试，特征工程只使用预测时可获得的信息，并用线上 A/B 实验验证。",
+      "excellentAnswer": "我会特别警惕“离线 AUC 高得不合理但线上没收益”。比如预测用户是否流失，却把流失后的客服工单或退款状态作为特征，这就是时间穿越。再比如先对全量数据做归一化、目标编码或缺失填充，再划分训练测试，也可能泄漏统计信息。工程上要给每个特征标注可用时间，离线样本构造要模拟线上请求时刻。评估上用时间切分和留出集，最后通过 A/B 验证，不能只看一次随机切分结果。",
+      "commonMistakes": [
+        "随机切分时间序列数据。",
+        "使用预测时不可获得的未来特征。",
+        "离线指标高就直接上线。"
+      ],
+      "followUps": [
+        "目标编码为什么容易产生泄漏？",
+        "时间切分和随机切分各适合什么场景？",
+        "如何证明一个特征在线上预测时可用？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "泄漏定义",
+          "时间穿越",
+          "标签泄漏",
+          "正确切分"
+        ],
+        "goodToHave": [
+          "特征可用时间",
+          "特征重要性异常",
+          "线上 A/B",
+          "预处理泄漏"
+        ],
+        "redFlags": [
+          "未来特征",
+          "只看随机验证",
+          "无线上验证"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_security_authz_001",
+      "category": "安全",
+      "skill": "权限控制",
+      "roles": [
+        "security",
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "接口已经做了登录鉴权，为什么还可能出现越权？请说明水平越权、垂直越权和对象级权限校验的设计。",
+      "keywords": [
+        "鉴权",
+        "授权",
+        "水平越权",
+        "垂直越权",
+        "对象级权限"
+      ],
+      "expectedPoints": [
+        "区分认证和授权",
+        "解释水平/垂直越权",
+        "对象级权限校验",
+        "服务端强制校验",
+        "审计和测试"
+      ],
+      "referenceAnswer": "登录鉴权只证明用户是谁，不代表他有权访问所有资源。水平越权是同级用户访问了别人的数据，例如修改订单 id 查看他人订单；垂直越权是普通用户访问管理员功能。对象级权限校验要在服务端根据用户、角色、租户、资源归属和操作类型判断，不能只靠前端隐藏按钮或路由。设计上应将权限校验收敛到统一中间件、服务层或策略引擎，关键操作记录审计日志，并在测试中覆盖篡改 id、跨租户、角色降级等场景。",
+      "excellentAnswer": "我会先区分 authentication 和 authorization。很多越权不是没登录，而是接口只查了 resourceId，没有验证这个资源是否属于当前用户或租户。解决上不能把权限散落在每个 controller 的 if 里，最好统一抽象成 subject-action-resource 的策略校验，并在数据查询层带上 tenantId/userId 约束。前端权限只改善体验，不能作为安全边界。上线前要有自动化安全用例和审计，发现越权后要评估历史访问范围。",
+      "commonMistakes": [
+        "把登录等同于授权。",
+        "只靠前端隐藏按钮。",
+        "查询资源时不带租户或用户约束。"
+      ],
+      "followUps": [
+        "如何防止跨租户数据访问？",
+        "RBAC 和 ABAC 有什么区别？",
+        "发现越权漏洞后如何评估影响范围？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "认证授权区分",
+          "水平越权",
+          "垂直越权",
+          "服务端校验"
+        ],
+        "goodToHave": [
+          "对象级权限",
+          "租户隔离",
+          "策略引擎",
+          "审计",
+          "安全测试"
+        ],
+        "redFlags": [
+          "只靠前端",
+          "只检查登录",
+          "无资源归属校验"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_security_ssrf_001",
+      "category": "安全",
+      "skill": "服务端请求伪造",
+      "roles": [
+        "security",
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "什么是 SSRF？如果系统允许用户提交图片 URL 或 webhook 地址，你会如何防护内网探测和云元数据泄漏？",
+      "keywords": [
+        "SSRF",
+        "内网探测",
+        "云元数据",
+        "URL 校验",
+        "出网控制"
+      ],
+      "expectedPoints": [
+        "解释 SSRF 原理",
+        "限制协议和目标地址",
+        "防 DNS rebinding 和重定向绕过",
+        "隔离出网权限",
+        "监控和审计"
+      ],
+      "referenceAnswer": "SSRF 是攻击者诱导服务端向攻击者指定的地址发请求，从而访问内网服务、云元数据地址或绕过网络边界。图片抓取、webhook、URL 预览都可能成为入口。防护要限制协议为 http/https，禁止 file、gopher 等危险协议；解析域名后校验 IP，拒绝内网、回环、链路本地和云元数据地址；处理重定向时每跳都重新校验，防 DNS rebinding；请求服务应运行在隔离网络中，最小化出网权限。还要设置超时、大小限制、审计日志和异常访问告警。",
+      "excellentAnswer": "我会把 SSRF 当作服务端出网能力滥用问题。仅用字符串黑名单不够，因为有 IP 编码、IPv6、DNS rebinding、302 跳转和域名 CNAME 等绕过。更稳的是统一 URL fetch 服务，做协议白名单、DNS 解析后 IP 分类、每次连接前校验最终 IP，并在网络层禁止访问 169.254.169.254、内网网段和管理端口。对 webhook 场景，还可以要求用户验证域名归属。即使应用校验有漏洞，网络 egress policy 也应该兜底。",
+      "commonMistakes": [
+        "只用字符串 contains 过滤 localhost。",
+        "不处理重定向和 DNS rebinding。",
+        "服务默认能访问全部内网。"
+      ],
+      "followUps": [
+        "为什么 302 重定向会绕过简单 URL 校验？",
+        "云元数据地址泄漏可能造成什么后果？",
+        "如何在 Kubernetes 中限制应用出网？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "SSRF 原理",
+          "协议白名单",
+          "IP 校验",
+          "内网/元数据拦截"
+        ],
+        "goodToHave": [
+          "DNS rebinding",
+          "重定向校验",
+          "egress policy",
+          "超时大小限制",
+          "审计"
+        ],
+        "redFlags": [
+          "黑名单过滤",
+          "无网络隔离",
+          "不校验最终 IP"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_security_secret_leak_001",
+      "category": "安全",
+      "skill": "密钥泄漏响应",
+      "roles": [
+        "security",
+        "devops",
+        "backend"
+      ],
+      "levels": [
+        "junior",
+        "middle",
+        "senior"
+      ],
+      "type": "project",
+      "difficulty": 2,
+      "question": "如果发现生产 API Key 被提交到了 Git 仓库，你会如何评估影响、止血、轮换和防止再次发生？",
+      "keywords": [
+        "密钥泄漏",
+        "Git",
+        "轮换",
+        "止血",
+        "防复发"
+      ],
+      "expectedPoints": [
+        "立即吊销或限制密钥",
+        "评估访问日志和影响范围",
+        "轮换相关系统配置",
+        "清理历史暴露和通知相关方",
+        "增加扫描和流程门禁"
+      ],
+      "referenceAnswer": "密钥泄漏后不能只删除文件。第一步是确认密钥类型、权限范围、是否已公开、是否被使用；立即吊销、禁用或收窄权限，并生成新密钥更新线上配置。第二步检查访问日志、调用来源和异常操作，评估是否发生数据访问或资源滥用。第三步处理 Git 历史、构建日志、镜像和制品中的残留，但即使清理历史也必须轮换密钥。防复发包括 pre-commit/CI 密钥扫描、密钥管理系统、最小权限、定期轮换和开发规范培训。",
+      "excellentAnswer": "我会按安全事件处理，而不是普通代码问题。先把泄漏密钥失效化，避免继续被用；如果不能立刻吊销，就先限制 IP、权限或配额。然后用云审计、API 访问日志和仓库可见性评估暴露时间和影响。轮换时要协调应用配置、CI/CD、第三方回调和缓存，避免新密钥上线前服务中断。事后要检查为什么能提交：本地没有扫描、CI 没拦截、密钥权限过大还是团队把密钥当配置管理。行动项必须落到工具和流程。",
+      "commonMistakes": [
+        "只删除提交中的密钥。",
+        "不吊销旧密钥。",
+        "不查访问日志和影响范围。"
+      ],
+      "followUps": [
+        "为什么清理 Git 历史仍不能替代密钥轮换？",
+        "密钥轮换如何避免服务中断？",
+        "CI 中如何做密钥泄漏门禁？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "吊销/轮换",
+          "影响评估",
+          "访问日志",
+          "防复发"
+        ],
+        "goodToHave": [
+          "最小权限",
+          "CI 扫描",
+          "Git 历史",
+          "构建制品",
+          "事件响应"
+        ],
+        "redFlags": [
+          "只删文件",
+          "不轮换",
+          "无审计"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_security_upload_001",
+      "category": "安全",
+      "skill": "文件上传安全",
+      "roles": [
+        "security",
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "用户头像或附件上传功能有哪些安全风险？你会如何设计文件类型校验、存储隔离、访问控制和恶意文件处理？",
+      "keywords": [
+        "文件上传",
+        "MIME 校验",
+        "存储隔离",
+        "访问控制",
+        "恶意文件"
+      ],
+      "expectedPoints": [
+        "校验文件类型和大小",
+        "不信任扩展名和客户端 MIME",
+        "隔离存储和执行权限",
+        "生成安全文件名",
+        "做鉴权、扫描和审计"
+      ],
+      "referenceAnswer": "文件上传风险包括上传 WebShell、伪造扩展名、超大文件耗尽资源、恶意图片或压缩包、路径穿越、越权访问和公开桶泄漏。校验时不能只信文件名后缀或客户端 MIME，要结合白名单、服务端 MIME 检测、魔数、大小和图片解码验证。文件应存到对象存储或隔离目录，不给执行权限，文件名由服务端生成，避免路径穿越。访问时要做权限校验、签名 URL 或私有桶策略。高风险文件可接入杀毒扫描、异步审核和下载时安全头。",
+      "excellentAnswer": "我会把上传链路拆成入口校验、存储隔离、访问控制和后处理。入口只允许明确业务需要的类型和大小，图片要真正解码重写，避免 polyglot 文件。存储层不要放在应用可执行目录，使用随机文件名和私有 bucket。下载或预览要走鉴权，不允许用户通过猜 URL 访问他人附件。对于压缩包要防 zip bomb 和路径穿越。日志里记录上传者、文件 hash、大小、类型和扫描结果，方便事后追踪。",
+      "commonMistakes": [
+        "只检查文件后缀。",
+        "把上传文件放到可执行目录。",
+        "公开 URL 无鉴权。"
+      ],
+      "followUps": [
+        "为什么图片上传也可能有安全风险？",
+        "如何防止路径穿越和 zip slip？",
+        "对象存储 bucket 应该如何设置权限？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "类型大小校验",
+          "服务端校验",
+          "存储隔离",
+          "访问控制"
+        ],
+        "goodToHave": [
+          "魔数",
+          "图片重编码",
+          "杀毒扫描",
+          "签名 URL",
+          "zip bomb"
+        ],
+        "redFlags": [
+          "只看后缀",
+          "可执行目录",
+          "公开访问无鉴权"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
+      }
+    },
+    {
+      "id": "approved_system_db_sharding_001",
+      "category": "系统设计",
+      "skill": "数据扩展",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "订单表数据量快速增长时，什么时候该考虑分库分表？如何选择分片键，并处理扩容、跨分片查询和全局唯一 ID？",
+      "keywords": [
+        "分库分表",
+        "分片键",
+        "扩容",
+        "跨分片查询",
+        "全局 ID"
+      ],
+      "expectedPoints": [
+        "先评估单库优化空间",
+        "选择稳定高区分度分片键",
+        "处理跨分片查询和事务",
+        "设计扩容迁移方案",
+        "全局 ID 和路由规则"
+      ],
+      "referenceAnswer": "分库分表是高成本方案，应该在索引、SQL、归档、读写分离和硬件优化不足以支撑时再考虑。分片键要稳定、查询高频、分布均匀，订单常见按 userId、buyerId、sellerId 或 orderId 路由，选择取决于主要查询路径。分片后跨分片查询、排序分页、聚合、事务和唯一约束都会变复杂，需要通过冗余索引表、异步汇总、搜索/OLAP 或业务限制解决。扩容要考虑一致性哈希、双写迁移、数据校验和灰度切流。全局 ID 可以用雪花算法、号段或数据库序列服务。",
+      "excellentAnswer": "我会先问瓶颈在哪里，是容量、写入、查询还是运维窗口。订单表如果只是历史数据太多，冷热归档可能比立即分表更合适。真正分片时，分片键必须匹配核心查询，比如用户查订单就按用户维度更自然，但商家后台和客服查询可能需要冗余索引或搜索引擎。扩容是最大风险之一，不能简单改 hash 规则，需要迁移方案、双读双写、校验和回滚。分库分表后还要接受一些能力退化，比如跨分片事务和全局排序变贵。",
+      "commonMistakes": [
+        "一遇到慢查询就分库分表。",
+        "分片键不匹配主要查询路径。",
+        "不考虑扩容和跨分片查询。"
+      ],
+      "followUps": [
+        "按 userId 分片后按 orderId 查询怎么办？",
+        "历史数据归档和分表分别解决什么问题？",
+        "扩容迁移期间如何校验数据一致？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "前置优化",
+          "分片键",
+          "跨分片查询",
+          "扩容迁移"
+        ],
+        "goodToHave": [
+          "全局 ID",
+          "冗余索引",
+          "冷热归档",
+          "双写校验",
+          "事务限制"
+        ],
+        "redFlags": [
+          "过早分库分表",
+          "无迁移方案",
+          "不考虑查询路径"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "manual-curated",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-05-29T00:00:00.000Z",
+        "approvedBy": "codex-reviewer",
+        "reviewNotes": "人工审核通过：为补齐薄弱方向手工编写，已补充参考答案、优秀答案、追问、误区和评分点。"
       }
     }
   ]

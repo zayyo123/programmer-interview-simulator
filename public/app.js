@@ -28,11 +28,15 @@ const profileDropzone = document.querySelector('#profileDropzone');
 const profileUploadButton = document.querySelector('#profileUploadButton');
 const profileFileInput = document.querySelector('#profileFileInput');
 const countdownOverlay = document.querySelector('#countdownOverlay');
+const workflowStepButtons = document.querySelectorAll('[data-step-target]');
+const workflowStepPanels = document.querySelectorAll('[data-workflow-step]');
+const workflowStatusEl = document.querySelector('#workflowStatus');
 const PRACTICE_HISTORY_KEY = 'programmer-interview-practice-history-v1';
 const PRACTICE_HISTORY_LIMIT = 12;
 
 let sessionId = null;
 let busy = false;
+let activeWorkflowStep = 'setup';
 let latestLiveCoachSnapshot = null;
 let liveCoachDetailsOpen = false;
 let currentPlan = [];
@@ -40,6 +44,13 @@ let currentQuestionId = null;
 let latestReport = null;
 let codeAnswerMode = 'explain';
 let codeAnswerModeQuestionId = null;
+
+document.addEventListener('click', (event) => {
+  const stepButton = event.target.closest('[data-step-target]');
+  if (!stepButton) return;
+
+  setWorkflowStep(stepButton.dataset.stepTarget);
+});
 
 liveCoachEl.addEventListener('click', (event) => {
   const toggle = event.target.closest('[data-live-coach-toggle]');
@@ -226,6 +237,56 @@ renderPlanPreview();
 renderPracticeHistory();
 renderAnswerGuide(null);
 renderAiProviderState();
+renderWorkflowState();
+
+function canOpenWorkflowStep(step) {
+  if (step === 'setup') return true;
+  if (step === 'interview') return Boolean(sessionId);
+  if (step === 'report') return Boolean(latestReport);
+  return false;
+}
+
+function setWorkflowStep(step) {
+  if (!canOpenWorkflowStep(step)) {
+    if (step === 'interview') {
+      setWorkflowStatus('请先完成面试配置并开始面试。');
+    } else if (step === 'report') {
+      setWorkflowStatus('完成面试后会生成复盘报告。');
+    }
+    renderWorkflowState();
+    return false;
+  }
+
+  activeWorkflowStep = step;
+  renderWorkflowState();
+  return true;
+}
+
+function setWorkflowStatus(message) {
+  if (workflowStatusEl) workflowStatusEl.textContent = message;
+}
+
+function renderWorkflowState() {
+  workflowStepPanels.forEach((panel) => {
+    panel.hidden = panel.dataset.workflowStep !== activeWorkflowStep;
+  });
+
+  workflowStepButtons.forEach((button) => {
+    const step = button.dataset.stepTarget;
+    const available = canOpenWorkflowStep(step);
+    button.classList.toggle('active', step === activeWorkflowStep);
+    button.classList.toggle('locked', !available);
+    button.setAttribute('aria-disabled', String(!available));
+  });
+
+  if (latestReport) {
+    setWorkflowStatus('复盘报告已生成，可以在三步之间回看配置、面试过程和报告。');
+  } else if (sessionId) {
+    setWorkflowStatus('面试已开始，可以返回查看配置；报告会在结束后解锁。');
+  } else {
+    setWorkflowStatus('先完成本轮面试配置，然后进入模拟面试。');
+  }
+}
 
 function initializeSetupControls() {
   renderChoiceGrid('role', roleChoiceGrid, {
@@ -417,6 +478,8 @@ setupForm.addEventListener('submit', async (event) => {
     answerInput.disabled = false;
     answerSubmitButton.disabled = false;
     finishButton.disabled = false;
+    setSetupReadonly(true);
+    setWorkflowStep('interview');
     answerInput.focus();
   } catch (error) {
     statusText.textContent = `开始面试失败：${error.message}`;
@@ -491,6 +554,7 @@ finishButton.addEventListener('click', async () => {
     answerSubmitButton.disabled = true;
     finishButton.disabled = true;
     statusText.textContent = '报告已生成。请查看总览和逐题差距。';
+    setWorkflowStep('report');
   } catch (error) {
     statusText.textContent = `生成报告失败：${error.message}`;
   } finally {
@@ -500,10 +564,40 @@ finishButton.addEventListener('click', async () => {
 
 function setBusy(nextBusy) {
   busy = nextBusy;
-  setupForm.querySelector('button[type="submit"]').disabled = nextBusy;
-  answerInput.disabled = nextBusy || !sessionId;
-  answerSubmitButton.disabled = nextBusy || !sessionId;
-  finishButton.disabled = nextBusy || !sessionId;
+  setupForm.querySelector('button[type="submit"]').disabled = nextBusy || Boolean(sessionId);
+  answerInput.disabled = nextBusy || !sessionId || Boolean(latestReport);
+  answerSubmitButton.disabled = nextBusy || !sessionId || Boolean(latestReport);
+  finishButton.disabled = nextBusy || !sessionId || Boolean(latestReport);
+  renderWorkflowState();
+}
+
+function resetSessionForNewSetup() {
+  sessionId = null;
+  currentPlan = [];
+  currentQuestionId = null;
+  latestLiveCoachSnapshot = null;
+  liveCoachDetailsOpen = false;
+  codeAnswerModeQuestionId = null;
+  setSetupReadonly(false);
+  renderInterviewProgress([], null, false);
+  renderAnswerGuide(null);
+  messagesEl.className = 'messages empty-state';
+  messagesEl.innerHTML = '<p>面试官会在这里开场，并提出第一道问题。</p>';
+  liveCoachEl.className = 'live-coach empty-state';
+  liveCoachEl.innerHTML = '<p>开始面试后，这里会显示面试官当前正在考察什么。</p>';
+  answerInput.value = '';
+  answerInput.disabled = true;
+  answerSubmitButton.disabled = true;
+  finishButton.disabled = true;
+}
+
+function setSetupReadonly(readonly) {
+  setupForm.querySelectorAll('input, select, textarea, button[type="submit"]').forEach((control) => {
+    if (control.type === 'file') return;
+    control.disabled = readonly || busy;
+  });
+
+  profileUploadButton.disabled = readonly || busy;
 }
 
 function getCurrentPlanItem() {
@@ -2771,6 +2865,7 @@ function applyReportQuestionDrill(questionIndex) {
 }
 
 function applyRecommendationToSetup(recommendation, resumeLines, statusMessage) {
+  resetSessionForNewSetup();
   setSelectValue('role', recommendation.roleValue);
   setSelectValue('level', recommendation.levelValue);
   setSelectValue('style', recommendation.styleValue);
@@ -2781,6 +2876,7 @@ function applyRecommendationToSetup(recommendation, resumeLines, statusMessage) 
   renderProfileAnalysis(resumeInput.value);
   renderPlanPreview();
   statusText.textContent = statusMessage;
+  setWorkflowStep('setup');
   setupForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 

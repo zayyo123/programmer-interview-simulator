@@ -80,7 +80,7 @@ export async function getQuestionBankCatalog(filters = {}) {
   };
 }
 
-export async function submitQuestionDraft(input = {}) {
+export async function submitQuestionDraft(input = {}, options = {}) {
   const draftPath = options.outputPath || questionDraftPath;
   const drafts = await loadQuestionDraftsFromPath(draftPath);
   const now = new Date().toISOString();
@@ -92,7 +92,7 @@ export async function submitQuestionDraft(input = {}) {
   });
 
   drafts.unshift(draft);
-  await saveQuestionDrafts(drafts);
+  await saveQuestionDraftsToPath(drafts, draftPath);
   return toDraftCatalogItem(draft);
 }
 
@@ -229,6 +229,9 @@ export function assessQuestionQuality(question, options = {}) {
   if (text.length > 260) penalize('warn', 'question-too-long', '题干过长，建议拆成主问题和追问', 4);
   if (hasPlaceholderText(text)) penalize('blocker', 'placeholder-question', '题干包含占位或 AI 痕迹', 18);
   if (looksGarbled(text) || looksGarbled(referenceAnswer)) penalize('blocker', 'garbled-text', '题干或答案疑似乱码', 18);
+  if (hasCandidateTemplateText(`${text} ${referenceAnswer} ${excellentAnswer}`)) {
+    penalize('blocker', 'candidate-template-text', '题目仍包含候选题模板/待重写说明，不能直接入库', 24);
+  }
 
   if (referenceAnswer.length < 70) penalize('blocker', 'thin-reference-answer', '参考答案太薄，无法支撑复盘和评分', 18);
   if (excellentAnswer.length < 70) penalize('warn', 'thin-excellent-answer', '优秀回答示例偏短，训练价值不足', 8);
@@ -520,13 +523,20 @@ function selectPromotedCandidates(candidates, options = {}) {
   const minScore = clampNumber(options.minScore, 0, 0, 100);
   const top = clampNumber(options.top || options.limit, rankSet.size ? 999 : 10, 1, 200);
   const includeSignalOnly = String(options.includeSignalOnly || '').toLowerCase() === 'true';
+  const includeLowQuality = String(options.includeLowQuality || '').toLowerCase() === 'true';
 
   return candidates
     .filter((candidate) => !rankSet.size || rankSet.has(Number(candidate.rank)))
     .filter((candidate) => !category || candidate.category === category)
     .filter((candidate) => Number(candidate.promotionScore || 0) >= minScore)
     .filter((candidate) => includeSignalOnly || candidate.importPolicy === 'can-transform')
+    .filter((candidate) => includeLowQuality || isCandidateQualityImportable(candidate))
     .slice(0, top);
+}
+
+function isCandidateQualityImportable(candidate) {
+  if (Number(candidate.qualityScore || 0) < 78) return false;
+  return !normalizeArray(candidate.qualityIssues).some((issue) => issue?.severity === 'blocker');
 }
 
 function parseRankSet(value) {
@@ -1341,6 +1351,17 @@ function countBy(items, getter) {
 
 function hasPlaceholderText(value) {
   return /todo|tbd|待补充|待完善|占位|示例答案|这里填写|作为ai|作为 AI|ai生成|AI 生成/i.test(String(value || ''));
+}
+
+function hasCandidateTemplateText(value) {
+  const text = String(value || '');
+  return [
+    '正式入库前应重写',
+    '请用中文面试回答方式说明',
+    '这道题来自外部草稿',
+    '优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”',
+    '的实现细节，你会补充哪三个关键点'
+  ].some((pattern) => text.includes(pattern));
 }
 
 function looksGarbled(value) {

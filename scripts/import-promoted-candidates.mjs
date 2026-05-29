@@ -32,6 +32,7 @@ function parseArgs(args) {
     else if (key === 'input') options.inputPath = value;
     else if (key === 'output') options.outputPath = value;
     else if (key === 'include-signal-only') options.includeSignalOnly = value;
+    else if (key === 'include-low-quality') options.includeLowQuality = value;
     return options;
   }, {});
 }

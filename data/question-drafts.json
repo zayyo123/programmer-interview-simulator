@@ -1,6 +1,628 @@
 {
-  "updatedAt": "2026-05-28T00:45:00.000Z",
+  "updatedAt": "2026-05-29T12:32:25.047Z",
   "drafts": [
+    {
+      "id": "draft_candidate_10_afddfc29",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 10,
+        "candidateId": "external_0044",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
+        "sourcePath": "docs/database/README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？",
+      "category": "MySQL",
+      "skill": "MySQL",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "MySQL",
+        "操作系统",
+        "MySQL 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "MySQL 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区",
+        "数据库执行机制和性能影响"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？",
+        "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #10 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_9_648f004e",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 9,
+        "candidateId": "external_0005",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
+        "sourcePath": "docs/cs-basics/README.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。",
+      "category": "网络",
+      "skill": "网络",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "fullstack",
+        "frontend"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "请解释“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点”，并说明它在 网络 面试中的核心原理、适用场景、边界条件和常见误区。",
+      "keywords": [
+        "网络",
+        "网络 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "网络 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区",
+        "网络交互流程和异常场景"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。”，正式入库前应重写为本地中文参考答案。回答应先给出 网络 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。”的核心结论，再展开 网络 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #9 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_8_e9db021b",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 8,
+        "candidateId": "external_0127",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-02.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "String s1 = new String(\"abc\");这句话创建了几个字符串对象？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "String s1 = new String(\"abc\");这句话创建了几个字符串对象？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #8 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_7_f5cf851a",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 7,
+        "candidateId": "external_0123",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-02.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "String 为什么是不可变的?",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "String 为什么是不可变的? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️String 为什么是不可变的?”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️String 为什么是不可变的?”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️String 为什么是不可变的?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #7 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_6_ae73832b",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 6,
+        "candidateId": "external_0146",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "JDK 动态代理和 CGLIB 动态代理有什么区别？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "JDK 动态代理和 CGLIB 动态代理有什么区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。",
+        "只罗列差异，不说明为什么这样设计以及如何选择。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #6 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_5_bd92887b",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 5,
+        "candidateId": "external_0132",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "Checked Exception 和 Unchecked Exception 有什么区别？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "Checked Exception 和 Unchecked Exception 有什么区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️Checked Exception 和 Unchecked Exception 有什么区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️Checked Exception 和 Unchecked Exception 有什么区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️Checked Exception 和 Unchecked Exception 有什么区别？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。",
+        "只罗列差异，不说明为什么这样设计以及如何选择。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #5 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_4_68b6642b",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 4,
+        "candidateId": "external_0161",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "BIO、NIO 和 AIO 的区别？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "BIO、NIO 和 AIO 的区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️BIO、NIO 和 AIO 的区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️BIO、NIO 和 AIO 的区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️BIO、NIO 和 AIO 的区别？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。",
+        "只罗列差异，不说明为什么这样设计以及如何选择。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #4 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_3_a089ef43",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 3,
+        "candidateId": "external_0124",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-02.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "字符串拼接用“+” 还是 StringBuilder?",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "字符串拼接用“+” 还是 StringBuilder? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️字符串拼接用“+” 还是 StringBuilder?”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️字符串拼接用“+” 还是 StringBuilder?”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️字符串拼接用“+” 还是 StringBuilder?”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #3 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_2_c1dbdea1",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 2,
+        "candidateId": "external_0138",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "异常使用有哪些需要注意的地方？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "异常使用有哪些需要注意的地方？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️异常使用有哪些需要注意的地方？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️异常使用有哪些需要注意的地方？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️异常使用有哪些需要注意的地方？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #2 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
+    {
+      "id": "draft_candidate_1_97f768da",
+      "status": "rejected",
+      "createdAt": "2026-05-28T08:27:39.716Z",
+      "updatedAt": "2026-05-29T12:32:25.047Z",
+      "importedFromCandidate": {
+        "rank": 1,
+        "candidateId": "external_0078",
+        "sourceId": "github-snailclimb-javaguide",
+        "sourceName": "JavaGuide 中文面试知识库",
+        "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
+        "sourcePath": "docs/java/basis/java-basic-questions-01.md",
+        "promotionScore": 100,
+        "qualityScore": 100
+      },
+      "title": "为什么说 Java 语言“编译与解释并存”？",
+      "category": "Java",
+      "skill": "Java",
+      "roles": [
+        "java",
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "junior",
+        "middle"
+      ],
+      "type": "knowledge",
+      "difficulty": 1,
+      "question": "为什么说 Java 语言“编译与解释并存”？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+      "keywords": [
+        "Java",
+        "Java 核心概念",
+        "适用场景",
+        "关键机制"
+      ],
+      "expectedPoints": [
+        "Java 核心概念",
+        "适用场景",
+        "关键机制",
+        "边界条件",
+        "常见误区"
+      ],
+      "referenceAnswer": "这道题来自外部草稿“⭐️为什么说 Java 语言“编译与解释并存”？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+      "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️为什么说 Java 语言“编译与解释并存”？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+      "followUps": [
+        "如果继续追问“⭐️为什么说 Java 语言“编译与解释并存”？”的实现细节，你会补充哪三个关键点？",
+        "这个问题在真实项目里最容易踩的坑是什么？",
+        "你会用哪些指标或现象证明自己的判断是对的？"
+      ],
+      "commonMistakes": [
+        "只背结论，不解释原理和判断过程。",
+        "没有说明适用边界和失败场景。",
+        "不能结合真实项目或线上排查经验。"
+      ],
+      "source": "external-candidate:JavaGuide 中文面试知识库",
+      "license": "Apache-2.0",
+      "attribution": "JavaGuide 中文面试知识库；许可证：Apache-2.0；来源：https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
+      "reviewNotes": "自动审核驳回：候选题仍是模板化草稿，参考答案包含待重写说明。；处理建议：先把题干改成真实中文面试问题，并补齐具体参考答案、优秀回答、评分点和追问后再提交审核。；由候选题 #1 自动转入待审核草稿。；推荐分：100，结构质量：100；授权策略允许转写成正式中文训练题。；授权清晰：Apache-2.0。；中文题源，转写成本低，和当前中文模拟面试定位匹配。；风险：需要在候选题中保留来源署名和许可证链接。",
+      "reviewedAt": "2026-05-29T12:32:25.047Z"
+    },
     {
       "id": "draft_review_external_0009",
       "status": "approved",

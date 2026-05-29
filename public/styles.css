@@ -75,10 +75,14 @@ h3 {
 
 .app-shell {
   display: grid;
-  grid-template-rows: auto minmax(680px, 86vh) auto;
+  grid-template-rows: auto auto minmax(680px, 1fr);
   gap: 18px;
   min-height: 100vh;
   padding: 18px;
+}
+
+.workflow-step[hidden] {
+  display: none !important;
 }
 
 .setup-dashboard,
@@ -95,6 +99,82 @@ h3 {
   display: grid;
   gap: 16px;
   padding: 16px;
+}
+
+.workflow-stepper {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(21, 23, 29, 0.88);
+  box-shadow: var(--shadow);
+}
+
+.workflow-step-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #171922;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.workflow-step-button span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.workflow-step-button strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+
+.workflow-step-button.active {
+  border-color: rgba(0, 123, 255, 0.8);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.22), rgba(23, 25, 34, 0.94));
+  color: #d7eaff;
+}
+
+.workflow-step-button.locked {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
+.workflow-status {
+  min-height: 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.setup-form :disabled,
+.profile-dropzone button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.setup-form button.choice-card:disabled,
+.setup-form button.level-step:disabled,
+.setup-form button.style-segment:disabled {
+  pointer-events: none;
 }
 
 .top-command {
@@ -1719,6 +1799,29 @@ body.coach-collapsed .coach-panel > :not(.panel-toggle) {
   .app-shell {
     grid-template-rows: auto auto auto;
     padding: 10px;
+  }
+
+  .workflow-stepper {
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .workflow-step-button {
+    display: grid;
+    gap: 5px;
+    min-height: 58px;
+    padding: 8px 4px;
+  }
+
+  .workflow-step-button span {
+    width: 24px;
+    height: 24px;
+    justify-self: center;
+  }
+
+  .workflow-step-button strong {
+    max-width: 100%;
+    font-size: 12px;
   }
 
   .choice-grid,
