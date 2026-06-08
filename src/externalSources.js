@@ -150,6 +150,161 @@ const githubSources = [
       'How do you detect a cycle in a linked list with Go?',
       'How would you implement a stack or queue in Go?'
     ]
+  },
+  {
+    id: 'github-devinterview-testing',
+    name: 'Devinterview Testing Interview Questions',
+    provider: 'GitHub',
+    license: 'NOASSERTION',
+    licenseUrl: 'https://github.com/Devinterview-io/testing-interview-questions',
+    attributionRequired: true,
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/Devinterview-io/testing-interview-questions/main/README.md'
+    ],
+    repoUrl: 'https://github.com/Devinterview-io/testing-interview-questions',
+    defaultCategory: '测试',
+    usage: '测试方向公开题源线索。授权不明确，仅保存标题、链接和热度信号，不直接导入正式题库。',
+    seedTitles: [
+      'How do you design a test strategy for a login and payment workflow?',
+      'What is the difference between unit testing, integration testing, and end-to-end testing?',
+      'How would you decide which cases should be automated first?'
+    ]
+  },
+  {
+    id: 'github-bregman-devops-exercises',
+    name: 'DevOps Exercises',
+    provider: 'GitHub',
+    license: 'NOASSERTION',
+    licenseUrl: 'https://github.com/bregman-arie/devops-exercises',
+    attributionRequired: true,
+    repoUrl: 'https://github.com/bregman-arie/devops-exercises',
+    directories: [
+      'https://api.github.com/repos/bregman-arie/devops-exercises/contents/topics'
+    ],
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/bregman-arie/devops-exercises/master/README.md'
+    ],
+    defaultCategory: 'DevOps',
+    usage: 'DevOps、SRE、运维、云原生和自动化方向题源线索。授权不明确，仅作为外围题库信号。',
+    seedTitles: [
+      'How would you troubleshoot a Kubernetes deployment that keeps restarting?',
+      'How do you design a CI/CD pipeline with rollback and approval gates?',
+      'What metrics would you use to diagnose an SRE incident?'
+    ]
+  },
+  {
+    id: 'github-devinterview-data-engineer',
+    name: 'Devinterview Data Engineer Interview Questions',
+    provider: 'GitHub',
+    license: 'NOASSERTION',
+    licenseUrl: 'https://github.com/Devinterview-io/data-engineer-interview-questions',
+    attributionRequired: true,
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/Devinterview-io/data-engineer-interview-questions/main/README.md'
+    ],
+    repoUrl: 'https://github.com/Devinterview-io/data-engineer-interview-questions',
+    defaultCategory: '数据',
+    usage: '数据工程方向公开题源线索。授权不明确，仅保存标题、链接和热度信号。',
+    seedTitles: [
+      'How would you design an ETL pipeline that supports backfill and idempotency?',
+      'What is the difference between a data warehouse, data lake, and lakehouse?',
+      'How do you monitor data quality in a batch and streaming pipeline?'
+    ]
+  },
+  {
+    id: 'github-packt-data-engineering-guide',
+    name: 'Cracking Data Engineering Interview Guide',
+    provider: 'GitHub',
+    license: 'MIT',
+    licenseUrl: 'https://raw.githubusercontent.com/PacktPublishing/Cracking-Data-Engineering-Interview-Guide/main/LICENSE',
+    attributionRequired: false,
+    repoUrl: 'https://github.com/PacktPublishing/Cracking-Data-Engineering-Interview-Guide',
+    defaultCategory: '数据',
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/PacktPublishing/Cracking-Data-Engineering-Interview-Guide/main/README.md'
+    ],
+    usage: 'MIT 授权的数据工程面试配套仓库，可作为数据建模、ETL、SQL 和平台工程草稿来源。',
+    seedTitles: [
+      'How do you choose between batch processing and stream processing?',
+      'How would you model slowly changing dimensions in an analytics warehouse?',
+      'How do you handle late-arriving events in a data pipeline?'
+    ]
+  },
+  {
+    id: 'github-amitshekhari-ml-interview',
+    name: 'Machine Learning Interview Questions',
+    provider: 'GitHub',
+    license: 'Apache-2.0',
+    licenseUrl: 'https://raw.githubusercontent.com/amitshekhariitbhu/machine-learning-interview-questions/main/LICENSE',
+    attributionRequired: true,
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/amitshekhariitbhu/machine-learning-interview-questions/main/README.md'
+    ],
+    repoUrl: 'https://github.com/amitshekhariitbhu/machine-learning-interview-questions',
+    defaultCategory: 'AI',
+    usage: 'Apache-2.0 授权的机器学习面试题源，可改写为 AI、模型评估、训练和部署方向中文草稿。',
+    seedTitles: [
+      'How do you detect and handle model drift in production?',
+      'How would you evaluate a recommendation model beyond offline accuracy?',
+      'What is cross-validation and when can it give misleading results?'
+    ]
+  },
+  {
+    id: 'github-redteamcaptain-pentesting',
+    name: 'Pentesting Interview Questions',
+    provider: 'GitHub',
+    license: 'CC0-1.0',
+    licenseUrl: 'https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE',
+    attributionRequired: false,
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md'
+    ],
+    repoUrl: 'https://github.com/redteamcaptain/Pentesting-Interview-Questions',
+    defaultCategory: '安全',
+    usage: 'CC0 授权的渗透测试和攻防安全面试题源，可改写为安全方向中文草稿。',
+    seedTitles: [
+      'How would you explain SQL injection and verify that it has been fixed?',
+      'What is the difference between authentication and authorization?',
+      'How would you triage a suspected web shell incident?'
+    ]
+  },
+  {
+    id: 'github-exajobs-security-engineer',
+    name: 'Security Engineer Interview Collection',
+    provider: 'GitHub',
+    license: 'MIT',
+    licenseUrl: 'https://raw.githubusercontent.com/exajobs/security-engineer-interview-collection/main/LICENSE',
+    attributionRequired: false,
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/exajobs/security-engineer-interview-collection/main/README.md'
+    ],
+    repoUrl: 'https://github.com/exajobs/security-engineer-interview-collection',
+    defaultCategory: '安全',
+    usage: 'MIT 授权的安全工程面试集合，可作为应用安全、身份认证、日志和威胁建模草稿来源。',
+    seedTitles: [
+      'How do you design defense in depth for a public API?',
+      'How would you investigate suspicious authentication activity from logs?',
+      'What is threat modeling and how do you apply it before development starts?'
+    ]
+  },
+  {
+    id: 'github-donnemartin-system-design',
+    name: 'System Design Primer',
+    provider: 'GitHub',
+    license: 'NOASSERTION',
+    licenseUrl: 'https://github.com/donnemartin/system-design-primer',
+    attributionRequired: true,
+    fallbackUrls: [
+      'https://raw.githubusercontent.com/donnemartin/system-design-primer/master/README.md'
+    ],
+    repoUrl: 'https://github.com/donnemartin/system-design-primer',
+    defaultCategory: '架构',
+    usage: '架构和系统设计方向经典公开资料。授权不明确，仅保存题目标题和链接作为外围题库信号。',
+    seedTitles: [
+      'How would you design a URL shortener with high availability?',
+      'How would you design a news feed that supports fanout and ranking?',
+      'How do you choose between strong consistency and eventual consistency?'
+    ]
   }
 ];
 
@@ -161,13 +316,92 @@ const stackExchangeSources = [
     license: 'CC BY-SA',
     licenseUrl: 'https://stackoverflow.com/help/licensing',
     attributionRequired: true,
-    tags: ['javascript', 'reactjs', 'typescript', 'vue.js', 'go', 'python', 'django', 'flask', 'celery', 'java', 'mysql', 'redis', 'algorithm'],
+    tags: ['javascript', 'reactjs', 'typescript', 'vue.js', 'go', 'python', 'django', 'flask', 'celery', 'java', 'mysql', 'redis', 'algorithm', 'testing', 'unit-testing', 'docker', 'kubernetes', 'spark', 'machine-learning', 'security', 'architecture'],
     url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=stackoverflow&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
     usage: '仅提取标题、标签、热度和链接作为追问/易错点信号；不要把问答正文直接写入本地题库。'
+  },
+  {
+    id: 'stack-sqa-testing-signals',
+    name: 'Software Quality Assurance 测试问答信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackexchange.com/legal/terms-of-service/public',
+    attributionRequired: true,
+    tags: ['automated-testing', 'selenium-webdriver', 'test-design', 'api-testing', 'performance-testing', 'regression-testing'],
+    url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=sqa&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
+    defaultCategory: '测试',
+    usage: '测试方向仅提取标题、标签、链接和热度，作为追问和易错点信号。'
+  },
+  {
+    id: 'stack-serverfault-ops-signals',
+    name: 'Server Fault 运维问答信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackexchange.com/legal/terms-of-service/public',
+    attributionRequired: true,
+    tags: ['linux', 'networking', 'monitoring', 'backup', 'nginx', 'docker'],
+    url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=serverfault&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
+    defaultCategory: '运维',
+    usage: '运维方向仅提取标题、标签、链接和热度，作为外围题库信号。'
+  },
+  {
+    id: 'stack-devops-signals',
+    name: 'DevOps Stack Exchange 问答信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackexchange.com/legal/terms-of-service/public',
+    attributionRequired: true,
+    tags: ['kubernetes', 'docker', 'jenkins', 'terraform', 'ci-cd', 'monitoring'],
+    url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=devops&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
+    defaultCategory: 'DevOps',
+    usage: 'DevOps/SRE 方向仅提取标题、标签、链接和热度，作为外围题库信号。'
+  },
+  {
+    id: 'stack-datascience-ai-data-signals',
+    name: 'Data Science AI 与数据问答信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackexchange.com/legal/terms-of-service/public',
+    attributionRequired: true,
+    tags: ['machine-learning', 'deep-learning', 'nlp', 'classification', 'clustering', 'bigdata'],
+    url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=datascience&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
+    defaultCategory: 'AI',
+    usage: '数据科学和 AI 方向仅提取标题、标签、链接和热度，作为外围题库信号。'
+  },
+  {
+    id: 'stack-security-signals',
+    name: 'Information Security 问答信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackexchange.com/legal/terms-of-service/public',
+    attributionRequired: true,
+    tags: ['xss', 'sql-injection', 'authentication', 'authorization', 'web-application', 'penetration-test'],
+    url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=security&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
+    defaultCategory: '安全',
+    usage: '安全方向仅提取标题、标签、链接和热度，作为外围题库信号。'
+  },
+  {
+    id: 'stack-softwareengineering-architecture-signals',
+    name: 'Software Engineering 架构问答信号',
+    provider: 'Stack Exchange API',
+    license: 'CC BY-SA',
+    licenseUrl: 'https://stackexchange.com/legal/terms-of-service/public',
+    attributionRequired: true,
+    tags: ['architecture', 'design-patterns', 'microservices', 'scalability', 'domain-driven-design'],
+    url: 'https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=votes&site=softwareengineering&pagesize=8&tagged={tag}&filter=!nNPvSNVZJS',
+    defaultCategory: '架构',
+    usage: '架构方向仅提取标题、标签、链接和热度，作为外围题库信号。'
   }
 ];
 
 const categoryRules = [
+  { category: '测试', pattern: /testing|test automation|automated-testing|selenium|qa|quality assurance|test case|test design|regression|performance test|api-testing|unit-testing|e2e|end-to-end|pytest|测试|用例|自动化测试|回归测试|性能测试|接口测试/i },
+  { category: 'DevOps', pattern: /devops|sre|site reliability|ci\/cd|ci-cd|jenkins|gitlab ci|github actions|docker|kubernetes|k8s|helm|terraform|ansible|prometheus|grafana|observability|deployment|rollback|pipeline|云原生|持续集成|持续交付/i },
+  { category: '运维', pattern: /ops|operations|linux|serverfault|monitoring|alert|backup|nginx|apache|dns|load balancer|incident|on-call|capacity|networking|运维|监控|告警|备份|巡检|故障|容量/i },
+  { category: '数据', pattern: /data engineer|data engineering|etl|elt|data pipeline|data warehouse|data lake|lakehouse|airflow|spark|flink|kafka|hive|bigquery|snowflake|dimensional|data modeling|slowly changing|batch|stream processing|数据工程|数仓|数据仓库|数据湖|数据建模|离线|实时/i },
+  { category: 'AI', pattern: /\b(?:artificial intelligence|machine learning|deep learning|mlops|llm|large language model|rag|embeddings?|vector database|recommendation model|model drift|cross-validation|feature engineering|classification|clustering|nlp|neural networks?)\b|机器学习|深度学习|大模型|向量数据库|向量检索|推荐系统|特征工程|模型漂移|模型评估|模型部署/i },
+  { category: '安全', pattern: /security|cybersecurity|pentest|penetration|red team|blue team|soc|xss|sql injection|csrf|ssrf|owasp|authentication|authorization|oauth|jwt|threat model|vulnerability|incident response|firewall|waf|安全|漏洞|渗透|攻防|认证|授权|威胁建模|应急响应/i },
+  { category: '架构', pattern: /system design|architecture|architect|distributed|scalability|microservice|high availability|consistency|eventual consistency|domain-driven|design pattern|fault tolerance|resilience|架构|系统设计|高可用|可扩展|微服务|分布式|一致性|容灾|技术治理/i },
   { category: 'Java', pattern: /java|jvm|jdk|jre|string|stringbuilder|stringbuffer|exception|hashmap|concurrenthashmap|spring|thread|concurrent|lock|bio|nio|aio/i },
   { category: 'Go', pattern: /\bgolang\b|\bgo\b|goroutine|channel|context|pprof/i },
   { category: 'Python', pattern: /python|django|flask|celery|asyncio|\bgil\b|pytest/i },
@@ -189,7 +423,7 @@ export async function syncExternalQuestionDrafts(options = {}) {
   const startedAt = new Date().toISOString();
   const results = await Promise.allSettled([
     ...githubSources.map((source) => fetchGithubInterviewQuestions({ fetchImpl, source })),
-    fetchStackExchangeSignals({ fetchImpl })
+    ...stackExchangeSources.map((source) => fetchStackExchangeSignals({ fetchImpl, source }))
   ]);
 
   const sources = results.map(formatSyncResult);
@@ -203,6 +437,7 @@ export async function syncExternalQuestionDrafts(options = {}) {
       githubDraftCount: drafts.filter((item) => item.provider === 'GitHub').length,
       chineseGithubDraftCount: drafts.filter((item) => item.provider === 'GitHub 中文题库').length,
       stackExchangeSignalCount: drafts.filter((item) => item.provider === 'Stack Exchange API').length,
+      directionDraftCount: drafts.filter((item) => ['测试', '运维', 'DevOps', '数据', 'AI', '安全', '架构'].includes(item.category)).length,
       readyForImportCount: drafts.filter((item) => item.importPolicy === 'can-transform').length,
       attributionRequiredCount: drafts.filter((item) => item.attributionRequired).length
     },
@@ -273,8 +508,7 @@ async function fetchGithubInterviewQuestions({ fetchImpl, source }) {
   };
 }
 
-async function fetchStackExchangeSignals({ fetchImpl }) {
-  const source = stackExchangeSources[0];
+async function fetchStackExchangeSignals({ fetchImpl, source }) {
   const payloads = await Promise.all(
     source.tags.map((tag) => fetchJson(source.url.replace('{tag}', encodeURIComponent(tag)), fetchImpl))
   );
@@ -373,7 +607,7 @@ function normalizeExternalItem(item, source, index) {
   const title = cleanupMarkdown(item.title || item.name || item.question || '');
   if (!title || title.length < 8) return null;
 
-  const category = inferCategory([title, ...(item.tags || [])].join(' '));
+  const category = source.defaultCategory || inferCategory([title, ...(item.tags || [])].join(' '));
   const tags = [...new Set([...(item.tags || []), category].filter(Boolean))].slice(0, 8);
   const importPolicy = getImportPolicy(source);
 

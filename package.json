@@ -11,7 +11,7 @@
     "promote:drafts": "node scripts/promote-external-drafts.mjs",
     "import:candidates": "node scripts/import-promoted-candidates.mjs",
     "screen:candidates": "node scripts/auto-screen-question-candidates.mjs",
-    "smoke": "node scripts/question-bank-check.mjs && node scripts/question-quality-check.mjs && node scripts/score-smoke.mjs && node scripts/smoke-test.js"
+    "smoke": "node scripts/question-bank-check.mjs && node scripts/question-quality-check.mjs && node scripts/role-coverage-check.mjs && node scripts/score-smoke.mjs && node scripts/smoke-test.js"
   },
   "engines": {
     "node": ">=18"
