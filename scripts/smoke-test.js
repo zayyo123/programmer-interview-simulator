@@ -192,6 +192,41 @@ async function main() {
       `frontend customization should schedule a frontend coding question, got: ${frontendCodingSession.plan.map((item) => `${item.category}:${item.id}:${item.codeKind || '-'}`).join(', ')}`
     );
 
+    const mobileClientCategories = new Set(['Android', 'iOS', '跨端/鸿蒙']);
+    const pureFrontendSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'frontend',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 8,
+        resume: '负责 React 中后台、组件库、Webpack 性能优化、首屏加载和白屏监控。'
+      }
+    });
+    assert(
+      pureFrontendSession.plan.every((item) => !mobileClientCategories.has(item.category)),
+      `pure frontend interviews should not include mobile client questions, got: ${pureFrontendSession.plan.map((item) => `${item.category}:${item.id}`).join(', ')}`
+    );
+
+    const androidFrontendSession = await request('/api/interviews', {
+      method: 'POST',
+      body: {
+        role: 'frontend',
+        level: 'senior',
+        style: 'pressure',
+        questionCount: 8,
+        resume: '负责 Android App、Kotlin、ANR、崩溃率治理和移动端性能优化。'
+      }
+    });
+    assert(
+      androidFrontendSession.plan.some((item) => item.category === 'Android'),
+      `Android resume signals should allow Android questions, got: ${androidFrontendSession.plan.map((item) => `${item.category}:${item.id}`).join(', ')}`
+    );
+    assert(
+      androidFrontendSession.plan.every((item) => !['iOS', '跨端/鸿蒙'].includes(item.category)),
+      `Android resume signals should not unlock unrelated mobile tracks, got: ${androidFrontendSession.plan.map((item) => `${item.category}:${item.id}`).join(', ')}`
+    );
+
     const backendCodingSession = await request('/api/interviews', {
       method: 'POST',
       body: {
@@ -432,7 +467,7 @@ async function main() {
       }
     });
     assert(
-      ['go_004', 'approved_go_goroutine_001'].includes(goProfileSession.plan[0]?.id),
+      ['go_004', 'approved_go_goroutine_001', 'approved_rigorous_go_001_context超时泄漏'].includes(goProfileSession.plan[0]?.id),
       `go profile session should start with a Go concurrency governance question when role-specific concurrency signals match, got: ${goProfileSession.plan.map((item) => item.id).join(', ')}`
     );
 

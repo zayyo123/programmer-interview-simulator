@@ -1,11 +1,17 @@
-import { questionBank, roleLabels } from '../src/questions.js';
+import { loadRuntimeQuestionBank } from '../src/questionGovernance.js';
+import { roleLabels } from '../src/questions.js';
 
 const allowedTypes = new Set(['knowledge', 'project', 'system-design', 'algorithm']);
 const allowedCodeKinds = new Set(['algorithm', 'sql', 'frontend', 'backend']);
 const allowedLevels = new Set(['junior', 'middle', 'senior']);
 const allowedRoles = new Set(Object.keys(roleLabels));
+const questionBank = await loadRuntimeQuestionBank();
 const ids = new Set();
 const errors = [];
+
+if (!questionBank.length) {
+  errors.push('运行时题库为空');
+}
 
 for (const [index, question] of questionBank.entries()) {
   const label = question.id || `第 ${index + 1} 题`;
@@ -52,6 +58,7 @@ for (const [index, question] of questionBank.entries()) {
 }
 
 const coverage = summarizeCoverage();
+const sources = summarizeSources();
 
 if (errors.length) {
   console.error(`题库结构体检失败，共 ${errors.length} 个问题：`);
@@ -59,7 +66,9 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`题库结构体检通过：${questionBank.length} 道题，覆盖 ${coverage.roles.size} 个方向、${coverage.categories.size} 个技术模块。`);
+console.log(
+  `题库结构体检通过：${questionBank.length} 道运行时题目，覆盖 ${coverage.roles.size} 个方向、${coverage.categories.size} 个技术模块，来源：${sources}。`
+);
 
 function requireString(value, message) {
   if (typeof value !== 'string' || !value.trim()) errors.push(message);
@@ -75,4 +84,15 @@ function summarizeCoverage() {
     if (question.category) summary.categories.add(question.category);
     return summary;
   }, { roles: new Set(), categories: new Set() });
+}
+
+function summarizeSources() {
+  const counts = questionBank.reduce((summary, question) => {
+    const source = question.governance?.source || question.source || 'unknown';
+    summary.set(source, (summary.get(source) || 0) + 1);
+    return summary;
+  }, new Map());
+  return [...counts.entries()]
+    .map(([source, count]) => `${source} ${count}`)
+    .join('、');
 }

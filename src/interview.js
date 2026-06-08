@@ -40,6 +40,13 @@ const roleStageBlueprints = {
   architect: ['project', 'knowledge', 'system-design', 'knowledge', 'project']
 };
 
+const mobileClientCategories = new Set(['Android', 'iOS', '跨端/鸿蒙']);
+const mobileClientSignalPatterns = {
+  Android: /android|安卓|kotlin|java\s+app|anr\b/i,
+  iOS: /\bios\b|iphone|ipad|swift|objective-c|objc/i,
+  '跨端/鸿蒙': /鸿蒙|harmony|arkts|小程序|跨端|react native|flutter|uni-app|taro/i
+};
+
 const levelExpectations = {
   junior: {
     minScoreToMoveNext: 62,
@@ -3927,12 +3934,14 @@ function selectBestQuestion({ available, selected, stage = {}, resumeSignals = c
 function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals(), blueprint = [], questionSource = defaultQuestionBank) {
   const blueprintCategories = new Set(blueprint.map((item) => item.preferredCategory).filter(Boolean));
   const blueprintTypes = new Set(blueprint.map((item) => item.preferredType).filter(Boolean));
-  const exactMatches = questionSource.filter((item) => item.roles.includes(role) && item.levels.includes(level));
-  const sameRoleFallback = questionSource.filter((item) => item.roles.includes(role) && !exactMatches.includes(item));
+  const eligibleQuestionSource = questionSource.filter((item) => isQuestionAllowedForRoleContext(item, role, resumeSignals));
+  const exactMatches = eligibleQuestionSource.filter((item) => item.roles.includes(role) && item.levels.includes(level));
+  const sameRoleFallback = eligibleQuestionSource.filter((item) => item.roles.includes(role) && !exactMatches.includes(item));
   const adjacentRoleFallback = questionSource.filter((item) => {
     return !exactMatches.includes(item)
       && !sameRoleFallback.includes(item)
       && item.levels.includes(level)
+      && isQuestionAllowedForRoleContext(item, role, resumeSignals)
       && sharesInterviewTrack(role, item.roles);
   });
 
@@ -3941,6 +3950,28 @@ function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResu
       return scorePoolPriority(right, resumeSignals, blueprintCategories, blueprintTypes)
         - scorePoolPriority(left, resumeSignals, blueprintCategories, blueprintTypes);
     });
+}
+
+function isQuestionAllowedForRoleContext(question, role, resumeSignals = createEmptyResumeSignals()) {
+  if (!mobileClientCategories.has(question.category)) return true;
+  if (!['frontend', 'fullstack'].includes(role)) return false;
+  return hasMobileClientSignals(question.category, resumeSignals);
+}
+
+function hasMobileClientSignals(category, resumeSignals = createEmptyResumeSignals()) {
+  const categoryHit = (resumeSignals.categories || [])
+    .concat(resumeSignals.analysisCategories || [])
+    .some((item) => item === category);
+  if (categoryHit) return true;
+
+  const signalPattern = mobileClientSignalPatterns[category];
+  if (!signalPattern) return false;
+
+  return signalPattern.test([
+    resumeSignals.text,
+    resumeSignals.analysisText,
+    resumeSignals.questionDrill?.source
+  ].filter(Boolean).join(' '));
 }
 
 function sharesInterviewTrack(role, roles) {

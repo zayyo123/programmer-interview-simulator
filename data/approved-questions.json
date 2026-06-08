@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-06-06T09:16:49.328Z",
+  "updatedAt": "2026-06-08T03:19:58.212Z",
   "questions": [
     {
       "id": "approved_mysql_unsigned_int_001",
@@ -55780,6 +55780,3110 @@
         "approvedAt": "2026-06-06T09:16:49.328Z",
         "approvedBy": "codex-curation",
         "reviewNotes": "内部原创扩充题：继续加厚题库，保留参考答案、优秀回答、追问、误区和评分点，并通过现有质量门禁。"
+      }
+    },
+    {
+      "id": "approved_rigorous_qa_001_订单回归风险收敛",
+      "category": "测试",
+      "skill": "回归测试风险收敛",
+      "roles": [
+        "qa"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "订单优惠规则改动后回归窗口只有半天，你如何决定测什么、不测什么，并证明风险可接受？",
+      "keywords": [
+        "回归测试",
+        "风险分级",
+        "用例裁剪",
+        "线上验证",
+        "质量门禁"
+      ],
+      "expectedPoints": [
+        "按变更影响面拆出价格计算、优惠叠加、库存锁定、支付金额和退款逆向链路",
+        "用生产流量、历史缺陷、核心 GMV 路径和接口依赖关系给用例排序",
+        "明确不测范围及理由，并用灰度、监控、告警和回滚预案兜底",
+        "覆盖边界数据：多券叠加、临界金额、库存不足、支付超时、重复提交和退款",
+        "给出通过标准：P0/P1 用例通过率、自动化冒烟结果、线上错误率和金额差异监控"
+      ],
+      "referenceAnswer": "我会先拿到变更 diff、接口契约和优惠规则配置，画出从购物车试算、下单锁库存、支付、退款到对账的影响链路。半天窗口不能平均回归，应把用例按业务损失和变更关联度排序：价格金额、优惠叠加、订单状态流转、支付金额一致性是必须测；低流量展示样式或未改动渠道可以降级为抽样。自动化部分先跑订单主链路、接口契约和历史缺陷用例，手工只补自动化覆盖不到的复杂组合。风险接受不能只说测完了，要给出灰度比例、订单金额差异告警、优惠使用失败率、支付前后金额一致性校验和快速回滚配置。",
+      "excellentAnswer": "我会把半天回归拆成三层。第一层是必须阻断发布的 P0 链路：下单金额计算、优惠互斥/叠加、库存锁定、支付金额、退款金额，这些用自动化冒烟加少量手工组合覆盖。第二层是风险抽样：按活动类型、用户等级、渠道、边界金额挑代表性数据，重点看临界金额、多券、库存不足、支付超时和重复提交。第三层是上线兜底：灰度到低比例用户，打开金额差异监控、优惠核销失败率、订单创建失败率、支付回调异常和客服投诉关键字。如果有范围不测，我会写清理由，例如未触达的展示页面只做主路径验证，并要求产品、开发、测试共同确认。发布后 30 分钟看核心指标，异常时优先回滚规则配置而不是回滚整包。",
+      "commonMistakes": [
+        "只说按优先级测试，但没有说明优先级来自影响面、金额风险和历史缺陷。",
+        "只跑自动化冒烟，不补优惠组合、逆向退款和重复提交等高风险边界。",
+        "没有明确不测范围、上线监控和回滚策略，导致风险不可解释。"
+      ],
+      "followUps": [
+        "如果产品坚持所有优惠组合都要测，但时间不够，你如何推动风险确认？",
+        "金额差异监控你会怎么设计阈值，避免误报和漏报？",
+        "如果灰度后只有少量用户出现优惠金额错误，你怎么止血和补偿？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "影响链路拆解",
+          "风险排序依据",
+          "边界用例选择",
+          "不测范围说明",
+          "灰度监控和回滚"
+        ],
+        "goodToHave": [
+          "历史缺陷回归",
+          "金额差异自动校验",
+          "产品开发测试共同签字确认",
+          "发布后观察窗口"
+        ],
+        "redFlags": [
+          "平均分配测试时间",
+          "只说全量回归",
+          "忽略退款和对账",
+          "没有线上兜底"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_ops_001_linux_cpu_飙高定位",
+      "category": "运维",
+      "skill": "Linux CPU 故障定位",
+      "roles": [
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Linux 服务器 CPU 突然打满，你如何区分用户态热点、系统态开销、IO 等待和容器资源限制？",
+      "keywords": [
+        "Linux",
+        "CPU",
+        "top",
+        "pidstat",
+        "iowait",
+        "容器限制"
+      ],
+      "expectedPoints": [
+        "先确认影响范围、CPU 使用构成和是否单机/多机同时发生",
+        "使用 top、mpstat、pidstat、perf、strace 等工具定位进程、线程和系统调用热点",
+        "区分 user、system、iowait、steal、load average 与实际 CPU 核数的关系",
+        "检查 cgroup 限额、容器 throttling、Kubernetes requests/limits 和邻居噪声",
+        "给出止血方案和复盘沉淀：扩容、限流、降级、优化热点、补监控告警"
+      ],
+      "referenceAnswer": "我会先看监控确认是单台、单应用还是整个集群 CPU 异常，同时看 user、system、iowait、steal 和 load average。user 高通常继续用 top -H、pidstat -u -p、perf top 或应用 profiler 找热点线程；system 高要看上下文切换、软中断、网络包量和 strace 系统调用；iowait 高说明线程可能卡在磁盘或网络 IO，要联动 iostat、vmstat、磁盘延迟和下游响应时间。容器环境还要看 cgroup cpu.stat 里的 throttled_time，以及 Kubernetes limit 是否过低。止血上先扩副本、限流或摘除异常节点，根因明确后再做代码热点优化、线程池隔离或资源配额调整。",
+      "excellentAnswer": "我的顺序是先止血再定位。先确认业务错误率和延迟是否受影响，如果已经影响核心链路，先摘流量、扩容或打开降级。定位时不只看 top 的百分比，而是看 CPU 构成：user 高看进程和线程热点，Java/Go/Python 分别接 profiler、pprof 或 py-spy；system 高看上下文切换、软中断、iptables、日志刷盘和系统调用；iowait 高用 iostat -x 看 await、util，再查慢盘、NFS 或下游阻塞；steal 高说明宿主机资源争抢。K8s 里还要查容器 throttling，如果 CPU limit 太低会出现应用没满核但延迟抖动。最后把根因对应到动作：代码热循环就修代码，锁竞争就改并发模型，IO 等待就优化存储或超时，资源限制就调 request/limit，并补上 CPU 构成、throttling 和核心接口延迟的联合告警。",
+      "commonMistakes": [
+        "只看 top 发现 CPU 高就重启，没有区分 user/system/iowait/steal。",
+        "忽略容器 CPU throttling，误判为应用代码性能问题。",
+        "没有先评估业务影响和止血，直接在故障现场长时间排查。"
+      ],
+      "followUps": [
+        "load average 很高但 CPU user 不高，你会优先怀疑什么？",
+        "Kubernetes 里怎么确认 CPU limit 导致 throttling？",
+        "如果 perf 看不到符号信息，你还有哪些替代手段？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "CPU 构成判断",
+          "进程线程定位",
+          "IO 等待区分",
+          "容器限额检查",
+          "止血和复盘"
+        ],
+        "goodToHave": [
+          "perf/pprof/py-spy 使用",
+          "软中断和上下文切换分析",
+          "K8s throttling 指标",
+          "业务指标联动"
+        ],
+        "redFlags": [
+          "只会重启",
+          "只看平均 CPU",
+          "忽略容器环境",
+          "没有业务止血"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_devops_001_发布回滚门禁",
+      "category": "DevOps",
+      "skill": "发布门禁与回滚",
+      "roles": [
+        "devops",
+        "ops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "如何设计一套 CI/CD 发布门禁，既能提升发布频率，又能在异常时快速回滚？",
+      "keywords": [
+        "CI/CD",
+        "质量门禁",
+        "灰度发布",
+        "回滚",
+        "可观测性"
+      ],
+      "expectedPoints": [
+        "流水线分层：提交检查、构建、单测、集成测试、安全扫描、制品签名和部署审批",
+        "发布策略包含蓝绿/金丝雀/灰度比例、自动暂停条件和手动批准点",
+        "回滚对象明确：镜像版本、配置、数据库变更、Feature Flag 和依赖服务",
+        "指标门禁使用错误率、P95/P99 延迟、核心业务转化、日志异常和告警状态",
+        "权限审计和可追溯：谁发布、发布了什么、关联需求和变更单"
+      ],
+      "referenceAnswer": "CI/CD 门禁不能只堆工具，要把风险前移和发布后自动判断结合起来。提交阶段做 lint、单测、依赖漏洞和密钥扫描；构建阶段产出不可变镜像并记录 commit、依赖版本和 SBOM；部署阶段按环境逐级推进，预发跑契约测试和数据库迁移演练，生产使用灰度或金丝雀。门禁指标要和服务 SLO 绑定，例如错误率、P99、核心接口成功率、队列堆积和业务下单转化。回滚要提前验证，应用镜像可回滚，配置用版本化配置中心，数据库变更要遵守向前兼容和 expand-contract，不能依赖临时手工 SQL。",
+      "excellentAnswer": "我会把门禁分成发布前、发布中、发布后三段。发布前要求代码评审、单测覆盖核心逻辑、契约测试、SAST/依赖扫描、镜像扫描和制品签名都通过，制品只能从流水线晋级，不能手工改服务器。发布中采用金丝雀，先 1% 或单 AZ，观察 10 到 15 分钟，自动比较错误率、P99、CPU、日志 ERROR、核心业务指标和告警状态，超过阈值自动暂停并通知负责人。发布后保留版本、配置、Feature Flag 和数据库迁移记录，回滚优先关开关或回滚配置，其次回滚镜像；涉及数据库时必须提前做兼容迁移，避免老代码读不了新表结构。权限上发布人、审批人、变更单和 commit 要可追溯，复盘时能知道哪一次发布引入了哪类风险。",
+      "commonMistakes": [
+        "把 CI/CD 等同于 Jenkins 脚本，没有质量门禁和发布指标。",
+        "只考虑应用回滚，忽略配置、数据库和 Feature Flag。",
+        "没有不可变制品和审计链路，线上版本不可追溯。"
+      ],
+      "followUps": [
+        "数据库字段删除这类不可逆变更，你会如何设计发布步骤？",
+        "金丝雀指标误报导致频繁暂停，你怎么调阈值？",
+        "紧急发布是否可以跳过门禁？如果可以，如何控制风险？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "流水线分层门禁",
+          "灰度发布策略",
+          "自动化指标判断",
+          "多对象回滚",
+          "审计追溯"
+        ],
+        "goodToHave": [
+          "不可变制品",
+          "SBOM/签名",
+          "expand-contract 数据库迁移",
+          "Feature Flag 止血"
+        ],
+        "redFlags": [
+          "只讲 Jenkins",
+          "没有回滚演练",
+          "手工改生产",
+          "忽略数据库兼容"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_data_001_指标口径治理",
+      "category": "数据",
+      "skill": "指标口径治理",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "多个看板的成交金额口径不一致，你如何定位原因并建立长期的数据指标治理机制？",
+      "keywords": [
+        "指标治理",
+        "数据血缘",
+        "口径一致性",
+        "数据质量",
+        "数仓"
+      ],
+      "expectedPoints": [
+        "先冻结争议指标，明确业务定义、时间口径、状态口径、退款和取消处理规则",
+        "沿血缘排查 ODS、DWD、DWS、ADS 各层过滤条件、去重逻辑和调度时间差",
+        "用样本订单做端到端对账，定位 SQL、维表、时区、延迟或补数问题",
+        "建立指标字典、Owner、版本变更、评审流程和自动质量规则",
+        "长期用数据质量监控覆盖唯一性、完整性、及时性、波动和跨表一致性"
+      ],
+      "referenceAnswer": "我会先让业务方确认成交金额的定义：是否含退款、取消、运费、优惠券、跨天支付、部分退款和时区。然后沿数据血缘查从 ODS 订单明细到 DWD 清洗、DWS 汇总再到 ADS 看板的 SQL，重点比对过滤条件、状态枚举、去重键、支付时间还是下单时间、调度周期和补数策略。定位时不要只看总数，要抽样 20 到 50 个差异订单做端到端对账。治理上需要指标字典、Owner、变更评审、口径版本和自动质量规则，例如成交金额日环比波动、订单数与金额跨层一致性、主键唯一性和延迟 SLA。",
+      "excellentAnswer": "我会先把争议看板暂停用于绩效或经营决策，避免错误口径继续扩散。排查从业务定义开始：成交金额到底按支付成功、订单完成还是扣除退款后计算，时间用支付时间还是订单创建时间。技术上用血缘工具或 SQL 手工追踪每一层，比较 where 条件、join 维表、去重窗口、状态映射和分区时间。发现差异后用订单粒度样本验证，而不是只改一个总数 SQL。长期治理要把指标沉淀到统一指标平台：每个指标有中文定义、计算 SQL、Owner、适用场景、不适用边界和变更记录；上线前跑质量规则，监控完整性、唯一性、及时性、波动率和跨层一致性。口径变更必须发公告并保留历史版本，否则同名指标会继续产生歧义。",
+      "commonMistakes": [
+        "只比较两个看板 SQL，不先确认业务口径。",
+        "只修当前报表，没有指标字典、Owner 和变更流程。",
+        "只看汇总差异，不抽样订单做端到端对账。"
+      ],
+      "followUps": [
+        "如果业务坚持两个部门使用不同成交金额口径，你怎么命名和治理？",
+        "数据延迟导致当天指标波动，你会如何提示用户？",
+        "补历史数据时如何避免影响线上看板和下游任务？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "业务口径确认",
+          "血缘分层排查",
+          "样本订单对账",
+          "指标字典和 Owner",
+          "质量监控规则"
+        ],
+        "goodToHave": [
+          "口径版本化",
+          "变更公告",
+          "统一指标平台",
+          "延迟 SLA"
+        ],
+        "redFlags": [
+          "直接改 SQL",
+          "忽略退款和时间口径",
+          "没有长期治理",
+          "只看汇总不看明细"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_ai_001_rag_召回质量排查",
+      "category": "AI",
+      "skill": "RAG 召回质量排查",
+      "roles": [
+        "ai"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "RAG 问答系统用户反馈答案经常引用不到正确文档，你如何排查是切分、召回、排序还是生成阶段的问题？",
+      "keywords": [
+        "RAG",
+        "向量检索",
+        "召回率",
+        "重排序",
+        "评估集"
+      ],
+      "expectedPoints": [
+        "构建带标准答案和证据文档的评估集，区分无答案、召回失败和生成幻觉",
+        "检查文档解析、切分粒度、chunk overlap、元数据和权限过滤是否破坏上下文",
+        "评估向量召回、BM25、混合检索、topK、相似度阈值和 query rewrite",
+        "检查 reranker、上下文压缩、prompt 引用约束和答案拒答策略",
+        "用 Recall@K、MRR、命中率、引用准确率和人工抽检闭环验证优化效果"
+      ],
+      "referenceAnswer": "我会先建立评估集，而不是凭几条反馈调参数。每条问题要有标准答案、应该命中的文档段落和权限范围，然后把失败拆成三类：正确文档没被召回、召回了但排序靠后、上下文给到了但模型生成错。切分阶段看 PDF/HTML 解析是否丢表格和标题，chunk 是否过大或过小，overlap 是否保留定义和条件，元数据和权限过滤是否误杀。召回阶段比较向量检索、BM25 和混合检索的 Recall@K，必要时做 query rewrite 和领域词同义词。排序和生成阶段看 reranker、topK、上下文长度、引用格式和拒答策略。",
+      "excellentAnswer": "我会把链路打点到每一步。用户问题进入后记录改写后的 query、召回 chunk、分数、rerank 后顺序、最终传给模型的上下文和答案引用。先用 100 到 300 条高频问题做离线评估，指标包括 Recall@5、Recall@10、MRR、引用准确率和无答案拒答率。如果 Recall 低，优先查切分和索引：标题层级是否进 metadata，表格是否被正确解析，chunk 是否跨章节，权限过滤是否过严；如果 Recall 可以但答案错，查 reranker、上下文压缩和 prompt 是否要求只基于引用回答；如果模型编造，就增加引用校验和无证据拒答。上线时灰度比较人工满意度、点击引用率和追问率，避免只优化离线相似度。",
+      "commonMistakes": [
+        "只调 topK 或换 embedding 模型，没有先区分失败发生在哪一层。",
+        "没有带证据文档的评估集，无法证明召回质量是否提升。",
+        "忽略权限过滤和文档解析，导致正确内容根本进不了索引。"
+      ],
+      "followUps": [
+        "Recall@K 提升但用户满意度下降，可能是什么原因？",
+        "文档里大量表格和流程图时，你会怎么处理切分和索引？",
+        "如何避免模型引用了文档但答案仍然断章取义？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "评估集构建",
+          "失败分层定位",
+          "切分和元数据检查",
+          "召回/排序指标",
+          "生成引用约束"
+        ],
+        "goodToHave": [
+          "混合检索",
+          "query rewrite",
+          "reranker",
+          "无答案拒答",
+          "线上灰度指标"
+        ],
+        "redFlags": [
+          "只说换模型",
+          "没有评估集",
+          "忽略权限",
+          "只看主观反馈"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_security_001_越权漏洞排查",
+      "category": "安全",
+      "skill": "越权漏洞排查",
+      "roles": [
+        "security"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "接口被报告存在水平越权，你如何验证、止血、修复并防止同类问题再次出现？",
+      "keywords": [
+        "越权",
+        "鉴权",
+        "授权",
+        "IDOR",
+        "审计"
+      ],
+      "expectedPoints": [
+        "复现时区分认证失败、水平越权、垂直越权和数据过滤缺失",
+        "止血包括临时下线高风险接口、加网关规则、限制敏感字段和审计异常访问",
+        "修复要在服务端按资源 Owner、租户、角色和数据域做授权校验，不能依赖前端隐藏",
+        "补充安全测试：不同用户、不同租户、不同角色、枚举 ID 和批量导出场景",
+        "长期治理包括统一授权中间件、代码审计规则、权限矩阵和访问日志告警"
+      ],
+      "referenceAnswer": "我会先用两个同角色不同用户账号复现，确认是否能通过修改 userId、orderId、tenantId 或路径参数读取他人资源。如果能复现，先判断影响范围：哪些接口、哪些字段、是否可写、是否可批量导出。止血可以临时关闭导出、网关拦截高风险参数、隐藏敏感字段或对异常枚举限流，同时保留访问日志用于溯源。修复必须在服务端资源层做授权，校验当前登录主体是否拥有该资源，而不是相信前端传来的 userId。测试要覆盖水平越权、垂直越权、跨租户、批量查询和缓存数据串租户。",
+      "excellentAnswer": "我的处理顺序是确认、止血、修复、复盘。确认阶段用 A/B 两个普通用户、管理员和不同租户账号构造请求，验证读、写、导出和批量接口是否都受影响，并从日志估算历史暴露范围。止血阶段先保护敏感数据，例如关闭导出、增加网关黑名单、限制 ID 枚举频率、临时加字段脱敏。根因修复不能散落在每个 Controller 里手写 if，而要沉淀统一授权方法：根据 subject、action、resource、tenant 和 data scope 判断权限，查询条件也要自动带上租户和 owner 约束。发布前补自动化安全用例和回归矩阵，发布后看异常 403、敏感接口访问量和枚举行为告警。最后补权限设计评审和代码扫描规则，避免新增接口绕过授权。",
+      "commonMistakes": [
+        "只在前端隐藏按钮或菜单，没有服务端资源级授权。",
+        "只修报告的单个接口，忽略同类查询、导出和批量接口。",
+        "没有审计历史访问范围，无法判断是否需要通知或补救。"
+      ],
+      "followUps": [
+        "如果修复后大量正常用户报 403，你如何快速定位误拦截？",
+        "多租户系统里缓存 key 如何避免串租户？",
+        "你会如何把越权测试纳入日常 CI？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "复现和分类",
+          "影响范围评估",
+          "临时止血",
+          "服务端资源级授权",
+          "同类接口回归"
+        ],
+        "goodToHave": [
+          "ABAC/RBAC 结合",
+          "租户隔离",
+          "枚举告警",
+          "代码扫描规则"
+        ],
+        "redFlags": [
+          "依赖前端控制",
+          "只修一个接口",
+          "忽略导出接口",
+          "没有日志审计"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_architect_001_多活一致性取舍",
+      "category": "系统设计",
+      "skill": "异地多活一致性取舍",
+      "roles": [
+        "architect",
+        "backend"
+      ],
+      "levels": [
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "设计核心交易系统异地多活时，你如何在可用性、延迟、数据一致性和故障切换之间做取舍？",
+      "keywords": [
+        "异地多活",
+        "一致性",
+        "RTO",
+        "RPO",
+        "故障切换"
+      ],
+      "expectedPoints": [
+        "先按业务域拆分强一致和最终一致边界，核心资金/库存/订单状态不能一概多写",
+        "定义 RTO、RPO、延迟预算、故障场景和手动/自动切换条件",
+        "说明流量路由、单元化、数据分片、幂等、冲突检测和补偿对账机制",
+        "覆盖脑裂、网络分区、消息重复、跨机房延迟和回切数据修复",
+        "通过演练、压测、故障注入、对账和业务指标验证方案可行"
+      ],
+      "referenceAnswer": "异地多活不能简单理解为所有机房同时读写同一份核心数据。核心交易要先拆业务域：用户浏览、推荐、配置可以多活；支付扣款、库存扣减、订单最终状态通常需要单元化或主写，避免跨机房强一致成本过高。设计时要明确 RTO、RPO 和延迟预算，流量按用户、地域或业务单元路由到固定机房，写入带幂等键和全局唯一 ID，跨单元通过消息同步、对账和补偿保证最终一致。故障切换要防脑裂，必须有仲裁、熔断和只读/降级策略。回切时要处理增量追平、冲突记录和人工审核。",
+      "excellentAnswer": "我会先问业务能接受什么损失，而不是直接画双写架构。资金类链路如果要求 RPO 接近 0，就不能轻易跨地域双主写；可以按用户或商户单元化，让一个交易主体在同一时间只有一个主写单元。读流量和弱一致服务可以多活，写流量通过路由表进入所属单元，所有写操作带业务幂等键、版本号和状态机校验。机房故障时先冻结路由变更，确认不是网络抖动造成脑裂，再按预案把受影响单元切到备机房，期间部分非核心能力降级。数据同步用消息和日志增量，切换后跑订单、支付、库存、账务对账，发现冲突进入补偿队列或人工审核。这个方案必须定期做故障演练，验证 RTO、RPO、峰值容量、回切耗时和客服影响，否则架构图没有意义。",
+      "commonMistakes": [
+        "把异地多活等同于数据库双主写，忽略冲突和脑裂。",
+        "没有按业务域划分一致性等级，所有链路使用同一种方案。",
+        "只设计切过去，不设计数据追平、冲突处理和回切。"
+      ],
+      "followUps": [
+        "如果网络分区时两个机房都认为自己可写，你怎么避免脑裂？",
+        "用户下单和支付分别落到不同单元时，你如何处理状态一致性？",
+        "多活演练你会设计哪些验收指标？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "业务一致性分级",
+          "RTO/RPO 定义",
+          "单元化或主写边界",
+          "故障切换防脑裂",
+          "对账补偿和回切"
+        ],
+        "goodToHave": [
+          "全局 ID 和幂等键",
+          "故障注入演练",
+          "冲突队列",
+          "降级策略"
+        ],
+        "redFlags": [
+          "盲目双写",
+          "没有 RTO/RPO",
+          "忽略脑裂",
+          "不考虑回切"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:32:27.348Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_java_001_spring事务失效排查",
+      "category": "Java",
+      "skill": "Spring 事务失效排查",
+      "roles": [
+        "java",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "线上发现订单状态已更新但库存扣减没有回滚，你如何排查 Spring 声明式事务是否失效？",
+      "keywords": [
+        "Spring",
+        "事务",
+        "回滚",
+        "传播行为",
+        "自调用"
+      ],
+      "expectedPoints": [
+        "确认事务边界：入口方法是否经过 Spring 代理，是否存在同类自调用或 private/final 方法",
+        "检查异常类型和回滚规则：受检异常、catch 吞异常、rollbackFor 配置和返回错误码场景",
+        "核对传播行为和多数据源：REQUIRES_NEW、NESTED、事务管理器选择和跨库一致性边界",
+        "检查数据库层行为：表引擎、自动提交、连接池、SQL 执行顺序和锁等待超时",
+        "给出验证方式：事务日志、AOP 调试、集成测试、故障注入和补偿任务"
+      ],
+      "referenceAnswer": "我会先确认这次库存扣减和订单状态更新是否在同一个事务边界内。Spring 声明式事务依赖代理，如果方法是同类自调用、private/final、没有被容器管理，或者入口没有走代理，@Transactional 可能不生效。其次看异常是否触发回滚：默认只回滚 RuntimeException，业务代码如果 catch 后只返回错误码，或者抛的是受检异常但没配置 rollbackFor，就不会回滚。还要查传播行为，REQUIRES_NEW 可能导致部分提交，多数据源下事务管理器选错也会失效。数据库侧要确认 InnoDB、autocommit、连接池和 SQL 执行顺序。验证上可以打开事务日志、在 TransactionInterceptor 打断点、补集成测试，并为历史异常订单跑补偿对账。",
+      "excellentAnswer": "我会按证据链排查，而不是直接猜 @Transactional 失效。第一步查日志和数据库 binlog，确认订单更新和库存扣减是否在同一请求、同一事务和同一数据源。第二步看代码入口：Controller 调 Service 是否走 Spring Bean，同类方法调用是否绕过代理，注解是否放在接口/实现类上且被当前代理模式识别。第三步看回滚触发条件：异常有没有被 catch，是否只返回 Result.fail，是否是 checked exception，rollbackFor 是否覆盖库存异常。第四步看传播行为和多数据源，库存扣减如果用了 REQUIRES_NEW 或另一个 transactionManager，订单回滚不会带着库存一起回滚。修复后要加集成测试模拟库存异常，断言订单、库存、消息表都回滚或进入补偿，并在线上补一个事务异常告警和异常订单对账任务。",
+      "commonMistakes": [
+        "只背 Spring 事务传播类型，没有结合代理、自调用和异常回滚规则排查。",
+        "把所有不一致都归因于事务失效，忽略多数据源、消息异步和补偿链路。",
+        "没有用集成测试或 binlog/事务日志证明修复有效。"
+      ],
+      "followUps": [
+        "如果库存扣减通过 MQ 异步执行，还能用本地事务保证一致性吗？",
+        "同类自调用导致事务失效，你有哪些修复方式？",
+        "为什么 catch 异常后手动 setRollbackOnly 有时比直接抛异常更危险？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "代理和自调用检查",
+          "异常回滚规则",
+          "传播行为分析",
+          "多数据源边界",
+          "验证和补偿方案"
+        ],
+        "goodToHave": [
+          "binlog 佐证",
+          "TransactionInterceptor 调试",
+          "集成测试",
+          "异常订单对账"
+        ],
+        "redFlags": [
+          "只说加 @Transactional",
+          "忽略 catch 吞异常",
+          "忽略异步消息",
+          "没有验证手段"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:37:27.645Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_go_001_context超时泄漏",
+      "category": "Go",
+      "skill": "context 超时与 goroutine 泄漏",
+      "roles": [
+        "go",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Go 服务请求超时后 goroutine 仍持续增长，你如何排查 context 取消没有正确传递的问题？",
+      "keywords": [
+        "Go",
+        "context",
+        "goroutine 泄漏",
+        "pprof",
+        "超时取消"
+      ],
+      "expectedPoints": [
+        "确认请求超时、goroutine 数、堆内存、下游耗时和错误率的时间关系",
+        "用 pprof goroutine、trace、日志 requestId 定位阻塞在 channel、锁、IO 或重试循环的位置",
+        "检查 context 是否从入口传到 DB、HTTP、RPC、消息处理和自定义 goroutine",
+        "检查是否使用 context.Background 覆盖、忘记 cancel、select 没监听 ctx.Done 或重试无退避",
+        "修复后用压测和超时注入验证 goroutine 能回落"
+      ],
+      "referenceAnswer": "我会先确认 goroutine 增长是否和请求超时、下游慢调用或重试放大同时发生。Go 里请求超时不代表所有派生 goroutine 自动退出，必须把 request context 传给 DB、HTTP client、RPC 和自定义 goroutine。定位时用 pprof /debug/pprof/goroutine 看堆栈，常见会卡在 channel receive/send、锁、网络 IO 或 time.Sleep 重试。代码层重点查有没有用 context.Background 替代传入 ctx，启动 goroutine 后没有 select 监听 ctx.Done，或者 WithTimeout 后忘记 cancel。修复后要做超时注入和并发压测，观察请求结束后 goroutine、连接数和内存是否回落。",
+      "excellentAnswer": "我的排查会从现象和堆栈闭环开始。先拉同一时间窗口的 goroutine 数、P99、下游超时、连接池占用和错误率，确认是否是某个依赖慢导致请求堆积。然后抓两次 pprof goroutine，比较增长的堆栈是否集中在同一段代码，比如等待 channel、HTTP Do、数据库 Query 或 worker pool。代码检查时要求所有 I/O 都使用带 ctx 的方法，如 QueryContext、http.NewRequestWithContext；自定义 goroutine 必须 select ctx.Done，重试循环要在每次重试前检查 ctx，且 WithTimeout 后 defer cancel 释放 timer。不能在库函数里随便创建 Background。修复验证用 fake slow dependency，让请求 200ms 超时，压测 5 分钟后 goroutine 应回到基线，连接池不再持续占满。",
+      "commonMistakes": [
+        "认为 HTTP 请求返回超时后 goroutine 会自动结束。",
+        "pprof 只看数量不看堆栈差异，找不到泄漏位置。",
+        "用 context.Background 断开取消链路。"
+      ],
+      "followUps": [
+        "如果 goroutine 卡在向无缓冲 channel 发送，你怎么改？",
+        "context 里适合放用户信息吗？有什么边界？",
+        "下游 SDK 不支持 context 时怎么做超时控制？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "pprof 堆栈定位",
+          "ctx 传递链路",
+          "ctx.Done 监听",
+          "cancel 释放",
+          "压测验证回落"
+        ],
+        "goodToHave": [
+          "trace/requestId 关联",
+          "连接池指标",
+          "超时注入",
+          "重试退避"
+        ],
+        "redFlags": [
+          "只说加超时时间",
+          "使用 Background 断链",
+          "不看 pprof",
+          "没有验证 goroutine 回落"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:37:27.645Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_python_001_celery重复消费幂等",
+      "category": "Python",
+      "skill": "Celery 重试与幂等",
+      "roles": [
+        "python",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Celery 任务因为超时重试导致同一笔订单被处理两次，你如何设计幂等和故障恢复？",
+      "keywords": [
+        "Python",
+        "Celery",
+        "幂等",
+        "重试",
+        "任务队列"
+      ],
+      "expectedPoints": [
+        "说明 Celery 至少一次投递、ack 时机、超时和 worker 崩溃会导致重复执行",
+        "用业务幂等键、唯一约束、状态机或去重表保护订单处理",
+        "区分可重试异常和不可重试异常，设置 retry 次数、退避、抖动和死信/失败队列",
+        "处理外部副作用：支付、发券、发消息要有请求流水号和查询确认",
+        "通过任务日志、链路追踪、补偿任务和对账验证一致性"
+      ],
+      "referenceAnswer": "Celery 默认更接近至少一次执行语义，worker 超时、崩溃、ack_late 或 broker 重投都可能让任务重复执行，所以不能靠“任务只会跑一次”保证订单正确。设计上要用订单号加业务动作作为幂等键，在数据库建唯一约束或任务执行表，处理前先抢占执行权，状态机只允许从合法状态流转。可重试异常如网络超时使用有限次数、指数退避和 jitter；参数错误或业务状态非法不要重试，直接进入失败队列。涉及支付、发券、发消息等外部副作用必须带请求流水号，并在重试前查询外部状态。最后用任务执行日志、订单对账和补偿任务兜底。",
+      "excellentAnswer": "我会把 Celery 任务分成“领取、执行、副作用、确认”四段设计。领取阶段任务参数必须包含稳定 business_key，例如 orderId + action，数据库有唯一索引，插入成功才执行，重复插入说明已处理或处理中。执行阶段用订单状态机保护，比如 CREATED 只能变 PROCESSING，不能从 SUCCESS 再扣一次库存。副作用阶段调用支付或发券系统时传 idempotency_key，超时后先查结果再决定是否重试，避免重复扣款。确认阶段选择合适 ack 策略，ack_late 虽能避免任务丢失，但必须接受重复执行并靠幂等兜底。失败处理要区分 RetryableError 和 NonRetryableError，超过次数进死信队列，补偿任务按执行表扫描长时间 PROCESSING 的记录。验证时模拟 worker kill、broker 重投和下游超时，检查订单、库存、外部流水都不会重复。",
+      "commonMistakes": [
+        "把 Celery 重试当成 exactly-once，业务层没有幂等。",
+        "所有异常都 retry，导致脏数据和下游压力扩大。",
+        "外部支付/发券没有请求流水号，超时后盲目重试。"
+      ],
+      "followUps": [
+        "ack_late 打开后有什么收益和风险？",
+        "任务执行表的状态和唯一键你会怎么设计？",
+        "如果外部系统没有幂等接口，你如何降低重复副作用风险？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "至少一次语义",
+          "业务幂等键",
+          "状态机/唯一约束",
+          "重试分类",
+          "补偿对账"
+        ],
+        "goodToHave": [
+          "ack_late 取舍",
+          "死信队列",
+          "外部流水号",
+          "worker kill 测试"
+        ],
+        "redFlags": [
+          "相信任务只执行一次",
+          "无限重试",
+          "无唯一约束",
+          "不查询外部结果"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:37:27.645Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_frontend_001_白屏监控定位",
+      "category": "前端",
+      "skill": "前端白屏监控与定位",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "线上 React 页面偶发白屏但本地无法复现，你如何设计监控并定位是资源、运行时错误还是接口数据导致？",
+      "keywords": [
+        "React",
+        "白屏",
+        "前端监控",
+        "SourceMap",
+        "资源加载"
+      ],
+      "expectedPoints": [
+        "采集 JS error、unhandledrejection、资源加载失败、接口失败、首屏性能和用户环境",
+        "用白屏检测区分根节点为空、关键容器无内容、骨架屏卡死和路由加载失败",
+        "结合 SourceMap、release 版本、用户行为路径和接口 trace 定位具体代码或数据",
+        "检查 CDN 缓存、chunk 加载、动态 import、浏览器兼容和灰度版本差异",
+        "止血方案包括回滚版本、关闭实验、降级路由、兜底错误边界和刷新 chunk"
+      ],
+      "referenceAnswer": "偶发白屏不能只等用户截图，要先有监控。前端应采集 window.onerror、unhandledrejection、资源加载失败、接口状态码、首屏性能、路由、release、浏览器版本和用户网络。白屏检测可以在首屏后检查 root 节点和关键业务容器是否有有效内容，排除骨架屏一直存在的情况。定位时用 SourceMap 还原堆栈，按 release 聚合错误，结合接口 trace 看是否是后端返回空结构或权限异常。资源问题要查 CDN、chunk 404、缓存旧 HTML 引用新 JS、动态 import 失败和灰度版本不一致。止血可以回滚、关闭实验、加 ErrorBoundary、路由级降级和 chunk load failed 自动刷新。",
+      "excellentAnswer": "我会先把白屏定义清楚：是 JS 崩溃导致 React 没挂载，还是挂载了但关键区域无数据，或者路由 chunk 没加载。监控 SDK 上报 release、路由、用户环境、JS 错误、Promise 错误、resource error、接口失败和 performance timing；白屏探针在 onload 后和路由切换后检查 root 子节点、关键容器高度和骨架屏持续时间。定位时按版本和浏览器聚合，如果集中在某个 release，就用 SourceMap 找具体组件；如果集中在 chunk load failed，就查 CDN 缓存和 HTML/JS 版本不一致；如果没有 JS 错误但接口 200 返回空数组，就查数据契约和权限。修复上加 ErrorBoundary 防止整页崩溃，动态 import 失败提示刷新，关键接口加空态和降级，并建立发布后白屏率、JS 错误率和 chunk 失败率看板。",
+      "commonMistakes": [
+        "只看接口日志，忽略 JS 运行时错误和资源加载失败。",
+        "没有 release 和 SourceMap，线上堆栈不可定位。",
+        "白屏检测只判断 root 是否存在，误判骨架屏或空态。"
+      ],
+      "followUps": [
+        "chunk load failed 通常有哪些原因？你会怎么兜底？",
+        "SourceMap 上传到监控平台有什么安全注意点？",
+        "如何区分真实白屏和用户网络慢导致的加载中？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "错误和资源监控",
+          "白屏探针定义",
+          "SourceMap 和 release",
+          "接口数据关联",
+          "回滚/降级止血"
+        ],
+        "goodToHave": [
+          "ErrorBoundary",
+          "chunk 自动刷新",
+          "灰度版本对比",
+          "用户行为路径"
+        ],
+        "redFlags": [
+          "只说本地复现",
+          "没有监控字段",
+          "无 SourceMap",
+          "忽略 CDN 缓存"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:37:27.645Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_dotnet_001_threadpool_starvation",
+      "category": "C#/.NET",
+      "skill": ".NET 线程池饥饿排查",
+      "roles": [
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": ".NET Web API 延迟突然升高但 CPU 不高，你如何排查是否存在线程池饥饿或同步阻塞？",
+      "keywords": [
+        ".NET",
+        "ThreadPool",
+        "async await",
+        "同步阻塞",
+        "诊断"
+      ],
+      "expectedPoints": [
+        "观察请求排队、线程池线程数、可用 worker、GC、连接池和下游耗时",
+        "检查 async 方法中 .Result、.Wait、Task.Run 滥用和同步 IO 阻塞",
+        "使用 dotnet-counters、dotnet-trace、dump、Application Insights 或日志定位等待点",
+        "区分线程池饥饿、数据库连接池耗尽、锁竞争和外部依赖慢调用",
+        "修复包括全链路 async、超时、连接池配置、限流和隔离慢依赖"
+      ],
+      "referenceAnswer": "CPU 不高但延迟升高，常见是请求在线程池或连接池里排队。排查 .NET 线程池饥饿时，我会看 dotnet-counters 里的 threadpool queue length、completed work item、thread count、ASP.NET request queue、GC 和异常率。代码上重点查 async 方法里有没有 .Result、.Wait、GetAwaiter().GetResult，是否同步读写文件或网络，是否在请求线程里 Task.Run 包 CPU/IO 工作。还要区分数据库连接池耗尽和锁竞争，可以看 SQL 连接池指标、下游耗时和 dump 线程栈。修复不是简单调高最小线程数，而是消除同步阻塞，确保 HTTP/DB/Redis 调用都有 async 和超时。",
+      "excellentAnswer": "我的顺序是先确认排队位置。先看应用入口 QPS、P95/P99、CPU、线程池 queue length、active requests、数据库连接池使用率和下游延迟。如果 threadpool queue length 持续增长而 CPU 不高，抓 dotnet-trace 或 dump 看大量线程是否阻塞在 Task.Wait、Monitor.Enter、SqlCommand.ExecuteReader 或 HttpClient.Send。常见根因是 async-over-sync：控制器是 async，但内部调用 .Result 等待异步结果，或者第三方 SDK 同步阻塞。短期可以限流、隔离慢接口、适当提高 ThreadPool MinThreads 缓解；长期要改成全链路 async，设置 CancellationToken 和超时，复用 HttpClient，给数据库连接池和慢依赖加隔离。验证时压测同样流量，线程池队列应稳定，P99 回落，下游超时时请求能释放。",
+      "commonMistakes": [
+        "看到 CPU 不高就排除性能问题，忽略线程池排队。",
+        "盲目调高 MinThreads，不修 .Result/.Wait 等同步阻塞。",
+        "把线程池饥饿和数据库连接池耗尽混为一谈。"
+      ],
+      "followUps": [
+        "为什么 async 方法里调用 .Result 可能导致吞吐下降？",
+        "如何区分 ThreadPool queue 和 SQL 连接池耗尽？",
+        "HttpClient 使用不当会造成哪些延迟问题？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "线程池指标",
+          "同步阻塞检查",
+          "诊断工具",
+          "连接池/锁竞争区分",
+          "全链路 async 修复"
+        ],
+        "goodToHave": [
+          "dotnet-counters",
+          "dump 栈分析",
+          "CancellationToken",
+          "依赖隔离"
+        ],
+        "redFlags": [
+          "只调线程数",
+          "忽略 .Result/.Wait",
+          "没有指标",
+          "不设超时"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:37:27.645Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_node_001_eventloop_lag",
+      "category": "Node.js",
+      "skill": "Node.js 事件循环延迟排查",
+      "roles": [
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Node.js 接口 QPS 不高但 P99 延迟很高，你如何排查事件循环阻塞、GC 和下游依赖问题？",
+      "keywords": [
+        "Node.js",
+        "event loop lag",
+        "GC",
+        "异步 IO",
+        "性能排查"
+      ],
+      "expectedPoints": [
+        "采集 event loop lag、CPU、heap、GC pause、接口耗时分布和下游调用耗时",
+        "检查同步 CPU 计算、JSON 大对象序列化、正则回溯、同步 fs/crypto/zlib 和日志阻塞",
+        "用 clinic.js、0x、node --prof、heap snapshot、async_hooks 或 APM 定位热点",
+        "区分事件循环阻塞、内存泄漏 GC、连接池耗尽和下游慢响应",
+        "修复包括拆分 CPU 任务、worker_threads、流式处理、限流、缓存和超时隔离"
+      ],
+      "referenceAnswer": "Node.js 单进程事件循环被阻塞时，QPS 不高也会 P99 很差。我会先看 event loop lag、CPU、heap 使用、GC pause、接口分位耗时和下游耗时。如果 lag 高且 CPU 高，重点查同步 CPU 计算、大 JSON stringify/parse、复杂正则、同步 fs、crypto 或压缩；如果 heap 持续增长且 GC pause 变长，查内存泄漏和缓存无限增长；如果 lag 不高但接口慢，更多是数据库、Redis、HTTP 下游或连接池问题。工具上可以用 clinic doctor/flame、0x、node --prof、heap snapshot 和 APM trace。修复要避免在主线程做重 CPU 工作，改 worker_threads、队列异步化、流式处理大对象，并给下游设置超时和熔断。",
+      "excellentAnswer": "我会先把 P99 拆成应用内阻塞和外部等待。应用层加 event loop delay histogram、GC pause、heap、active handles、接口 trace 和下游 span。如果 event loop lag 在慢请求期间明显升高，说明主线程被阻塞，抓 CPU profile 看热点是否在 JSON 序列化、正则、加解密、图片处理或同步文件；这类要迁到 worker_threads、预计算、分页/流式返回或换成异步 API。如果 lag 正常但 P99 高，就查连接池、DNS、TLS、Redis/DB 慢查询和重试放大。如果 heap 上涨伴随频繁 major GC，就抓 heap snapshot 对比 retained objects，查全局缓存、闭包引用或请求对象泄漏。验证时用压测看 event loop lag P99、接口 P99 和 GC pause 是否同时下降。",
+      "commonMistakes": [
+        "只看 QPS 不高就排除 Node 性能问题。",
+        "把所有慢请求都归因于下游，不看 event loop lag。",
+        "在主线程做大 JSON、正则或加解密等 CPU 重任务。"
+      ],
+      "followUps": [
+        "如何监控 event loop lag？阈值怎么设？",
+        "worker_threads 和 cluster 分别适合解决什么问题？",
+        "JSON.stringify 大对象慢，你有哪些优化手段？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "event loop lag 指标",
+          "CPU/GC/heap 分析",
+          "同步阻塞源识别",
+          "下游慢调用区分",
+          "主线程减负方案"
+        ],
+        "goodToHave": [
+          "clinic/0x 使用",
+          "heap snapshot 对比",
+          "worker_threads",
+          "流式处理"
+        ],
+        "redFlags": [
+          "只说加机器",
+          "不看事件循环",
+          "主线程做 CPU 重活",
+          "没有超时隔离"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:37:27.645Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_php_001_fpm慢请求排查",
+      "category": "PHP",
+      "skill": "PHP-FPM 慢请求排查",
+      "roles": [
+        "backend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "PHP 接口 P99 延迟升高但数据库慢查询不明显，你如何排查 PHP-FPM、OPcache 和外部依赖问题？",
+      "keywords": [
+        "PHP",
+        "PHP-FPM",
+        "OPcache",
+        "慢请求",
+        "连接池"
+      ],
+      "expectedPoints": [
+        "检查 PHP-FPM slowlog、request_slowlog_timeout、pm 模式、max_children、队列和进程占用",
+        "区分 PHP 执行耗时、数据库连接等待、Redis/HTTP 外部依赖、文件 IO 和日志阻塞",
+        "检查 OPcache 命中率、重启/发布导致的缓存抖动和 Composer autoload 开销",
+        "用 APM trace、nginx upstream_time、应用日志 requestId 和系统指标串联链路",
+        "给出止血和修复：扩 FPM、限流、超时、缓存、依赖隔离、代码热点优化和发布预热"
+      ],
+      "referenceAnswer": "我会先用 nginx access log 区分 request_time 和 upstream_response_time，再看 PHP-FPM 状态页确认 active/idle、listen queue、max_children reached 是否异常。如果数据库慢查询不明显，重点查 FPM slowlog，看请求卡在外部 HTTP、Redis、文件 IO、锁等待还是业务循环。OPcache 也要看命中率和发布后缓存重建，Composer autoload 或动态 include 过多会放大冷启动。外部依赖要有超时和 trace，不能让一个慢接口占满 FPM worker。止血可以临时扩 max_children、扩容实例、限流慢接口或关闭高风险功能，长期要优化热点代码、缓存依赖结果、设置合理超时并做发布预热。",
+      "excellentAnswer": "我的排查会先确认瓶颈是在 nginx 排队、FPM 排队还是 PHP 执行。nginx 日志里如果 request_time 高但 upstream_time 不高，可能是客户端或网关；如果 upstream_time 高，就看 FPM status 的 listen queue 和 max children。如果队列满，说明 worker 被占住，抓 slowlog 能看到具体 PHP 栈。常见原因包括同步调用第三方接口没有超时、Redis 连接等待、文件锁、日志同步写、反序列化大对象和 OPcache 发布后抖动。OPcache 要关注 hit rate、memory usage、restart count，发布时可以预热热点文件。修复不是单纯调大 max_children，因为可能把数据库或 Redis 打垮；要给外部依赖设超时、熔断和降级，慢接口做隔离池，配合 APM trace 看 P95/P99 是否回落。",
+      "commonMistakes": [
+        "只查 MySQL 慢查询，忽略 FPM worker 被外部依赖占满。",
+        "盲目调大 max_children，导致下游数据库或 Redis 压力更大。",
+        "没有启用 slowlog 和 FPM status，排查只能靠猜。"
+      ],
+      "followUps": [
+        "PHP-FPM listen queue 持续升高说明什么？",
+        "OPcache 在发布过程中可能造成什么抖动？",
+        "为什么 max_children 不能无限调大？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "FPM status/slowlog",
+          "链路耗时拆分",
+          "OPcache 检查",
+          "外部依赖超时",
+          "止血和长期优化"
+        ],
+        "goodToHave": [
+          "nginx upstream_time",
+          "APM trace",
+          "发布预热",
+          "慢接口隔离"
+        ],
+        "redFlags": [
+          "只查数据库",
+          "只重启 PHP-FPM",
+          "无限调 worker",
+          "没有超时"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:42:27.868Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_cpp_001_内存越界定位",
+      "category": "C/C++",
+      "skill": "C/C++ 内存越界定位",
+      "roles": [
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "C++ 服务偶发崩溃且 core 栈不稳定，你如何定位是否存在内存越界、悬空指针或数据竞争？",
+      "keywords": [
+        "C++",
+        "core dump",
+        "ASan",
+        "TSan",
+        "内存越界"
+      ],
+      "expectedPoints": [
+        "保留 core、符号表、构建版本、输入请求和崩溃前日志，先建立可复现线索",
+        "用 gdb/lldb 查看栈、寄存器、线程、对象内存和最近变更，判断是否栈已被破坏",
+        "使用 ASan、UBSan、Valgrind、TSan 或 debug allocator 检测越界、use-after-free 和竞态",
+        "重点检查生命周期、容器迭代器失效、buffer 长度、跨线程共享对象和回调捕获",
+        "修复后补压力测试、模糊测试、并发测试和 sanitizer CI 门禁"
+      ],
+      "referenceAnswer": "偶发崩溃且栈不稳定，通常要怀疑内存破坏或并发竞态。第一步保留 core、二进制符号、编译参数、版本号和崩溃前请求，确保 gdb 能看到准确符号。core 栈如果跳到非法地址或对象字段异常，要检查是否有 buffer overflow、use-after-free、double free、迭代器失效或数据竞争。复现困难时用 ASan/UBSan 跑压测，能快速抓越界和悬空指针；竞态用 TSan 或增加锁竞争压测。代码重点看裸指针生命周期、lambda 捕获引用、vector 扩容后引用失效、memcpy 长度和多线程共享对象。修复后要把 sanitizer 加进 CI 或夜间压测。",
+      "excellentAnswer": "我不会只看一次 core 栈就下结论。先确认崩溃版本和符号一致，打开 core_pattern 收集多个 core，对比是否都在同一模块附近。如果栈每次不同，说明可能早已写坏内存，崩溃点不是根因。接着用 ASan 版本在预发或压测环境复现，ASan 能直接指出越界写、use-after-free 和 double free 的位置；如果怀疑多线程，就用 TSan 看 data race。业务代码里重点查对象所有权是否清晰，shared_ptr/unique_ptr 是否混用错误，异步回调是否捕获了栈变量引用，容器 erase 后迭代器是否继续使用。修复后补单测覆盖边界长度，压测覆盖高并发路径，并把 sanitizer 报告作为合并门禁，避免靠线上 core 才发现。",
+      "commonMistakes": [
+        "只根据崩溃栈修最后一行代码，忽略内存早已被破坏。",
+        "没有保存符号表和构建版本，core 无法准确分析。",
+        "不用 sanitizer，只靠人工审代码排查越界。"
+      ],
+      "followUps": [
+        "ASan 和 TSan 分别适合发现什么问题？",
+        "vector 扩容为什么会导致引用或迭代器失效？",
+        "线上不能开 ASan 时你如何降低复现成本？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "core 和符号保存",
+          "gdb/lldb 分析",
+          "sanitizer 工具",
+          "生命周期/竞态检查",
+          "CI/压测门禁"
+        ],
+        "goodToHave": [
+          "多 core 对比",
+          "fuzz 测试",
+          "debug allocator",
+          "构建版本追溯"
+        ],
+        "redFlags": [
+          "只看崩溃点",
+          "无符号表",
+          "忽略并发",
+          "不做复现验证"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:42:27.868Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_android_001_anr定位治理",
+      "category": "Android",
+      "skill": "Android ANR 定位治理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Android 线上 ANR 增多，你如何区分主线程阻塞、锁等待、Binder 调用和启动阶段耗时？",
+      "keywords": [
+        "Android",
+        "ANR",
+        "主线程",
+        "Binder",
+        "Trace"
+      ],
+      "expectedPoints": [
+        "收集 ANR traces、主线程堆栈、CPU/IO、设备型号、系统版本、页面和用户操作路径",
+        "区分 Input dispatch、Broadcast、Service、ContentProvider 和启动阶段 ANR 类型",
+        "检查主线程同步 IO、数据库、网络、Bitmap 解码、锁等待、Binder 同步调用和大 JSON 解析",
+        "使用 Perfetto/Systrace、StrictMode、APM、日志埋点和灰度版本对比定位",
+        "修复包括异步化、锁粒度收敛、预加载/懒加载、超时、降级和启动任务编排"
+      ],
+      "referenceAnswer": "ANR 要先看类型和主线程栈。Input dispatch ANR 多半是主线程 5 秒内没响应输入；Broadcast、Service、ContentProvider 有各自超时。线上要收集 traces.txt、发生页面、设备、系统版本、CPU/IO 和用户操作。主线程如果卡在 SQLite、文件读写、网络、Bitmap 解码或 JSON 解析，就是耗时任务放错线程；如果卡在 monitor 或 CountDownLatch，要查锁等待和线程依赖；如果卡在 Binder transact，要看系统服务或跨进程调用是否同步阻塞。定位工具可以用 Perfetto/Systrace 看主线程时间线，用 StrictMode 在测试阶段提前发现主线程 IO。修复要把耗时任务异步化，启动阶段做懒加载和任务编排。",
+      "excellentAnswer": "我会按 ANR 类型建立排查路径。先从线上 APM 聚合看是否集中在某个页面、版本、机型或 Android 系统版本，再拉 traces 看 main thread 最终卡在哪里，同时看 CPU 是否打满、IO wait 是否高。如果主线程栈在数据库或文件，说明主线程 IO；在 synchronized/LockSupport，说明锁等待，要找到持锁线程；在 BinderProxy.transact，说明同步 Binder 可能被系统服务或远程进程拖住；启动 ANR 则要看 Application、ContentProvider、首屏初始化是否做了过多 SDK 初始化。治理上把大任务移到后台线程，主线程只做 UI；启动任务分级，首屏必需、首屏后、空闲时分别执行；锁不要跨线程等待主线程；对三方 SDK 做超时和降级。最后用 ANR 率、冷启动耗时和主线程长任务数验证。",
+      "commonMistakes": [
+        "只说不要在主线程做耗时操作，但不能根据 traces 定位具体等待点。",
+        "忽略 Binder 和锁等待，把所有 ANR 都归因于 CPU 慢。",
+        "启动阶段 SDK 初始化无编排，导致低端机集中 ANR。"
+      ],
+      "followUps": [
+        "main 线程卡在 monitor enter，你下一步看什么？",
+        "ContentProvider 初始化为什么可能导致启动 ANR？",
+        "如何治理三方 SDK 初始化导致的启动耗时？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "ANR 类型区分",
+          "traces 主线程分析",
+          "锁/Binder/IO 判断",
+          "Perfetto 或 APM 工具",
+          "异步化和启动治理"
+        ],
+        "goodToHave": [
+          "StrictMode",
+          "机型版本聚合",
+          "启动任务分级",
+          "主线程长任务监控"
+        ],
+        "redFlags": [
+          "只说开子线程",
+          "不看 traces",
+          "忽略锁等待",
+          "没有线上指标"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:42:27.868Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_ios_001_启动耗时优化",
+      "category": "iOS",
+      "skill": "iOS 启动耗时优化",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "iOS App 冷启动变慢，你如何拆解 dyld、运行时初始化、首页渲染和网络依赖的耗时？",
+      "keywords": [
+        "iOS",
+        "冷启动",
+        "dyld",
+        "Instruments",
+        "首页渲染"
+      ],
+      "expectedPoints": [
+        "区分 pre-main 和 main 之后耗时，采集启动阶段埋点和真实设备分位数",
+        "检查动态库数量、符号绑定、Objective-C 类/分类加载、+load、静态初始化和 Swift 运行时成本",
+        "分析首页渲染、布局计算、图片解码、数据库读取、配置拉取和首屏网络阻塞",
+        "使用 Instruments、os_signpost、MetricKit、启动日志和包体/依赖分析定位",
+        "优化包括延迟初始化、合并/减少动态库、懒加载、缓存首屏数据、异步解码和启动任务编排"
+      ],
+      "referenceAnswer": "iOS 冷启动要先拆 pre-main 和 main 后。pre-main 主要包括 dyld 加载动态库、符号绑定、Objective-C runtime 注册类和 category、执行 +load、C++ 静态初始化等；main 后包括 AppDelegate、SDK 初始化、首页创建、布局、图片解码、数据库和网络。排查时用 Xcode 启动时间、Instruments、os_signpost 和 MetricKit 收集真实设备 P50/P90/P99，不只看模拟器。优化上减少动态库和 +load，把非首屏 SDK 延迟到首屏后，首页数据用缓存兜底，图片异步解码，复杂布局预计算或懒加载。网络配置不能阻塞首屏，必要时用本地默认配置。",
+      "excellentAnswer": "我会先建立启动分段埋点：进程创建、main 进入、AppDelegate 完成、首个 ViewController viewDidAppear、首屏数据可见。pre-main 慢就看动态库数量、符号绑定、+load 和静态初始化，能合并的动态库合并，能挪到 initialize 或懒加载的不要放 +load。main 后慢就看 SDK 初始化、数据库打开、首页布局和网络配置，三方 SDK 按必需程度分级，广告、埋点、推送不应该阻塞首屏。首页渲染要看 Auto Layout 复杂度、图片解码和主线程 IO。验证不能只看平均值，要按机型、系统版本、冷/热启动分别看 P90/P99，并防止优化引入首屏空白或功能延迟异常。",
+      "commonMistakes": [
+        "只优化首页接口，忽略 pre-main 动态库和 +load 成本。",
+        "只看开发机平均启动时间，不看低端设备和 P90/P99。",
+        "把所有 SDK 都放启动同步初始化。"
+      ],
+      "followUps": [
+        "+load 为什么会影响启动？如何治理？",
+        "MetricKit 能提供哪些启动和卡顿指标？",
+        "首屏缓存如何避免展示过期或错误数据？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "pre-main/main 分段",
+          "dyld/runtime 成本",
+          "首页渲染分析",
+          "Instruments/os_signpost",
+          "延迟初始化和懒加载"
+        ],
+        "goodToHave": [
+          "MetricKit",
+          "机型分位数",
+          "动态库治理",
+          "首屏缓存兜底"
+        ],
+        "redFlags": [
+          "只看接口耗时",
+          "同步初始化所有 SDK",
+          "不分冷/热启动",
+          "只看平均值"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:42:27.868Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_cross_001_多端一致性治理",
+      "category": "跨端/鸿蒙",
+      "skill": "跨端一致性治理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "同一业务要同时支持 Web、小程序、App 和鸿蒙端，你如何治理多端交互、状态和发布一致性？",
+      "keywords": [
+        "跨端",
+        "鸿蒙",
+        "小程序",
+        "多端一致性",
+        "灰度发布"
+      ],
+      "expectedPoints": [
+        "明确哪些能力复用、哪些端侧差异必须保留，不能盲目一套代码跑所有端",
+        "抽象业务状态机、接口契约、设计 Token、埋点规范和错误码，而不是只复用 UI",
+        "处理端能力差异：路由、权限、存储、支付、推送、文件、蓝牙/定位和系统 API",
+        "建立多端测试矩阵、截图/契约测试、灰度发布、版本兼容和回滚策略",
+        "用崩溃率、白屏率、接口错误率、转化漏斗和端差异缺陷数衡量治理效果"
+      ],
+      "referenceAnswer": "多端一致性治理的重点不是强行统一 UI 代码，而是统一业务语义和质量标准。首先抽象订单、支付、登录等业务状态机，保证各端状态流转一致；接口契约、错误码、埋点、设计 Token 和权限模型要统一。端侧差异要显式管理，例如小程序包体和 API 限制、App 原生能力、鸿蒙系统权限和生命周期、Web 浏览器兼容。发布上要有版本兼容策略，服务端不能只兼容最新版客户端；灰度和回滚要按端、版本、渠道拆分。测试上建立多端矩阵，覆盖核心链路、端能力、弱网和升级场景。",
+      "excellentAnswer": "我会把跨端治理分成业务层、能力层和发布层。业务层统一状态机和接口契约，例如支付中、支付成功、退款中这些状态所有端都不能各自发明；能力层用适配器封装路由、存储、权限、支付、推送、文件和定位，不同端实现不同，但业务调用同一语义；表现层统一设计 Token 和组件规范，但允许平台交互差异。鸿蒙、小程序、iOS、Android、Web 的生命周期和权限模型不同，必须有端能力清单。发布时服务端接口保持向后兼容，灰度按端和版本放量，监控白屏率、崩溃率、接口错误率和转化漏斗。测试不能只测一个 H5，要有多端核心路径矩阵和截图/契约测试。",
+      "commonMistakes": [
+        "把跨端等同于 UI 复用，忽略业务状态和接口契约。",
+        "没有版本兼容，服务端改动导致旧端不可用。",
+        "忽略鸿蒙、小程序、App 的权限和生命周期差异。"
+      ],
+      "followUps": [
+        "哪些逻辑适合跨端复用，哪些不适合？",
+        "服务端接口如何兼容多个客户端版本？",
+        "多端灰度时发现只有某一端转化下降，你怎么定位？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "业务状态机统一",
+          "接口契约和错误码",
+          "端能力适配",
+          "多端测试矩阵",
+          "灰度和版本兼容"
+        ],
+        "goodToHave": [
+          "设计 Token",
+          "埋点规范",
+          "截图测试",
+          "端差异缺陷度量"
+        ],
+        "redFlags": [
+          "只讲一套代码",
+          "忽略旧版本兼容",
+          "不测端差异",
+          "没有灰度回滚"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:42:27.868Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_mysql_001_死锁复盘治理",
+      "category": "MySQL",
+      "skill": "MySQL 死锁复盘治理",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "MySQL 线上偶发死锁导致订单更新失败，你如何定位死锁链路并治理同类问题？",
+      "keywords": [
+        "MySQL",
+        "死锁",
+        "InnoDB",
+        "锁等待",
+        "事务治理"
+      ],
+      "expectedPoints": [
+        "收集 SHOW ENGINE INNODB STATUS、错误日志、事务 SQL、索引和业务请求链路",
+        "分析两个事务持有哪些锁、等待哪些锁、是否存在访问顺序不一致或范围锁过大",
+        "检查隔离级别、索引命中、next-key lock、批量更新顺序和事务内外部调用",
+        "治理手段包括统一加锁顺序、补索引、缩短事务、拆批、重试和幂等保护",
+        "用压测、死锁计数、锁等待时间和失败订单补偿验证治理效果"
+      ],
+      "referenceAnswer": "我会先保留死锁现场，而不是只让业务重试。InnoDB 死锁日志能看到两个事务分别持有的锁、等待的锁和相关 SQL，再结合业务 requestId 找到调用链路。常见原因包括两个事务更新订单和库存顺序相反、where 条件没命中索引导致范围锁、批量更新 ID 顺序不一致、事务里夹杂远程调用导致持锁时间过长。治理要让同类资源按固定顺序加锁，补充合适索引缩小锁范围，把慢操作移出事务，批量更新排序，必要时对可恢复场景做有限重试。订单场景还要保证重试幂等和补偿对账，不能让死锁重试造成重复扣库存。",
+      "excellentAnswer": "我的定位路径是从数据库证据还原业务链路。先看 SHOW ENGINE INNODB STATUS 的 LATEST DETECTED DEADLOCK，确认事务 A/B 的 SQL、锁模式、索引、等待关系；再用慢日志、binlog 或应用日志找到对应接口和参数。如果看到 update ... where status = ? 没走合适索引，就可能锁了过大范围；如果两个接口一个先锁订单再锁库存，另一个先锁库存再锁订单，就要统一顺序。修复上优先减少锁冲突：补联合索引，缩短事务，把 RPC/MQ 发送移到提交后，批量按主键排序，热点订单加业务串行化。重试只能作为兜底，必须有幂等键和状态机。上线后看 deadlock count、lock wait、订单失败率和补偿任务数量是否下降。",
+      "commonMistakes": [
+        "只说数据库会自动回滚一个事务，没有复盘锁等待关系。",
+        "盲目加重试，忽略幂等和重复副作用。",
+        "事务里做远程调用或大量批处理，持锁时间过长。"
+      ],
+      "followUps": [
+        "next-key lock 为什么可能扩大锁范围？",
+        "死锁重试应该放在哪一层，最多重试几次？",
+        "如何判断是缺索引导致的范围锁？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "死锁日志分析",
+          "锁等待关系还原",
+          "索引和加锁顺序检查",
+          "事务缩短治理",
+          "幂等重试和验证指标"
+        ],
+        "goodToHave": [
+          "binlog/requestId 关联",
+          "批量排序",
+          "热点资源串行化",
+          "补偿对账"
+        ],
+        "redFlags": [
+          "只重试",
+          "不看死锁日志",
+          "忽略索引",
+          "事务内远程调用"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:47:27.872Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_redis_001_缓存击穿治理",
+      "category": "Redis",
+      "skill": "Redis 缓存击穿治理",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "热点商品缓存过期瞬间数据库被打满，你如何设计缓存击穿治理和验证方案？",
+      "keywords": [
+        "Redis",
+        "缓存击穿",
+        "热点 key",
+        "互斥锁",
+        "逻辑过期"
+      ],
+      "expectedPoints": [
+        "识别热点 key、过期时间分布、DB QPS、缓存命中率和请求放大时间点",
+        "治理方案包括互斥锁、逻辑过期、后台刷新、热点 key 预热和随机过期",
+        "说明锁超时、请求降级、旧值返回、一致性窗口和雪崩/穿透区别",
+        "保护数据库：限流、队列削峰、只允许单线程回源和失败兜底",
+        "通过压测、命中率、回源次数、DB 负载和用户延迟验证效果"
+      ],
+      "referenceAnswer": "缓存击穿是热点 key 失效后大量请求同时回源 DB。排查先确认是否集中在少数 key、过期时间是否同步、缓存命中率是否骤降和 DB QPS 是否被放大。治理可以用互斥锁让一个请求回源，其余等待或返回旧值；也可以用逻辑过期，缓存里保存数据和逻辑过期时间，过期后由后台线程刷新，前台短时间返回旧值。热点商品可以提前预热，过期时间加随机抖动，DB 侧加限流和降级。锁必须有超时，回源失败不能删除旧值，避免雪上加霜。验证看同一热点 key 的并发压测下 DB 回源次数是否接近 1，P99 是否稳定。",
+      "excellentAnswer": "我会根据业务对一致性的要求选方案。如果商品详情允许短时间旧值，优先逻辑过期：缓存不过物理删除，读到逻辑过期后尝试抢刷新锁，抢到的异步重建，没抢到的返回旧值并打标。价格或库存这类强敏感字段则要拆开处理，不能全部用旧值。互斥锁方案要注意锁粒度、超时时间和异常释放，避免锁失效后所有请求再次回源。热点 key 要有识别和预热机制，比如按访问量统计 TOP key，发布或活动前主动加载。保护 DB 还要有限流、熔断和降级文案。压测时模拟热点 key 过期瞬间 1000 并发，看 Redis 命中率、DB QPS、回源次数、锁等待和用户 P99，而不是只看功能正确。",
+      "commonMistakes": [
+        "把击穿、穿透、雪崩混为一谈，方案不匹配。",
+        "互斥锁没有超时或异常释放，导致请求全部阻塞。",
+        "对强一致字段直接返回旧值，没有说明业务风险。"
+      ],
+      "followUps": [
+        "逻辑过期为什么能保护 DB？代价是什么？",
+        "热点 key 如何自动发现和预热？",
+        "如果回源失败，缓存旧值应该保留多久？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "热点识别",
+          "互斥锁或逻辑过期",
+          "DB 保护",
+          "一致性取舍",
+          "压测验证"
+        ],
+        "goodToHave": [
+          "热点预热",
+          "随机过期",
+          "旧值标记",
+          "TOP key 统计"
+        ],
+        "redFlags": [
+          "只说加缓存",
+          "锁无超时",
+          "所有字段都返回旧值",
+          "没有 DB 限流"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:47:27.872Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_kafka_001_消费积压治理",
+      "category": "Kafka",
+      "skill": "Kafka 消费积压治理",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Kafka 消费组突然积压严重，你如何判断是生产放大、消费者变慢、分区不足还是下游依赖阻塞？",
+      "keywords": [
+        "Kafka",
+        "消费积压",
+        "consumer lag",
+        "分区",
+        "下游阻塞"
+      ],
+      "expectedPoints": [
+        "先看 consumer lag、生产速率、消费速率、分区分布、rebalance 和错误率时间线",
+        "检查消费者处理耗时、批量大小、并发模型、提交 offset 时机和重复消费风险",
+        "判断下游 DB/Redis/HTTP 是否变慢，是否有重试放大或单条毒消息阻塞",
+        "评估分区数、消费者实例数、key 分布倾斜和热点分区",
+        "治理包括限流、扩容、拆分 topic/分区、跳过/隔离毒消息、批处理优化和补偿对账"
+      ],
+      "referenceAnswer": "Kafka lag 上升要先画时间线：生产速率是否突然增加，消费速率是否下降，是否发生 rebalance，错误率和下游延迟是否同步升高。如果生产放大但消费者正常，可以临时扩消费者，但扩容受分区数限制；如果只有某些分区 lag 高，要看 key 是否倾斜。消费者变慢要看单条处理耗时、批量参数、线程池、同步下游调用和重试。毒消息会导致同一 offset 反复失败，应该隔离到死信队列而不是阻塞整个分区。offset 提交要和业务处理一致，避免先提交后失败丢消息，或不提交导致无限重复。",
+      "excellentAnswer": "我的处理顺序是先防止积压继续扩大。先看 topic 级和 partition 级 lag、records-lag-max、records-consumed-rate、produce rate、rebalance 次数和 consumer error。若所有分区同步增长，可能是整体生产放大或下游慢；若单分区高，多半是 key 倾斜或毒消息。消费者内部要打点每阶段耗时：反序列化、业务校验、DB 写入、外部 HTTP、offset commit。下游慢时先限流生产或降级非核心消费，必要时扩消费者到分区上限。长期治理包括增加分区但评估 key 顺序语义，批量写入和异步化，下游连接池隔离，毒消息进入 DLQ 并带原始 payload 和错误原因。恢复后要控制追赶速度，避免把 DB 打爆，并用对账确认没有丢处理或重复副作用。",
+      "commonMistakes": [
+        "看到 lag 就盲目加消费者，但分区数不足或 key 倾斜时无效。",
+        "毒消息反复重试阻塞分区，没有死信队列。",
+        "offset 提交和业务处理不一致，造成丢消息或重复副作用。"
+      ],
+      "followUps": [
+        "为什么消费者数量超过分区数后不再提升吞吐？",
+        "如何处理必须保持同一订单顺序的消息？",
+        "积压追赶时如何避免下游二次雪崩？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "lag 时间线",
+          "生产/消费速率对比",
+          "分区和 key 倾斜",
+          "下游耗时定位",
+          "offset 和 DLQ 策略"
+        ],
+        "goodToHave": [
+          "partition 级指标",
+          "rebalance 分析",
+          "追赶限速",
+          "对账补偿"
+        ],
+        "redFlags": [
+          "只扩容消费者",
+          "忽略分区上限",
+          "无限重试毒消息",
+          "先提交 offset 再处理"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:47:27.872Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_k8s_001_pod频繁重启排查",
+      "category": "运维",
+      "skill": "Kubernetes Pod 重启排查",
+      "roles": [
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Kubernetes 中某服务 Pod 频繁重启，你如何区分 OOMKilled、探针失败、镜像问题和应用自身崩溃？",
+      "keywords": [
+        "Kubernetes",
+        "Pod 重启",
+        "OOMKilled",
+        "Probe",
+        "容器日志"
+      ],
+      "expectedPoints": [
+        "查看 pod describe、events、last state、exit code、restart count 和前一个容器日志",
+        "区分 OOMKilled、CrashLoopBackOff、ImagePullBackOff、探针失败和节点驱逐",
+        "检查 requests/limits、内存峰值、GC、启动耗时、健康检查路径和依赖可用性",
+        "分析发布变更、配置/Secret、镜像 tag、启动参数和节点资源压力",
+        "给出止血和治理：回滚、调资源、修探针、启动保护、限流、监控和 HPA/VPA 建议"
+      ],
+      "referenceAnswer": "我会先 kubectl describe pod 看 last state、reason、exit code 和 events，再 kubectl logs --previous 看上一次崩溃前日志。OOMKilled 通常 exit code 137，要结合容器内存 working set、limit、GC 和最近流量判断；探针失败会在 events 里看到 liveness/readiness probe failed，要检查探针路径是否依赖下游、timeout 是否太短、启动是否需要 startupProbe；ImagePullBackOff 是镜像拉取或权限问题；CrashLoopBackOff 则要看应用异常栈和配置。止血可以回滚版本、临时提高资源、关闭错误探针或摘流量，但长期要修内存泄漏、启动耗时和健康检查语义。",
+      "excellentAnswer": "我的排查不会只看当前日志，因为容器重启后现场会丢。第一步看 describe：Restart Count、Last State、Reason、Exit Code、Started/Finished 时间和 Events。第二步拉 previous logs，还原崩溃前异常。如果是 OOMKilled，看 limit 是否太低、内存是否持续增长、是否有大对象缓存或 GC 不及时；如果是 probe failed，要区分 readiness 和 liveness，liveness 不应该因为下游短暂失败就杀进程，启动慢应用应配置 startupProbe；如果是节点驱逐，看 node memory pressure 和 ephemeral storage。发布后突然出现则比对镜像、配置、Secret、环境变量和启动参数。修复后补 Pod 重启率、OOM 次数、探针失败率和启动耗时告警。",
+      "commonMistakes": [
+        "只看当前日志，不看 --previous 和 events。",
+        "把 readiness/liveness 混用，导致下游抖动时杀死健康进程。",
+        "只调大内存 limit，不分析内存增长和对象缓存。"
+      ],
+      "followUps": [
+        "startupProbe 和 livenessProbe 的区别是什么？",
+        "Exit Code 137 通常说明什么？还有哪些可能？",
+        "readiness 失败时服务流量会发生什么变化？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "describe/events",
+          "previous logs",
+          "OOM/probe/image/crash 区分",
+          "资源和配置检查",
+          "止血和监控治理"
+        ],
+        "goodToHave": [
+          "startupProbe",
+          "节点驱逐分析",
+          "发布变更对比",
+          "VPA/HPA 建议"
+        ],
+        "redFlags": [
+          "只重启 Pod",
+          "不看 previous 日志",
+          "探针依赖下游",
+          "无资源指标"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:47:27.872Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_network_001_tls握手耗时排查",
+      "category": "网络",
+      "skill": "TLS 握手耗时排查",
+      "roles": [
+        "ops",
+        "devops",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "接口总耗时升高但服务端业务耗时正常，你如何排查 DNS、TCP、TLS 握手和连接复用问题？",
+      "keywords": [
+        "网络",
+        "DNS",
+        "TCP",
+        "TLS",
+        "连接复用"
+      ],
+      "expectedPoints": [
+        "拆分客户端总耗时、DNS、TCP connect、TLS handshake、TTFB、服务端处理和下载时间",
+        "检查 DNS 解析延迟、解析结果漂移、跨地域调度和缓存 TTL",
+        "分析 TCP 重传、SYN backlog、连接数、TIME_WAIT、丢包和负载均衡链路",
+        "检查 TLS 证书链、协议版本、会话复用、OCSP、加密套件和网关 CPU",
+        "治理包括连接池/Keep-Alive、HTTP/2、DNS 缓存、就近接入、证书优化和链路监控"
+      ],
+      "referenceAnswer": "服务端业务耗时正常时，要把端到端耗时拆开。客户端或网关日志应记录 DNS、TCP connect、TLS handshake、request sent、TTFB 和 response download。DNS 慢可能是解析器、跨地域调度或 TTL 问题；TCP 慢要看丢包、重传、SYN backlog、负载均衡和连接数；TLS 慢要看证书链、协议版本、会话复用、OCSP 和网关 CPU。连接没有复用会让每次请求都付 DNS/TCP/TLS 成本，移动端弱网尤其明显。治理上启用 Keep-Alive、合理连接池、HTTP/2、多地域就近接入、证书链精简和 TLS session resumption，并用分段指标持续监控。",
+      "excellentAnswer": "我的排查会从客户端 waterfall 或网关 timing 开始，而不是只看应用日志。先确认 total time 高在哪一段：DNS 高查解析耗时、是否频繁不缓存、是否解析到远端 IP；connect 高查 TCP 三次握手、丢包重传、SYN backlog、LB 健康和跨运营商链路；TLS 高查证书链是否过长、是否每次全握手、OCSP 是否阻塞、TLS 版本和网关 CPU；TTFB 高才回到服务端排队或业务。连接复用是重点，如果客户端没有 keep-alive 或连接池配置太小，会在并发下频繁建连。修复后用 curl timing、APM span、LB 指标和抓包验证各阶段耗时下降，而不是只看平均 RT。",
+      "commonMistakes": [
+        "只看服务端接口耗时，忽略客户端建连和 TLS 成本。",
+        "没有分段 timing，DNS/TCP/TLS 问题混在总耗时里。",
+        "禁用 Keep-Alive 或连接池过小，导致频繁握手。"
+      ],
+      "followUps": [
+        "curl 如何输出 DNS、connect、TLS 和 TTFB 分段耗时？",
+        "TLS session resumption 为什么能降低延迟？",
+        "TIME_WAIT 很多一定是问题吗？怎么判断？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "端到端分段耗时",
+          "DNS 排查",
+          "TCP 重传/连接分析",
+          "TLS 握手分析",
+          "连接复用治理"
+        ],
+        "goodToHave": [
+          "curl timing",
+          "抓包",
+          "HTTP/2",
+          "OCSP/证书链优化"
+        ],
+        "redFlags": [
+          "只看服务端日志",
+          "没有分段指标",
+          "忽略连接池",
+          "把 TIME_WAIT 一概当故障"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:47:27.872Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_dba_001_备份恢复演练",
+      "category": "运维",
+      "skill": "数据库备份恢复演练",
+      "roles": [
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "公司要求验证 MySQL 备份是否真的可恢复，你如何设计备份、恢复演练和 RPO/RTO 验收？",
+      "keywords": [
+        "DBA",
+        "MySQL",
+        "备份恢复",
+        "RPO",
+        "RTO"
+      ],
+      "expectedPoints": [
+        "明确全量、增量、binlog、逻辑备份和物理备份的组合及保留策略",
+        "定义 RPO/RTO、恢复目标时间点、数据校验方式和业务验收标准",
+        "在隔离环境定期演练恢复，校验表结构、行数、校验和、关键业务查询和权限",
+        "覆盖备份加密、异地存储、权限隔离、备份失败告警和恢复脚本版本化",
+        "输出演练报告：耗时、失败点、数据差异、改进项和下次演练计划"
+      ],
+      "referenceAnswer": "验证备份可恢复不能只看备份任务成功。先定义业务 RPO 和 RTO，例如最多丢 5 分钟数据、2 小时内恢复核心库。备份策略通常是定期全量加 binlog 增量，关键库要异地保存并加密。恢复演练要在隔离环境按指定时间点恢复，校验库表结构、行数、checksum、关键订单/账户查询和应用只读验证。还要检查备份文件权限、过期策略、备份失败告警和恢复脚本是否可重复执行。演练报告要记录恢复耗时、binlog 应用位置、数据差异和失败步骤，下一次改进要进入运维任务。",
+      "excellentAnswer": "我会把备份恢复当成生产能力验收，而不是一次命令演示。先和业务确认 RPO/RTO，再反推备份频率、binlog 保留、跨机房存储和恢复资源。每月至少抽一个库做隔离恢复：拉取最近全量备份，应用 binlog 到指定时间点，恢复后跑自动校验，包括表数量、行数、checksum、关键 SQL、账户余额或订单金额抽样。备份文件要加密，恢复权限和生产写权限隔离，防止演练误连生产。还要模拟备份损坏、binlog 缺失、权限不足和磁盘空间不足。最终用演练报告证明在 RTO 内恢复，RPO 内数据缺口可接受，并把恢复步骤脚本化和版本化。",
+      "commonMistakes": [
+        "只监控备份任务成功，不做恢复演练。",
+        "没有 RPO/RTO，无法判断备份策略是否满足业务。",
+        "恢复演练连接或覆盖生产环境，风险极高。"
+      ],
+      "followUps": [
+        "逻辑备份和物理备份各有什么优缺点？",
+        "如何恢复到误删表之前的某个时间点？",
+        "备份文件加密后密钥如何管理？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "备份策略组合",
+          "RPO/RTO 定义",
+          "隔离恢复演练",
+          "数据校验",
+          "演练报告和改进"
+        ],
+        "goodToHave": [
+          "binlog 时间点恢复",
+          "异地加密",
+          "脚本版本化",
+          "故障场景演练"
+        ],
+        "redFlags": [
+          "只看备份成功",
+          "不做恢复",
+          "无 RPO/RTO",
+          "演练误连生产"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:52:27.918Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_sre_001_trace告警降噪",
+      "category": "DevOps",
+      "skill": "可观测性与告警降噪",
+      "roles": [
+        "devops",
+        "ops",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "微服务告警很多但定位很慢，你如何设计指标、日志、Trace 和告警降噪体系？",
+      "keywords": [
+        "SRE",
+        "可观测性",
+        "Trace",
+        "告警降噪",
+        "SLO"
+      ],
+      "expectedPoints": [
+        "按用户体验定义 SLI/SLO，例如成功率、延迟、错误率和核心业务转化",
+        "统一 TraceId、结构化日志、指标标签和服务拓扑，支持从告警跳到链路和日志",
+        "区分症状告警和原因告警，优先对用户影响告警，减少低价值资源噪声",
+        "设置告警聚合、抑制、依赖关联、变更关联和值班升级策略",
+        "通过 MTTA、MTTR、告警命中率、误报率和漏报复盘持续优化"
+      ],
+      "referenceAnswer": "告警多但定位慢，通常是告警围绕机器资源而不是用户影响。体系设计要先定义 SLI/SLO，例如核心接口成功率、P99、订单创建成功率，再让告警从这些症状指标触发。日志要结构化并带 traceId、userId 或 orderId，指标标签要控制基数，Trace 要覆盖入口、RPC、DB、缓存和 MQ。告警要聚合和抑制，比如下游数据库故障时不要让所有上游服务同时轰炸。还要把发布变更、配置变更和告警时间线关联。效果用 MTTA、MTTR、误报率、告警确认率和复盘改进项衡量。",
+      "excellentAnswer": "我会把可观测性设计成“发现影响、定位路径、复盘改进”三层。发现影响靠 SLO 告警，比如支付成功率下降、P99 超阈值、错误预算消耗过快；资源 CPU、内存只作为辅助原因告警。定位路径要求一次请求从网关到服务、DB、Redis、MQ 都有 traceId，日志结构化，错误码统一，Trace span 记录下游耗时和异常。告警降噪上做服务依赖拓扑，如果根因服务已经告警，上游只聚合成一个影响范围；发布窗口内自动关联最近变更。值班策略要有严重级别、升级路径和 runbook。每次事故复盘时看这次告警是否及时、是否准确、是否可操作，并更新阈值、仪表盘和 runbook。",
+      "commonMistakes": [
+        "把 CPU、内存告警当核心告警，用户已经受影响才发现。",
+        "日志没有 traceId，指标、日志、Trace 无法互相跳转。",
+        "没有告警抑制和依赖关联，下游故障触发告警风暴。"
+      ],
+      "followUps": [
+        "高基数标签会带来什么问题？",
+        "症状告警和原因告警怎么配合？",
+        "如何衡量告警是否需要删除或降级？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "SLI/SLO",
+          "TraceId 贯通",
+          "结构化日志和指标",
+          "告警聚合抑制",
+          "MTTA/MTTR 复盘"
+        ],
+        "goodToHave": [
+          "错误预算",
+          "变更关联",
+          "服务拓扑",
+          "runbook"
+        ],
+        "redFlags": [
+          "只堆监控工具",
+          "无用户影响指标",
+          "无 traceId",
+          "告警不分级"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:52:27.918Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_perf_001_容量压测方案",
+      "category": "测试",
+      "skill": "容量压测与瓶颈分析",
+      "roles": [
+        "qa",
+        "devops",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "大促前要评估下单链路容量，你如何设计压测模型、监控指标和瓶颈定位流程？",
+      "keywords": [
+        "性能测试",
+        "容量评估",
+        "压测模型",
+        "瓶颈定位",
+        "大促"
+      ],
+      "expectedPoints": [
+        "基于业务峰值、转化漏斗、读写比例、商品热点和支付回调估算压测模型",
+        "区分单接口压测、链路压测、稳定性压测、限流降级演练和全链路影子压测",
+        "监控应用、DB、Redis、MQ、网关、机器资源和业务成功率/P99/错误率",
+        "瓶颈定位按网关、应用线程池、连接池、慢 SQL、缓存、MQ 和下游依赖逐层收敛",
+        "输出容量水位、扩容建议、降级预案、风险清单和复测结果"
+      ],
+      "referenceAnswer": "下单链路压测不能只压一个创建订单接口。先根据大促预估 UV、转化率、峰值系数、读写比例、热点商品和支付回调量建立流量模型，再拆成浏览、加购、试算、下单、支付回调、库存扣减和消息消费。监控要覆盖业务成功率、P95/P99、错误码、网关、应用线程池、连接池、DB QPS/锁等待、Redis 命中率、MQ lag 和机器资源。瓶颈定位按链路逐层看：网关限流、应用线程池、数据库慢 SQL、库存热点、缓存击穿、MQ 积压和下游支付。结果要给出最大安全 QPS、资源水位、扩容方案和降级开关。",
+      "excellentAnswer": "我会先和业务确认目标：不是测系统能不能跑，而是证明大促峰值下核心交易成功率和 P99 达标。压测模型用历史流量加峰值放大，包含热点商品集中访问、优惠试算、重复提交、支付回调延迟和取消退款等真实比例。环境上优先做全链路影子压测，数据隔离，避免污染生产订单。压测过程中实时看漏斗：请求进入、订单创建、库存扣减、支付回调、消息消费和对账，每一层都有成功率和延迟。瓶颈出现时先保现场，不要同时改多个参数；例如 DB CPU 高要看慢 SQL 和锁，MQ lag 高要看消费耗时和下游。压测报告要包含容量上限、瓶颈点、扩容成本、降级策略、复测对比和仍然未覆盖的风险。",
+      "commonMistakes": [
+        "只压单接口，不模拟真实业务漏斗和热点商品。",
+        "只看平均响应时间，不看 P99、错误率和业务成功率。",
+        "压测数据污染生产或没有隔离影子流量。"
+      ],
+      "followUps": [
+        "全链路压测如何避免真实扣库存和扣款？",
+        "压测时发现 P99 抖动但平均值正常，你怎么定位？",
+        "如何设计降级开关的压测验证？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "业务流量模型",
+          "链路压测类型",
+          "全链路指标",
+          "逐层瓶颈定位",
+          "容量报告和降级预案"
+        ],
+        "goodToHave": [
+          "影子压测",
+          "热点商品模型",
+          "漏斗成功率",
+          "复测对比"
+        ],
+        "redFlags": [
+          "只压单接口",
+          "只看平均值",
+          "无数据隔离",
+          "没有业务指标"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:52:27.918Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_mlops_001_模型漂移监控",
+      "category": "AI",
+      "skill": "MLOps 模型漂移监控",
+      "roles": [
+        "ai",
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "线上推荐模型点击率持续下降，你如何判断是数据漂移、特征异常、模型退化还是业务环境变化？",
+      "keywords": [
+        "MLOps",
+        "模型漂移",
+        "特征监控",
+        "推荐系统",
+        "A/B 实验"
+      ],
+      "expectedPoints": [
+        "区分业务指标下降、样本分布漂移、特征质量异常、训练/推理不一致和模型本身退化",
+        "监控特征缺失率、分布 PSI/KS、取值范围、延迟、训练线上一致性和数据新鲜度",
+        "检查召回、排序、过滤、曝光、点击、转化漏斗和实验分桶是否异常",
+        "通过离线评估、回放、A/B 实验、灰度回滚和基线模型对比定位",
+        "治理包括数据质量门禁、特征版本、模型注册、自动告警、回滚和再训练策略"
+      ],
+      "referenceAnswer": "点击率下降不一定是模型退化。先看是否全量下降还是某些流量、渠道、用户群下降，再检查推荐漏斗：召回量、排序分数、过滤数量、曝光、点击和转化。数据侧要看特征缺失率、分布漂移 PSI/KS、枚举值异常、实时特征延迟和训练/推理特征是否一致。模型侧比较当前模型、上一个模型和简单基线的离线指标，再做线上 A/B 或灰度回滚验证。业务环境也可能变化，例如活动结束、流量结构变化、埋点改版或页面位置调整。治理上要有特征监控、数据质量门禁、模型版本和快速回滚。",
+      "excellentAnswer": "我的排查会先保护线上效果。如果 CTR 连续低于阈值，先按预案切一部分流量回上一个稳定模型或规则兜底，同时保留实验对照。定位时按漏斗拆：请求量是否变了，召回候选数是否下降，排序分数分布是否偏移，过滤规则是否误杀，曝光埋点和点击埋点是否变更。特征层看缺失率、默认值占比、实时特征延迟、类别特征新值比例、数值特征 PSI，以及训练和线上特征计算代码是否同版本。模型层做离线回放和基线对比，如果离线好线上差，要怀疑分桶、埋点或推理特征；如果离线也差，考虑数据漂移和再训练。长期要把特征质量、模型指标和业务指标接入 MLOps 门禁，模型注册、灰度、回滚和再训练都有记录。",
+      "commonMistakes": [
+        "看到 CTR 下降就直接重训模型，不查埋点、流量和特征质量。",
+        "只看整体指标，忽略人群、渠道、实验桶和漏斗分层。",
+        "没有稳定基线和回滚机制，无法判断当前模型是否真的变差。"
+      ],
+      "followUps": [
+        "PSI 指标能说明什么？有什么局限？",
+        "训练/推理特征不一致通常怎么发现？",
+        "如果离线 AUC 提升但线上 CTR 下降，你会怀疑什么？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "漏斗拆解",
+          "特征质量监控",
+          "漂移指标",
+          "A/B 和回滚",
+          "MLOps 治理"
+        ],
+        "goodToHave": [
+          "基线模型对比",
+          "离线回放",
+          "实验分桶检查",
+          "再训练策略"
+        ],
+        "redFlags": [
+          "直接重训",
+          "只看整体 CTR",
+          "无特征监控",
+          "无回滚"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:52:27.918Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_manager_001_事故复盘推动",
+      "category": "系统设计",
+      "skill": "技术管理事故复盘",
+      "roles": [
+        "architect"
+      ],
+      "levels": [
+        "senior"
+      ],
+      "type": "project",
+      "difficulty": 3,
+      "question": "讲一次你负责推动的线上事故复盘，你如何避免复盘变成追责，并确保改进项真的落地？",
+      "keywords": [
+        "技术管理",
+        "事故复盘",
+        "改进落地",
+        "SLA",
+        "组织协作"
+      ],
+      "expectedPoints": [
+        "说明事故背景、影响范围、时间线、检测发现、止血恢复和用户/业务损失",
+        "复盘聚焦系统性原因：监控缺失、发布流程、容量、架构单点、权限或协作断点",
+        "避免追责个人，使用事实时间线和 5 Whys/RCA 找到可改进机制",
+        "改进项要有 Owner、优先级、截止时间、验收指标和跟踪机制",
+        "用后续演练、告警提前量、MTTR、故障重复率和流程变更证明复盘有效"
+      ],
+      "referenceAnswer": "事故复盘首先要还原事实：从首次异常、告警、人工发现、止血、恢复到影响结束的时间线，量化影响用户、订单、金额或 SLA。复盘不能停在某个人操作失误，要继续问为什么流程允许这个操作造成事故，例如发布门禁缺失、监控没覆盖、回滚不可用、权限过大或容量评估不足。会议上避免定性指责，所有结论都要有日志、监控、变更记录支撑。改进项必须有 Owner、截止时间和验收标准，比如新增灰度门禁、补告警、回滚演练或权限收敛。后续要跟踪关闭，并在月度事故会上检查同类问题是否复发。",
+      "excellentAnswer": "我会把复盘目标定义为降低同类事故复发概率，而不是找一个背锅人。会前先收集证据：监控曲线、日志、发布记录、聊天记录、用户影响和处理时间线，会议中先对齐事实，再做 RCA。比如事故表面是工程师发错配置，深层原因可能是配置无校验、无灰度、权限过宽、回滚脚本不可用和告警晚于用户反馈。改进项分立即、短期、长期：立即补监控和回滚脚本，短期加配置校验和审批，长期建设配置平台和演练机制。每个动作有 Owner、截止日期、验收指标，比如告警提前 5 分钟发现、回滚 10 分钟内完成。复盘结论要公开透明但避免羞辱个人，管理者要保护讲真话的环境。",
+      "commonMistakes": [
+        "复盘只写人为失误，没有追到流程和系统机制。",
+        "改进项没有 Owner、截止时间和验收标准，最后不了了之。",
+        "只复盘技术原因，忽略沟通、权限、发布和应急协作问题。"
+      ],
+      "followUps": [
+        "如果事故确实由明显违规操作导致，如何既追责又保持复盘文化？",
+        "复盘改进项太多时如何排序？",
+        "如何证明复盘机制本身有效？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "事实时间线",
+          "影响量化",
+          "RCA 系统原因",
+          "Owner 和验收指标",
+          "持续跟踪"
+        ],
+        "goodToHave": [
+          "5 Whys",
+          "无责复盘文化",
+          "事故指标趋势",
+          "演练机制"
+        ],
+        "redFlags": [
+          "只追责个人",
+          "无数据证据",
+          "改进项无负责人",
+          "同类事故反复发生"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:52:27.918Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_security_002_供应链依赖治理",
+      "category": "安全",
+      "skill": "软件供应链安全治理",
+      "roles": [
+        "security",
+        "devops"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "生产依赖被曝高危漏洞，你如何评估影响、修复升级并建立软件供应链安全治理？",
+      "keywords": [
+        "安全",
+        "供应链",
+        "依赖漏洞",
+        "SBOM",
+        "签名"
+      ],
+      "expectedPoints": [
+        "识别受影响依赖、版本、调用路径、暴露面、漏洞利用条件和业务影响范围",
+        "结合 CVSS、EPSS、PoC、是否公网暴露和数据敏感度确定修复优先级",
+        "修复包括升级、替换、临时禁用风险功能、WAF/网关缓解和回归测试",
+        "治理要有 SBOM、依赖扫描、制品签名、私有仓库准入、许可证和安全基线",
+        "通过漏洞修复 SLA、扫描覆盖率、阻断次数和复发率评估安全治理效果"
+      ],
+      "referenceAnswer": "我会先确认漏洞是否真的影响我们，而不是看到公告就全量停发。排查维度包括依赖名称和版本、是否被打进运行镜像、是否在可达调用路径上、服务是否公网暴露、是否处理敏感数据以及是否已有 PoC。优先级不能只看 CVSS，还要结合利用难度、资产重要性和暴露面。修复上优先升级到安全版本，升级风险大时用网关规则、关闭危险功能或隔离访问做临时缓解，同时补回归测试。长期治理要生成 SBOM，CI 中做依赖漏洞扫描、许可证检查、镜像扫描和制品签名，生产只允许可信制品发布。",
+      "excellentAnswer": "我会把这类事件按应急和治理两条线推进。应急阶段先从制品仓库、镜像仓库和 SBOM 查哪些服务包含漏洞依赖，再用运行时流量和代码搜索判断是否可达。如果是公网可利用的 RCE，先通过 WAF、网关、ACL 或关闭入口降风险，再安排升级；如果只是测试依赖或不可达路径，可以降低优先级但仍记录。升级时要看破坏性变更，跑单元、集成、冒烟和安全复测，必要时灰度发布。治理阶段要求所有项目提交依赖清单，CI 阻断高危漏洞，基础镜像定期重建，制品签名防止被篡改，私有仓库禁止未知来源包。指标上看高危漏洞平均修复时间、超 SLA 数、扫描覆盖率和重复引入次数。",
+      "commonMistakes": [
+        "只看 CVSS 分数，不判断依赖是否可达和是否暴露。",
+        "直接升级依赖但不做兼容回归，修安全引入业务事故。",
+        "没有 SBOM 和制品签名，无法快速定位受影响服务。"
+      ],
+      "followUps": [
+        "SBOM 在漏洞应急中具体解决什么问题？",
+        "如果高危漏洞短期无法升级，你有哪些临时缓解手段？",
+        "如何防止开发绕过依赖扫描门禁？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "影响范围识别",
+          "漏洞优先级评估",
+          "升级和临时缓解",
+          "SBOM/依赖扫描",
+          "制品可信治理"
+        ],
+        "goodToHave": [
+          "EPSS/PoC 判断",
+          "制品签名",
+          "私有仓库准入",
+          "修复 SLA 指标"
+        ],
+        "redFlags": [
+          "只看 CVSS",
+          "无回归测试",
+          "无依赖清单",
+          "允许未知制品上线"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:59:58.537Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_data_002_flink实时延迟治理",
+      "category": "数据",
+      "skill": "Flink 实时链路延迟治理",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Flink 实时指标延迟突然从秒级变成分钟级，你如何定位是数据源、反压、状态还是下游写入导致？",
+      "keywords": [
+        "数据",
+        "Flink",
+        "反压",
+        "checkpoint",
+        "实时指标"
+      ],
+      "expectedPoints": [
+        "先看 Kafka lag、source 读取速率、算子吞吐、watermark、checkpoint 和端到端延迟",
+        "用 Flink Web UI 定位反压算子，区分 CPU、序列化、状态访问、窗口聚合和网络 shuffle",
+        "检查 state backend、RocksDB、checkpoint 大小/耗时、状态膨胀和 key 倾斜",
+        "检查下游 sink 写入 DB/ClickHouse/ES 的批量、连接池、失败重试和限流",
+        "治理包括扩并行度、处理 key 倾斜、优化状态 TTL、异步 IO、批量写入和降级补数"
+      ],
+      "referenceAnswer": "实时延迟变高要先拆链路。Kafka lag 增长说明 source 或下游处理跟不上；Flink Web UI 的 backpressure 能看到哪个算子阻塞。若某个 key 分区特别慢，要怀疑 key 倾斜；若 checkpoint 耗时变长或失败，要看状态大小、RocksDB IO 和网络；若 sink 慢，则下游 DB 或 ES 写入可能成为瓶颈。还要看 watermark 是否不推进，可能是乱序、空闲分区或事件时间问题。治理上可以增加并行度、优化窗口和状态 TTL、对热点 key 打散、sink 批量写入或异步 IO，并为延迟期间的数据设计补数和对账。",
+      "excellentAnswer": "我会先看端到端延迟是从 source 开始积压，还是某个算子之后才变慢。指标上拉 Kafka lag、records in/out、busy time、backpressure、watermark、checkpoint duration/size、RocksDB read/write 和 sink 失败率。如果 source 正常但某个窗口算子 backpressure 高，可能是 key 倾斜或状态访问慢，可以看 subtask 数据分布和热点 key；如果 checkpoint 从几十秒涨到几分钟，可能是状态膨胀或存储 IO 问题，需要清理 TTL、拆状态或优化 RocksDB；如果 sink 重试多，则要看下游限流和批量参数。修复不能只加并行度，因为 keyBy 后单 key 仍在一个 subtask。上线后用延迟分位、lag、checkpoint 成功率和指标准确性验证，并准备离线补数修复延迟期间的结果。",
+      "commonMistakes": [
+        "只看 Kafka lag，不看 Flink 算子反压和 checkpoint。",
+        "遇到延迟就盲目加并行度，忽略 key 倾斜。",
+        "只追求实时恢复，不设计补数和指标一致性校验。"
+      ],
+      "followUps": [
+        "watermark 不推进会造成什么现象？",
+        "key 倾斜在 Flink 中有哪些治理方式？",
+        "checkpoint 变慢和状态膨胀有什么关系？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "Kafka lag",
+          "反压定位",
+          "checkpoint/状态分析",
+          "sink 下游排查",
+          "补数和验证"
+        ],
+        "goodToHave": [
+          "watermark",
+          "RocksDB 指标",
+          "key 倾斜治理",
+          "异步 IO"
+        ],
+        "redFlags": [
+          "只加并行度",
+          "不看 checkpoint",
+          "忽略下游 sink",
+          "无补数方案"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:59:58.537Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_frontend_002_微前端治理",
+      "category": "前端",
+      "skill": "微前端治理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "多个团队共建中后台时，你如何设计微前端的路由、样式隔离、依赖共享和发布回滚机制？",
+      "keywords": [
+        "前端",
+        "微前端",
+        "路由",
+        "样式隔离",
+        "发布回滚"
+      ],
+      "expectedPoints": [
+        "说明为什么需要微前端：团队边界、独立发布、遗留系统整合和复杂中后台治理",
+        "设计主应用和子应用路由注册、权限、菜单、登录态和全局状态通信边界",
+        "处理样式隔离、JS 沙箱、依赖共享、公共组件版本和构建产物加载策略",
+        "发布要支持子应用独立灰度、版本锁定、回滚、健康检查和加载失败降级",
+        "用白屏率、加载耗时、子应用错误率、发布失败率和跨团队交付效率评估效果"
+      ],
+      "referenceAnswer": "微前端适合多个团队独立交付且业务边界清晰的中后台，但会引入运行时复杂度。设计上主应用负责登录、权限、菜单、基础布局和路由分发，子应用负责各自业务页面。路由要有统一注册和权限校验，样式要做命名空间、CSS Modules 或 Shadow DOM 隔离，JS 需要沙箱避免全局污染。依赖共享要控制版本，React/Vue 等核心库不能随意多版本冲突。发布上每个子应用有独立版本、灰度和回滚，加载失败时主应用要能展示降级页而不是整站白屏。",
+      "excellentAnswer": "我会先确认是否真的需要微前端。如果只是组件复用，设计系统或 monorepo 可能更简单。确定采用后，主应用只承载跨团队公共能力：认证、权限、菜单、路由容器、埋点和错误边界；子应用按业务域拆分，不能共享过多内部状态。技术上要处理四类隔离：路由前缀避免冲突，样式用作用域或 Shadow DOM，JS 沙箱隔离 window 污染，依赖共享通过 import map 或 federation 控制版本。发布时子应用 manifest 版本化，支持按用户或租户灰度，加载失败走降级，主应用监控每个子应用白屏、资源 404 和运行时错误。治理上还要有公共组件兼容策略和跨团队接口契约，否则微前端会变成分布式前端泥球。",
+      "commonMistakes": [
+        "为了流行而上微前端，业务和团队边界并不清晰。",
+        "只拆构建仓库，不治理样式、全局变量和依赖版本冲突。",
+        "子应用加载失败导致整个主应用白屏，没有降级和回滚。"
+      ],
+      "followUps": [
+        "微前端和 monorepo 分别适合什么场景？",
+        "多个子应用依赖不同 React 版本时怎么处理？",
+        "如何监控某个子应用导致的白屏？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "团队边界判断",
+          "主子应用路由权限",
+          "样式/JS 隔离",
+          "依赖共享",
+          "独立发布回滚"
+        ],
+        "goodToHave": [
+          "manifest 版本化",
+          "错误边界",
+          "import map/federation",
+          "白屏监控"
+        ],
+        "redFlags": [
+          "盲目微前端",
+          "无隔离机制",
+          "依赖版本失控",
+          "加载失败无降级"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:59:58.537Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_ops_002_云成本治理",
+      "category": "运维",
+      "skill": "云成本容量治理",
+      "roles": [
+        "ops",
+        "devops",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "云资源账单连续三个月上涨但业务流量没有同步增长，你如何定位成本来源并建立容量治理机制？",
+      "keywords": [
+        "运维",
+        "云成本",
+        "容量",
+        "监控",
+        "资源治理"
+      ],
+      "expectedPoints": [
+        "按账号、项目、服务、环境、标签、地域和资源类型拆分账单与用量趋势",
+        "识别闲置实例、低利用率 CPU/内存、未释放磁盘、NAT/公网流量、日志存储和快照成本",
+        "建立资源标签、预算告警、成本 Owner、配额审批、生命周期和自动回收机制",
+        "结合容量水位、SLO、峰谷流量、弹性伸缩、预留实例和竞价实例做优化",
+        "用单位业务成本、资源利用率、预算偏差和节省金额验证治理效果"
+      ],
+      "referenceAnswer": "云成本治理要先把账单拆细，不能只看总额。按项目、环境、服务、地域和资源类型看趋势，结合标签找到 Owner。常见浪费包括测试环境常开、低利用率实例、未释放磁盘和快照、NAT 网关和跨区流量、日志保存过久、对象存储生命周期缺失。治理上要求所有资源有标签和负责人，预算超阈值告警，临时资源到期自动回收。优化不能只砍机器，要结合 CPU/内存水位、SLO 和峰谷流量，使用弹性伸缩、预留实例、竞价实例、日志分层存储和容量压测结果。",
+      "excellentAnswer": "我会把成本上涨拆成价格、用量和浪费三类。先拉账单明细，按服务、环境、团队、标签和地域做同比环比，找到增长最大的资源类型。然后对计算、存储、网络、日志分别排查：计算看 CPU/内存利用率和副本冗余；存储看 unattached disk、快照和对象生命周期；网络看 NAT、跨 AZ/跨地域流量和公网出口；日志看采集量、索引字段和保留周期。治理机制上资源必须带 owner、cost-center、env 标签，预算告警到团队，测试环境定时关停，闲置资源自动回收。优化建议要带风险，例如缩容是否影响 SLO，预留实例是否锁定长期需求。最终看单位订单成本、资源利用率和预算偏差是否改善。",
+      "commonMistakes": [
+        "只要求团队少用机器，没有账单拆分和 Owner。",
+        "只看计算实例，忽略 NAT 流量、日志、快照和对象存储。",
+        "盲目缩容导致 SLO 或发布稳定性受损。"
+      ],
+      "followUps": [
+        "云上 NAT 网关为什么可能成为大额成本来源？",
+        "如何设计资源标签规范？",
+        "预留实例和竞价实例适合哪些工作负载？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "账单拆分",
+          "资源利用率",
+          "闲置资源识别",
+          "标签和预算告警",
+          "容量/SLO 取舍"
+        ],
+        "goodToHave": [
+          "单位业务成本",
+          "生命周期策略",
+          "弹性伸缩",
+          "预留/竞价实例"
+        ],
+        "redFlags": [
+          "只砍机器",
+          "无标签 Owner",
+          "忽略网络日志成本",
+          "不看 SLO"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:59:58.537Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_llmops_001_提示词回归评测",
+      "category": "AI",
+      "skill": "LLMOps 提示词回归评测",
+      "roles": [
+        "ai"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "大模型应用修改提示词后线上投诉增加，你如何建立提示词回归评测、灰度和回滚机制？",
+      "keywords": [
+        "AI",
+        "LLMOps",
+        "提示词",
+        "评估",
+        "灰度"
+      ],
+      "expectedPoints": [
+        "建立覆盖高频、长尾、对抗、无答案和敏感场景的评测集，并保留期望行为",
+        "评估指标包含准确性、引用一致性、拒答率、幻觉率、安全违规、格式稳定和成本/延迟",
+        "提示词、模型、检索配置、工具调用和安全策略都要版本化并可回滚",
+        "上线采用离线评测、人工抽检、灰度实验、线上反馈和自动告警闭环",
+        "对失败样本做归因：检索缺失、提示词约束弱、模型漂移、工具失败或安全策略冲突"
+      ],
+      "referenceAnswer": "提示词修改不能直接全量上线。首先要有评测集，覆盖高频问题、边界问题、无答案问题、敏感问题和历史投诉样本，每条样本记录期望答案、必须引用的资料或应该拒答的原因。指标不能只看人工感觉，要看准确率、幻觉率、引用准确率、拒答率、格式合规、工具调用成功率、延迟和成本。提示词、模型版本、RAG 检索参数和安全策略都要版本化。上线前离线评测和人工抽检通过后灰度，线上监控投诉率、低分反馈、转人工率和安全拦截。异常时能一键回滚提示词版本。",
+      "excellentAnswer": "我会把提示词当成可发布的工程制品管理。每次修改都关联变更说明和评测结果，先跑固定回归集：高频用户问题、长尾问题、对抗注入、无答案拒答、敏感合规、格式输出和工具调用。自动评估可以用规则、语义相似度和 LLM-as-judge，但关键业务样本必须人工抽检。灰度时按用户或场景小流量放量，对比旧版本的解决率、投诉率、引用命中、幻觉、延迟和 token 成本。如果新提示词在某类问题上退化，要归因是检索没召回、上下文太长、约束不清、工具调用失败还是安全策略过严。所有提示词、模型、retriever、reranker 和工具 schema 都要版本化，异常时回滚整套配置而不是只改一句话。",
+      "commonMistakes": [
+        "把提示词当文案，修改后不做回归评测直接上线。",
+        "只看少量人工样例，缺少历史投诉和对抗样本。",
+        "只回滚提示词，不回滚相关模型、检索和工具配置。"
+      ],
+      "followUps": [
+        "LLM-as-judge 有哪些风险？如何校准？",
+        "无答案拒答样本为什么重要？",
+        "提示词灰度应该观察哪些线上指标？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "评测集",
+          "准确/幻觉/安全指标",
+          "版本化",
+          "灰度回滚",
+          "失败归因"
+        ],
+        "goodToHave": [
+          "历史投诉样本",
+          "LLM-as-judge 校准",
+          "工具 schema 版本",
+          "token 成本"
+        ],
+        "redFlags": [
+          "直接全量上线",
+          "无评测集",
+          "只看主观感觉",
+          "不能回滚配置"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T02:59:58.537Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_architect_002_业务连续性演练",
+      "category": "系统设计",
+      "skill": "业务连续性与容灾演练",
+      "roles": [
+        "architect",
+        "ops",
+        "devops"
+      ],
+      "levels": [
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "核心交易系统要做业务连续性演练，你如何设计故障场景、RTO/RPO、降级和恢复验收？",
+      "keywords": [
+        "架构",
+        "系统",
+        "可用性",
+        "RTO",
+        "RPO",
+        "降级"
+      ],
+      "expectedPoints": [
+        "按业务链路定义核心能力、依赖服务、单点风险、RTO、RPO 和演练边界",
+        "设计机房故障、数据库主从切换、缓存不可用、MQ 积压、支付依赖超时等故障场景",
+        "明确降级策略：只读、限流、熔断、关闭非核心功能、排队和人工补偿",
+        "恢复验收覆盖数据一致性、订单状态、支付回调、库存补偿、对账和用户影响",
+        "演练后输出时间线、指标、失败点、责任 Owner 和下一次改进计划"
+      ],
+      "referenceAnswer": "业务连续性演练要先从业务目标反推技术方案。核心交易系统需要明确哪些能力必须保，例如下单、支付回调、库存扣减和订单查询，分别能接受多长恢复时间和多少数据丢失。演练场景不能只停一台机器，要覆盖机房不可用、数据库主从切换、Redis 故障、MQ 积压、下游支付超时和配置中心异常。演练中要验证限流、熔断、只读、排队、关闭优惠等降级是否能保护核心链路。恢复后必须对账订单、支付、库存和消息，确认没有重复扣款、漏发货或状态卡死。",
+      "excellentAnswer": "我会先定义演练成功标准，而不是直接制造故障。比如核心下单 RTO 15 分钟，支付回调 RPO 接近 0，订单查询可以降级读缓存。场景设计按依赖图来：入口网关、应用集群、数据库、Redis、MQ、支付和配置中心逐个注入故障，并提前准备停止条件，避免演练变真事故。演练时记录从告警触发、值班响应、决策、切流、降级、恢复到对账完成的完整时间线。降级策略要有开关和权限，例如关闭营销计算、限制非核心查询、支付回调进入补偿队列。验收不只看服务恢复，还要看订单金额、库存、支付流水和消息消费是否一致。最后把失败点变成 runbook、自动化脚本和下一次演练目标。",
+      "commonMistakes": [
+        "只做技术组件切换，不定义业务 RTO/RPO 和用户影响。",
+        "只演练恢复服务，不做订单、支付、库存和消息对账。",
+        "没有停止条件和回滚方案，演练风险不可控。"
+      ],
+      "followUps": [
+        "RTO 和 RPO 冲突时你如何和业务做取舍？",
+        "演练中发现降级开关不可用，你如何止血？",
+        "如何避免演练结论停留在文档里？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "RTO/RPO",
+          "故障场景",
+          "降级策略",
+          "恢复对账",
+          "演练复盘"
+        ],
+        "goodToHave": [
+          "依赖图",
+          "停止条件",
+          "runbook",
+          "自动化切换"
+        ],
+        "redFlags": [
+          "只重启服务",
+          "无业务验收",
+          "无回滚",
+          "不对账"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:14:58.166Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_security_003_多租户权限治理",
+      "category": "安全",
+      "skill": "多租户权限与数据隔离",
+      "roles": [
+        "security",
+        "architect",
+        "backend"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "SaaS 系统发现租户间数据可能串读，你如何验证、修复并治理多租户权限隔离？",
+      "keywords": [
+        "安全",
+        "权限",
+        "授权",
+        "越权",
+        "审计"
+      ],
+      "expectedPoints": [
+        "验证跨租户读写、导出、搜索、缓存、异步任务和报表接口是否存在越权",
+        "检查认证主体、租户上下文、资源 owner、数据域授权和服务端查询条件",
+        "修复包括强制 tenantId 过滤、统一授权中间件、缓存 key 带租户、异步任务租户隔离",
+        "补安全测试矩阵：不同租户、不同角色、ID 枚举、批量导出和后台管理场景",
+        "建立审计日志、异常访问告警、权限评审和代码扫描规则"
+      ],
+      "referenceAnswer": "多租户串读属于高风险安全问题，不能只修一个接口。验证时要准备两个租户、多个角色账号，测试详情页、列表、搜索、导出、报表、异步任务和后台管理接口是否能通过改 tenantId 或资源 ID 访问其他租户数据。根因通常是服务端只校验登录态，没有把 tenantId、资源 owner 和角色授权加入查询条件，或者缓存 key 没带租户导致串缓存。修复要在统一数据访问层或授权中间件强制注入租户上下文，关键接口加资源级授权。还要补审计日志和异常枚举告警。",
+      "excellentAnswer": "我会先止血：关闭高风险导出和跨租户搜索，保留访问日志，评估历史影响范围。修复时不允许依赖前端传 tenantId，也不能让各接口手写 if。登录后服务端从 token/session 解析租户上下文，查询条件由数据访问层自动附加 tenant_id，缓存 key、MQ 消息、定时任务参数和对象存储路径都必须带租户维度。权限上区分租户管理员、普通用户和平台运维，平台运维访问也要审计和审批。测试要覆盖读、写、导出、批量接口、报表聚合和 ID 枚举。上线后看跨租户访问拒绝数、敏感接口访问日志和告警，复盘是否有同类接口遗漏。",
+      "commonMistakes": [
+        "只在前端隐藏租户参数，没有服务端强制租户过滤。",
+        "只修详情接口，忽略列表、导出、缓存和异步任务。",
+        "平台管理员访问无审计，无法追踪敏感数据访问。"
+      ],
+      "followUps": [
+        "缓存 key 为什么必须包含 tenantId？",
+        "平台运维需要跨租户排障时如何授权和审计？",
+        "如何把多租户越权测试纳入 CI？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "跨租户验证",
+          "服务端授权",
+          "tenantId 强制过滤",
+          "缓存/异步隔离",
+          "审计告警"
+        ],
+        "goodToHave": [
+          "统一数据访问层",
+          "权限矩阵",
+          "ID 枚举测试",
+          "代码扫描"
+        ],
+        "redFlags": [
+          "相信前端参数",
+          "只修单接口",
+          "缓存不隔离",
+          "无审计"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:14:58.166Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_data_003_血缘影响分析",
+      "category": "数据",
+      "skill": "数据血缘与变更影响分析",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "上游订单表字段准备改名，如何用数据血缘评估影响并保证下游指标和报表不出错？",
+      "keywords": [
+        "数据",
+        "血缘",
+        "指标",
+        "调度",
+        "质量"
+      ],
+      "expectedPoints": [
+        "识别字段被哪些 ODS/DWD/DWS/ADS 任务、指标、报表、接口和机器学习特征使用",
+        "评估调度依赖、SQL 解析、字段别名、历史分区、补数任务和数据质量规则影响",
+        "制定兼容方案：双写/双字段、视图兼容、灰度切换、版本公告和下游确认",
+        "上线前跑血缘影响清单、回归 SQL、样本对账、核心指标波动和报表验收",
+        "变更后监控任务失败率、空值率、指标波动、报表访问异常和用户反馈"
+      ],
+      "referenceAnswer": "字段改名看似简单，但可能影响数仓任务、指标口径、报表和特征。首先通过血缘平台或 SQL 解析找出引用该字段的 ODS、DWD、DWS、ADS 任务，以及 BI 报表、接口和下游特征。然后评估调度依赖和历史分区，确认补数脚本、质量规则和临时查询是否也引用旧字段。安全做法是保留一段时间双字段或视图兼容，先让下游改造并验收，再切换上游。上线前要跑回归 SQL 和样本对账，确保核心指标不变；上线后监控任务失败、空值率和指标波动。",
+      "excellentAnswer": "我会把字段改名当成数据契约变更处理。第一步从元数据和血缘系统导出影响清单，按任务、报表、接口、特征和负责人分组，标注 P0/P1 影响。第二步制定兼容窗口，例如上游同时产出 old_field 和 new_field 两周，或者在 DWD 层用视图保持旧字段可用，避免下游同时发布。第三步让关键指标跑双口径对比，抽样订单做明细对账，质量规则增加新旧字段一致性校验。第四步变更公告和截止日期明确，过期后再清理旧字段。整个过程要关注历史分区和补数任务，因为只改当天任务容易让回刷失败。",
+      "commonMistakes": [
+        "只改当前 SQL，不查报表、接口、特征和历史补数。",
+        "没有兼容期，导致下游任务同一晚批量失败。",
+        "只看任务成功，不看指标口径和明细对账。"
+      ],
+      "followUps": [
+        "没有血缘平台时如何做影响分析？",
+        "双字段兼容期多久合适？",
+        "历史分区和补数为什么容易被忽略？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "血缘影响清单",
+          "调度和报表影响",
+          "兼容方案",
+          "回归对账",
+          "上线监控"
+        ],
+        "goodToHave": [
+          "数据契约",
+          "双字段/视图",
+          "Owner 确认",
+          "历史补数验证"
+        ],
+        "redFlags": [
+          "直接改字段",
+          "无下游通知",
+          "不验指标",
+          "忽略历史分区"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:14:58.166Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_android_002_崩溃率治理",
+      "category": "Android",
+      "skill": "Android 崩溃率治理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "Android 新版本发布后崩溃率升高，你如何定位是空指针、兼容性、混淆还是三方 SDK 导致？",
+      "keywords": [
+        "Android",
+        "崩溃",
+        "Crash",
+        "混淆",
+        "兼容性"
+      ],
+      "expectedPoints": [
+        "按版本、机型、系统版本、渠道、页面和用户路径聚合崩溃堆栈与影响人数",
+        "使用 mapping 文件还原混淆堆栈，区分业务代码、系统兼容和三方 SDK 崩溃",
+        "检查空指针、生命周期、权限、ROM 差异、ABI、资源缺失和动态下发配置",
+        "发布止血包括灰度暂停、回滚、远程开关、降级三方 SDK 和热修复评估",
+        "治理包括崩溃率门禁、启动/核心路径自动化、兼容测试矩阵和发布后观察"
+      ],
+      "referenceAnswer": "Android 崩溃率升高要先按版本和维度聚合，确认是否集中在新版本、某些机型、系统版本或渠道。堆栈如果被混淆，必须用对应 mapping 文件还原，否则无法准确定位。业务代码常见是空指针、生命周期时序、权限未授权和异步回调访问销毁页面；兼容性问题可能集中在特定 Android 版本或厂商 ROM；三方 SDK 崩溃要看是否在其包名栈内以及是否由我们传入非法参数触发。止血上先暂停灰度、关闭远程配置、回滚或降级 SDK，修复后用崩溃率、影响用户数和核心路径回归验证。",
+      "excellentAnswer": "我会先看崩溃是否超过发布门禁，比如 crash-free users 低于阈值就暂停放量。定位时按 release、device、os、channel、ABI 和页面聚合 Top crash，先处理影响人数最大的堆栈。mapping 文件要和构建产物绑定，避免还原错版本。如果是 NullPointerException，看对象生命周期和异步回调；如果是 Resources.NotFoundException，查资源分包和配置；如果是 UnsatisfiedLinkError，查 so 架构和动态加载；如果是 SecurityException，查权限和系统版本；三方 SDK 则看初始化时机和版本变更。治理上发布前跑核心路径自动化和兼容矩阵，发布后分阶段灰度，每阶段观察崩溃率、ANR、启动耗时和关键转化。",
+      "commonMistakes": [
+        "没有保存 mapping 文件，线上混淆堆栈无法还原。",
+        "只看崩溃次数，不看影响用户数、版本和机型分布。",
+        "灰度阶段崩溃升高仍继续放量。"
+      ],
+      "followUps": [
+        "UnsatisfiedLinkError 通常和哪些发布问题有关？",
+        "如何判断三方 SDK 崩溃是否由我们使用方式触发？",
+        "crash-free users 和 crash 次数哪个更适合做发布门禁？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "版本机型聚合",
+          "mapping 还原",
+          "兼容/权限/SDK 判断",
+          "灰度止血",
+          "发布门禁"
+        ],
+        "goodToHave": [
+          "Top crash 优先级",
+          "ABI/资源排查",
+          "远程开关",
+          "兼容测试矩阵"
+        ],
+        "redFlags": [
+          "无 mapping",
+          "不暂停灰度",
+          "只看总崩溃数",
+          "不分版本机型"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:14:58.166Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_backend_001_限流熔断治理",
+      "category": "系统设计",
+      "skill": "后端限流熔断治理",
+      "roles": [
+        "backend",
+        "java",
+        "go",
+        "python",
+        "architect"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "system-design",
+      "difficulty": 3,
+      "question": "下游依赖偶发慢导致上游线程池被打满，你如何设计限流、熔断、隔离和降级？",
+      "keywords": [
+        "系统设计",
+        "限流",
+        "熔断",
+        "降级",
+        "隔离"
+      ],
+      "expectedPoints": [
+        "识别慢依赖如何占满线程池、连接池和请求队列，量化超时、错误率和 P99 影响",
+        "按接口、用户、租户、调用方或资源维度设计限流，区分本地限流和分布式限流",
+        "使用超时、熔断、半开探测、失败率/慢调用比例和滑动窗口保护上游",
+        "隔离线程池、连接池、bulkhead 和队列，避免非核心依赖拖垮核心链路",
+        "降级策略包含缓存旧值、默认值、排队、异步补偿、关闭非核心功能和告警复盘"
+      ],
+      "referenceAnswer": "下游慢调用最危险的是占住上游线程池和连接池，最终把无关请求也拖慢。设计上先给每个下游设置合理超时，不能无限等待。限流用于控制入口流量，可以按用户、接口、租户或调用方维度做令牌桶/漏桶；熔断用于下游错误率或慢调用比例过高时快速失败，半开状态少量探测恢复。隔离要把核心和非核心依赖放在不同线程池、连接池或 bulkhead，避免报表接口拖垮下单接口。降级要提前定义，比如返回缓存旧值、默认文案、排队处理或关闭非核心推荐。",
+      "excellentAnswer": "我会先用指标确认故障传播路径：下游 P99 升高后，上游活跃线程、连接池等待、队列长度和超时是否一起上升。治理分四层。第一层是超时，所有 RPC/HTTP/DB 调用必须有小于入口超时的预算；第二层是限流，入口按核心接口和租户做配额，防止重试风暴；第三层是熔断，用滑动窗口统计错误率和慢调用比例，打开后快速失败，半开少量探测；第四层是隔离，核心链路独立线程池和连接池，非核心依赖失败时降级。降级结果要业务可接受，例如商品推荐缺失可以返回默认列表，支付状态不能随意默认成功。上线前要故障注入慢依赖，验证核心接口 P99、错误率和线程池水位不会被拖垮。",
+      "commonMistakes": [
+        "只加超时时间，不做线程池和连接池隔离。",
+        "熔断阈值拍脑袋，没有基于错误率、慢调用比例和窗口统计。",
+        "降级结果不符合业务语义，例如支付链路返回假成功。"
+      ],
+      "followUps": [
+        "限流和熔断解决的问题有什么区别？",
+        "半开状态为什么需要？",
+        "如何设计入口超时和下游超时预算？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "慢依赖传播分析",
+          "限流维度",
+          "熔断策略",
+          "资源隔离",
+          "业务降级"
+        ],
+        "goodToHave": [
+          "滑动窗口",
+          "半开探测",
+          "bulkhead",
+          "故障注入验证"
+        ],
+        "redFlags": [
+          "无限等待下游",
+          "无隔离",
+          "降级语义错误",
+          "不做故障演练"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:14:58.166Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_qa_002_自动化用例稳定性治理",
+      "category": "测试",
+      "skill": "自动化测试稳定性治理",
+      "roles": [
+        "qa"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "UI 自动化用例经常偶发失败，团队开始不信任自动化结果，你如何治理稳定性和有效性？",
+      "keywords": [
+        "测试",
+        "自动化",
+        "用例",
+        "断言",
+        "质量"
+      ],
+      "expectedPoints": [
+        "区分真实缺陷、环境问题、数据污染、等待策略、选择器脆弱和三方依赖抖动",
+        "建立失败分类、重跑策略、失败截图/视频/日志/网络请求和用例 Owner",
+        "优化用例设计：稳定选择器、显式等待、测试数据隔离、接口 Mock 和原子化断言",
+        "用 flaky rate、有效拦截缺陷数、误报率、修复时长和覆盖核心链路衡量质量",
+        "将高价值冒烟用例纳入发布门禁，低价值/高波动用例重写或下线"
+      ],
+      "referenceAnswer": "自动化不稳定时，先要把失败分类，而不是简单全部重跑。常见原因包括环境不可用、测试数据被污染、页面异步加载等待不合理、选择器依赖 DOM 层级、三方服务抖动以及真实产品缺陷。治理上每次失败要自动保留截图、视频、浏览器日志、接口 HAR 和后端 requestId，失败用例要有 Owner。用例层面使用 data-testid 或稳定选择器，显式等待业务状态，测试数据独立创建和清理，对不稳定三方依赖使用 Mock。指标上看 flaky rate、误报率和有效拦截缺陷数，长期不可信的用例不能继续当发布门禁。",
+      "excellentAnswer": "我会先把自动化分层：发布门禁只保留核心链路和高稳定用例，探索性或长尾场景放到夜间任务。对偶发失败做 2 周统计，按失败原因归类，真实缺陷必须进缺陷流程，环境和数据问题由平台治理，选择器和等待问题由用例维护人修复。技术上给关键元素加稳定 test id，避免 sleep，改用接口响应、URL、状态文本或 DOM 可见性作为等待条件；测试数据每次独立生成，避免复用脏账号。重跑只能用于识别 flaky，不能掩盖问题。最后设门槛：flaky rate 超过阈值的用例自动移出门禁，修复后再恢复。",
+      "commonMistakes": [
+        "失败就无脑重跑，导致真实缺陷被掩盖。",
+        "用固定 sleep 等待页面，既慢又不稳定。",
+        "所有自动化都进发布门禁，低价值用例拖垮反馈效率。"
+      ],
+      "followUps": [
+        "flaky 用例是否应该直接删除？怎么判断？",
+        "UI 自动化和接口自动化如何分工？",
+        "如何设计测试数据避免用例互相污染？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "失败分类",
+          "证据采集",
+          "稳定选择器和等待",
+          "数据隔离",
+          "flaky 指标治理"
+        ],
+        "goodToHave": [
+          "用例 Owner",
+          "门禁分层",
+          "Mock 三方依赖",
+          "低价值用例下线"
+        ],
+        "redFlags": [
+          "只靠重跑",
+          "大量 sleep",
+          "无失败证据",
+          "无 Owner"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:19:58.212Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_ops_003_证书过期治理",
+      "category": "运维",
+      "skill": "证书过期与 TLS 治理",
+      "roles": [
+        "ops",
+        "devops",
+        "security"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "线上 HTTPS 证书过期导致部分客户端无法访问，你如何止血并建立证书生命周期治理？",
+      "keywords": [
+        "运维",
+        "监控",
+        "故障",
+        "网络",
+        "TLS"
+      ],
+      "expectedPoints": [
+        "确认影响域名、证书链、客户端类型、CDN/网关/Ingress/负载均衡和过期时间",
+        "止血包括快速更换证书、刷新 CDN/网关配置、验证中间证书链和回滚错误配置",
+        "排查自动续期失败原因：DNS 校验、HTTP 校验、权限、配额、脚本和发布流程",
+        "建立证书资产清单、到期监控、提前告警、自动续期、双人审批和演练",
+        "用证书剩余天数、续期成功率、告警提前量和故障复发率衡量治理效果"
+      ],
+      "referenceAnswer": "证书过期故障先要确认影响范围，是某个域名、某条证书链、某个 CDN 节点还是某类旧客户端。止血上尽快签发或切换有效证书，更新 CDN、Ingress、负载均衡或网关配置，并验证完整证书链和 SNI。部分客户端失败可能是中间证书链不完整或老系统不支持新根证书。复盘要查自动续期为什么没生效：DNS/HTTP challenge 失败、权限过期、脚本报错、证书没有发布到所有节点或监控没有覆盖。长期要维护证书资产清单，到期前 30/15/7 天告警，自动续期后做端到端探测。",
+      "excellentAnswer": "我会先从用户入口验证：用 openssl s_client、curl 和外部监控检查域名证书、SNI、证书链、过期时间和各地域 CDN 节点。如果只是某些客户端失败，要检查中间证书和兼容性。止血时不能只把证书上传到一处，还要确认 CDN、WAF、Ingress、SLB、API 网关都已生效，并用真实客户端和探测点验证。治理上所有证书纳入资产平台，记录域名、Owner、签发机构、部署位置、自动续期方式和到期时间；续期流程自动化，但生产替换要有审批和灰度探测。监控不只看文件日期，还要从公网探测 TLS 握手成功率和剩余有效期。",
+      "commonMistakes": [
+        "只更新源站证书，忘记 CDN、网关或 Ingress 仍使用旧证书。",
+        "只监控证书文件，不做公网 TLS 握手探测。",
+        "自动续期失败后没有告警，直到用户访问失败才发现。"
+      ],
+      "followUps": [
+        "SNI 配置错误会导致什么现象？",
+        "为什么中间证书链不完整会影响部分客户端？",
+        "证书自动续期后如何确认所有入口都生效？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "影响范围确认",
+          "证书链验证",
+          "入口配置更新",
+          "自动续期排查",
+          "到期监控治理"
+        ],
+        "goodToHave": [
+          "SNI 检查",
+          "公网探测",
+          "资产清单 Owner",
+          "续期演练"
+        ],
+        "redFlags": [
+          "只换源站",
+          "无到期告警",
+          "不验证证书链",
+          "无资产清单"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:19:58.212Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_ai_002_向量库容量与召回治理",
+      "category": "AI",
+      "skill": "向量库容量与召回治理",
+      "roles": [
+        "ai",
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "RAG 知识库规模增长后检索变慢且召回质量下降，你如何治理向量库容量、索引和评估？",
+      "keywords": [
+        "AI",
+        "数据",
+        "模型",
+        "评估",
+        "向量"
+      ],
+      "expectedPoints": [
+        "区分数据增长、chunk 质量、embedding 模型、索引参数、过滤条件和 rerank 对召回的影响",
+        "监控向量数量、索引构建耗时、查询 P95/P99、召回率、MRR、命中率和存储成本",
+        "治理 chunk 去重、冷热分层、metadata 过滤、分片、索引参数和增量构建策略",
+        "建立带证据文档的评测集，对比不同 embedding、topK、reranker 和过滤策略",
+        "上线灰度观察引用准确率、无答案拒答、用户反馈、延迟和成本"
+      ],
+      "referenceAnswer": "向量库变慢和召回下降要分开定位。规模增长会影响索引构建、查询延迟和内存/磁盘成本，但召回下降也可能来自文档切分变差、重复 chunk 太多、metadata 过滤误杀、embedding 模型不适合领域词或 topK 太小。治理时先建立评测集，每个问题有应命中文档，离线看 Recall@K、MRR 和引用准确率。容量上做 chunk 去重、冷热知识分层、按租户或业务分片，调整 HNSW/IVF 等索引参数，并监控查询 P99 和索引构建耗时。上线要灰度比较延迟、召回和成本。",
+      "excellentAnswer": "我会先固定评估集，再动索引参数。评估集覆盖高频问题、长尾术语、跨文档问题和无答案问题，每条标注正确证据文档。然后拆链路：文档解析和 chunk 是否保留标题层级，embedding 是否按新模型全量重算，metadata 过滤是否把正确文档过滤掉，向量索引参数是否在召回和延迟之间过度偏向速度。容量治理上对重复和过期文档清理，冷热分层，按业务域分 collection，增量构建要保证删除和更新一致。检索结果进入 reranker 前后都要记录分数和文档 ID。最终用 Recall@10、MRR、引用准确率、查询 P99 和每万次查询成本判断方案是否变好。",
+      "commonMistakes": [
+        "只调 topK，不检查 chunk、metadata 和评测集。",
+        "只看查询延迟，不看 Recall@K 和引用准确率。",
+        "增量更新只新增不删除，导致过期文档继续被召回。"
+      ],
+      "followUps": [
+        "向量库分片会对召回有什么影响？",
+        "如何判断是 embedding 模型问题还是 chunk 问题？",
+        "metadata 过滤为什么可能降低召回？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "评测集",
+          "召回指标",
+          "索引和容量监控",
+          "chunk/metadata 治理",
+          "灰度验证"
+        ],
+        "goodToHave": [
+          "冷热分层",
+          "reranker 对比",
+          "增量删除一致性",
+          "成本指标"
+        ],
+        "redFlags": [
+          "只调 topK",
+          "无评测集",
+          "忽略过期数据",
+          "只看延迟"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:19:58.212Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_frontend_003_可访问性治理",
+      "category": "前端",
+      "skill": "前端可访问性治理",
+      "roles": [
+        "frontend",
+        "fullstack"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "企业后台要求支持可访问性，你如何治理键盘操作、语义化、颜色对比和自动化检测？",
+      "keywords": [
+        "前端",
+        "页面",
+        "浏览器",
+        "组件",
+        "可访问性"
+      ],
+      "expectedPoints": [
+        "覆盖键盘可达、焦点顺序、焦点可见、ARIA、语义化标签和表单错误提示",
+        "检查颜色对比、字号、图标文本替代、弹窗焦点陷阱和屏幕阅读器体验",
+        "在组件库层建立 Button、Modal、Table、Form、Menu 等基础组件规范",
+        "引入 axe、eslint-plugin-jsx-a11y、Storybook 可访问性测试和人工抽检",
+        "用缺陷数、自动化扫描通过率、关键流程键盘完成率和用户反馈验证治理效果"
+      ],
+      "referenceAnswer": "可访问性不能只靠业务页面逐个修，最好从组件库和规范入手。键盘用户要能通过 Tab 按合理顺序访问控件，焦点要可见，弹窗要有焦点陷阱和关闭后焦点恢复。语义化上按钮用 button，表单 label 和错误提示要关联，必要时使用 ARIA 但不能滥用。颜色对比要满足 WCAG 要求，图标按钮要有可读名称。自动化可以接入 eslint-plugin-jsx-a11y、axe 和 Storybook 插件，但屏幕阅读器和复杂交互仍要人工抽检。",
+      "excellentAnswer": "我会先定义企业后台的可访问性基线，并把它落在组件库。基础组件必须默认可键盘操作，例如 Modal 打开后焦点进入弹窗，Tab 不逃出弹窗，Esc 可关闭，关闭后回到触发按钮；Table、Menu、Select 要有合理的 aria 属性和键盘行为。页面层要求标题层级、表单 label、错误提示、颜色对比和图标替代文本。工程上把 jsx-a11y lint 加进 CI，Storybook 跑 axe 扫描，关键流程如登录、查询、提交审批要做键盘-only 验收。指标上看扫描问题数、阻断缺陷、关键流程键盘完成率，而不是只在最后做一次无障碍报告。",
+      "commonMistakes": [
+        "只加 aria-label，但底层元素语义和键盘行为仍然错误。",
+        "只做颜色对比，不检查焦点顺序和弹窗焦点陷阱。",
+        "完全依赖自动化扫描，忽略屏幕阅读器和复杂交互人工验证。"
+      ],
+      "followUps": [
+        "ARIA 什么时候应该用，什么时候不应该用？",
+        "Modal 的焦点陷阱如何设计？",
+        "自动化可访问性测试有哪些覆盖不到的地方？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "键盘可达",
+          "语义化/ARIA",
+          "颜色对比",
+          "组件库治理",
+          "自动化和人工检测"
+        ],
+        "goodToHave": [
+          "焦点陷阱",
+          "Storybook axe",
+          "屏幕阅读器抽检",
+          "CI 门禁"
+        ],
+        "redFlags": [
+          "只加 aria",
+          "无键盘测试",
+          "无焦点管理",
+          "只靠人工口头检查"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:19:58.212Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
+      }
+    },
+    {
+      "id": "approved_rigorous_data_004_数据质量sla治理",
+      "category": "数据",
+      "skill": "数据质量 SLA 治理",
+      "roles": [
+        "data"
+      ],
+      "levels": [
+        "middle",
+        "senior"
+      ],
+      "type": "knowledge",
+      "difficulty": 3,
+      "question": "核心经营日报经常延迟或数据异常，你如何建立数据质量 SLA、告警和责任闭环？",
+      "keywords": [
+        "数据",
+        "质量",
+        "指标",
+        "调度",
+        "SLA"
+      ],
+      "expectedPoints": [
+        "定义数据 SLA：产出时间、完整性、准确性、唯一性、波动范围和可用性",
+        "按链路识别上游采集、ODS、DWD、DWS、ADS、调度依赖和报表刷新风险",
+        "建立质量规则：分区到达、行数波动、空值率、主键唯一、金额对账和跨层一致性",
+        "告警要有 Owner、等级、影响报表、预计恢复时间、补数流程和业务通知机制",
+        "用 SLA 达成率、MTTR、重复故障率、误报率和业务投诉数衡量治理效果"
+      ],
+      "referenceAnswer": "数据质量 SLA 要把“什么时候产出”和“数据是否可信”都定义清楚。经营日报通常要规定最晚产出时间、核心指标完整性、金额对账、空值率、主键唯一和波动阈值。链路上要梳理从采集、ODS、DWD、DWS 到 ADS 和 BI 刷新的依赖，任何上游延迟都可能影响报表。质量规则需要自动运行，失败后告警给明确 Owner，并告诉业务影响范围和预计恢复时间。补数流程要标准化，补完后做跨层一致性和关键指标对账。长期看 SLA 达成率、MTTR 和重复故障率。",
+      "excellentAnswer": "我会先把经营日报分级：老板看的核心日报是 P0，必须有明确 SLA；普通分析报表可以降级。P0 指标定义规则包括分区是否到达、订单金额是否和交易系统对账、用户数是否异常波动、主键是否重复、维表是否缺失。调度平台里每个任务要有 Owner 和影响下游，告警不能只说某任务失败，而要说明影响哪个报表和哪个指标。处理流程包括暂停报表刷新或加“数据延迟”提示，补数后自动回归校验。对于频繁失败的上游，要推动采集稳定性或任务拆分，而不是每天人工补数。治理效果看 SLA 达成率、业务投诉、重复故障和平均恢复时间。",
+      "commonMistakes": [
+        "只监控任务成功失败，不校验数据内容是否正确。",
+        "告警没有 Owner 和业务影响说明，没人处理。",
+        "补数后不做对账，可能把错误数据覆盖到报表。"
+      ],
+      "followUps": [
+        "数据质量规则误报很多时怎么治理？",
+        "核心指标波动阈值如何设置？",
+        "如果上游晚到导致日报延迟，你会如何通知业务？"
+      ],
+      "scoringRubric": {
+        "mustHave": [
+          "SLA 定义",
+          "链路依赖",
+          "质量规则",
+          "Owner 告警",
+          "补数和对账"
+        ],
+        "goodToHave": [
+          "报表分级",
+          "业务影响提示",
+          "SLA 达成率",
+          "重复故障治理"
+        ],
+        "redFlags": [
+          "只看任务成功",
+          "无 Owner",
+          "无对账",
+          "长期人工补数"
+        ]
+      },
+      "governance": {
+        "status": "approved",
+        "source": "internal-rigorous-curation-20260608",
+        "license": "原创/内部题库",
+        "attributionRequired": false,
+        "approvedAt": "2026-06-08T03:19:58.212Z",
+        "approvedBy": "codex-curation",
+        "reviewNotes": "内部原创严审题：补充具体参考答案、评分点、追问和常见误区，避免模板化答案。"
       }
     }
   ]
