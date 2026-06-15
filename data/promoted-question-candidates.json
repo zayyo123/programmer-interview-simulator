@@ -1,24 +1,26 @@
 {
-  "generatedAt": "2026-05-29T12:33:07.000Z",
-  "sourceSyncedAt": "2026-05-28T08:18:07.999Z",
+  "generatedAt": "2026-06-15T05:48:13.743Z",
+  "sourceSyncedAt": "2026-06-15T05:48:13.440Z",
   "summary": {
-    "externalDraftCount": 548,
-    "scoredCount": 357,
+    "externalDraftCount": 1023,
+    "scoredCount": 423,
     "candidateCount": 40,
     "minScore": 72,
     "includeSignalOnly": false,
     "byCategory": {
-      "Java": 8,
-      "网络": 5,
+      "Java": 7,
       "MySQL": 8,
-      "Redis": 3,
+      "运维": 1,
+      "架构": 1,
+      "安全": 6,
       "前端": 8,
-      "Go": 6,
-      "算法": 2
+      "Go": 8,
+      "算法": 1
     },
     "bySource": {
-      "JavaGuide 中文面试知识库": 24,
-      "ReactJS Interview Questions": 1,
+      "JavaGuide 中文面试知识库": 17,
+      "Pentesting Interview Questions": 6,
+      "ReactJS Interview Questions": 2,
       "FAQGURU Go and Frontend Questions": 12,
       "Go Interview Coding Questions": 3
     }
@@ -32,8 +34,8 @@
   "candidates": [
     {
       "rank": 1,
-      "id": "external_0078",
-      "title": "⭐️为什么说 Java 语言“编译与解释并存”？",
+      "id": "external_0007",
+      "title": "⭐️ 为什么说 Java 语言“编译与解释并存”？",
       "category": "Java",
       "skill": "Java",
       "type": "knowledge",
@@ -41,8 +43,8 @@
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-01.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
@@ -89,7 +91,7 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "⭐️为什么说 Java 语言“编译与解释并存”？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "⭐️ 为什么说 Java 语言“编译与解释并存”？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
           "Java",
           "Java 核心概念",
@@ -103,10 +105,10 @@
           "边界条件",
           "常见误区"
         ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️为什么说 Java 语言“编译与解释并存”？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️为什么说 Java 语言“编译与解释并存”？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“⭐️ 为什么说 Java 语言“编译与解释并存”？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️ 为什么说 Java 语言“编译与解释并存”？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“⭐️为什么说 Java 语言“编译与解释并存”？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“⭐️ 为什么说 Java 语言“编译与解释并存”？”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？"
         ],
@@ -135,8 +137,8 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-01.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-01.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -148,24 +150,24 @@
     },
     {
       "rank": 2,
-      "id": "external_0138",
-      "title": "⭐️异常使用有哪些需要注意的地方？",
-      "category": "Java",
-      "skill": "Java",
+      "id": "external_0036",
+      "title": "⭐️MySQL 有什么优点？",
+      "category": "MySQL",
+      "skill": "MySQL",
       "type": "knowledge",
       "difficulty": 1,
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "Java"
+        "MySQL"
       ],
       "promotionScore": 100,
       "qualityScore": 76,
@@ -191,12 +193,14 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_java_异常使用有哪些需要注意的地方",
-        "category": "Java",
-        "skill": "Java",
+        "id": "candidate_mysql_mysql_有什么优点",
+        "category": "MySQL",
+        "skill": "MySQL",
         "roles": [
-          "java",
           "backend",
+          "java",
+          "go",
+          "python",
           "fullstack"
         ],
         "levels": [
@@ -205,26 +209,28 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "⭐️异常使用有哪些需要注意的地方？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "⭐️MySQL 有什么优点？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
-          "Java",
-          "Java 核心概念",
+          "MySQL",
+          "MySQL 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "Java 核心概念",
+          "MySQL 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "数据库执行机制和性能影响"
         ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️异常使用有哪些需要注意的地方？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️异常使用有哪些需要注意的地方？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“⭐️MySQL 有什么优点？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️MySQL 有什么优点？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“⭐️异常使用有哪些需要注意的地方？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“⭐️MySQL 有什么优点？”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
+          "你会用哪些指标或现象证明自己的判断是对的？",
+          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
         ],
         "commonMistakes": [
           "只背结论，不解释原理和判断过程。",
@@ -233,14 +239,15 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "Java 核心概念",
+            "MySQL 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "Java"
+            "数据库执行机制和性能影响",
+            "MySQL"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -251,8 +258,8 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-03.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -264,24 +271,25 @@
     },
     {
       "rank": 3,
-      "id": "external_0124",
-      "title": "⭐️字符串拼接用“+” 还是 StringBuilder?",
-      "category": "Java",
-      "skill": "Java",
+      "id": "external_0084",
+      "title": "监控工具： 介绍常用的慢 SQL 监控工具，如 MySQL 慢查询日志、Performance Schema 等，说明你对这些工具的熟悉程度以及如何通过它们定位问题。",
+      "category": "运维",
+      "skill": "运维",
       "type": "knowledge",
       "difficulty": 1,
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-02.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "Java"
+        "运维",
+        "MySQL"
       ],
       "promotionScore": 100,
       "qualityScore": 76,
@@ -292,7 +300,7 @@
         "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
         "题目本身是中文，适合直接转成中文面试问法。",
         "标题天然接近面试问句。",
-        "来源中带高频标记，可作为候选参考。"
+        "运维 正式题数量不多，适合作为补充候选。"
       ],
       "promotionRisks": [
         "需要在候选题中保留来源署名和许可证链接。",
@@ -307,12 +315,12 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_java_字符串拼接用_还是_stringbuilder",
-        "category": "Java",
-        "skill": "Java",
+        "id": "candidate_运维_监控工具_介绍常用的慢_sql_监控工具_如_mysql_慢查询日志_performanc",
+        "category": "运维",
+        "skill": "运维",
         "roles": [
-          "java",
           "backend",
+          "java",
           "fullstack"
         ],
         "levels": [
@@ -321,54 +329,61 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "⭐️字符串拼接用“+” 还是 StringBuilder? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "请解释“监控工具： 介绍常用的慢 SQL 监控工具，如 MySQL 慢查询日志、Performance Schema 等，说明你对这些工具的熟悉程度以及如何通过它们定位问题”，并说明它在 运维 面试中的核心原理、适用场景、边界条件和常见误区。",
         "keywords": [
-          "Java",
-          "Java 核心概念",
+          "运维",
+          "MySQL",
+          "运维 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "Java 核心概念",
+          "运维 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "排查顺序和优化取舍",
+          "数据库执行机制和性能影响"
         ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️字符串拼接用“+” 还是 StringBuilder?”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️字符串拼接用“+” 还是 StringBuilder?”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“监控工具： 介绍常用的慢 SQL 监控工具，如 MySQL 慢查询日志、Performance Schema 等，说明你对这些工具的熟悉程度以及如何通过它们定位问题。”，正式入库前应重写为本地中文参考答案。回答应先给出 运维 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“监控工具： 介绍常用的慢 SQL 监控工具，如 MySQL 慢查询日志、Performance Schema 等，说明你对这些工具的熟悉程度以及如何通过它们定位问题。”的核心结论，再展开 运维 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“⭐️字符串拼接用“+” 还是 StringBuilder?”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“监控工具： 介绍常用的慢 SQL 监控工具，如 MySQL 慢查询日志、Performance Schema 等，说明你对这些工具的熟悉程度以及如何通过它们定位问题。”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？"
         ],
         "commonMistakes": [
           "只背结论，不解释原理和判断过程。",
           "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
+          "不能结合真实项目或线上排查经验。",
+          "一上来给方案，不先确认现象、范围、指标和证据。"
         ],
         "scoringRubric": {
           "mustHave": [
-            "Java 核心概念",
+            "运维 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "Java"
+            "排查顺序和优化取舍",
+            "数据库执行机制和性能影响",
+            "运维"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
             "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
+            "不能结合真实项目或线上排查经验。",
+            "一上来给方案，不先确认现象、范围、指标和证据。"
           ]
         },
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-02.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -380,715 +395,8 @@
     },
     {
       "rank": 4,
-      "id": "external_0161",
-      "title": "⭐️BIO、NIO 和 AIO 的区别？",
-      "category": "Java",
-      "skill": "Java",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-03.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "Java"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "来源中带高频标记，可作为候选参考。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_java_bio_nio_和_aio_的区别",
-        "category": "Java",
-        "skill": "Java",
-        "roles": [
-          "java",
-          "backend",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "⭐️BIO、NIO 和 AIO 的区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "Java",
-          "Java 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "Java 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️BIO、NIO 和 AIO 的区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️BIO、NIO 和 AIO 的区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“⭐️BIO、NIO 和 AIO 的区别？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。",
-          "只罗列差异，不说明为什么这样设计以及如何选择。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "Java 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "Java"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。",
-            "只罗列差异，不说明为什么这样设计以及如何选择。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-03.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 5,
-      "id": "external_0132",
-      "title": "⭐️Checked Exception 和 Unchecked Exception 有什么区别？",
-      "category": "Java",
-      "skill": "Java",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-03.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "Java"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "来源中带高频标记，可作为候选参考。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_java_checked_exception_和_unchecked_exception_有什么",
-        "category": "Java",
-        "skill": "Java",
-        "roles": [
-          "java",
-          "backend",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "⭐️Checked Exception 和 Unchecked Exception 有什么区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "Java",
-          "Java 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "Java 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️Checked Exception 和 Unchecked Exception 有什么区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️Checked Exception 和 Unchecked Exception 有什么区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“⭐️Checked Exception 和 Unchecked Exception 有什么区别？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。",
-          "只罗列差异，不说明为什么这样设计以及如何选择。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "Java 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "Java"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。",
-            "只罗列差异，不说明为什么这样设计以及如何选择。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-03.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 6,
-      "id": "external_0146",
-      "title": "⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？",
-      "category": "Java",
-      "skill": "Java",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-03.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "Java"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "来源中带高频标记，可作为候选参考。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_java_jdk_动态代理和_cglib_动态代理有什么区别",
-        "category": "Java",
-        "skill": "Java",
-        "roles": [
-          "java",
-          "backend",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "Java",
-          "Java 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "Java 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“⭐️JDK 动态代理和 CGLIB 动态代理有什么区别？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。",
-          "只罗列差异，不说明为什么这样设计以及如何选择。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "Java 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "Java"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。",
-            "只罗列差异，不说明为什么这样设计以及如何选择。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-03.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-03.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 7,
-      "id": "external_0123",
-      "title": "⭐️String 为什么是不可变的?",
-      "category": "Java",
-      "skill": "Java",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-02.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "Java"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "来源中带高频标记，可作为候选参考。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_java_string_为什么是不可变的",
-        "category": "Java",
-        "skill": "Java",
-        "roles": [
-          "java",
-          "backend",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "⭐️String 为什么是不可变的? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "Java",
-          "Java 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "Java 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️String 为什么是不可变的?”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️String 为什么是不可变的?”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“⭐️String 为什么是不可变的?”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "Java 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "Java"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-02.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 8,
-      "id": "external_0127",
-      "title": "⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？",
-      "category": "Java",
-      "skill": "Java",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
-      "sourcePath": "docs/java/basis/java-basic-questions-02.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "Java"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "来源中带高频标记，可作为候选参考。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_java_string_s1_new_string_abc_这句话创建了几个字符串对象",
-        "category": "Java",
-        "skill": "Java",
-        "roles": [
-          "java",
-          "backend",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "Java",
-          "Java 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "Java 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“⭐️String s1 = new String(\"abc\");这句话创建了几个字符串对象？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "Java 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "Java"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/java/basis/java-basic-questions-02.md",
-          "sourcePath": "docs/java/basis/java-basic-questions-02.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 9,
-      "id": "external_0005",
-      "title": "从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。",
-      "category": "网络",
-      "skill": "网络",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-      "sourcePath": "docs/cs-basics/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "网络"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_网络_从输入_url_到页面展示到底发生了什么_用一次完整请求串联_dns_tcp_http_浏",
-        "category": "网络",
-        "skill": "网络",
-        "roles": [
-          "backend",
-          "java",
-          "go",
-          "python",
-          "fullstack",
-          "frontend"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "请解释“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点”，并说明它在 网络 面试中的核心原理、适用场景、边界条件和常见误区。",
-        "keywords": [
-          "网络",
-          "网络 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "网络 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区",
-          "网络交互流程和异常场景"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。”，正式入库前应重写为本地中文参考答案。回答应先给出 网络 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。”的核心结论，再展开 网络 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“从输入 URL 到页面展示到底发生了什么？：用一次完整请求串联 DNS、TCP、HTTP、浏览器渲染等知识点。”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "网络 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "网络交互流程和异常场景",
-            "网络"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-          "sourcePath": "docs/cs-basics/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 10,
-      "id": "external_0044",
-      "title": "关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？",
+      "id": "external_0076",
+      "title": "能用 MySQL 直接存储文件（比如图片）吗？",
       "category": "MySQL",
       "skill": "MySQL",
       "type": "knowledge",
@@ -1096,258 +404,8 @@
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "MySQL",
-        "操作系统"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_mysql_关系型数据库和_nosql_分别适合解决什么问题_常见选型边界在哪里",
-        "category": "MySQL",
-        "skill": "MySQL",
-        "roles": [
-          "backend",
-          "java",
-          "go",
-          "python",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "MySQL",
-          "操作系统",
-          "MySQL 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "MySQL 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区",
-          "数据库执行机制和性能影响"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“关系型数据库和 NoSQL 分别适合解决什么问题，常见选型边界在哪里？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "MySQL 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "数据库执行机制和性能影响",
-            "MySQL",
-            "操作系统"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 11,
-      "id": "external_0050",
-      "title": "关系型数据库和 NoSQL 有什么区别？分别适合哪些场景？",
-      "category": "MySQL",
-      "skill": "MySQL",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "MySQL",
-        "操作系统"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "当前正式题库的 MySQL 方向仍值得继续扩充。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_mysql_关系型数据库和_nosql_有什么区别_分别适合哪些场景",
-        "category": "MySQL",
-        "skill": "MySQL",
-        "roles": [
-          "backend",
-          "java",
-          "go",
-          "python",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "关系型数据库和 NoSQL 有什么区别？分别适合哪些场景？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "MySQL",
-          "操作系统",
-          "MySQL 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "MySQL 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区",
-          "数据库执行机制和性能影响"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“关系型数据库和 NoSQL 有什么区别？分别适合哪些场景？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“关系型数据库和 NoSQL 有什么区别？分别适合哪些场景？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“关系型数据库和 NoSQL 有什么区别？分别适合哪些场景？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。",
-          "只罗列差异，不说明为什么这样设计以及如何选择。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "MySQL 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "数据库执行机制和性能影响",
-            "MySQL",
-            "操作系统"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。",
-            "只罗列差异，不说明为什么这样设计以及如何选择。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 12,
-      "id": "external_0056",
-      "title": "如何通过 EXPLAIN 分析 SQL 执行计划？",
-      "category": "MySQL",
-      "skill": "MySQL",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
@@ -1380,7 +438,7 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_mysql_如何通过_explain_分析_sql_执行计划",
+        "id": "candidate_mysql_能用_mysql_直接存储文件_比如图片_吗",
         "category": "MySQL",
         "skill": "MySQL",
         "roles": [
@@ -1396,7 +454,7 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "如何通过 EXPLAIN 分析 SQL 执行计划？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "能用 MySQL 直接存储文件（比如图片）吗？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
           "MySQL",
           "MySQL 核心概念",
@@ -1408,12 +466,13 @@
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "数据库执行机制和性能影响"
         ],
-        "referenceAnswer": "这道题来自外部草稿“如何通过 EXPLAIN 分析 SQL 执行计划？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“如何通过 EXPLAIN 分析 SQL 执行计划？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“能用 MySQL 直接存储文件（比如图片）吗？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“能用 MySQL 直接存储文件（比如图片）吗？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“如何通过 EXPLAIN 分析 SQL 执行计划？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“能用 MySQL 直接存储文件（比如图片）吗？”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？",
           "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
@@ -1432,6 +491,7 @@
           "goodToHave": [
             "边界条件",
             "常见误区",
+            "数据库执行机制和性能影响",
             "MySQL"
           ],
           "redFlags": [
@@ -1443,8 +503,8 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -1455,9 +515,9 @@
       }
     },
     {
-      "rank": 13,
-      "id": "external_0043",
-      "title": "已经写过业务 CRUD，但对数据库底层原理、性能优化和 NoSQL 选型不够熟的读者。",
+      "rank": 5,
+      "id": "external_0058",
+      "title": "请解释一下 MySQL 的联合索引及其最左前缀原则",
       "category": "MySQL",
       "skill": "MySQL",
       "type": "knowledge",
@@ -1465,16 +525,137 @@
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "MySQL",
-        "操作系统"
+        "MySQL"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "包含高频面试考点或真实工程场景。",
+        "当前正式题库的 MySQL 方向仍值得继续扩充。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "标题更像文章主题，入库前需要改写成明确问题。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_mysql_请解释一下_mysql_的联合索引及其最左前缀原则",
+        "category": "MySQL",
+        "skill": "MySQL",
+        "roles": [
+          "backend",
+          "java",
+          "go",
+          "python",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "请解释“请解释一下 MySQL 的联合索引及其最左前缀原则”，并说明它在 MySQL 面试中的核心原理、适用场景、边界条件和常见误区。",
+        "keywords": [
+          "MySQL",
+          "MySQL 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "MySQL 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区",
+          "数据库执行机制和性能影响"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“请解释一下 MySQL 的联合索引及其最左前缀原则”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“请解释一下 MySQL 的联合索引及其最左前缀原则”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“请解释一下 MySQL 的联合索引及其最左前缀原则”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？",
+          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "MySQL 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "数据库执行机制和性能影响",
+            "MySQL"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 6,
+      "id": "external_0079",
+      "title": "如何分析 SQL 的性能？",
+      "category": "MySQL",
+      "skill": "MySQL",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "MySQL"
       ],
       "promotionScore": 100,
       "qualityScore": 76,
@@ -1500,7 +681,7 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_mysql_已经写过业务_crud_但对数据库底层原理_性能优化和_nosql_选型不够熟的读者",
+        "id": "candidate_mysql_如何分析_sql_的性能",
         "category": "MySQL",
         "skill": "MySQL",
         "roles": [
@@ -1516,10 +697,9 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "请解释“已经写过业务 CRUD，但对数据库底层原理、性能优化和 NoSQL 选型不够熟的读者”，并说明它在 MySQL 面试中的核心原理、适用场景、边界条件和常见误区。",
+        "question": "如何分析 SQL 的性能？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
           "MySQL",
-          "操作系统",
           "MySQL 核心概念",
           "适用场景",
           "关键机制"
@@ -1530,13 +710,12 @@
           "关键机制",
           "边界条件",
           "常见误区",
-          "排查顺序和优化取舍",
-          "数据库执行机制和性能影响"
+          "排查顺序和优化取舍"
         ],
-        "referenceAnswer": "这道题来自外部草稿“已经写过业务 CRUD，但对数据库底层原理、性能优化和 NoSQL 选型不够熟的读者。”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“已经写过业务 CRUD，但对数据库底层原理、性能优化和 NoSQL 选型不够熟的读者。”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“如何分析 SQL 的性能？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“如何分析 SQL 的性能？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“已经写过业务 CRUD，但对数据库底层原理、性能优化和 NoSQL 选型不够熟的读者。”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“如何分析 SQL 的性能？”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？",
           "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
@@ -1557,7 +736,6 @@
             "边界条件",
             "常见误区",
             "排查顺序和优化取舍",
-            "数据库执行机制和性能影响",
             "MySQL"
           ],
           "redFlags": [
@@ -1570,8 +748,8 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -1582,9 +760,9 @@
       }
     },
     {
-      "rank": 14,
-      "id": "external_0049",
-      "title": "字符集详解：字符集是什么？怎么用？：理解字符集、编码、乱码原因以及 MySQL 字符集设置。",
+      "rank": 7,
+      "id": "external_0088",
+      "title": "深入理解 MySQL 索引底层原理 - 腾讯技术工程 - 2020",
       "category": "MySQL",
       "skill": "MySQL",
       "type": "knowledge",
@@ -1592,8 +770,8 @@
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
@@ -1611,7 +789,7 @@
         "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
         "题目本身是中文，适合直接转成中文面试问法。",
         "标题天然接近面试问句。",
-        "当前正式题库的 MySQL 方向仍值得继续扩充。"
+        "包含高频面试考点或真实工程场景。"
       ],
       "promotionRisks": [
         "需要在候选题中保留来源署名和许可证链接。",
@@ -1626,7 +804,7 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_mysql_字符集详解_字符集是什么_怎么用_理解字符集_编码_乱码原因以及_mysql_字符集",
+        "id": "candidate_mysql_深入理解_mysql_索引底层原理_腾讯技术工程_2020",
         "category": "MySQL",
         "skill": "MySQL",
         "roles": [
@@ -1642,7 +820,7 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "请解释“字符集详解：字符集是什么？怎么用？：理解字符集、编码、乱码原因以及 MySQL 字符集设置”，并说明它在 MySQL 面试中的核心原理、适用场景、边界条件和常见误区。",
+        "question": "请解释“深入理解 MySQL 索引底层原理 - 腾讯技术工程 - 2020”，并说明它在 MySQL 面试中的核心原理、适用场景、边界条件和常见误区。",
         "keywords": [
           "MySQL",
           "MySQL 核心概念",
@@ -1657,10 +835,10 @@
           "常见误区",
           "数据库执行机制和性能影响"
         ],
-        "referenceAnswer": "这道题来自外部草稿“字符集详解：字符集是什么？怎么用？：理解字符集、编码、乱码原因以及 MySQL 字符集设置。”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“字符集详解：字符集是什么？怎么用？：理解字符集、编码、乱码原因以及 MySQL 字符集设置。”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“深入理解 MySQL 索引底层原理 - 腾讯技术工程 - 2020”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“深入理解 MySQL 索引底层原理 - 腾讯技术工程 - 2020”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“字符集详解：字符集是什么？怎么用？：理解字符集、编码、乱码原因以及 MySQL 字符集设置。”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“深入理解 MySQL 索引底层原理 - 腾讯技术工程 - 2020”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？",
           "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
@@ -1691,8 +869,8 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -1703,128 +881,9 @@
       }
     },
     {
-      "rank": 15,
-      "id": "external_0034",
-      "title": "charactersetclient ：描述了客户端发送给服务器的 SQL 语句使用的是什么字符集。",
-      "category": "MySQL",
-      "skill": "MySQL",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/character-set.md",
-      "sourcePath": "docs/database/character-set.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "MySQL"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "当前正式题库的 MySQL 方向仍值得继续扩充。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_mysql_charactersetclient_描述了客户端发送给服务器的_sql_语句使用的",
-        "category": "MySQL",
-        "skill": "MySQL",
-        "roles": [
-          "backend",
-          "java",
-          "go",
-          "python",
-          "fullstack"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "请解释“charactersetclient ：描述了客户端发送给服务器的 SQL 语句使用的是什么字符集”，并说明它在 MySQL 面试中的核心原理、适用场景、边界条件和常见误区。",
-        "keywords": [
-          "MySQL",
-          "MySQL 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "MySQL 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“charactersetclient ：描述了客户端发送给服务器的 SQL 语句使用的是什么字符集。”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“charactersetclient ：描述了客户端发送给服务器的 SQL 语句使用的是什么字符集。”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“charactersetclient ：描述了客户端发送给服务器的 SQL 语句使用的是什么字符集。”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "MySQL 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "MySQL"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/character-set.md",
-          "sourcePath": "docs/database/character-set.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 16,
+      "rank": 8,
       "id": "external_0035",
-      "title": "charactersetconnection ：描述了服务器接收到 SQL 语句时使用什么字符集进行翻译。",
+      "title": "什么是 MySQL？",
       "category": "MySQL",
       "skill": "MySQL",
       "type": "knowledge",
@@ -1832,8 +891,8 @@
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/character-set.md",
-      "sourcePath": "docs/database/character-set.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
@@ -1866,7 +925,7 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_mysql_charactersetconnection_描述了服务器接收到_sql_语句时使用",
+        "id": "candidate_mysql_什么是_mysql",
         "category": "MySQL",
         "skill": "MySQL",
         "roles": [
@@ -1882,7 +941,129 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "请解释“charactersetconnection ：描述了服务器接收到 SQL 语句时使用什么字符集进行翻译”，并说明它在 MySQL 面试中的核心原理、适用场景、边界条件和常见误区。",
+        "question": "什么是 MySQL？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "MySQL",
+          "MySQL 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "MySQL 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区",
+          "数据库执行机制和性能影响"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“什么是 MySQL？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“什么是 MySQL？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“什么是 MySQL？”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？",
+          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "MySQL 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "数据库执行机制和性能影响",
+            "MySQL"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 9,
+      "id": "external_0034",
+      "title": "什么是 SQL？",
+      "category": "MySQL",
+      "skill": "MySQL",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "MySQL"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "当前正式题库的 MySQL 方向仍值得继续扩充。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "标题过短，语义不够完整。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_mysql_什么是_sql",
+        "category": "MySQL",
+        "skill": "MySQL",
+        "roles": [
+          "backend",
+          "java",
+          "go",
+          "python",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "什么是 SQL？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
           "MySQL",
           "MySQL 核心概念",
@@ -1896,10 +1077,10 @@
           "边界条件",
           "常见误区"
         ],
-        "referenceAnswer": "这道题来自外部草稿“charactersetconnection ：描述了服务器接收到 SQL 语句时使用什么字符集进行翻译。”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“charactersetconnection ：描述了服务器接收到 SQL 语句时使用什么字符集进行翻译。”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“什么是 SQL？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“什么是 SQL？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“charactersetconnection ：描述了服务器接收到 SQL 语句时使用什么字符集进行翻译。”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“什么是 SQL？”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？",
           "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
@@ -1929,8 +1110,8 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/character-set.md",
-          "sourcePath": "docs/database/character-set.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -1941,25 +1122,151 @@
       }
     },
     {
-      "rank": 17,
-      "id": "external_0008",
-      "title": "HTTP 和 HTTPS 有什么区别？HTTPS 为什么更安全？",
-      "category": "网络",
-      "skill": "网络",
-      "type": "knowledge",
+      "rank": 10,
+      "id": "external_0052",
+      "title": "虽然 MyISAM 引擎和 InnoDB 引擎都是使用 B+Tree 作为索引结构，但是两者的实现方式不太一样。",
+      "category": "MySQL",
+      "skill": "算法",
+      "type": "algorithm",
       "difficulty": 1,
       "provider": "GitHub 中文题库",
       "sourceId": "github-snailclimb-javaguide",
       "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-      "sourcePath": "docs/cs-basics/README.md",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
       "license": "Apache-2.0",
       "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
       "attributionRequired": true,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "网络"
+        "算法"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "包含高频面试考点或真实工程场景。",
+        "当前正式题库的 MySQL 方向仍值得继续扩充。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "标题更像文章主题，入库前需要改写成明确问题。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_mysql_虽然_myisam_引擎和_innodb_引擎都是使用_b_tree_作为索引结构_",
+        "category": "MySQL",
+        "skill": "算法",
+        "roles": [
+          "backend",
+          "java",
+          "go",
+          "python",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "algorithm",
+        "codeKind": "sql",
+        "difficulty": 1,
+        "question": "请围绕“虽然 MyISAM 引擎和 InnoDB 引擎都是使用 B+Tree 作为索引结构，但是两者的实现方式不太一样”说明解题思路、关键数据结构、边界条件和复杂度；可以写伪代码或代码片段。",
+        "keywords": [
+          "MySQL",
+          "算法",
+          "MySQL 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "MySQL 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区",
+          "数据库执行机制和性能影响"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“虽然 MyISAM 引擎和 InnoDB 引擎都是使用 B+Tree 作为索引结构，但是两者的实现方式不太一样。”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“虽然 MyISAM 引擎和 InnoDB 引擎都是使用 B+Tree 作为索引结构，但是两者的实现方式不太一样。”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“虽然 MyISAM 引擎和 InnoDB 引擎都是使用 B+Tree 作为索引结构，但是两者的实现方式不太一样。”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？",
+          "如果输入规模扩大 10 倍，你的复杂度和边界处理是否还能接受？",
+          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "MySQL 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "数据库执行机制和性能影响",
+            "MySQL",
+            "算法"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 11,
+      "id": "external_0005",
+      "title": "支持多线程（C++ 语言没有内置的多线程机制，因此必须调用操作系统的多线程功能来进行多线程程序设计，而 Java 语言却提供了多线程支持）；",
+      "category": "Java",
+      "skill": "Java",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Java"
       ],
       "promotionScore": 100,
       "qualityScore": 76,
@@ -1985,16 +1292,13 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_网络_http_和_https_有什么区别_https_为什么更安全",
-        "category": "网络",
-        "skill": "网络",
+        "id": "candidate_java_支持多线程_c_语言没有内置的多线程机制_因此必须调用操作系统的多线程功能来进行多线程",
+        "category": "Java",
+        "skill": "Java",
         "roles": [
-          "backend",
           "java",
-          "go",
-          "python",
-          "fullstack",
-          "frontend"
+          "backend",
+          "fullstack"
         ],
         "levels": [
           "junior",
@@ -2002,25 +1306,142 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "HTTP 和 HTTPS 有什么区别？HTTPS 为什么更安全？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "请解释“支持多线程（C++ 语言没有内置的多线程机制，因此必须调用操作系统的多线程功能来进行多线程程序设计，而 Java 语言却提供了多线程支持）；”，并说明它在 Java 面试中的核心原理、适用场景、边界条件和常见误区。",
         "keywords": [
-          "网络",
-          "网络 核心概念",
+          "Java",
+          "Java 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "网络 核心概念",
+          "Java 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
           "常见误区",
-          "网络交互流程和异常场景"
+          "方案取舍和失败恢复"
         ],
-        "referenceAnswer": "这道题来自外部草稿“HTTP 和 HTTPS 有什么区别？HTTPS 为什么更安全？”，正式入库前应重写为本地中文参考答案。回答应先给出 网络 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“HTTP 和 HTTPS 有什么区别？HTTPS 为什么更安全？”的核心结论，再展开 网络 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“支持多线程（C++ 语言没有内置的多线程机制，因此必须调用操作系统的多线程功能来进行多线程程序设计，而 Java 语言却提供了多线程支持）；”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“支持多线程（C++ 语言没有内置的多线程机制，因此必须调用操作系统的多线程功能来进行多线程程序设计，而 Java 语言却提供了多线程支持）；”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“HTTP 和 HTTPS 有什么区别？HTTPS 为什么更安全？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“支持多线程（C++ 语言没有内置的多线程机制，因此必须调用操作系统的多线程功能来进行多线程程序设计，而 Java 语言却提供了多线程支持）；”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Java 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "方案取舍和失败恢复",
+            "Java"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 12,
+      "id": "external_0009",
+      "title": "Java 和 C++ 的区别？",
+      "category": "Java",
+      "skill": "Java",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Java"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "Java 正式题数量不多，适合作为补充候选。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_java_java_和_c_的区别",
+        "category": "Java",
+        "skill": "Java",
+        "roles": [
+          "java",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "Java 和 C++ 的区别？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Java",
+          "Java 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Java 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Java 和 C++ 的区别？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Java 和 C++ 的区别？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Java 和 C++ 的区别？”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？"
         ],
@@ -2032,15 +1453,14 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "网络 核心概念",
+            "Java 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "网络交互流程和异常场景",
-            "网络"
+            "Java"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -2052,8 +1472,594 @@
         "governance": {
           "status": "candidate",
           "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-          "sourcePath": "docs/cs-basics/README.md",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 13,
+      "id": "external_0010",
+      "title": "Java 有自动内存管理垃圾回收机制(GC)，不需要程序员手动释放无用内存。",
+      "category": "Java",
+      "skill": "Java",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Java"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "包含高频面试考点或真实工程场景。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_java_java_有自动内存管理垃圾回收机制_gc_不需要程序员手动释放无用内存",
+        "category": "Java",
+        "skill": "Java",
+        "roles": [
+          "java",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "请解释“Java 有自动内存管理垃圾回收机制(GC)，不需要程序员手动释放无用内存”，并说明它在 Java 面试中的核心原理、适用场景、边界条件和常见误区。",
+        "keywords": [
+          "Java",
+          "Java 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Java 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Java 有自动内存管理垃圾回收机制(GC)，不需要程序员手动释放无用内存。”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Java 有自动内存管理垃圾回收机制(GC)，不需要程序员手动释放无用内存。”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Java 有自动内存管理垃圾回收机制(GC)，不需要程序员手动释放无用内存。”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Java 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Java"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 14,
+      "id": "external_0014",
+      "title": "Java 语言关键字有哪些？",
+      "category": "Java",
+      "skill": "Java",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Java"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "Java 正式题数量不多，适合作为补充候选。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_java_java_语言关键字有哪些",
+        "category": "Java",
+        "skill": "Java",
+        "roles": [
+          "java",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "Java 语言关键字有哪些？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Java",
+          "Java 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Java 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Java 语言关键字有哪些？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Java 语言关键字有哪些？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Java 语言关键字有哪些？”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Java 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Java"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 15,
+      "id": "external_0004",
+      "title": "Java 语言有哪些特点？",
+      "category": "Java",
+      "skill": "Java",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Java"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "Java 正式题数量不多，适合作为补充候选。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_java_java_语言有哪些特点",
+        "category": "Java",
+        "skill": "Java",
+        "roles": [
+          "java",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "Java 语言有哪些特点？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Java",
+          "Java 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Java 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Java 语言有哪些特点？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Java 语言有哪些特点？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Java 语言有哪些特点？”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Java 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Java"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 16,
+      "id": "external_0016",
+      "title": "Java 中的几种基本数据类型了解么？",
+      "category": "Java",
+      "skill": "Java",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Java"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "Java 正式题数量不多，适合作为补充候选。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_java_java_中的几种基本数据类型了解么",
+        "category": "Java",
+        "skill": "Java",
+        "roles": [
+          "java",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "Java 中的几种基本数据类型了解么？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Java",
+          "Java 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Java 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Java 中的几种基本数据类型了解么？”，正式入库前应重写为本地中文参考答案。回答应先给出 Java 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Java 中的几种基本数据类型了解么？”的核心结论，再展开 Java 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Java 中的几种基本数据类型了解么？”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Java 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Java"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/java/basis/java-basic-questions-01.md",
+          "sourcePath": "README.md",
+          "license": "Apache-2.0",
+          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+          "attributionRequired": true,
+          "promotionScore": 100,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 17,
+      "id": "external_0049",
+      "title": "MySQL 存储引擎架构了解吗？",
+      "category": "架构",
+      "skill": "架构",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub 中文题库",
+      "sourceId": "github-snailclimb-javaguide",
+      "sourceName": "JavaGuide 中文面试知识库",
+      "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+      "sourcePath": "README.md",
+      "license": "Apache-2.0",
+      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
+      "attributionRequired": true,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "架构",
+        "MySQL"
+      ],
+      "promotionScore": 100,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：Apache-2.0。",
+        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
+        "题目本身是中文，适合直接转成中文面试问法。",
+        "标题天然接近面试问句。",
+        "架构 正式题数量不多，适合作为补充候选。"
+      ],
+      "promotionRisks": [
+        "需要在候选题中保留来源署名和许可证链接。",
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_架构_mysql_存储引擎架构了解吗",
+        "category": "架构",
+        "skill": "架构",
+        "roles": [
+          "backend",
+          "java",
+          "fullstack"
+        ],
+        "levels": [
+          "middle",
+          "senior"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "MySQL 存储引擎架构了解吗？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "架构",
+          "MySQL",
+          "架构 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "架构 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区",
+          "方案取舍和失败恢复",
+          "数据库执行机制和性能影响"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“MySQL 存储引擎架构了解吗？”，正式入库前应重写为本地中文参考答案。回答应先给出 架构 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“MySQL 存储引擎架构了解吗？”的核心结论，再展开 架构 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“MySQL 存储引擎架构了解吗？”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "架构 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "方案取舍和失败恢复",
+            "数据库执行机制和性能影响",
+            "架构"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "JavaGuide 中文面试知识库",
+          "sourceUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/docs/database/mysql/mysql-questions-01.md",
+          "sourcePath": "README.md",
           "license": "Apache-2.0",
           "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
           "attributionRequired": true,
@@ -2065,39 +2071,38 @@
     },
     {
       "rank": 18,
-      "id": "external_0048",
-      "title": "MongoDB、Elasticsearch 这类 NoSQL/搜索系统在后端面试和工程选型中常考哪些点？",
-      "category": "MySQL",
-      "skill": "MySQL",
+      "id": "external_0516",
+      "title": "Describe the TCP Handshake?",
+      "category": "安全",
+      "skill": "安全",
       "type": "knowledge",
       "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
+      "provider": "GitHub",
+      "sourceId": "github-redteamcaptain-pentesting",
+      "sourceName": "Pentesting Interview Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+      "sourcePath": "README.md",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+      "attributionRequired": false,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "MySQL",
-        "操作系统"
+        "网络",
+        "安全"
       ],
-      "promotionScore": 100,
+      "promotionScore": 99,
       "qualityScore": 76,
       "qualityGrade": "D",
       "promotionReasons": [
         "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
+        "授权清晰：CC0-1.0。",
         "标题天然接近面试问句。",
-        "当前正式题库的 MySQL 方向仍值得继续扩充。"
+        "包含高频面试考点或真实工程场景。",
+        "安全 正式题数量不多，适合作为补充候选。",
+        "分类明确，容易映射到本地岗位训练路线。"
       ],
       "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
         "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
       ],
       "qualityIssues": [
@@ -2109,14 +2114,12 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_mysql_mongodb_elasticsearch_这类_nosql_搜索系统在后端面试和工",
-        "category": "MySQL",
-        "skill": "MySQL",
+        "id": "candidate_安全_describe_the_tcp_handshake",
+        "category": "安全",
+        "skill": "安全",
         "roles": [
           "backend",
           "java",
-          "go",
-          "python",
           "fullstack"
         ],
         "levels": [
@@ -2125,28 +2128,28 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "MongoDB、Elasticsearch 这类 NoSQL/搜索系统在后端面试和工程选型中常考哪些点？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "Describe the TCP Handshake? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
-          "MySQL",
-          "操作系统",
-          "MySQL 核心概念",
+          "安全",
+          "网络",
+          "安全 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "MySQL 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "网络交互流程和异常场景"
         ],
-        "referenceAnswer": "这道题来自外部草稿“MongoDB、Elasticsearch 这类 NoSQL/搜索系统在后端面试和工程选型中常考哪些点？”，正式入库前应重写为本地中文参考答案。回答应先给出 MySQL 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“MongoDB、Elasticsearch 这类 NoSQL/搜索系统在后端面试和工程选型中常考哪些点？”的核心结论，再展开 MySQL 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“Describe the TCP Handshake?”，正式入库前应重写为本地中文参考答案。回答应先给出 安全 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Describe the TCP Handshake?”的核心结论，再展开 安全 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“MongoDB、Elasticsearch 这类 NoSQL/搜索系统在后端面试和工程选型中常考哪些点？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“Describe the TCP Handshake?”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果线上 SQL 变慢，你会如何用 Explain 和监控验证原因？"
+          "你会用哪些指标或现象证明自己的判断是对的？"
         ],
         "commonMistakes": [
           "只背结论，不解释原理和判断过程。",
@@ -2155,15 +2158,16 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "MySQL 核心概念",
+            "安全 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "MySQL",
-            "操作系统"
+            "网络交互流程和异常场景",
+            "安全",
+            "网络"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -2173,13 +2177,13 @@
         },
         "governance": {
           "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
+          "source": "Pentesting Interview Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+          "sourcePath": "README.md",
+          "license": "CC0-1.0",
+          "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 99,
           "qualityScore": 76,
           "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
         }
@@ -2187,39 +2191,38 @@
     },
     {
       "rank": 19,
-      "id": "external_0006",
-      "title": "OSI 七层模型和 TCP/IP 四层模型分别是什么？每层解决什么问题？",
-      "category": "网络",
-      "skill": "网络",
+      "id": "external_0540",
+      "title": "How does HTTP handle state?",
+      "category": "安全",
+      "skill": "安全",
       "type": "knowledge",
       "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-      "sourcePath": "docs/cs-basics/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
+      "provider": "GitHub",
+      "sourceId": "github-redteamcaptain-pentesting",
+      "sourceName": "Pentesting Interview Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+      "sourcePath": "README.md",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+      "attributionRequired": false,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
         "网络",
-        "操作系统"
+        "安全"
       ],
-      "promotionScore": 100,
+      "promotionScore": 99,
       "qualityScore": 76,
       "qualityGrade": "D",
       "promotionReasons": [
         "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
+        "授权清晰：CC0-1.0。",
         "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
+        "包含高频面试考点或真实工程场景。",
+        "安全 正式题数量不多，适合作为补充候选。",
+        "分类明确，容易映射到本地岗位训练路线。"
       ],
       "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
         "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
       ],
       "qualityIssues": [
@@ -2231,16 +2234,13 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_网络_osi_七层模型和_tcp_ip_四层模型分别是什么_每层解决什么问题",
-        "category": "网络",
-        "skill": "网络",
+        "id": "candidate_安全_how_does_http_handle_state",
+        "category": "安全",
+        "skill": "安全",
         "roles": [
           "backend",
           "java",
-          "go",
-          "python",
-          "fullstack",
-          "frontend"
+          "fullstack"
         ],
         "levels": [
           "junior",
@@ -2248,26 +2248,26 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "OSI 七层模型和 TCP/IP 四层模型分别是什么？每层解决什么问题？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "How does HTTP handle state? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
+          "安全",
           "网络",
-          "操作系统",
-          "网络 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "网络 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
           "常见误区",
           "网络交互流程和异常场景"
         ],
-        "referenceAnswer": "这道题来自外部草稿“OSI 七层模型和 TCP/IP 四层模型分别是什么？每层解决什么问题？”，正式入库前应重写为本地中文参考答案。回答应先给出 网络 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“OSI 七层模型和 TCP/IP 四层模型分别是什么？每层解决什么问题？”的核心结论，再展开 网络 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“How does HTTP handle state?”，正式入库前应重写为本地中文参考答案。回答应先给出 安全 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How does HTTP handle state?”的核心结论，再展开 安全 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“OSI 七层模型和 TCP/IP 四层模型分别是什么？每层解决什么问题？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“How does HTTP handle state?”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？"
         ],
@@ -2278,7 +2278,7 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "网络 核心概念",
+            "安全 核心概念",
             "适用场景",
             "关键机制"
           ],
@@ -2286,8 +2286,8 @@
             "边界条件",
             "常见误区",
             "网络交互流程和异常场景",
-            "网络",
-            "操作系统"
+            "安全",
+            "网络"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -2297,13 +2297,13 @@
         },
         "governance": {
           "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-          "sourcePath": "docs/cs-basics/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
+          "source": "Pentesting Interview Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+          "sourcePath": "README.md",
+          "license": "CC0-1.0",
+          "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 99,
           "qualityScore": 76,
           "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
         }
@@ -2311,38 +2311,38 @@
     },
     {
       "rank": 20,
-      "id": "external_0058",
-      "title": "Redis 持久化、主从复制、哨兵和 Cluster 分别解决什么问题？",
-      "category": "Redis",
-      "skill": "Redis",
+      "id": "external_0565",
+      "title": "If you could re-design TCP, what would you fix?",
+      "category": "安全",
+      "skill": "安全",
       "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
+      "difficulty": 2,
+      "provider": "GitHub",
+      "sourceId": "github-redteamcaptain-pentesting",
+      "sourceName": "Pentesting Interview Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+      "sourcePath": "README.md",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+      "attributionRequired": false,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "Redis"
+        "网络",
+        "安全"
       ],
-      "promotionScore": 100,
+      "promotionScore": 99,
       "qualityScore": 76,
       "qualityGrade": "D",
       "promotionReasons": [
         "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
+        "授权清晰：CC0-1.0。",
         "标题天然接近面试问句。",
-        "当前正式题库的 Redis 方向仍值得继续扩充。"
+        "包含高频面试考点或真实工程场景。",
+        "安全 正式题数量不多，适合作为补充候选。",
+        "分类明确，容易映射到本地岗位训练路线。"
       ],
       "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
         "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
       ],
       "qualityIssues": [
@@ -2354,43 +2354,43 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_redis_redis_持久化_主从复制_哨兵和_cluster_分别解决什么问题",
-        "category": "Redis",
-        "skill": "Redis",
+        "id": "candidate_安全_if_you_could_re_design_tcp_what_would_you_fix",
+        "category": "安全",
+        "skill": "安全",
         "roles": [
           "backend",
           "java",
-          "go",
-          "python",
           "fullstack"
         ],
         "levels": [
           "junior",
-          "middle"
+          "middle",
+          "senior"
         ],
         "type": "knowledge",
-        "difficulty": 1,
-        "question": "Redis 持久化、主从复制、哨兵和 Cluster 分别解决什么问题？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "difficulty": 2,
+        "question": "If you could re-design TCP, what would you fix? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
-          "Redis",
-          "Redis 核心概念",
+          "安全",
+          "网络",
+          "安全 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "Redis 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "网络交互流程和异常场景"
         ],
-        "referenceAnswer": "这道题来自外部草稿“Redis 持久化、主从复制、哨兵和 Cluster 分别解决什么问题？”，正式入库前应重写为本地中文参考答案。回答应先给出 Redis 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Redis 持久化、主从复制、哨兵和 Cluster 分别解决什么问题？”的核心结论，再展开 Redis 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“If you could re-design TCP, what would you fix?”，正式入库前应重写为本地中文参考答案。回答应先给出 安全 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“If you could re-design TCP, what would you fix?”的核心结论，再展开 安全 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“Redis 持久化、主从复制、哨兵和 Cluster 分别解决什么问题？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“If you could re-design TCP, what would you fix?”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果 Redis 延迟升高或缓存不一致，你会怎么排查？"
+          "你会用哪些指标或现象证明自己的判断是对的？"
         ],
         "commonMistakes": [
           "只背结论，不解释原理和判断过程。",
@@ -2399,14 +2399,16 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "Redis 核心概念",
+            "安全 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "Redis"
+            "网络交互流程和异常场景",
+            "安全",
+            "网络"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -2416,13 +2418,13 @@
         },
         "governance": {
           "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
+          "source": "Pentesting Interview Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+          "sourcePath": "README.md",
+          "license": "CC0-1.0",
+          "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 99,
           "qualityScore": 76,
           "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
         }
@@ -2430,38 +2432,38 @@
     },
     {
       "rank": 21,
-      "id": "external_0047",
-      "title": "Redis 为什么快，常用数据结构、缓存策略、持久化、阻塞问题和集群机制如何理解？",
-      "category": "Redis",
-      "skill": "Redis",
+      "id": "external_0564",
+      "title": "What are the primary design flaws in HTTP, and how would you improve it?",
+      "category": "安全",
+      "skill": "安全",
       "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
+      "difficulty": 2,
+      "provider": "GitHub",
+      "sourceId": "github-redteamcaptain-pentesting",
+      "sourceName": "Pentesting Interview Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+      "sourcePath": "README.md",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+      "attributionRequired": false,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "Redis"
+        "网络",
+        "安全"
       ],
-      "promotionScore": 100,
+      "promotionScore": 99,
       "qualityScore": 76,
       "qualityGrade": "D",
       "promotionReasons": [
         "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
+        "授权清晰：CC0-1.0。",
         "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
+        "包含高频面试考点或真实工程场景。",
+        "安全 正式题数量不多，适合作为补充候选。",
+        "分类明确，容易映射到本地岗位训练路线。"
       ],
       "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
         "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
       ],
       "qualityIssues": [
@@ -2473,43 +2475,43 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_redis_redis_为什么快_常用数据结构_缓存策略_持久化_阻塞问题和集群机制如何理解",
-        "category": "Redis",
-        "skill": "Redis",
+        "id": "candidate_安全_what_are_the_primary_design_flaws_in_http_and",
+        "category": "安全",
+        "skill": "安全",
         "roles": [
           "backend",
           "java",
-          "go",
-          "python",
           "fullstack"
         ],
         "levels": [
           "junior",
-          "middle"
+          "middle",
+          "senior"
         ],
         "type": "knowledge",
-        "difficulty": 1,
-        "question": "Redis 为什么快，常用数据结构、缓存策略、持久化、阻塞问题和集群机制如何理解？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "difficulty": 2,
+        "question": "What are the primary design flaws in HTTP, and how would you improve it? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
-          "Redis",
-          "Redis 核心概念",
+          "安全",
+          "网络",
+          "安全 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "Redis 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "网络交互流程和异常场景"
         ],
-        "referenceAnswer": "这道题来自外部草稿“Redis 为什么快，常用数据结构、缓存策略、持久化、阻塞问题和集群机制如何理解？”，正式入库前应重写为本地中文参考答案。回答应先给出 Redis 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Redis 为什么快，常用数据结构、缓存策略、持久化、阻塞问题和集群机制如何理解？”的核心结论，再展开 Redis 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“What are the primary design flaws in HTTP, and how would you improve it?”，正式入库前应重写为本地中文参考答案。回答应先给出 安全 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What are the primary design flaws in HTTP, and how would you improve it?”的核心结论，再展开 安全 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“Redis 为什么快，常用数据结构、缓存策略、持久化、阻塞问题和集群机制如何理解？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“What are the primary design flaws in HTTP, and how would you improve it?”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果 Redis 延迟升高或缓存不一致，你会怎么排查？"
+          "你会用哪些指标或现象证明自己的判断是对的？"
         ],
         "commonMistakes": [
           "只背结论，不解释原理和判断过程。",
@@ -2518,14 +2520,16 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "Redis 核心概念",
+            "安全 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "Redis"
+            "网络交互流程和异常场景",
+            "安全",
+            "网络"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -2535,13 +2539,13 @@
         },
         "governance": {
           "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
+          "source": "Pentesting Interview Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+          "sourcePath": "README.md",
+          "license": "CC0-1.0",
+          "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 99,
           "qualityScore": 76,
           "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
         }
@@ -2549,38 +2553,39 @@
     },
     {
       "rank": 22,
-      "id": "external_0057",
-      "title": "Redis 为什么快？缓存穿透、击穿、雪崩如何处理？",
-      "category": "Redis",
-      "skill": "Redis",
+      "id": "external_0539",
+      "title": "What’s the difference between HTTP and HTML?",
+      "category": "安全",
+      "skill": "安全",
       "type": "knowledge",
       "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-      "sourcePath": "docs/database/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
+      "provider": "GitHub",
+      "sourceId": "github-redteamcaptain-pentesting",
+      "sourceName": "Pentesting Interview Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+      "sourcePath": "README.md",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+      "attributionRequired": false,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "Redis"
+        "前端",
+        "网络",
+        "安全"
       ],
-      "promotionScore": 100,
+      "promotionScore": 99,
       "qualityScore": 76,
       "qualityGrade": "D",
       "promotionReasons": [
         "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
+        "授权清晰：CC0-1.0。",
         "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
+        "包含高频面试考点或真实工程场景。",
+        "安全 正式题数量不多，适合作为补充候选。",
+        "分类明确，容易映射到本地岗位训练路线。"
       ],
       "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
         "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
       ],
       "qualityIssues": [
@@ -2592,14 +2597,12 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_redis_redis_为什么快_缓存穿透_击穿_雪崩如何处理",
-        "category": "Redis",
-        "skill": "Redis",
+        "id": "candidate_安全_what_s_the_difference_between_http_and_html",
+        "category": "安全",
+        "skill": "安全",
         "roles": [
           "backend",
           "java",
-          "go",
-          "python",
           "fullstack"
         ],
         "levels": [
@@ -2608,27 +2611,29 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "Redis 为什么快？缓存穿透、击穿、雪崩如何处理？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "What’s the difference between HTTP and HTML? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
-          "Redis",
-          "Redis 核心概念",
+          "安全",
+          "前端",
+          "网络",
+          "安全 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "Redis 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
-          "常见误区"
+          "常见误区",
+          "网络交互流程和异常场景"
         ],
-        "referenceAnswer": "这道题来自外部草稿“Redis 为什么快？缓存穿透、击穿、雪崩如何处理？”，正式入库前应重写为本地中文参考答案。回答应先给出 Redis 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Redis 为什么快？缓存穿透、击穿、雪崩如何处理？”的核心结论，再展开 Redis 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“What’s the difference between HTTP and HTML?”，正式入库前应重写为本地中文参考答案。回答应先给出 安全 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What’s the difference between HTTP and HTML?”的核心结论，再展开 安全 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“Redis 为什么快？缓存穿透、击穿、雪崩如何处理？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“What’s the difference between HTTP and HTML?”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果 Redis 延迟升高或缓存不一致，你会怎么排查？"
+          "你会用哪些指标或现象证明自己的判断是对的？"
         ],
         "commonMistakes": [
           "只背结论，不解释原理和判断过程。",
@@ -2637,14 +2642,16 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "Redis 核心概念",
+            "安全 核心概念",
             "适用场景",
             "关键机制"
           ],
           "goodToHave": [
             "边界条件",
             "常见误区",
-            "Redis"
+            "网络交互流程和异常场景",
+            "安全",
+            "前端"
           ],
           "redFlags": [
             "只背结论，不解释原理和判断过程。",
@@ -2654,13 +2661,13 @@
         },
         "governance": {
           "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/database/README.md",
-          "sourcePath": "docs/database/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
+          "source": "Pentesting Interview Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+          "sourcePath": "README.md",
+          "license": "CC0-1.0",
+          "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 99,
           "qualityScore": 76,
           "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
         }
@@ -2668,38 +2675,38 @@
     },
     {
       "rank": 23,
-      "id": "external_0010",
-      "title": "TCP 如何保证可靠传输？TCP 和 UDP 如何选型？",
-      "category": "网络",
-      "skill": "网络",
+      "id": "external_0520",
+      "title": "What's the difference between TCP and UDP?",
+      "category": "安全",
+      "skill": "安全",
       "type": "knowledge",
       "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-      "sourcePath": "docs/cs-basics/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
+      "provider": "GitHub",
+      "sourceId": "github-redteamcaptain-pentesting",
+      "sourceName": "Pentesting Interview Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+      "sourcePath": "README.md",
+      "license": "CC0-1.0",
+      "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+      "attributionRequired": false,
       "importPolicy": "can-transform",
       "popularity": 0,
       "tags": [
-        "网络"
+        "网络",
+        "安全"
       ],
-      "promotionScore": 100,
+      "promotionScore": 99,
       "qualityScore": 76,
       "qualityGrade": "D",
       "promotionReasons": [
         "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
+        "授权清晰：CC0-1.0。",
         "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
+        "包含高频面试考点或真实工程场景。",
+        "安全 正式题数量不多，适合作为补充候选。",
+        "分类明确，容易映射到本地岗位训练路线。"
       ],
       "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
         "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
       ],
       "qualityIssues": [
@@ -2711,16 +2718,13 @@
         }
       ],
       "proposedQuestion": {
-        "id": "candidate_网络_tcp_如何保证可靠传输_tcp_和_udp_如何选型",
-        "category": "网络",
-        "skill": "网络",
+        "id": "candidate_安全_what_s_the_difference_between_tcp_and_udp",
+        "category": "安全",
+        "skill": "安全",
         "roles": [
           "backend",
           "java",
-          "go",
-          "python",
-          "fullstack",
-          "frontend"
+          "fullstack"
         ],
         "levels": [
           "junior",
@@ -2728,25 +2732,26 @@
         ],
         "type": "knowledge",
         "difficulty": 1,
-        "question": "TCP 如何保证可靠传输？TCP 和 UDP 如何选型？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "question": "What's the difference between TCP and UDP? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
         "keywords": [
+          "安全",
           "网络",
-          "网络 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制"
         ],
         "expectedPoints": [
-          "网络 核心概念",
+          "安全 核心概念",
           "适用场景",
           "关键机制",
           "边界条件",
           "常见误区",
           "网络交互流程和异常场景"
         ],
-        "referenceAnswer": "这道题来自外部草稿“TCP 如何保证可靠传输？TCP 和 UDP 如何选型？”，正式入库前应重写为本地中文参考答案。回答应先给出 网络 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“TCP 如何保证可靠传输？TCP 和 UDP 如何选型？”的核心结论，再展开 网络 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "referenceAnswer": "这道题来自外部草稿“What's the difference between TCP and UDP?”，正式入库前应重写为本地中文参考答案。回答应先给出 安全 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What's the difference between TCP and UDP?”的核心结论，再展开 安全 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
         "followUps": [
-          "如果继续追问“TCP 如何保证可靠传输？TCP 和 UDP 如何选型？”的实现细节，你会补充哪三个关键点？",
+          "如果继续追问“What's the difference between TCP and UDP?”的实现细节，你会补充哪三个关键点？",
           "这个问题在真实项目里最容易踩的坑是什么？",
           "你会用哪些指标或现象证明自己的判断是对的？"
         ],
@@ -2757,7 +2762,7 @@
         ],
         "scoringRubric": {
           "mustHave": [
-            "网络 核心概念",
+            "安全 核心概念",
             "适用场景",
             "关键机制"
           ],
@@ -2765,6 +2770,7 @@
             "边界条件",
             "常见误区",
             "网络交互流程和异常场景",
+            "安全",
             "网络"
           ],
           "redFlags": [
@@ -2775,13 +2781,13 @@
         },
         "governance": {
           "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-          "sourcePath": "docs/cs-basics/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
+          "source": "Pentesting Interview Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/README.md",
+          "sourcePath": "README.md",
+          "license": "CC0-1.0",
+          "licenseUrl": "https://raw.githubusercontent.com/redteamcaptain/Pentesting-Interview-Questions/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 99,
           "qualityScore": 76,
           "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
         }
@@ -2789,128 +2795,7 @@
     },
     {
       "rank": 24,
-      "id": "external_0009",
-      "title": "TCP 三次握手、四次挥手分别解决什么问题？TIMEWAIT 为什么存在？",
-      "category": "网络",
-      "skill": "网络",
-      "type": "knowledge",
-      "difficulty": 1,
-      "provider": "GitHub 中文题库",
-      "sourceId": "github-snailclimb-javaguide",
-      "sourceName": "JavaGuide 中文面试知识库",
-      "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-      "sourcePath": "docs/cs-basics/README.md",
-      "license": "Apache-2.0",
-      "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-      "attributionRequired": true,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "网络"
-      ],
-      "promotionScore": 100,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：Apache-2.0。",
-        "中文题源，转写成本低，和当前中文模拟面试定位匹配。",
-        "题目本身是中文，适合直接转成中文面试问法。",
-        "标题天然接近面试问句。",
-        "包含高频面试考点或真实工程场景。"
-      ],
-      "promotionRisks": [
-        "需要在候选题中保留来源署名和许可证链接。",
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_网络_tcp_三次握手_四次挥手分别解决什么问题_timewait_为什么存在",
-        "category": "网络",
-        "skill": "网络",
-        "roles": [
-          "backend",
-          "java",
-          "go",
-          "python",
-          "fullstack",
-          "frontend"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "knowledge",
-        "difficulty": 1,
-        "question": "TCP 三次握手、四次挥手分别解决什么问题？TIMEWAIT 为什么存在？ 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "网络",
-          "网络 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "网络 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区",
-          "网络交互流程和异常场景"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“TCP 三次握手、四次挥手分别解决什么问题？TIMEWAIT 为什么存在？”，正式入库前应重写为本地中文参考答案。回答应先给出 网络 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。入库时需要保留来源署名：JavaGuide 中文面试知识库，许可证 Apache-2.0。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“TCP 三次握手、四次挥手分别解决什么问题？TIMEWAIT 为什么存在？”的核心结论，再展开 网络 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“TCP 三次握手、四次挥手分别解决什么问题？TIMEWAIT 为什么存在？”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "网络 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "网络交互流程和异常场景",
-            "网络"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "JavaGuide 中文面试知识库",
-          "sourceUrl": "https://github.com/Snailclimb/JavaGuide/blob/main/docs/cs-basics/README.md",
-          "sourcePath": "docs/cs-basics/README.md",
-          "license": "Apache-2.0",
-          "licenseUrl": "https://raw.githubusercontent.com/Snailclimb/JavaGuide/main/LICENSE",
-          "attributionRequired": true,
-          "promotionScore": 100,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 25,
-      "id": "external_0270",
+      "id": "external_0150",
       "title": "Are custom DOM attributes supported in React v16?",
       "category": "前端",
       "skill": "前端",
@@ -3022,8 +2907,8 @@
       }
     },
     {
-      "rank": 26,
-      "id": "external_0440",
+      "rank": 25,
+      "id": "external_0320",
       "title": "Are there any drawback of Vue.js you know?",
       "category": "前端",
       "skill": "前端",
@@ -3135,8 +3020,8 @@
       }
     },
     {
-      "rank": 27,
-      "id": "external_0297",
+      "rank": 26,
+      "id": "external_0177",
       "title": "Can you declared multiple types of variables in single declaration in Go?",
       "category": "Go",
       "skill": "Go",
@@ -3249,8 +3134,8 @@
       }
     },
     {
-      "rank": 28,
-      "id": "external_0439",
+      "rank": 27,
+      "id": "external_0319",
       "title": "Can you force Vue.js to reload/rerender?",
       "category": "前端",
       "skill": "前端",
@@ -3362,8 +3247,8 @@
       }
     },
     {
-      "rank": 29,
-      "id": "external_0466",
+      "rank": 28,
+      "id": "external_0346",
       "title": "Could we use TypeScript on backend and how?",
       "category": "前端",
       "skill": "前端",
@@ -3478,8 +3363,8 @@
       }
     },
     {
-      "rank": 30,
-      "id": "external_0457",
+      "rank": 29,
+      "id": "external_0337",
       "title": "Do we need to compile TypeScript files and why?",
       "category": "前端",
       "skill": "前端",
@@ -3594,8 +3479,8 @@
       }
     },
     {
-      "rank": 31,
-      "id": "external_0464",
+      "rank": 30,
+      "id": "external_0344",
       "title": "Does TypeScript support all object oriented principles?",
       "category": "前端",
       "skill": "前端",
@@ -3710,8 +3595,8 @@
       }
     },
     {
-      "rank": 32,
-      "id": "external_0479",
+      "rank": 31,
+      "id": "external_0359",
       "title": "Does TypeScript supports function overloading?",
       "category": "前端",
       "skill": "前端",
@@ -3826,8 +3711,8 @@
       }
     },
     {
-      "rank": 33,
-      "id": "external_0312",
+      "rank": 32,
+      "id": "external_0192",
       "title": "Have you worked with Go 2?",
       "category": "Go",
       "skill": "Go",
@@ -3940,8 +3825,8 @@
       }
     },
     {
-      "rank": 34,
-      "id": "external_0447",
+      "rank": 33,
+      "id": "external_0327",
       "title": "How can I watch an array length using Vue.js?",
       "category": "前端",
       "skill": "前端",
@@ -4056,8 +3941,8 @@
       }
     },
     {
-      "rank": 35,
-      "id": "external_0488",
+      "rank": 34,
+      "id": "external_0368",
       "title": "How do you detect a cycle in a linked list with Go?",
       "category": "Go",
       "skill": "Go",
@@ -4170,250 +4055,8 @@
       }
     },
     {
-      "rank": 36,
-      "id": "external_0331",
-      "title": "How to check if an object is an array or not? Provide some code.",
-      "category": "算法",
-      "skill": "算法",
-      "type": "algorithm",
-      "difficulty": 1,
-      "provider": "GitHub",
-      "sourceId": "github-faqguru-golang-frontend",
-      "sourceName": "FAQGURU Go and Frontend Questions",
-      "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/javascript.md",
-      "sourcePath": "README.md",
-      "license": "MIT",
-      "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
-      "attributionRequired": false,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "算法"
-      ],
-      "promotionScore": 98,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：MIT。",
-        "标题天然接近面试问句。",
-        "当前正式题库的 算法 方向仍值得继续扩充。",
-        "分类明确，容易映射到本地岗位训练路线。"
-      ],
-      "promotionRisks": [
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_算法_how_to_check_if_an_object_is_an_array_or_not_",
-        "category": "算法",
-        "skill": "算法",
-        "roles": [
-          "backend",
-          "frontend",
-          "fullstack",
-          "java",
-          "go",
-          "python"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "algorithm",
-        "codeKind": "algorithm",
-        "difficulty": 1,
-        "question": "请围绕“How to check if an object is an array or not? Provide some code”说明解题思路、关键数据结构、边界条件和复杂度；可以写伪代码或代码片段。",
-        "keywords": [
-          "算法",
-          "算法 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "算法 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“How to check if an object is an array or not? Provide some code.”，正式入库前应重写为本地中文参考答案。回答应先给出 算法 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How to check if an object is an array or not? Provide some code.”的核心结论，再展开 算法 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“How to check if an object is an array or not? Provide some code.”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果输入规模扩大 10 倍，你的复杂度和边界处理是否还能接受？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。",
-          "忽略复杂度、边界输入和重复/空值等特殊情况。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "算法 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "算法"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。",
-            "忽略复杂度、边界输入和重复/空值等特殊情况。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "FAQGURU Go and Frontend Questions",
-          "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/javascript.md",
-          "sourcePath": "README.md",
-          "license": "MIT",
-          "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
-          "attributionRequired": false,
-          "promotionScore": 98,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 37,
-      "id": "external_0351",
-      "title": "How would you add your own method to the Array object so the following code would work?",
-      "category": "算法",
-      "skill": "算法",
-      "type": "algorithm",
-      "difficulty": 1,
-      "provider": "GitHub",
-      "sourceId": "github-faqguru-golang-frontend",
-      "sourceName": "FAQGURU Go and Frontend Questions",
-      "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/javascript.md",
-      "sourcePath": "README.md",
-      "license": "MIT",
-      "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
-      "attributionRequired": false,
-      "importPolicy": "can-transform",
-      "popularity": 0,
-      "tags": [
-        "算法"
-      ],
-      "promotionScore": 98,
-      "qualityScore": 76,
-      "qualityGrade": "D",
-      "promotionReasons": [
-        "授权策略允许转写成正式中文训练题。",
-        "授权清晰：MIT。",
-        "标题天然接近面试问句。",
-        "当前正式题库的 算法 方向仍值得继续扩充。",
-        "分类明确，容易映射到本地岗位训练路线。"
-      ],
-      "promotionRisks": [
-        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
-      ],
-      "qualityIssues": [
-        {
-          "severity": "blocker",
-          "code": "candidate-template-text",
-          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
-          "penalty": 24
-        }
-      ],
-      "proposedQuestion": {
-        "id": "candidate_算法_how_would_you_add_your_own_method_to_the_arra",
-        "category": "算法",
-        "skill": "算法",
-        "roles": [
-          "backend",
-          "frontend",
-          "fullstack",
-          "java",
-          "go",
-          "python"
-        ],
-        "levels": [
-          "junior",
-          "middle"
-        ],
-        "type": "algorithm",
-        "codeKind": "algorithm",
-        "difficulty": 1,
-        "question": "How would you add your own method to the Array object so the following code would work? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
-        "keywords": [
-          "算法",
-          "算法 核心概念",
-          "适用场景",
-          "关键机制"
-        ],
-        "expectedPoints": [
-          "算法 核心概念",
-          "适用场景",
-          "关键机制",
-          "边界条件",
-          "常见误区"
-        ],
-        "referenceAnswer": "这道题来自外部草稿“How would you add your own method to the Array object so the following code would work?”，正式入库前应重写为本地中文参考答案。回答应先给出 算法 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
-        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“How would you add your own method to the Array object so the following code would work?”的核心结论，再展开 算法 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
-        "followUps": [
-          "如果继续追问“How would you add your own method to the Array object so the following code would work?”的实现细节，你会补充哪三个关键点？",
-          "这个问题在真实项目里最容易踩的坑是什么？",
-          "你会用哪些指标或现象证明自己的判断是对的？",
-          "如果输入规模扩大 10 倍，你的复杂度和边界处理是否还能接受？"
-        ],
-        "commonMistakes": [
-          "只背结论，不解释原理和判断过程。",
-          "没有说明适用边界和失败场景。",
-          "不能结合真实项目或线上排查经验。",
-          "忽略复杂度、边界输入和重复/空值等特殊情况。"
-        ],
-        "scoringRubric": {
-          "mustHave": [
-            "算法 核心概念",
-            "适用场景",
-            "关键机制"
-          ],
-          "goodToHave": [
-            "边界条件",
-            "常见误区",
-            "算法"
-          ],
-          "redFlags": [
-            "只背结论，不解释原理和判断过程。",
-            "没有说明适用边界和失败场景。",
-            "不能结合真实项目或线上排查经验。",
-            "忽略复杂度、边界输入和重复/空值等特殊情况。"
-          ]
-        },
-        "governance": {
-          "status": "candidate",
-          "source": "FAQGURU Go and Frontend Questions",
-          "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/javascript.md",
-          "sourcePath": "README.md",
-          "license": "MIT",
-          "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
-          "attributionRequired": false,
-          "promotionScore": 98,
-          "qualityScore": 76,
-          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
-        }
-      }
-    },
-    {
-      "rank": 38,
-      "id": "external_0489",
+      "rank": 35,
+      "id": "external_0369",
       "title": "How would you implement a stack or queue in Go?",
       "category": "Go",
       "skill": "Go",
@@ -4526,8 +4169,8 @@
       }
     },
     {
-      "rank": 39,
-      "id": "external_0487",
+      "rank": 36,
+      "id": "external_0367",
       "title": "How would you reverse a linked list in Go?",
       "category": "Go",
       "skill": "Go",
@@ -4640,8 +4283,8 @@
       }
     },
     {
-      "rank": 40,
-      "id": "external_0294",
+      "rank": 37,
+      "id": "external_0174",
       "title": "Is Go a new language, framework or library?",
       "category": "Go",
       "skill": "Go",
@@ -4746,6 +4389,355 @@
           "sourcePath": "README.md",
           "license": "MIT",
           "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 98,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 38,
+      "id": "external_0188",
+      "title": "Is Go an object-oriented language?",
+      "category": "Go",
+      "skill": "Go",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub",
+      "sourceId": "github-faqguru-golang-frontend",
+      "sourceName": "FAQGURU Go and Frontend Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "sourcePath": "README.md",
+      "license": "MIT",
+      "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
+      "attributionRequired": false,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Go"
+      ],
+      "promotionScore": 98,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：MIT。",
+        "标题天然接近面试问句。",
+        "当前正式题库的 Go 方向仍值得继续扩充。",
+        "分类明确，容易映射到本地岗位训练路线。"
+      ],
+      "promotionRisks": [
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_go_is_go_an_object_oriented_language",
+        "category": "Go",
+        "skill": "Go",
+        "roles": [
+          "go",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "Is Go an object-oriented language? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Go",
+          "Go 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Go 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Is Go an object-oriented language?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Is Go an object-oriented language?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Is Go an object-oriented language?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Go 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Go"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "FAQGURU Go and Frontend Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+          "sourcePath": "README.md",
+          "license": "MIT",
+          "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 98,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 39,
+      "id": "external_0187",
+      "title": "Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?",
+      "category": "Go",
+      "skill": "Go",
+      "type": "knowledge",
+      "difficulty": 1,
+      "provider": "GitHub",
+      "sourceId": "github-faqguru-golang-frontend",
+      "sourceName": "FAQGURU Go and Frontend Questions",
+      "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+      "sourcePath": "README.md",
+      "license": "MIT",
+      "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
+      "attributionRequired": false,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "Go"
+      ],
+      "promotionScore": 98,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：MIT。",
+        "标题天然接近面试问句。",
+        "当前正式题库的 Go 方向仍值得继续扩充。",
+        "分类明确，容易映射到本地岗位训练路线。"
+      ],
+      "promotionRisks": [
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_go_let_s_talk_variable_declaration_in_go_could_y",
+        "category": "Go",
+        "skill": "Go",
+        "roles": [
+          "go",
+          "backend",
+          "fullstack"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "knowledge",
+        "difficulty": 1,
+        "question": "Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "Go",
+          "Go 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "Go 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?”，正式入库前应重写为本地中文参考答案。回答应先给出 Go 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?”的核心结论，再展开 Go 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“Let's talk variable declaration in Go. Could you explain what is a variable \"zero value\"?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "Go 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "Go"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "FAQGURU Go and Frontend Questions",
+          "sourceUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/topics/en/golang.md",
+          "sourcePath": "README.md",
+          "license": "MIT",
+          "licenseUrl": "https://raw.githubusercontent.com/FAQGURU/FAQGURU/master/LICENSE",
+          "attributionRequired": false,
+          "promotionScore": 98,
+          "qualityScore": 76,
+          "reviewNotes": "外部草稿自动生成候选题，正式入库前需要人工复核参考答案和评分点。"
+        }
+      }
+    },
+    {
+      "rank": 40,
+      "id": "external_0110",
+      "title": "What is \"key\" prop and what is the benefit of using it in arrays of elements?",
+      "category": "算法",
+      "skill": "算法",
+      "type": "algorithm",
+      "difficulty": 1,
+      "provider": "GitHub",
+      "sourceId": "github-sudheerj-react-interview",
+      "sourceName": "ReactJS Interview Questions",
+      "sourceUrl": "https://github.com/sudheerj/reactjs-interview-questions/blob/master/README.md",
+      "sourcePath": "README.md",
+      "license": "MIT",
+      "licenseUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/LICENSE",
+      "attributionRequired": false,
+      "importPolicy": "can-transform",
+      "popularity": 0,
+      "tags": [
+        "算法"
+      ],
+      "promotionScore": 98,
+      "qualityScore": 76,
+      "qualityGrade": "D",
+      "promotionReasons": [
+        "授权策略允许转写成正式中文训练题。",
+        "授权清晰：MIT。",
+        "标题天然接近面试问句。",
+        "当前正式题库的 算法 方向仍值得继续扩充。",
+        "分类明确，容易映射到本地岗位训练路线。"
+      ],
+      "promotionRisks": [
+        "候选结构待补强：题目仍包含候选题模板/待重写说明，不能直接入库"
+      ],
+      "qualityIssues": [
+        {
+          "severity": "blocker",
+          "code": "candidate-template-text",
+          "message": "题目仍包含候选题模板/待重写说明，不能直接入库",
+          "penalty": 24
+        }
+      ],
+      "proposedQuestion": {
+        "id": "candidate_算法_what_is_key_prop_and_what_is_the_benefit_of_u",
+        "category": "算法",
+        "skill": "算法",
+        "roles": [
+          "backend",
+          "frontend",
+          "fullstack",
+          "java",
+          "go",
+          "python"
+        ],
+        "levels": [
+          "junior",
+          "middle"
+        ],
+        "type": "algorithm",
+        "codeKind": "algorithm",
+        "difficulty": 1,
+        "question": "What is \"key\" prop and what is the benefit of using it in arrays of elements? 请用中文面试回答方式说明核心原理、边界条件和真实项目中的取舍。",
+        "keywords": [
+          "算法",
+          "算法 核心概念",
+          "适用场景",
+          "关键机制"
+        ],
+        "expectedPoints": [
+          "算法 核心概念",
+          "适用场景",
+          "关键机制",
+          "边界条件",
+          "常见误区"
+        ],
+        "referenceAnswer": "这道题来自外部草稿“What is \"key\" prop and what is the benefit of using it in arrays of elements?”，正式入库前应重写为本地中文参考答案。回答应先给出 算法 的核心定义或主流程，再解释关键机制和适用场景。随后补充边界条件、常见误区、线上排查或项目落地取舍。该来源不要求额外署名，但仍建议保留来源链接便于追溯。",
+        "excellentAnswer": "优秀回答可以按“结论 -> 原理 -> 场景 -> 边界 -> 项目化表达”的结构组织。先用一两句话回答“What is \"key\" prop and what is the benefit of using it in arrays of elements?”的核心结论，再展开 算法 里的关键机制。如果涉及性能、并发、一致性或网络交互，要说明判断顺序、指标证据和方案取舍。最后结合自己项目中的一次真实使用、排查或优化经历，说明结果和复盘。",
+        "followUps": [
+          "如果继续追问“What is \"key\" prop and what is the benefit of using it in arrays of elements?”的实现细节，你会补充哪三个关键点？",
+          "这个问题在真实项目里最容易踩的坑是什么？",
+          "你会用哪些指标或现象证明自己的判断是对的？",
+          "如果输入规模扩大 10 倍，你的复杂度和边界处理是否还能接受？"
+        ],
+        "commonMistakes": [
+          "只背结论，不解释原理和判断过程。",
+          "没有说明适用边界和失败场景。",
+          "不能结合真实项目或线上排查经验。",
+          "忽略复杂度、边界输入和重复/空值等特殊情况。"
+        ],
+        "scoringRubric": {
+          "mustHave": [
+            "算法 核心概念",
+            "适用场景",
+            "关键机制"
+          ],
+          "goodToHave": [
+            "边界条件",
+            "常见误区",
+            "算法"
+          ],
+          "redFlags": [
+            "只背结论，不解释原理和判断过程。",
+            "没有说明适用边界和失败场景。",
+            "不能结合真实项目或线上排查经验。",
+            "忽略复杂度、边界输入和重复/空值等特殊情况。"
+          ]
+        },
+        "governance": {
+          "status": "candidate",
+          "source": "ReactJS Interview Questions",
+          "sourceUrl": "https://github.com/sudheerj/reactjs-interview-questions/blob/master/README.md",
+          "sourcePath": "README.md",
+          "license": "MIT",
+          "licenseUrl": "https://raw.githubusercontent.com/sudheerj/reactjs-interview-questions/master/LICENSE",
           "attributionRequired": false,
           "promotionScore": 98,
           "qualityScore": 76,

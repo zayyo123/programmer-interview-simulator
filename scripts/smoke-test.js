@@ -666,7 +666,7 @@ function verifyFrontendAnswerGuide() {
 
   assert(html.includes('id="answerGuide"'), 'frontend should render the current answer guide container');
   assert(html.includes('id="planPreview"'), 'setup form should render a pre-interview plan preview container');
-  assert(html.includes('/app.js?v=geek-dark-2'), 'index should load the latest frontend bundle version');
+  assert(html.includes('/app.js?v=geek-light-1'), 'index should load the latest frontend bundle version');
   assert(html.includes('/vendor/echarts.min.js'), 'index should load ECharts for dashboard charts');
   assert(app.includes('function renderAnswerGuide'), 'frontend should update answer guide from current question state');
   assert(app.includes('function renderQuestionDrillAnswerGuide'), 'answer guide should render single-question drill guidance');

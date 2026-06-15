@@ -16,7 +16,11 @@ const practiceHistoryEl = document.querySelector('#practiceHistory');
 const profileAnalysisEl = document.querySelector('#profileAnalysis');
 const planPreviewEl = document.querySelector('#planPreview');
 const questionOpsEl = document.querySelector('#questionOps');
+const paperOpsEl = document.querySelector('#paperOps');
+const setupSummaryEl = document.querySelector('#setupSummary');
 const resumeInput = setupForm.querySelector('textarea[name="resume"]');
+const roleGroupTabs = document.querySelector('#roleGroupTabs');
+const roleGroupHint = document.querySelector('#roleGroupHint');
 const roleChoiceGrid = document.querySelector('#roleChoiceGrid');
 const levelStepper = document.querySelector('#levelStepper');
 const styleSegmented = document.querySelector('#styleSegmented');
@@ -27,12 +31,19 @@ const aiProviderWarning = document.querySelector('#aiProviderWarning');
 const profileDropzone = document.querySelector('#profileDropzone');
 const profileUploadButton = document.querySelector('#profileUploadButton');
 const profileFileInput = document.querySelector('#profileFileInput');
+const fillRoleSampleButton = document.querySelector('#fillRoleSampleButton');
+const clearResumeButton = document.querySelector('#clearResumeButton');
 const countdownOverlay = document.querySelector('#countdownOverlay');
+const productNavButtons = document.querySelectorAll('[data-product-target]');
+const productViews = document.querySelectorAll('[data-product-view]');
 const workflowStepButtons = document.querySelectorAll('[data-step-target]');
 const workflowStepPanels = document.querySelectorAll('[data-workflow-step]');
 const workflowStatusEl = document.querySelector('#workflowStatus');
+const themeToggle = document.querySelector('#themeToggle');
+const themeToggleText = document.querySelector('#themeToggleText');
 const PRACTICE_HISTORY_KEY = 'programmer-interview-practice-history-v1';
 const PRACTICE_HISTORY_LIMIT = 12;
+const THEME_STORAGE_KEY = 'programmer-interview-theme-v1';
 
 let sessionId = null;
 let busy = false;
@@ -44,8 +55,83 @@ let currentQuestionId = null;
 let latestReport = null;
 let codeAnswerMode = 'explain';
 let codeAnswerModeQuestionId = null;
+let activeRoleGroup = 'backend';
+let activeProductView = 'interview';
+let latestQuestionBankCatalog = null;
+let latestQuestionPaper = null;
+
+const roleGroups = [
+  {
+    id: 'backend',
+    label: '后端',
+    hint: 'Java、Go、Python 和通用后端分开选，重点覆盖 API、数据库、缓存、并发和系统设计。',
+    roles: ['java', 'backend', 'go', 'python']
+  },
+  {
+    id: 'client',
+    label: '前端 / 客户端',
+    hint: '前端只覆盖 Web 前端；Android、iOS、鸿蒙/跨端必须在简历有对应信号时才进入题目池。',
+    roles: ['frontend', 'fullstack']
+  },
+  {
+    id: 'quality',
+    label: '测试 / 运维',
+    hint: '质量保障、运维、DBA、网络、DevOps 和 SRE 按工程职责拆开训练。',
+    roles: ['qa', 'ops', 'devops']
+  },
+  {
+    id: 'data-ai',
+    label: '数据 / AI',
+    hint: '数据工程关注链路和治理，AI 关注数据、模型、评估、部署和漂移。',
+    roles: ['data', 'ai']
+  },
+  {
+    id: 'security-architect',
+    label: '安全 / 管理',
+    hint: '安全强调攻防闭环和风险治理，架构/管理强调取舍、推进和技术治理。',
+    roles: ['security', 'architect']
+  }
+];
+
+const roleDescriptions = {
+  java: 'JVM / Spring',
+  backend: 'API / DB / Redis',
+  frontend: 'Web / Vue / React',
+  fullstack: '端到端链路',
+  go: 'Goroutine / 微服务',
+  python: 'FastAPI / Worker',
+  qa: '测试策略 / 自动化',
+  ops: 'Linux / 网络 / 数据库',
+  devops: 'CI/CD / K8s / 稳定性',
+  data: 'ETL / 数仓 / SQL',
+  ai: '模型 / 特征 / 推理',
+  security: '攻防 / 漏洞 / 加固',
+  architect: '架构 / 取舍 / 治理'
+};
+
+const roleResumeSamples = {
+  java: '负责交易履约系统，技术栈 Java、Spring Boot、MySQL、Redis、RocketMQ。主导过订单状态机重构、库存一致性治理和慢 SQL 优化，核心接口 P95 从 480ms 降到 180ms。',
+  backend: '负责订单与支付中台后端，技术栈 REST API、MySQL、Redis、消息队列。做过接口幂等、缓存穿透治理、超时重试和灰度发布，重点关注稳定性和数据一致性。',
+  frontend: '负责 Web 前端监控平台，技术栈 Vue3、TypeScript、Vite、ECharts。主导组件库沉淀、首屏性能优化、白屏监控和大数据量图表渲染治理，不涉及 Android/iOS。',
+  fullstack: '负责运营后台全栈模块，前端使用 React 和 ECharts，后端使用 Node.js 与 MySQL。独立完成权限配置、报表查询、接口联调和上线监控，关注端到端交付效率。',
+  go: '负责 Go 微服务网关和异步任务系统，技术栈 Gin、gRPC、Redis、Kafka。治理过 goroutine 泄漏、context 超时传递、接口限流和服务降级。',
+  python: '负责 Python 数据服务和后台任务，技术栈 FastAPI、Celery、MySQL、Redis。做过批处理任务拆分、接口性能优化、异常重试和任务可观测性建设。',
+  qa: '负责核心交易链路测试开发，覆盖接口自动化、UI 回归、Mock、压测和质量门禁。设计过用例分层、边界断言、失败重跑和缺陷闭环。',
+  ops: '负责生产环境运维和数据库巡检，覆盖 Linux、Nginx、MySQL、网络排障、监控告警和容量评估。处理过 CPU 飙高、连接数打满、慢查询和主从延迟问题。',
+  devops: '负责 DevOps 和 SRE 稳定性平台，覆盖 GitLab CI、Docker、Kubernetes、Prometheus、Grafana。建设过发布流水线、灰度回滚、告警降噪和故障复盘机制。',
+  data: '负责离线数仓和实时数据链路，技术栈 Hive、Spark、Flink、Airflow、SQL。做过维度建模、ETL 稳定性治理、数据质量校验和指标口径统一。',
+  ai: '负责机器学习模型工程化落地，覆盖数据清洗、特征工程、模型训练、离线评估、在线推理和效果监控。关注数据漂移、模型版本、A/B 实验和部署稳定性。',
+  security: '负责 Web 安全和业务风控建设，覆盖 XSS、SQL 注入、越权、CSRF、WAF 和权限加固。参与过漏洞验证、修复推进、安全基线和 DevSecOps 门禁。',
+  architect: '负责核心业务架构治理和团队技术方案评审，覆盖高并发、数据一致性、服务拆分、容量规划和技术债治理。推动过稳定性改造、跨团队协作和架构取舍落地。'
+};
 
 document.addEventListener('click', (event) => {
+  const productButton = event.target.closest('[data-product-target]');
+  if (productButton) {
+    setProductView(productButton.dataset.productTarget);
+    return;
+  }
+
   const stepButton = event.target.closest('[data-step-target]');
   if (!stepButton) return;
 
@@ -87,28 +173,69 @@ answerGuideEl.addEventListener('click', (event) => {
 styleSelect.addEventListener('change', () => {
   renderStyleHint(styleSelect.value);
   syncChoiceControls();
+  renderSetupSummary();
   renderPlanPreview();
   loadQuestionBankSnapshot();
 });
 
 resumeInput.addEventListener('input', () => {
   renderProfileAnalysis(resumeInput.value);
+  renderSetupSummary();
   renderPlanPreview();
 });
 
 setupForm.addEventListener('change', (event) => {
   if (event.target === resumeInput || event.target === styleSelect) return;
+  const roleSelect = setupForm.querySelector('select[name="role"]');
+  if (event.target === roleSelect) {
+    activeRoleGroup = findRoleGroupId(roleSelect.value);
+    renderRoleChoices();
+  }
   syncChoiceControls();
+  renderSetupSummary();
   renderPlanPreview();
   loadQuestionBankSnapshot();
 });
 
-aiProviderSelect?.addEventListener('change', renderAiProviderState);
+roleChoiceGrid?.addEventListener('click', (event) => {
+  const button = event.target.closest('[data-choice-value]');
+  if (!button) return;
+
+  const roleSelect = setupForm.querySelector('select[name="role"]');
+  if (!roleSelect) return;
+
+  roleSelect.value = button.dataset.choiceValue || roleSelect.value;
+  roleSelect.dispatchEvent(new Event('change', { bubbles: true }));
+  syncChoiceControls();
+});
+
+aiProviderSelect?.addEventListener('change', () => {
+  renderAiProviderState();
+  renderSetupSummary();
+});
 aiKeyInput?.addEventListener('input', renderAiProviderState);
 profileUploadButton?.addEventListener('click', () => profileFileInput?.click());
 profileFileInput?.addEventListener('change', async () => {
   const file = profileFileInput.files?.[0];
   if (file) await importProfileFile(file);
+});
+
+fillRoleSampleButton?.addEventListener('click', () => {
+  const role = setupForm.querySelector('select[name="role"]')?.value || 'backend';
+  const sample = roleResumeSamples[role] || roleResumeSamples.backend;
+  resumeInput.value = sample;
+  renderProfileAnalysis(resumeInput.value);
+  renderSetupSummary();
+  renderPlanPreview();
+  statusText.textContent = '已填入当前岗位样例，可以直接开始面试或继续补充真实项目背景。';
+});
+
+clearResumeButton?.addEventListener('click', () => {
+  resumeInput.value = '';
+  renderProfileAnalysis('');
+  renderSetupSummary();
+  renderPlanPreview();
+  statusText.textContent = '已清空背景，将按当前岗位的通用路径开始面试。';
 });
 
 profileDropzone?.addEventListener('dragover', (event) => {
@@ -118,6 +245,11 @@ profileDropzone?.addEventListener('dragover', (event) => {
 
 profileDropzone?.addEventListener('dragleave', () => {
   profileDropzone.classList.remove('dragging');
+});
+
+themeToggle?.addEventListener('click', () => {
+  const currentTheme = document.documentElement.dataset.theme === 'light' ? 'light' : 'dark';
+  applyTheme(currentTheme === 'light' ? 'dark' : 'light');
 });
 
 profileDropzone?.addEventListener('drop', async (event) => {
@@ -211,6 +343,7 @@ reportEl.addEventListener('click', async (event) => {
   await copyReportMarkdown(latestReport);
 });
 
+initializeTheme();
 initializeSetupControls();
 questionOpsEl?.addEventListener('click', async (event) => {
   const refreshButton = event.target.closest('[data-refresh-question-bank]');
@@ -231,13 +364,104 @@ questionOpsEl?.addEventListener('submit', async (event) => {
   event.preventDefault();
   await submitQuestionDraft(form);
 });
+
+paperOpsEl?.addEventListener('click', async (event) => {
+  const refreshButton = event.target.closest('[data-refresh-paper-center]');
+  if (!refreshButton) return;
+
+  await loadQuestionBankSnapshot();
+});
+
 renderStyleHint(styleSelect.value);
 renderProfileAnalysis(resumeInput.value);
+renderSetupSummary();
 renderPlanPreview();
 renderPracticeHistory();
 renderAnswerGuide(null);
 renderAiProviderState();
 renderWorkflowState();
+setProductView('interview');
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  applyTheme(savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark', { persist: false });
+}
+
+function applyTheme(theme, options = {}) {
+  const nextTheme = theme === 'light' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = nextTheme;
+
+  if (themeToggle) {
+    const isLight = nextTheme === 'light';
+    themeToggle.setAttribute('aria-pressed', String(isLight));
+    themeToggle.setAttribute('aria-label', isLight ? '切换到暗黑模式' : '切换到白天模式');
+    themeToggle.title = isLight ? '切换到暗黑模式' : '切换到白天模式';
+  }
+
+  if (themeToggleText) {
+    themeToggleText.textContent = nextTheme === 'light' ? '白天模式' : '暗黑模式';
+  }
+
+  if (options.persist !== false) {
+    localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  }
+
+  if (latestLiveCoachSnapshot) {
+    renderStressGaugeChart(latestLiveCoachSnapshot.stress);
+  }
+
+  if (latestReport) {
+    renderReportRadarChart(latestReport);
+  }
+}
+
+function setProductView(view) {
+  const nextView = view || 'interview';
+  activeProductView = nextView;
+
+  productViews.forEach((panel) => {
+    panel.hidden = panel.dataset.productView !== nextView;
+  });
+
+  productNavButtons.forEach((button) => {
+    const active = button.dataset.productTarget === nextView;
+    button.classList.toggle('active', active);
+    button.setAttribute('aria-current', active ? 'page' : 'false');
+  });
+
+  if (nextView === 'question-bank') {
+    latestQuestionBankCatalog ? renderQuestionOps(latestQuestionBankCatalog) : loadQuestionBankSnapshot();
+  } else if (nextView === 'paper-center') {
+    latestQuestionBankCatalog ? renderPaperCenter(latestQuestionBankCatalog, latestQuestionPaper) : loadQuestionBankSnapshot();
+  } else if (nextView === 'records') {
+    renderPracticeHistory();
+  }
+}
+
+function renderSetupSummary() {
+  if (!setupSummaryEl) return;
+
+  const formData = new FormData(setupForm);
+  const questionCount = Math.max(3, Math.min(6, Number(formData.get('questionCount') || 5)));
+  const provider = getProviderText(formData.get('aiProvider') || 'mock');
+  const source = formData.get('questionSource') === 'ai' ? 'AI 动态出题' : '本地题库';
+  const resumeState = String(formData.get('resume') || '').trim() ? '已填写背景' : '通用练习';
+  const items = [
+    ['方向', getSelectLabel('role', formData.get('role')) || '当前方向'],
+    ['难度', getSelectLabel('level', formData.get('level')) || '当前级别'],
+    ['风格', getSelectLabel('style', formData.get('style')) || '常规面试'],
+    ['题量', `${questionCount} 题`],
+    ['引擎', provider],
+    ['题源', `${source} · ${resumeState}`]
+  ];
+
+  setupSummaryEl.innerHTML = items.map(([label, value]) => `
+    <article>
+      <span>${escapeHtml(label)}</span>
+      <strong>${escapeHtml(value)}</strong>
+    </article>
+  `).join('');
+}
 
 function canOpenWorkflowStep(step) {
   if (step === 'setup') return true;
@@ -289,21 +513,9 @@ function renderWorkflowState() {
 }
 
 function initializeSetupControls() {
-  renderChoiceGrid('role', roleChoiceGrid, {
-    java: 'JVM / Spring',
-    backend: 'API / DB / Redis',
-    frontend: 'Vue / React / JS',
-    fullstack: '端到端链路',
-    go: 'Goroutine / 微服务',
-    python: 'FastAPI / Worker',
-    qa: '测试策略 / 自动化',
-    ops: 'Linux / 网络 / 数据库',
-    devops: 'CI/CD / K8s / 稳定性',
-    data: 'ETL / 数仓 / SQL',
-    ai: '模型 / 特征 / 推理',
-    security: '攻防 / 漏洞 / 加固',
-    architect: '架构 / 取舍 / 治理'
-  });
+  activeRoleGroup = findRoleGroupId(setupForm.querySelector('select[name="role"]')?.value) || activeRoleGroup;
+  renderRoleGroupTabs();
+  renderRoleChoices();
   renderChoiceGrid('level', levelStepper, {
     junior: '基础主线',
     middle: '细节取舍',
@@ -315,6 +527,62 @@ function initializeSetupControls() {
     coaching: '提示更多'
   }, 'style-segment');
   syncChoiceControls();
+}
+
+function findRoleGroupId(role) {
+  return roleGroups.find((group) => group.roles.includes(role))?.id || roleGroups[0]?.id || 'backend';
+}
+
+function getActiveRoleGroup() {
+  return roleGroups.find((group) => group.id === activeRoleGroup) || roleGroups[0];
+}
+
+function renderRoleGroupTabs() {
+  if (!roleGroupTabs) return;
+
+  roleGroupTabs.innerHTML = roleGroups.map((group) => `
+    <button type="button" class="role-group-tab" data-role-group="${escapeHtml(group.id)}">
+      <strong>${escapeHtml(group.label)}</strong>
+      <span>${group.roles.length} 个岗位</span>
+    </button>
+  `).join('');
+
+  roleGroupTabs.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-role-group]');
+    if (!button) return;
+
+    activeRoleGroup = button.dataset.roleGroup || activeRoleGroup;
+    const roleSelect = setupForm.querySelector('select[name="role"]');
+    const activeGroup = getActiveRoleGroup();
+    if (roleSelect && !activeGroup.roles.includes(roleSelect.value)) {
+      roleSelect.value = activeGroup.roles[0] || roleSelect.value;
+      roleSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    renderRoleChoices();
+    syncChoiceControls();
+    renderPlanPreview();
+    loadQuestionBankSnapshot();
+  });
+}
+
+function renderRoleChoices() {
+  const roleSelect = setupForm.querySelector('select[name="role"]');
+  const activeGroup = getActiveRoleGroup();
+  if (!roleSelect || !roleChoiceGrid || !activeGroup) return;
+
+  roleChoiceGrid.innerHTML = activeGroup.roles.map((role) => {
+    const option = [...roleSelect.options].find((item) => item.value === role);
+    const label = option?.textContent || role;
+    return `
+      <button type="button" class="choice-card role-choice-card" data-choice-field="role" data-choice-value="${escapeHtml(role)}">
+        <strong>${escapeHtml(label)}</strong>
+        <span>${escapeHtml(roleDescriptions[role] || '定制面试路线')}</span>
+      </button>
+    `;
+  }).join('');
+
+  if (roleGroupHint) roleGroupHint.textContent = activeGroup.hint;
+  syncRoleGroupTabs();
 }
 
 function renderChoiceGrid(fieldName, container, descriptions = {}, className = 'choice-card') {
@@ -342,6 +610,15 @@ function syncChoiceControls() {
   document.querySelectorAll('[data-choice-field]').forEach((button) => {
     const select = setupForm.querySelector(`select[name="${button.dataset.choiceField}"]`);
     button.classList.toggle('active', Boolean(select && select.value === button.dataset.choiceValue));
+  });
+  syncRoleGroupTabs();
+}
+
+function syncRoleGroupTabs() {
+  const roleSelect = setupForm.querySelector('select[name="role"]');
+  if (roleSelect) activeRoleGroup = findRoleGroupId(roleSelect.value);
+  document.querySelectorAll('[data-role-group]').forEach((button) => {
+    button.classList.toggle('active', button.dataset.roleGroup === activeRoleGroup);
   });
 }
 
@@ -606,14 +883,15 @@ function getCurrentPlanItem() {
 }
 
 async function loadQuestionBankSnapshot() {
-  if (!questionOpsEl) return;
+  if (!questionOpsEl && !paperOpsEl) return;
 
   const formData = new FormData(setupForm);
   const params = new URLSearchParams({
     role: formData.get('role') || '',
     level: formData.get('level') || ''
   });
-  questionOpsEl.classList.add('loading');
+  questionOpsEl?.classList.add('loading');
+  paperOpsEl?.classList.add('loading');
 
   try {
     const [catalog, paper] = await Promise.all([
@@ -630,21 +908,30 @@ async function loadQuestionBankSnapshot() {
         })
       })
     ]);
-    renderQuestionOps(catalog, paper);
+    latestQuestionBankCatalog = catalog;
+    latestQuestionPaper = paper;
+    renderQuestionOps(catalog);
+    renderPaperCenter(catalog, paper);
   } catch (error) {
-    questionOpsEl.className = 'question-ops empty-question-ops';
-    questionOpsEl.innerHTML = `<p>${escapeHtml(`题库治理加载失败：${error.message}`)}</p>`;
+    if (questionOpsEl) {
+      questionOpsEl.className = 'question-ops standalone-workspace empty-question-ops';
+      questionOpsEl.innerHTML = `<p>${escapeHtml(`题库治理加载失败：${error.message}`)}</p>`;
+    }
+    if (paperOpsEl) {
+      paperOpsEl.className = 'question-ops standalone-workspace empty-question-ops';
+      paperOpsEl.innerHTML = `<p>${escapeHtml(`组卷规则加载失败：${error.message}`)}</p>`;
+    }
   }
 }
 
-function renderQuestionOps(catalog, paper) {
+function renderQuestionOps(catalog) {
   if (!questionOpsEl) return;
 
   const summary = catalog?.summary || {};
   const pendingDrafts = Array.isArray(catalog?.pendingDrafts) ? catalog.pendingDrafts : [];
-  const template = selectTemplateForCurrentSetup(catalog?.templates || []);
+  const items = Array.isArray(catalog?.items) ? catalog.items : [];
   const draftList = pendingDrafts.length
-    ? pendingDrafts.slice(0, 3).map((draft) => `
+    ? pendingDrafts.slice(0, 5).map((draft) => `
       <article class="question-draft">
         <div>
           <strong>${escapeHtml(draft.title || draft.question || '待审核题')}</strong>
@@ -659,13 +946,26 @@ function renderQuestionOps(catalog, paper) {
       </article>
     `).join('')
     : '<p>暂无待审核题。可以先提交一题，审核通过后会进入后续模拟面试抽题池。</p>';
+  const assetRows = items.length
+    ? items.slice(0, 8).map((item) => `
+      <article class="question-asset-row">
+        <div>
+          <strong>${escapeHtml(item.question || item.id || '题目')}</strong>
+          <span>${escapeHtml(`${item.category || '综合能力'} · ${getPlanTypeLabel(item)} · ${getDifficultyLabel(item.difficulty)} · ${item.reviewStatus || '已审核'}`)}</span>
+        </div>
+        <div class="question-template-mix">
+          ${renderPills(item.tags || [], '暂无标签')}
+        </div>
+      </article>
+    `).join('')
+    : '<p>当前筛选条件下暂无正式题目。</p>';
 
-  questionOpsEl.className = 'question-ops';
+  questionOpsEl.className = 'question-ops standalone-workspace';
   questionOpsEl.innerHTML = `
     <div class="question-ops-header">
       <div>
-        <strong>题库与组卷</strong>
-        <span>结构化题库 · 人工审核 · 规则抽题</span>
+        <strong>题库管理</strong>
+        <span>题目资产 · 质量门禁 · 人工审核</span>
       </div>
       <button type="button" class="mini-button subtle-button" data-refresh-question-bank>刷新</button>
     </div>
@@ -675,15 +975,6 @@ function renderQuestionOps(catalog, paper) {
       <div><span>待审核</span><strong>${escapeHtml(summary.pendingReviewCount ?? 0)}</strong></div>
       <div><span>标签</span><strong>${escapeHtml(summary.tagCount ?? 0)}</strong></div>
       <div><span>质量</span><strong>${escapeHtml(summary.qualityScore ?? '-')}</strong></div>
-    </div>
-
-    <div class="question-template-card">
-      <span>当前组卷模板</span>
-      <strong>${escapeHtml(template?.name || '通用均衡面')}</strong>
-      <p>${escapeHtml((template?.rules || ['按岗位、级别、题型、难度和简历信号综合抽题']).join('；'))}</p>
-      <div class="question-template-mix">
-        ${renderPills(formatPaperMix(paper), '暂无组卷预览')}
-      </div>
     </div>
 
     <details class="question-draft-panel">
@@ -713,6 +1004,111 @@ function renderQuestionOps(catalog, paper) {
 
     <div class="section-label">待审核题目</div>
     <div class="question-draft-list">${draftList}</div>
+
+    <div class="section-label">正式题库</div>
+    <div class="question-asset-list">${assetRows}</div>
+  `;
+}
+
+function renderPaperCenter(catalog = latestQuestionBankCatalog, paper = latestQuestionPaper) {
+  if (!paperOpsEl) return;
+
+  if (!catalog) {
+    paperOpsEl.className = 'question-ops standalone-workspace empty-question-ops';
+    paperOpsEl.innerHTML = '<p>组卷规则加载中...</p>';
+    return;
+  }
+
+  const formData = new FormData(setupForm);
+  const roleLabel = getSelectLabel('role', formData.get('role')) || '当前岗位';
+  const levelLabel = getSelectLabel('level', formData.get('level')) || '当前级别';
+  const questionCount = Number(formData.get('questionCount') || paper?.total || 5);
+  const template = selectTemplateForCurrentSetup(catalog.templates || []);
+  const templates = Array.isArray(catalog.templates) ? catalog.templates : [];
+  const paperItems = Array.isArray(paper?.items) ? paper.items : [];
+  const templateCards = templates.length
+    ? templates.map((item) => `
+      <article class="paper-template-card ${item.id === template?.id ? 'active' : ''}">
+        <span>${escapeHtml(item.levels?.join(' / ') || '通用')}</span>
+        <strong>${escapeHtml(item.name || '未命名模板')}</strong>
+        <p>${escapeHtml((item.rules || ['按岗位、级别和题型规则抽题']).join('；'))}</p>
+        <div class="question-template-mix">
+          ${renderPills((item.stages || []).map((type) => getPlanTypeLabel(type)), '暂无阶段')}
+        </div>
+      </article>
+    `).join('')
+    : '<p>暂无模板，当前会使用通用均衡规则。</p>';
+  const previewRows = paperItems.length
+    ? paperItems.map((item) => `
+      <article class="paper-preview-row">
+        <span>${escapeHtml(String(item.order || '-'))}</span>
+        <div>
+          <strong>${escapeHtml(getPlanTypeLabel(item))}</strong>
+          <p>${escapeHtml(`${item.category || '综合能力'} · ${getDifficultyLabel(item.difficulty)} · ${item.planReason || '按规则组卷。'}`)}</p>
+          <div class="question-template-mix">
+            ${renderPills(item.tags || [], '暂无标签')}
+          </div>
+        </div>
+      </article>
+    `).join('')
+    : '<p>暂无组卷预览，请检查题库中是否有匹配当前岗位和难度的题目。</p>';
+
+  paperOpsEl.className = 'question-ops standalone-workspace';
+  paperOpsEl.innerHTML = `
+    <div class="question-ops-header">
+      <div>
+        <strong>组卷中心</strong>
+        <span>抽题模板 · 题型比例 · 面试预览</span>
+      </div>
+      <button type="button" class="mini-button subtle-button" data-refresh-paper-center>刷新预览</button>
+    </div>
+
+    <div class="paper-brief-grid">
+      <article>
+        <span>当前场景</span>
+        <strong>${escapeHtml(`${roleLabel} · ${levelLabel}`)}</strong>
+      </article>
+      <article>
+        <span>目标题量</span>
+        <strong>${escapeHtml(`${questionCount} 题`)}</strong>
+      </article>
+      <article>
+        <span>命中模板</span>
+        <strong>${escapeHtml(template?.name || '通用均衡面')}</strong>
+      </article>
+      <article>
+        <span>预览结果</span>
+        <strong>${escapeHtml(`${paper?.total ?? 0} 题`)}</strong>
+      </article>
+    </div>
+
+    <div class="paper-layout">
+      <section class="paper-panel">
+        <div class="section-label">抽题比例</div>
+        <div class="question-template-card">
+          <span>题型 / 难度 Mix</span>
+          <strong>${escapeHtml(template?.name || '通用均衡面')}</strong>
+          <p>${escapeHtml((template?.rules || ['按岗位、级别、题型、难度和简历信号综合抽题']).join('；'))}</p>
+          <div class="question-template-mix">
+            ${renderPills(formatPaperMix(paper), '暂无组卷预览')}
+          </div>
+        </div>
+        <div class="section-label">模板库</div>
+        <div class="paper-template-list">${templateCards}</div>
+      </section>
+
+      <section class="paper-panel">
+        <div class="section-label">当前预览</div>
+        <div class="paper-preview-list">${previewRows}</div>
+      </section>
+    </div>
+
+    <section class="paper-release-plan">
+      <div class="section-label">落地步骤</div>
+      <article><strong>1. 维护题库</strong><span>先在题库管理中补齐岗位、级别、题型和参考答案。</span></article>
+      <article><strong>2. 校准模板</strong><span>用当前岗位配置刷新预览，确认基础题、项目题、场景题和代码题比例。</span></article>
+      <article><strong>3. 回到开始面试</strong><span>普通练习者只选择岗位、级别、风格和题量，不需要理解题库后台。</span></article>
+    </section>
   `;
 }
 
@@ -1077,6 +1473,7 @@ function renderPlanPreview() {
   if (!planPreviewEl) return;
 
   const formData = new FormData(setupForm);
+  const role = String(formData.get('role') || 'backend');
   const roleLabel = getSelectLabel('role', formData.get('role')) || '当前方向';
   const levelLabel = getSelectLabel('level', formData.get('level')) || '当前级别';
   const styleLabel = getSelectLabel('style', formData.get('style')) || '常规面试';
@@ -1084,6 +1481,7 @@ function renderPlanPreview() {
   const analysis = analyzeProfileText(formData.get('resume') || '');
   const stages = createPlanPreviewStages(questionCount, analysis);
   const previewReasons = createPlanPreviewReasons(analysis);
+  const productNotes = getSelectedRoleProductNotes(role, analysis);
   const focus = analysis.hasInput
     ? (analysis.focusTopics[0] || analysis.recommendedTracks[0] || '结合 JD/简历做定制追问')
     : '快速练习会从通用基础八股题开始，再进入追问和项目/场景题。';
@@ -1094,6 +1492,20 @@ function renderPlanPreview() {
       <strong>本轮训练计划预览</strong>
       <span>${escapeHtml(`${roleLabel} · ${levelLabel} · ${styleLabel}`)}</span>
     </div>
+    <div class="plan-decision-grid">
+      <article>
+        <span>岗位边界</span>
+        <strong>${escapeHtml(productNotes.boundary)}</strong>
+      </article>
+      <article>
+        <span>题量节奏</span>
+        <strong>${escapeHtml(`${questionCount} 道题，先校准基础，再进入追问`)}</strong>
+      </article>
+      <article>
+        <span>简历信号</span>
+        <strong>${escapeHtml(productNotes.signal)}</strong>
+      </article>
+    </div>
     <div class="plan-preview-steps">
       ${stages.map((stage, index) => `
         <span>${escapeHtml(`${index + 1}. ${stage}`)}</span>
@@ -1103,9 +1515,48 @@ function renderPlanPreview() {
     <div class="plan-preview-reasons">
       ${previewReasons.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}
     </div>
-    <p>${escapeHtml(`训练重点：${focus}`)}</p>
-    <p>${escapeHtml('提示：预览只展示面试节奏，不提前暴露具体题目和参考答案。')}</p>
+    <div class="plan-next-action">
+      <strong>${escapeHtml(`训练重点：${focus}`)}</strong>
+      <span>${escapeHtml(productNotes.guardrail)}</span>
+    </div>
   `;
+}
+
+function getSelectedRoleProductNotes(role, analysis) {
+  const group = roleGroups.find((item) => item.roles.includes(role));
+  const baseSignal = analysis?.hasInput
+    ? `已识别 ${analysis.focusTopics?.length || 0} 个重点、${analysis.riskQuestionMappings?.length || 0} 个风险`
+    : '未填写简历/JD，将按岗位通用路径训练';
+  const roleBoundary = {
+    frontend: {
+      boundary: 'Web 前端，不默认混入 Android/iOS/鸿蒙',
+      guardrail: '如果简历没有移动端关键词，题库会自动过滤客户端专项题。'
+    },
+    fullstack: {
+      boundary: '全栈链路，前端与后端都会覆盖',
+      guardrail: '会优先考端到端链路、接口协作、数据一致性和前端落地。'
+    },
+    ops: {
+      boundary: '运维 / DBA / 网络，强调稳定性实战',
+      guardrail: '题目会围绕监控、故障、容量、网络和系统指标。'
+    },
+    qa: {
+      boundary: '测试开发 / QA，强调质量闭环',
+      guardrail: '题目会围绕用例、断言、边界、自动化和回归策略。'
+    },
+    ai: {
+      boundary: 'AI / 算法，强调工程可落地',
+      guardrail: '题目会覆盖数据、模型、评估、部署和漂移治理。'
+    }
+  }[role] || {
+    boundary: group ? group.label : '按当前岗位边界出题',
+    guardrail: '预览只展示面试节奏，不提前展开具体考题内容。'
+  };
+
+  return {
+    ...roleBoundary,
+    signal: baseSignal
+  };
 }
 
 function createPlanPreviewReasons(analysis) {
@@ -1580,6 +2031,7 @@ function renderStressGaugeChart(stress) {
     const target = document.querySelector('#stressGaugeChart');
     if (!target || !window.echarts) return;
 
+    const themeColors = getThemeChartColors();
     const chart = window.echarts.getInstanceByDom(target) || window.echarts.init(target, null, { renderer: 'svg' });
     chart.setOption({
       backgroundColor: 'transparent',
@@ -1615,7 +2067,7 @@ function renderStressGaugeChart(stress) {
           roundCap: true,
           lineStyle: {
             width: 14,
-            color: [[1, 'rgba(255, 255, 255, 0.08)']]
+            color: [[1, themeColors.axisBase]]
           }
         },
         axisTick: {
@@ -1623,7 +2075,7 @@ function renderStressGaugeChart(stress) {
           splitNumber: 2,
           lineStyle: {
             width: 1,
-            color: 'rgba(244, 247, 251, 0.18)'
+            color: themeColors.axisTick
           }
         },
         splitLine: {
@@ -1631,7 +2083,7 @@ function renderStressGaugeChart(stress) {
           length: 10,
           lineStyle: {
             width: 2,
-            color: 'rgba(244, 247, 251, 0.26)'
+            color: themeColors.axisSplit
           }
         },
         axisLabel: {
@@ -1643,24 +2095,24 @@ function renderStressGaugeChart(stress) {
           width: 10,
           offsetCenter: [0, '5%'],
           itemStyle: {
-            color: '#f4f7fb',
+            color: themeColors.ink,
             shadowBlur: 8,
-            shadowColor: 'rgba(255,255,255,0.45)'
+            shadowColor: themeColors.pointerShadow
           }
         },
         anchor: {
           show: true,
           size: 13,
           itemStyle: {
-            color: '#f4f7fb',
-            borderColor: '#101115',
+            color: themeColors.ink,
+            borderColor: themeColors.panel,
             borderWidth: 3
           }
         },
         detail: {
           valueAnimation: true,
           offsetCenter: [0, '56%'],
-          color: '#f4f7fb',
+          color: themeColors.ink,
           fontFamily: 'Cascadia Code, Consolas, monospace',
           fontSize: 22,
           fontWeight: 800,
@@ -1671,6 +2123,28 @@ function renderStressGaugeChart(stress) {
     });
     chart.resize();
   });
+}
+
+function getThemeChartColors() {
+  const styles = getComputedStyle(document.documentElement);
+  const ink = styles.getPropertyValue('--ink').trim() || '#f4f7fb';
+  const panel = styles.getPropertyValue('--panel').trim() || '#101115';
+  const textBody = styles.getPropertyValue('--text-body').trim() || ink;
+  const green = styles.getPropertyValue('--green').trim() || '#28a745';
+  const blue = styles.getPropertyValue('--blue').trim() || '#007bff';
+  const isLight = document.documentElement.dataset.theme === 'light';
+
+  return {
+    ink,
+    panel,
+    textBody,
+    green,
+    blue,
+    axisBase: isLight ? 'rgba(22, 32, 51, 0.1)' : 'rgba(255, 255, 255, 0.08)',
+    axisTick: isLight ? 'rgba(22, 32, 51, 0.22)' : 'rgba(244, 247, 251, 0.18)',
+    axisSplit: isLight ? 'rgba(22, 32, 51, 0.32)' : 'rgba(244, 247, 251, 0.26)',
+    pointerShadow: isLight ? 'rgba(39, 57, 90, 0.24)' : 'rgba(255,255,255,0.45)'
+  };
 }
 
 function renderInterviewProgress(plan, currentId, completed = false) {
@@ -3513,6 +3987,7 @@ function renderReportRadarChart(report) {
     if (!target || !window.echarts) return;
 
     const dimensions = createReportRadarDimensions(report);
+    const themeColors = getThemeChartColors();
     const chart = window.echarts.getInstanceByDom(target) || window.echarts.init(target, null, { renderer: 'svg' });
     chart.setOption({
       backgroundColor: 'transparent',
@@ -3525,7 +4000,7 @@ function renderReportRadarChart(report) {
           max: 100
         })),
         axisName: {
-          color: '#c8d0de',
+          color: themeColors.textBody,
           fontSize: 12,
           fontWeight: 700
         },
@@ -3561,14 +4036,14 @@ function renderReportRadarChart(report) {
         symbolSize: 5,
         lineStyle: {
           width: 2,
-          color: '#007bff'
+          color: themeColors.blue
         },
         areaStyle: {
           color: 'rgba(0, 123, 255, 0.34)'
         },
         itemStyle: {
-          color: '#28a745',
-          borderColor: '#d9ffe2',
+          color: themeColors.green,
+          borderColor: themeColors.panel,
           borderWidth: 1
         },
         data: [{

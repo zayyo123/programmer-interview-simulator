@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>程序员模拟面试系统</title>
-    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/styles.css?v=geek-light-1" />
   </head>
   <body>
     <main class="app-shell">
@@ -16,26 +16,62 @@
             <p>Dark IDE style interview cockpit for serious technical practice.</p>
           </div>
         </div>
-        <section id="practiceHistory" class="practice-history" aria-live="polite">
-          <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
+        <section class="product-brief" aria-label="产品规划">
+          <div>
+            <span>Product Map</span>
+            <strong>练习、题库、组卷、复盘分离</strong>
+          </div>
+          <p>普通练习者只配置本轮面试；题目资产和抽题规则放到独立工作区维护。</p>
         </section>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+          <span class="theme-toggle-track" aria-hidden="true">
+            <span class="theme-toggle-thumb"></span>
+          </span>
+          <span id="themeToggleText">暗黑模式</span>
+        </button>
       </header>
 
-      <nav class="workflow-stepper" aria-label="面试流程">
-        <button type="button" class="workflow-step-button active" data-step-target="setup">
-          <span>1</span>
-          <strong>面试配置</strong>
+      <nav class="product-nav" aria-label="系统模块">
+        <button type="button" class="product-nav-button active" data-product-target="interview">
+          <span>01</span>
+          <strong>开始面试</strong>
+          <small>配置 → 模拟 → 复盘</small>
         </button>
-        <button type="button" class="workflow-step-button locked" data-step-target="interview" aria-disabled="true">
-          <span>2</span>
-          <strong>模拟面试</strong>
+        <button type="button" class="product-nav-button" data-product-target="question-bank">
+          <span>02</span>
+          <strong>题库管理</strong>
+          <small>题目资产与审核</small>
         </button>
-        <button type="button" class="workflow-step-button locked" data-step-target="report" aria-disabled="true">
-          <span>3</span>
-          <strong>复盘报告</strong>
+        <button type="button" class="product-nav-button" data-product-target="paper-center">
+          <span>03</span>
+          <strong>组卷中心</strong>
+          <small>抽题规则与预览</small>
+        </button>
+        <button type="button" class="product-nav-button" data-product-target="records">
+          <span>04</span>
+          <strong>复盘记录</strong>
+          <small>历史表现与补练</small>
         </button>
       </nav>
-      <p id="workflowStatus" class="workflow-status" aria-live="polite">先完成本轮面试配置，然后进入模拟面试。</p>
+
+      <section class="product-view" data-product-view="interview">
+      <section class="workflow-console">
+        <nav class="workflow-stepper" aria-label="面试流程">
+          <button type="button" class="workflow-step-button active" data-step-target="setup">
+            <span>1</span>
+            <strong>面试配置</strong>
+          </button>
+          <button type="button" class="workflow-step-button locked" data-step-target="interview" aria-disabled="true">
+            <span>2</span>
+            <strong>模拟面试</strong>
+          </button>
+          <button type="button" class="workflow-step-button locked" data-step-target="report" aria-disabled="true">
+            <span>3</span>
+            <strong>复盘报告</strong>
+          </button>
+        </nav>
+        <p id="workflowStatus" class="workflow-status" aria-live="polite">先完成本轮面试配置，然后进入模拟面试。</p>
+      </section>
 
       <section class="setup-dashboard workflow-step" data-workflow-step="setup" aria-label="面试配置与准备">
 
@@ -63,6 +99,14 @@
                   <option value="architect">架构师 / 技术管理</option>
                 </select>
               </label>
+              <div class="role-picker">
+                <div class="section-label">先选技术方向</div>
+                <div id="roleGroupTabs" class="role-group-tabs" aria-label="技术方向分组"></div>
+                <div class="role-picker-head">
+                  <span>再选具体岗位</span>
+                  <strong id="roleGroupHint">按方向过滤岗位，避免前端、Android、iOS 混选。</strong>
+                </div>
+              </div>
               <div id="roleChoiceGrid" class="choice-grid role-choice-grid" aria-label="方向快捷选择"></div>
 
               <label class="native-field">
@@ -86,33 +130,41 @@
               <div id="styleSegmented" class="segmented-control" aria-label="面试风格选择"></div>
               <div id="styleHint" class="style-hint" aria-live="polite"></div>
 
-              <label class="native-field">
-                <span>AI 引擎</span>
-                <select id="aiProviderSelect" name="aiProvider">
-                  <option value="mock" selected>Local Mock</option>
-                  <option value="gemini">Gemini</option>
-                  <option value="openrouter">OpenRouter</option>
-                  <option value="ollama">Ollama</option>
-                </select>
-              </label>
-              <label id="aiKeyField" class="ai-key-field">
-                <span>API Key / Base URL</span>
-                <input id="aiKeyInput" type="text" placeholder="Mock 模式无需填写" autocomplete="off" />
-              </label>
-              <p id="aiProviderWarning" class="provider-warning">Local Mock 已启用，本地规则会保证流程可运行。</p>
-
-              <label class="native-field">
-                <span>题目来源</span>
-                <select name="questionSource">
-                  <option value="local" selected>本地题库</option>
-                  <option value="ai">AI 动态出题</option>
-                </select>
-              </label>
-
               <label class="native-field compact-field">
                 <span>题目数量</span>
                 <input name="questionCount" type="number" min="3" max="6" value="5" />
               </label>
+
+              <details class="advanced-setup">
+                <summary>
+                  <span>高级设置</span>
+                  <strong>AI 引擎、题源和接口配置</strong>
+                </summary>
+                <div class="advanced-setup-body">
+                  <label class="native-field">
+                    <span>AI 引擎</span>
+                    <select id="aiProviderSelect" name="aiProvider">
+                      <option value="mock" selected>Local Mock</option>
+                      <option value="gemini">Gemini</option>
+                      <option value="openrouter">OpenRouter</option>
+                      <option value="ollama">Ollama</option>
+                    </select>
+                  </label>
+                  <label id="aiKeyField" class="ai-key-field">
+                    <span>API Key / Base URL</span>
+                    <input id="aiKeyInput" type="text" placeholder="Mock 模式无需填写" autocomplete="off" />
+                  </label>
+                  <p id="aiProviderWarning" class="provider-warning">Local Mock 已启用，本地规则会保证流程可运行。</p>
+
+                  <label class="native-field compact-field">
+                    <span>题目来源</span>
+                    <select name="questionSource">
+                      <option value="local" selected>本地题库</option>
+                      <option value="ai">AI 动态出题</option>
+                    </select>
+                  </label>
+                </div>
+              </details>
             </aside>
 
             <section class="profile-zone">
@@ -128,6 +180,10 @@
 
               <label class="resume-editor">
                 <span>简历或项目背景</span>
+                <div class="resume-toolbar" aria-label="简历背景快捷操作">
+                  <button type="button" class="mini-button" id="fillRoleSampleButton">填入当前岗位样例</button>
+                  <button type="button" class="mini-button subtle-button" id="clearResumeButton">清空背景</button>
+                </div>
                 <textarea
                   name="resume"
                   rows="9"
@@ -135,28 +191,54 @@
                 ></textarea>
               </label>
 
-              <section id="profileAnalysis" class="profile-analysis empty-profile">
-                <p>填写或上传背景后，会实时解析能力点、风险点和推荐考点。</p>
+              <details class="insight-drawer">
+                <summary>
+                  <span>简历解析</span>
+                  <strong>能力点、风险点和推荐考点</strong>
+                </summary>
+                <section id="profileAnalysis" class="profile-analysis empty-profile">
+                  <p>填写或上传背景后，会实时解析能力点、风险点和推荐考点。</p>
+                </section>
+              </details>
+
+            </section>
+
+            <aside class="launch-panel">
+              <div class="panel-kicker">Run Control</div>
+              <h2>本轮作战台</h2>
+              <section id="setupSummary" class="setup-summary" aria-live="polite">
+                <article>
+                  <span>方向</span>
+                  <strong>Java 后端</strong>
+                </article>
+                <article>
+                  <span>难度</span>
+                  <strong>中级</strong>
+                </article>
+                <article>
+                  <span>风格</span>
+                  <strong>常规面试</strong>
+                </article>
+                <article>
+                  <span>题量</span>
+                  <strong>5 题</strong>
+                </article>
               </section>
-            </section>
+              <section class="launch-strip">
+                <section id="planPreview" class="plan-preview" aria-live="polite">
+                  <p>选择配置后，这里会预览本轮训练节奏，不提前暴露具体题目。</p>
+                </section>
+                <div class="launch-actions">
+                  <div id="countdownOverlay" class="countdown-overlay" hidden>
+                    <span>3</span>
+                    <p>全面面试即将开始</p>
+                  </div>
+                  <button type="submit" class="primary-button launch-button">开启全面面试</button>
+                </div>
+              </section>
+            </aside>
           </section>
 
-          <section class="launch-strip">
-            <section id="planPreview" class="plan-preview" aria-live="polite">
-              <p>选择配置后，这里会预览本轮训练节奏，不提前暴露具体题目。</p>
-            </section>
-            <div class="launch-actions">
-              <div id="countdownOverlay" class="countdown-overlay" hidden>
-                <span>3</span>
-                <p>全面面试即将开始</p>
-              </div>
-              <button type="submit" class="primary-button launch-button">开启全面面试</button>
-            </div>
-          </section>
-
-          <section id="questionOps" class="question-ops" aria-live="polite">
-            <p>题库治理加载中...</p>
-          </section>
         </form>
       </section>
 
@@ -219,9 +301,28 @@
           <p>完成一轮面试后会生成复盘报告。</p>
         </div>
       </section>
+      </section>
+
+      <section class="product-view" data-product-view="question-bank" hidden>
+        <section id="questionOps" class="question-ops standalone-workspace" aria-live="polite">
+          <p>题库治理加载中...</p>
+        </section>
+      </section>
+
+      <section class="product-view" data-product-view="paper-center" hidden>
+        <section id="paperOps" class="question-ops standalone-workspace" aria-live="polite">
+          <p>组卷规则加载中...</p>
+        </section>
+      </section>
+
+      <section class="product-view" data-product-view="records" hidden>
+        <section id="practiceHistory" class="practice-history standalone-workspace" aria-live="polite">
+          <p>完成第一轮面试后，这里会记录练习次数、平均分和薄弱点。</p>
+        </section>
+      </section>
     </main>
 
     <script src="/vendor/echarts.min.js"></script>
-    <script src="/app.js?v=geek-dark-2" type="module"></script>
+    <script src="/app.js?v=geek-light-1" type="module"></script>
   </body>
 </html>
