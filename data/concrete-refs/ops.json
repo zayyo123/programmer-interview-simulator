@@ -1,0 +1,162 @@
+{
+  "RAID 与磁盘故障": {
+    "referenceAnswer": "RAID0 条带无冗余；RAID1 镜像；RAID5/6 允许坏 1/2 块盘；RAID10 性能+冗余。故障处理：mdadm -D 看 State、隔离坏盘 mdadm --fail、热备替换、观察 rebuild；完成后 fsck/读写校验；业务侧只读或切备库。",
+    "excellentAnswer": "我会先给结论，再展开：RAID0 条带无冗余；RAID1 镜像；RAID5/6 允许坏 1/2 块盘；RAID10 性能+冗余。故障处理：mdadm -D 看 State、隔离坏盘 mdadm --fail、热备替换、观察 rebuild；完成后 fsck/读写校验；业务侧只读或切备库。"
+  },
+  "LVM 扩容": {
+    "referenceAnswer": "lvextend 扩逻辑卷 + resize2fs/xfs_growfs 扩文件系统；先确认 VG 有空余 PV；在线扩容注意 IO 峰值；扩容前快照/备份。",
+    "excellentAnswer": "我会先给结论，再展开：lvextend 扩逻辑卷 + resize2fs/xfs_growfs 扩文件系统；先确认 VG 有空余 PV；在线扩容注意 IO 峰值；扩容前快照/备份。"
+  },
+  "网络抓包": {
+    "referenceAnswer": "tcpdump -i eth0 host x.x.x.x and port 443 -w cap；Wireshark 看三次握手、重传、RTT；配合 ss -s 看队列。",
+    "excellentAnswer": "我会先给结论，再展开：tcpdump -i eth0 host x.x.x.x and port 443 -w cap；Wireshark 看三次握手、重传、RTT；配合 ss -s 看队列。"
+  },
+  "SYN Flood": {
+    "referenceAnswer": "SYN 半连接占满 backlog；防护：syn cookies、调大 tcp_max_syn_backlog、CDN/WAF 清洗、限速；监控 SYN_RECV 堆积。",
+    "excellentAnswer": "我会先给结论，再展开：SYN 半连接占满 backlog；防护：syn cookies、调大 tcp_max_syn_backlog、CDN/WAF 清洗、限速；监控 SYN_RECV 堆积。"
+  },
+  "Nginx 限流": {
+    "referenceAnswer": "limit_req_zone + limit_req burst/nodelay；limit_conn 限制连接；429 返回；配合 upstream keepalive 和超时。",
+    "excellentAnswer": "我会先给结论，再展开：limit_req_zone + limit_req burst/nodelay；limit_conn 限制连接；429 返回；配合 upstream keepalive 和超时。"
+  },
+  "Nginx 缓存": {
+    "referenceAnswer": "proxy_cache_path 配 keys_zone；proxy_cache_valid 按状态码 TTL；缓存键含 URI/参数；注意鉴权接口禁缓存。",
+    "excellentAnswer": "我会先给结论，再展开：proxy_cache_path 配 keys_zone；proxy_cache_valid 按状态码 TTL；缓存键含 URI/参数；注意鉴权接口禁缓存。"
+  },
+  "Keepalived VIP": {
+    "referenceAnswer": "VRRP 选举 master 持 VIP；健康检查脚本失败则降优先级；注意脑裂用 nopreempt/单播/防火墙放行 VRRP。",
+    "excellentAnswer": "我会先给结论，再展开：VRRP 选举 master 持 VIP；健康检查脚本失败则降优先级；注意脑裂用 nopreempt/单播/防火墙放行 VRRP。"
+  },
+  "日志采集链路": {
+    "referenceAnswer": "日志采集链路：结合题目「日志从主机到平台采集丢失或延迟时，你会如何排查 Agent、队列和存储」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：日志采集链路：结合题目「日志从主机到平台采集丢失或延迟时，你会如何排查 Agent、队列和存储」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "Prometheus 存储": {
+    "referenceAnswer": "TSDB 块压缩与 retention；高基数标签会爆内存；remote write 长期存储；recording rule 预聚合。",
+    "excellentAnswer": "我会先给结论，再展开：TSDB 块压缩与 retention；高基数标签会爆内存；remote write 长期存储；recording rule 预聚合。"
+  },
+  "Grafana 看板": {
+    "referenceAnswer": "Panel 用 PromQL；变量 templating 切换环境；告警 contact point；Dashboard as code 版本化。",
+    "excellentAnswer": "我会先给结论，再展开：Panel 用 PromQL；变量 templating 切换环境；告警 contact point；Dashboard as code 版本化。"
+  },
+  "堡垒机权限": {
+    "referenceAnswer": "堡垒机权限：结合题目「生产堡垒机如何设计授权、审计、命令记录和紧急访问」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：堡垒机权限：结合题目「生产堡垒机如何设计授权、审计、命令记录和紧急访问」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "数据库权限": {
+    "referenceAnswer": "数据库权限：结合题目「DBA 如何设计生产数据库账号权限、审批和审计，避免共享 root 账号」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：数据库权限：结合题目「DBA 如何设计生产数据库账号权限、审批和审计，避免共享 root 账号」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "binlog 恢复": {
+    "referenceAnswer": "mysqlbinlog 按位点回放；全量+binlog 增量；验证 gtid 一致性；恢复在隔离库演练再切流。",
+    "excellentAnswer": "我会先给结论，再展开：mysqlbinlog 按位点回放；全量+binlog 增量；验证 gtid 一致性；恢复在隔离库演练再切流。"
+  },
+  "备份加密": {
+    "referenceAnswer": "mysqlbinlog 按位点回放；全量+binlog 增量；验证 gtid 一致性；恢复在隔离库演练再切流。",
+    "excellentAnswer": "我会先给结论，再展开：mysqlbinlog 按位点回放；全量+binlog 增量；验证 gtid 一致性；恢复在隔离库演练再切流。"
+  },
+  "Redis Sentinel": {
+    "referenceAnswer": "Sentinel 监控主从自动 failover；Cluster 16384 slot，MOVED/ASK 重定向；客户端需集群感知。",
+    "excellentAnswer": "我会先给结论，再展开：Sentinel 监控主从自动 failover；Cluster 16384 slot，MOVED/ASK 重定向；客户端需集群感知。"
+  },
+  "Redis Cluster": {
+    "referenceAnswer": "lvextend 扩逻辑卷 + resize2fs/xfs_growfs 扩文件系统；先确认 VG 有空余 PV；在线扩容注意 IO 峰值；扩容前快照/备份。",
+    "excellentAnswer": "我会先给结论，再展开：lvextend 扩逻辑卷 + resize2fs/xfs_growfs 扩文件系统；先确认 VG 有空余 PV；在线扩容注意 IO 峰值；扩容前快照/备份。"
+  },
+  "Elasticsearch 运维": {
+    "referenceAnswer": "Elasticsearch 运维：结合题目「Elasticsearch 集群 yellow/red 状态如何排查，分片和磁盘水位如何治理」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：Elasticsearch 运维：结合题目「Elasticsearch 集群 yellow/red 状态如何排查，分片和磁盘水位如何治理」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "Kafka Broker 故障": {
+    "referenceAnswer": "under-replicated 看 ISR；Controller 选举；磁盘满/网络分区导致 leader 不可用；重分配分区均衡。",
+    "excellentAnswer": "我会先给结论，再展开：under-replicated 看 ISR；Controller 选举；磁盘满/网络分区导致 leader 不可用；重分配分区均衡。"
+  },
+  "RabbitMQ 堆积": {
+    "referenceAnswer": "RabbitMQ 堆积：结合题目「RabbitMQ 消息堆积时，你会如何判断消费者、路由、ack 和磁盘瓶颈」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：RabbitMQ 堆积：结合题目「RabbitMQ 消息堆积时，你会如何判断消费者、路由、ack 和磁盘瓶颈」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "容器镜像清理": {
+    "referenceAnswer": "K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。",
+    "excellentAnswer": "我会先给结论，再展开：K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。"
+  },
+  "CoreDNS 故障": {
+    "referenceAnswer": "K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。",
+    "excellentAnswer": "我会先给结论，再展开：K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。"
+  },
+  "Ingress 故障": {
+    "referenceAnswer": "K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。",
+    "excellentAnswer": "我会先给结论，再展开：K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。"
+  },
+  "节点污点容忍": {
+    "referenceAnswer": "K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。",
+    "excellentAnswer": "我会先给结论，再展开：K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。"
+  },
+  "PV 存储故障": {
+    "referenceAnswer": "K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。",
+    "excellentAnswer": "我会先给结论，再展开：K8s 排障：kubectl describe/events/logs；DNS 看 Corefile 上游；Ingress 看 backend/endpoints；PV 绑定 PVC 与 StorageClass。"
+  },
+  "系统时间漂移": {
+    "referenceAnswer": "系统时间漂移：结合题目「服务器时间漂移会影响哪些业务？NTP/Chrony 如何监控和治理」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：系统时间漂移：结合题目「服务器时间漂移会影响哪些业务？NTP/Chrony 如何监控和治理」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "内核参数调优": {
+    "referenceAnswer": "内核参数调优：结合题目「高并发服务上线前，哪些 Linux 内核参数可能需要评估，为什么不能盲目套模板」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：内核参数调优：结合题目「高并发服务上线前，哪些 Linux 内核参数可能需要评估，为什么不能盲目套模板」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "连接池耗尽": {
+    "referenceAnswer": "连接池耗尽：结合题目「应用连接池耗尽时，运维侧如何从数据库、网络和应用指标协助定位」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：连接池耗尽：结合题目「应用连接池耗尽时，运维侧如何从数据库、网络和应用指标协助定位」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "负载均衡算法": {
+    "referenceAnswer": "负载均衡算法：结合题目「轮询、最少连接、IP Hash 和权重负载均衡各适合什么场景」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：负载均衡算法：结合题目「轮询、最少连接、IP Hash 和权重负载均衡各适合什么场景」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "WAF 误拦截": {
+    "referenceAnswer": "STRIDE 六类威胁；SDL 设计评审+威胁建模+测试；越权：水平/垂直，测 IDOR；WAF 误报调规则。",
+    "excellentAnswer": "我会先给结论，再展开：STRIDE 六类威胁；SDL 设计评审+威胁建模+测试；越权：水平/垂直，测 IDOR；WAF 误报调规则。"
+  },
+  "DDoS 应急": {
+    "referenceAnswer": "DDoS 应急：结合题目「遭遇 DDoS 攻击时，运维如何判断攻击类型、牵引清洗和保护核心服务」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：DDoS 应急：结合题目「遭遇 DDoS 攻击时，运维如何判断攻击类型、牵引清洗和保护核心服务」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "CMDB 依赖": {
+    "referenceAnswer": "CMDB 依赖：结合题目「服务 CMDB 信息不准确时会影响哪些故障处理和发布动作？如何治理」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：CMDB 依赖：结合题目「服务 CMDB 信息不准确时会影响哪些故障处理和发布动作？如何治理」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "巡检自动化": {
+    "referenceAnswer": "巡检自动化：结合题目「生产巡检自动化应该检查哪些内容，如何避免巡检脚本自身造成风险」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：巡检自动化：结合题目「生产巡检自动化应该检查哪些内容，如何避免巡检脚本自身造成风险」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "机房断电": {
+    "referenceAnswer": "mysqlbinlog 按位点回放；全量+binlog 增量；验证 gtid 一致性；恢复在隔离库演练再切流。",
+    "excellentAnswer": "我会先给结论，再展开：mysqlbinlog 按位点回放；全量+binlog 增量；验证 gtid 一致性；恢复在隔离库演练再切流。"
+  },
+  "容量水位": {
+    "referenceAnswer": "lvextend 扩逻辑卷 + resize2fs/xfs_growfs 扩文件系统；先确认 VG 有空余 PV；在线扩容注意 IO 峰值；扩容前快照/备份。",
+    "excellentAnswer": "我会先给结论，再展开：lvextend 扩逻辑卷 + resize2fs/xfs_growfs 扩文件系统；先确认 VG 有空余 PV；在线扩容注意 IO 峰值；扩容前快照/备份。"
+  },
+  "证书轮换": {
+    "referenceAnswer": "证书轮换：结合题目「多域名多环境证书轮换如何自动化，避免过期和替换错误」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：证书轮换：结合题目「多域名多环境证书轮换如何自动化，避免过期和替换错误」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "发布窗口": {
+    "referenceAnswer": "发布窗口：结合题目「为什么核心系统发布需要窗口和冻结策略？例外发布如何审批」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：发布窗口：结合题目「为什么核心系统发布需要窗口和冻结策略？例外发布如何审批」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "Runbook 演练": {
+    "referenceAnswer": "Runbook 演练：结合题目「运维 Runbook 如何编写和演练，保证新人值班也能执行」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：Runbook 演练：结合题目「运维 Runbook 如何编写和演练，保证新人值班也能执行」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "供应商故障": {
+    "referenceAnswer": "供应商故障：结合题目「云厂商或第三方服务故障时，运维如何判断影响范围并执行切换」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：供应商故障：结合题目「云厂商或第三方服务故障时，运维如何判断影响范围并执行切换」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "成本优化": {
+    "referenceAnswer": "成本优化：结合题目「服务器和云资源成本持续上涨时，运维如何定位浪费和优化」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：成本优化：结合题目「服务器和云资源成本持续上涨时，运维如何定位浪费和优化」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "变更审计": {
+    "referenceAnswer": "变更审计：结合题目「一次生产配置变更造成故障时，你会如何通过审计追踪责任和改进流程」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：变更审计：结合题目「一次生产配置变更造成故障时，你会如何通过审计追踪责任和改进流程」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  }
+}

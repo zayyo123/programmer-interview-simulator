@@ -1,6 +1,16 @@
 import { chooseProvider } from './config.js';
 import { createFallbackInterviewerReply } from './interview.js';
 import { levelLabels, roleLabels } from './questions.js';
+import {
+  extractProfileSignals,
+  sanitizeStructuredCategories,
+  sanitizeStructuredTerms
+} from '../shared/profileAnalysis.js';
+import {
+  buildLocalProfileAnalysis,
+  sanitizeStructuredFocusTopics
+} from '../shared/profileAnalyzeLocal.js';
+import { isGenericTemplateReferenceAnswer } from '../shared/referenceAnswerResolver.js';
 
 export async function generateInterviewerReply({ config, session, answer, prompt }) {
   const provider = chooseProvider(config);
@@ -76,10 +86,161 @@ async function callProvider(config, provider, prompt, options = {}) {
   throw new Error(`Unsupported AI provider: ${provider}`);
 }
 
+export async function generateConcreteReferenceAnswer({ config, question }) {
+  const provider = chooseProvider(config);
+  if (provider === 'mock') return null;
+
+  const prompt = buildConcreteReferencePrompt(question);
+
+  try {
+    const raw = await callProvider(config, provider, prompt, {
+      temperature: 0.25,
+      maxOutputTokens: 2200
+    });
+    return normalizeConcreteReferenceAnswer(parseJsonObject(raw));
+  } catch (error) {
+    console.error(`[ai-reference:${provider}]`, error.message);
+    return null;
+  }
+}
+
+function buildConcreteReferencePrompt(question = {}) {
+  const mustHave = (question.scoringRubric?.mustHave || [])
+    .filter((item) => !/明确.*目标|指标.*验证|风险控制/.test(String(item)))
+    .slice(0, 6);
+
+  return [
+    '你是资深技术面试官。请为下面这道面试题写「参考答案」和「优秀回答示例」。',
+    '要求：具体、准确、可照抄口述；写清机制、步骤、命令/配置/指标、边界和排查顺序。',
+    '禁止套话：不要写“目标约束风险验证”“不能只背术语”“应先定义问题目标和边界”。',
+    '只输出 JSON：{ "referenceAnswer": "...", "excellentAnswer": "..." }',
+    `岗位方向：${question.category || '技术'}`,
+    `技能点：${question.skill || ''}`,
+    `题型：${question.type || 'knowledge'}`,
+    `题目：${question.question || ''}`,
+    mustHave.length ? `尽量覆盖：${mustHave.join('；')}` : ''
+  ].filter(Boolean).join('\n');
+}
+
+function normalizeConcreteReferenceAnswer(parsed) {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+
+  const referenceAnswer = String(parsed.referenceAnswer || '').trim();
+  const excellentAnswer = String(parsed.excellentAnswer || '').trim();
+  if (!referenceAnswer || referenceAnswer.length < 80) return null;
+  if (isGenericTemplateReferenceAnswer(referenceAnswer)) return null;
+
+  return {
+    referenceAnswer,
+    excellentAnswer: excellentAnswer && !isGenericTemplateReferenceAnswer(excellentAnswer)
+      ? excellentAnswer
+      : referenceAnswer.replace(/^（示例）/, '我')
+  };
+}
+
+export async function extractStructuredProfile({ config, text, role = '' }) {
+  const provider = chooseProvider(config);
+  if (provider === 'mock') return null;
+
+  const prompt = buildStructuredProfilePrompt(text, role);
+
+  try {
+    const raw = await callProvider(config, provider, prompt, {
+      temperature: 0.2,
+      maxOutputTokens: 1800
+    });
+    return normalizeStructuredProfile(parseJsonObject(raw), text, role);
+  } catch (error) {
+    console.error(`[ai-profile:${provider}]`, error.message);
+    return null;
+  }
+}
+
+function buildStructuredProfilePrompt(text, role) {
+  const roleLabel = roleLabels[role] || role || '未指定';
+  const resume = String(text || '').trim().slice(0, 6000);
+
+  return [
+    '你是技术招聘顾问。请从候选人 JD/简历中做保守、可验证的结构化抽取。',
+    '只输出 JSON 对象，不要 Markdown，不要解释。',
+    '宁可少识别也不要猜测；只写原文中能明确支持的技术词和方向。',
+    '',
+    `目标岗位：${roleLabel}`,
+    '解析时请结合目标岗位，优先保留与该岗位强相关的技术词、考点和风险；与岗位无关的技能不要强行纳入。',
+    `候选人资料：\n${resume}`,
+    '',
+    '输出字段：',
+    'terms: string[] — 具体技术名词，如 "Spring Boot"、"Redis"，最多 8 个',
+    'categories: string[] — 从技术方向集合里选，最多 4 个。可选值：Java、Go、Python、前端、MySQL、Redis、消息队列、微服务、测试、运维、DevOps、数据、AI、安全、架构、算法、系统设计',
+    'focusTopics: string[] — 面试高频考点，最多 6 个，短语即可',
+    'capabilities: string[] — 候选人应准备的能力点，最多 5 条',
+    'risks: string[] — 简历/表达风险，最多 4 条',
+    'confidence: number — 0 到 1，表示你对抽取结果的整体把握',
+    '',
+    '约束：',
+    '- 没有明确证据就不要输出对应 term 或 category',
+    '- 不要把岗位默认值当成候选人技能',
+    '- confidence 低于 0.5 时 terms 和 categories 应为空数组'
+  ].join('\n');
+}
+
+function normalizeStructuredProfile(parsed, text, role) {
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return null;
+
+  const source = String(text || '').trim();
+  const { normalized } = extractProfileSignals(source, { role });
+  const terms = sanitizeStructuredTerms(parsed.terms, source, normalized);
+  const categories = sanitizeStructuredCategories(parsed.categories, source, normalized, role);
+  const local = buildLocalProfileAnalysis(source, role);
+  const confidence = clampNumber(parsed.confidence, 0, 1, 0);
+
+  return {
+    terms,
+    categories,
+    focusTopics: sanitizeStructuredFocusTopics(parsed.focusTopics, local.focusTopics, role, categories),
+    capabilities: normalizeStringArray(parsed.capabilities).slice(0, 5),
+    risks: normalizeStringArray(parsed.risks).slice(0, 4),
+    confidence
+  };
+}
+
+function parseJsonObject(text) {
+  const raw = String(text || '').trim();
+  if (!raw) throw new Error('AI returned empty profile analysis');
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+  } catch {
+    // fall through
+  }
+
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i)?.[1];
+  if (fenced) {
+    const parsed = JSON.parse(fenced);
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+  }
+
+  const start = raw.indexOf('{');
+  const end = raw.lastIndexOf('}');
+  if (start !== -1 && end > start) {
+    const parsed = JSON.parse(raw.slice(start, end + 1));
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) return parsed;
+  }
+
+  throw new Error('AI returned invalid profile JSON');
+}
+
+function clampNumber(value, min, max, fallback) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return fallback;
+  return Math.max(min, Math.min(max, numeric));
+}
+
 function buildQuestionPlanPrompt(interviewConfig, localPlan = []) {
   const role = roleLabels[interviewConfig.role] || interviewConfig.role || '后端开发';
   const level = levelLabels[interviewConfig.level] || interviewConfig.level || '中级';
-  const count = Math.max(3, Math.min(8, Number(interviewConfig.questionCount || 5)));
+  const count = Math.max(1, Math.floor(Number(interviewConfig.questionCount || 5)));
   const resume = String(interviewConfig.resume || '').trim();
   const localOutline = localPlan
     .slice(0, count)
@@ -122,7 +283,7 @@ function normalizeAiQuestionPlan(text, interviewConfig) {
 
   const role = interviewConfig.role || 'backend';
   const level = interviewConfig.level || 'middle';
-  const targetCount = Math.max(3, Math.min(8, Number(interviewConfig.questionCount || 5)));
+  const targetCount = Math.max(1, Math.floor(Number(interviewConfig.questionCount || 5)));
   const allowedTypes = new Set(['knowledge', 'project', 'system-design', 'algorithm']);
   const allowedCodeKinds = new Set(['algorithm', 'sql', 'frontend', 'backend']);
 

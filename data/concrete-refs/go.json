@@ -1,0 +1,62 @@
+{
+  "Go 调度器": {
+    "referenceAnswer": "GMP：G goroutine、M OS 线程、P 逻辑处理器持本地队列。GOMAXPROCS 控制 P 数。work stealing、sysmon 抢占、netpoller 处理网络阻塞。大量 G 因栈小可扩缩、用户态调度、阻塞时线程复用。",
+    "excellentAnswer": "GMP 让少量线程跑大量 goroutine，P 本地队列加窃取，网络 I/O 走 netpoller。"
+  },
+  "goroutine 泄漏": {
+    "referenceAnswer": "原因：channel 永久阻塞、WaitGroup 未 Done、context 未取消、ticker 未 Stop、HTTP body 未关。定位 pprof goroutine 看重复栈。修复：超时 context、确保消费者退出、defer Stop/Close。",
+    "excellentAnswer": "泄漏我用 pprof goroutine 看栈，常见 channel 阻塞或 ctx 未取消。"
+  },
+  "channel 关闭": {
+    "referenceAnswer": "只由发送方或唯一 owner 关闭；关闭后 send panic，recv 得零值 ok=false。用 select+ok、sync.Once 关闭。fan-in 等所有 sender 结束再 close。",
+    "excellentAnswer": "channel 发送方关闭，接收方用 ok 判断，避免向已关闭 channel 发送。"
+  },
+  "context 传播": {
+    "referenceAnswer": "传递 deadline/cancel；入口 WithTimeout，下游第一参数 ctx，select Done() 退出。不要存全局或结构体长期持有；Value 只放 request id 等小数据。",
+    "excellentAnswer": "请求入口建带超时的 ctx，全链路透传，goroutine select Done()。"
+  },
+  "defer 成本": {
+    "referenceAnswer": "defer LIFO 执行，Go1.14+ 栈上 defer 开销已低。适用资源释放、解锁、关闭文件。高频热点避免多层 defer，可内联 close/unlock；defer+闭包注意变量捕获。",
+    "excellentAnswer": "defer 适合解锁和关闭；极高频路径我会权衡可读性与内联释放。"
+  },
+  "接口与空指针": {
+    "referenceAnswer": "interface 是 (type, value) 对；nil 指针赋给 interface 后 type 非 nil，故 iface != nil。返回 error 时勿 return typed nil pointer。判断用 reflect 或避免把 nil 指针塞进 interface。",
+    "excellentAnswer": "nil 指针放进 interface 不等于 nil，因为动态类型还在；我会 return nil 或具体 error 值。"
+  },
+  "map 并发安全": {
+    "referenceAnswer": "map 非并发安全，并发写会 fatal error。方案：sync.Mutex/RWMutex 包一层、sync.Map（读多写少）、分片 map 降锁。选型看读写比例和 key 稳定性。",
+    "excellentAnswer": "并发 map 我用 mutex 包一层或 sync.Map；高并发可分片锁。"
+  },
+  "内存逃逸": {
+    "referenceAnswer": "逃逸分析决定栈或堆分配；返回局部变量指针、interface 动态派发、闭包引用、过大对象会逃逸。go build -gcflags=-m 查看。减少逃逸可降 GC 压力。",
+    "excellentAnswer": "用 -gcflags=-m 看逃逸；减少不必要的堆分配能降低 GC。"
+  },
+  "GC 调优": {
+    "referenceAnswer": "Go GC 并发标记清除，关注 GOGC、分配率、堆增长。延迟抖动看分配热点、大对象、goroutine STW。工具 pprof heap、GODEBUG=gctrace=1。先减分配再调 GOGC。",
+    "excellentAnswer": "Go GC 我先降分配率和对象大小，再用 gctrace 和 pprof heap 验证。"
+  },
+  "pprof 使用": {
+    "referenceAnswer": "CPU：热点函数；heap：分配/存活；goroutine：泄漏栈；block/mutex：锁竞争。采集 curl /debug/pprof，go tool pprof 分析。线上常配合连续采样和基准对比。",
+    "excellentAnswer": "CPU 看热点，goroutine 看泄漏，block 看锁；我会对比发布前后 profile。"
+  },
+  "错误处理": {
+    "referenceAnswer": "error 是值，用 %w 包装保留链 errors.Is/As。sentinel error 定义包级变量。业务错误码与底层 error 分层；日志记上下文，对外统一码。避免 panic 处理可预期错误。",
+    "excellentAnswer": "我用 %w 包装错误，errors.Is 判断；业务码和底层 error 分层。"
+  },
+  "泛型取舍": {
+    "referenceAnswer": "泛型适合容器、算法、约束类型安全复用；不适合为抽象而抽象。用 constraints.Ordered/comparable；避免过度 type parameter 导致可读性下降。",
+    "excellentAnswer": "泛型我用于通用数据结构；不为省几行代码过度抽象。"
+  },
+  "HTTP 服务优雅退出": {
+    "referenceAnswer": "监听 SIGTERM/SIGINT，server.Shutdown(ctx) 停止接收新连接并等待在处理请求完成。配合 readiness 摘流、固定超时、关闭后台 goroutine。Kubernetes preStop 留足时间。",
+    "excellentAnswer": "收到 SIGTERM 先摘流，Shutdown 等待在途请求，超时强制退出。"
+  },
+  "限流背压": {
+    "referenceAnswer": "限流：令牌桶/漏桶、x/time/rate、网关层限流。背压：有界 channel、阻塞发送、返回 429/排队。监控拒绝率、队列深度、下游 RT，避免重试风暴。",
+    "excellentAnswer": "入口限流+有界队列做背压，下游慢时快速失败而非无限堆积。"
+  },
+  "并发测试": {
+    "referenceAnswer": "用 testing + race detector（-race）、并发压测、确定性复现（固定 seed/sync）。表驱动+goroutine 启动，WaitGroup 等待，检查无 data race 和 panic。",
+    "excellentAnswer": "并发测试我开 -race，用 WaitGroup 和可控并发度复现问题。"
+  }
+}

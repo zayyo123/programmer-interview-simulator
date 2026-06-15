@@ -4,7 +4,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { loadExternalQuestionDrafts, syncExternalQuestionDrafts } from './externalSources.js';
+import { getAvailableQuestionCount } from './interview.js';
 import { questionBank, roleLabels } from './questions.js';
+import { withResolvedReferenceAnswers } from '../shared/referenceAnswerResolver.js';
 
 const rootDir = join(fileURLToPath(new URL('.', import.meta.url)), '..');
 export const questionDraftPath = join(rootDir, 'data', 'question-drafts.json');
@@ -49,16 +51,16 @@ const defaultTemplates = [
 export async function loadRuntimeQuestionBank() {
   const approved = await loadApprovedQuestions();
   return [
-    ...questionBank.map((item) => attachGovernance(item, {
+    ...questionBank.map((item) => withResolvedReferenceAnswers(attachGovernance(item, {
       status: 'approved',
       source: 'built-in',
       reviewStatus: '已审核'
-    })),
-    ...approved.map((item) => attachGovernance(item, {
+    }))),
+    ...approved.map((item) => withResolvedReferenceAnswers(attachGovernance(item, {
       status: 'approved',
       source: item.governance?.source || 'manual-approved',
       reviewStatus: '人工审核通过'
-    }))
+    })))
   ];
 }
 
@@ -70,9 +72,16 @@ export async function getQuestionBankCatalog(filters = {}) {
   const pendingDrafts = drafts.filter((item) => item.status === 'pending');
   const rejectedDrafts = drafts.filter((item) => item.status === 'rejected');
   const filteredItems = filterQuestions(runtimeBank, filters).slice(0, 60);
+  const role = clean(filters.role);
+  const level = clean(filters.level);
 
   return {
     summary: createQuestionBankSummary(runtimeBank, pendingDrafts, rejectedDrafts),
+    availability: {
+      role: role || null,
+      level: level || null,
+      count: getAvailableQuestionCount({ role, level }, runtimeBank)
+    },
     templates: defaultTemplates,
     facets: createQuestionFacets(runtimeBank),
     items: filteredItems.map(toCatalogItem),

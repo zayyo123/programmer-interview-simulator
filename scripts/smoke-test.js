@@ -12,7 +12,9 @@ import {
   createReport,
   evaluateAnswerForTest,
   maybeAdvanceQuestion,
-  recordAnswerForCurrentQuestion
+  recordAnswerForCurrentQuestion,
+  recordSkippedQuestion,
+  advanceAfterSkip
 } from '../src/interview.js';
 import { questionBank } from '../src/questions.js';
 import { spawn } from 'node:child_process';
@@ -25,8 +27,10 @@ const baseUrl = `http://127.0.0.1:${port}`;
 
 async function main() {
   verifyStalledFollowUpCutoff();
+  verifySkipQuestion();
   verifyFrontendAnswerGuide();
   verifyCodeDimensionScores();
+  verifyQuestionDeduplication();
   await verifyExternalQuestionSources();
 
   const server = spawn(process.execPath, ['src/server.js'], {
@@ -206,6 +210,10 @@ async function main() {
     assert(
       pureFrontendSession.plan.every((item) => !mobileClientCategories.has(item.category)),
       `pure frontend interviews should not include mobile client questions, got: ${pureFrontendSession.plan.map((item) => `${item.category}:${item.id}`).join(', ')}`
+    );
+    assert(
+      pureFrontendSession.plan.every((item) => item.category !== 'Go' && (item.type !== 'algorithm' || item.codeKind === 'frontend')),
+      `frontend interviews should not include Go or non-JS algorithm questions, got: ${pureFrontendSession.plan.map((item) => `${item.category}:${item.id}:${item.codeKind || '-'}`).join(', ')}`
     );
 
     const androidFrontendSession = await request('/api/interviews', {
@@ -576,6 +584,39 @@ async function main() {
   }
 }
 
+function verifyQuestionDeduplication() {
+  const config = {
+    role: 'java',
+    level: 'middle',
+    questionCount: 3,
+    resume: ''
+  };
+  const firstPlan = createInterviewPlan(config, { selectionSeed: 42 });
+  const firstIds = firstPlan.map((item) => item.id);
+  assert(firstIds.length === 3, `dedup first plan should have 3 questions, got ${firstIds.length}`);
+
+  const secondPlan = createInterviewPlan(config, {
+    selectionSeed: 43,
+    excludeQuestionIds: firstIds
+  });
+  const secondIds = secondPlan.map((item) => item.id);
+  assert(secondIds.length === 3, `dedup second plan should have 3 questions, got ${secondIds.length}`);
+  assert(
+    secondIds.every((id) => !firstIds.includes(id)),
+    `dedup second plan should not repeat first plan ids, overlap: ${firstIds.filter((id) => secondIds.includes(id)).join(', ')}`
+  );
+
+  const reusePlan = createInterviewPlan(config, {
+    selectionSeed: 44,
+    excludeQuestionIds: firstIds,
+    reuseAllowedQuestionIds: [firstIds[0]]
+  });
+  assert(
+    reusePlan.some((item) => item.id === firstIds[0]),
+    `reuseAllowedQuestionIds should allow a previously used question back into the plan`
+  );
+}
+
 function verifyStalledFollowUpCutoff() {
   const config = {
     role: 'backend',
@@ -586,7 +627,7 @@ function verifyStalledFollowUpCutoff() {
   };
   const session = {
     config,
-    plan: createInterviewPlan(config),
+    plan: createInterviewPlan(config, { selectionSeed: 11 }),
     currentIndex: 0,
     answers: [],
     completed: false,
@@ -641,7 +682,7 @@ function verifyStalledFollowUpCutoff() {
   };
   const drillSession = {
     config: drillConfig,
-    plan: createInterviewPlan(drillConfig),
+    plan: createInterviewPlan(drillConfig, { selectionSeed: 12 }),
     currentIndex: 0,
     answers: [],
     completed: false,
@@ -659,6 +700,34 @@ function verifyStalledFollowUpCutoff() {
   );
 }
 
+function verifySkipQuestion() {
+  const config = {
+    role: 'backend',
+    level: 'middle',
+    style: 'coaching',
+    questionCount: 3,
+    resume: '负责订单系统，使用 Java、MySQL、Redis。'
+  };
+  const session = {
+    config,
+    plan: createInterviewPlan(config, { selectionSeed: 11 }),
+    currentIndex: 0,
+    answers: [],
+    completed: false,
+    messages: []
+  };
+
+  const skipped = recordSkippedQuestion(session);
+  assert(skipped?.id, 'skip should capture the current planned question');
+  const advanced = advanceAfterSkip(session);
+  assert(advanced.advanced, 'skip should advance to the next question');
+  assert(session.currentIndex === 1, `skip should move current index forward, got ${session.currentIndex}`);
+
+  const report = createReport(session);
+  assert(report.questions[0]?.exitReason === 'skipped', `skipped question should be marked in report, got ${report.questions[0]?.exitReason}`);
+  assert(report.questions[0]?.userAnswerSummary === '（已跳过）', 'skipped question should show skip marker in report');
+}
+
 function verifyFrontendAnswerGuide() {
   const html = readFileSync('public/index.html', 'utf8');
   const app = readFileSync('public/app.js', 'utf8').replace(/\r\n/g, '\n');
@@ -666,7 +735,9 @@ function verifyFrontendAnswerGuide() {
 
   assert(html.includes('id="answerGuide"'), 'frontend should render the current answer guide container');
   assert(html.includes('id="planPreview"'), 'setup form should render a pre-interview plan preview container');
-  assert(html.includes('/app.js?v=geek-light-1'), 'index should load the latest frontend bundle version');
+  assert(html.includes('/app.js?v=geek-skip-1'), 'index should load the latest frontend bundle version');
+  assert(html.includes('id="skipQuestionButton"'), 'frontend should render skip question button');
+  assert(app.includes('/api/interviews/${sessionId}/skip'), 'frontend should call skip question API');
   assert(html.includes('/vendor/echarts.min.js'), 'index should load ECharts for dashboard charts');
   assert(app.includes('function renderAnswerGuide'), 'frontend should update answer guide from current question state');
   assert(app.includes('function renderQuestionDrillAnswerGuide'), 'answer guide should render single-question drill guidance');

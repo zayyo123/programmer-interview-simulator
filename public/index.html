@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>程序员模拟面试系统</title>
-    <link rel="stylesheet" href="/styles.css?v=geek-light-1" />
+    <link rel="stylesheet" href="/styles.css?v=geek-nav-3" />
   </head>
   <body>
     <main class="app-shell">
@@ -23,11 +23,11 @@
           </div>
           <p>普通练习者只配置本轮面试；题目资产和抽题规则放到独立工作区维护。</p>
         </section>
-        <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换到白天模式" aria-pressed="false">
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="切换到暗黑模式" aria-pressed="true">
           <span class="theme-toggle-track" aria-hidden="true">
             <span class="theme-toggle-thumb"></span>
           </span>
-          <span id="themeToggleText">暗黑模式</span>
+          <span id="themeToggleText">白天模式</span>
         </button>
       </header>
 
@@ -132,8 +132,9 @@
 
               <label class="native-field compact-field">
                 <span>题目数量</span>
-                <input name="questionCount" type="number" min="3" max="6" value="5" />
+                <input name="questionCount" type="number" min="1" step="1" value="5" />
               </label>
+              <div id="questionCountHint" class="provider-warning warning" hidden aria-live="polite"></div>
 
               <details class="advanced-setup">
                 <summary>
@@ -194,7 +195,7 @@
               <details class="insight-drawer">
                 <summary>
                   <span>简历解析</span>
-                  <strong>能力点、风险点和推荐考点</strong>
+                  <strong>结合所选技术方向分析能力点、风险点和推荐考点</strong>
                 </summary>
                 <section id="profileAnalysis" class="profile-analysis empty-profile">
                   <p>填写或上传背景后，会实时解析能力点、风险点和推荐考点。</p>
@@ -229,11 +230,7 @@
                   <p>选择配置后，这里会预览本轮训练节奏，不提前暴露具体题目。</p>
                 </section>
                 <div class="launch-actions">
-                  <div id="countdownOverlay" class="countdown-overlay" hidden>
-                    <span>3</span>
-                    <p>全面面试即将开始</p>
-                  </div>
-                  <button type="submit" class="primary-button launch-button">开启全面面试</button>
+                  <button type="submit" class="primary-button launch-button">开启面试</button>
                 </div>
               </section>
             </aside>
@@ -268,6 +265,8 @@
               </div>
             </div>
 
+            <div id="questionStageBar" class="question-stage-bar" hidden></div>
+
             <div id="messages" class="messages empty-state">
               <p>面试官会在这里开场，并提出第一道问题。</p>
             </div>
@@ -277,14 +276,17 @@
                 <p>开始面试后，这里会提示当前题型的作答方式。</p>
               </section>
               <textarea id="answerInput" rows="4" placeholder="在这里输入你的回答..." disabled></textarea>
-              <button type="submit" class="primary-button" disabled>提交回答</button>
+              <div class="answer-form-actions">
+                <button type="submit" class="primary-button" disabled>提交回答</button>
+                <button type="button" id="skipQuestionButton" class="ghost-button" disabled>跳过此题</button>
+              </div>
             </form>
           </section>
 
           <aside class="coach-panel collapsible-panel" data-panel="coach">
-            <button type="button" class="panel-toggle" data-toggle-panel="coach" title="折叠实时教练">◐</button>
+            <button type="button" class="panel-toggle" data-toggle-panel="coach" title="折叠面试官关注板">◐</button>
             <section id="liveCoach" class="live-coach empty-state">
-              <p>开始面试后，这里会显示面试官当前正在考察什么。</p>
+              <p>开始面试后，这里会显示面试官当前关注点和回答建议。</p>
             </section>
           </aside>
         </section>
@@ -294,7 +296,7 @@
         <div class="panel-header report-header">
           <div>
             <h2>复盘报告</h2>
-            <p>宏观战绩、逐题拆解、误区和三轮通关路线图。</p>
+            <p>综合素质评级盘、宏观战绩、逐题拆解与通关路线图。</p>
           </div>
         </div>
         <div id="report" class="report empty-state">
@@ -322,7 +324,31 @@
       </section>
     </main>
 
+    <div id="setupBlockedDialog" class="setup-blocked-dialog" hidden>
+      <div
+        class="setup-blocked-dialog-content"
+        role="alertdialog"
+        aria-labelledby="setupBlockedTitle"
+        aria-describedby="setupBlockedMessage"
+        aria-modal="true"
+      >
+        <h3 id="setupBlockedTitle">暂时无法开启新面试</h3>
+        <p id="setupBlockedMessage"></p>
+        <div class="setup-blocked-actions">
+          <button type="button" class="mini-button subtle-button" data-close-setup-blocked>知道了</button>
+          <button type="button" class="mini-button primary-button" data-go-interview-from-blocked hidden>前往模拟面试</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="countdownOverlay" class="countdown-overlay" hidden>
+      <div class="countdown-overlay-content">
+        <span>3</span>
+        <p>全面面试即将开始</p>
+      </div>
+    </div>
+
     <script src="/vendor/echarts.min.js"></script>
-    <script src="/app.js?v=geek-light-1" type="module"></script>
+    <script src="/app.js?v=geek-skip-1" type="module"></script>
   </body>
 </html>

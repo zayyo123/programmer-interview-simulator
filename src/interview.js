@@ -1,4 +1,6 @@
 import { levelLabels, questionBank as defaultQuestionBank, roleLabels, styleLabels } from './questions.js';
+import { normalizeProfileText, tokenMatches } from '../shared/profileAnalysis.js';
+import { resolveQuestionAnswers } from '../shared/referenceAnswerResolver.js';
 
 const roleTopics = {
   backend: ['MySQL', 'Redis', '网络', '操作系统', '项目经历', '系统设计', '算法'],
@@ -41,6 +43,23 @@ const roleStageBlueprints = {
 };
 
 const mobileClientCategories = new Set(['Android', 'iOS', '跨端/鸿蒙']);
+const roleBlockedCategories = {
+  frontend: new Set(['Go', 'Java', 'Python']),
+  go: new Set(['前端']),
+  java: new Set(['前端', 'Go']),
+  python: new Set(['前端', 'Go'])
+};
+const roleAllowedAlgorithmCodeKinds = {
+  frontend: new Set(['frontend']),
+  qa: new Set(['frontend', 'algorithm']),
+  backend: new Set(['algorithm', 'sql', 'backend']),
+  java: new Set(['algorithm', 'sql', 'backend']),
+  go: new Set(['algorithm', 'backend']),
+  python: new Set(['algorithm', 'sql', 'backend']),
+  fullstack: new Set(['frontend', 'algorithm', 'sql', 'backend']),
+  data: new Set(['algorithm', 'sql']),
+  ai: new Set(['algorithm', 'backend'])
+};
 const mobileClientSignalPatterns = {
   Android: /android|安卓|kotlin|java\s+app|anr\b/i,
   iOS: /\bios\b|iphone|ipad|swift|objective-c|objc/i,
@@ -77,14 +96,139 @@ const levelExpectations = {
   }
 };
 
+export function getAvailableQuestionCount(config = {}, questionBank = defaultQuestionBank) {
+  const role = config.role || 'backend';
+  const level = config.level || 'middle';
+  const resumeSignals = extractResumeSignals(config.resume, config.profileAnalysis, role);
+  const blueprint = createInterviewBlueprint({
+    role,
+    level,
+    targetCount: 1,
+    resumeSignals,
+    questionBank
+  });
+
+  return buildCandidateQuestionPool(role, level, resumeSignals, blueprint, questionBank).length;
+}
+
+export function countRemainingQuestions(config = {}, questionBank = defaultQuestionBank, excludeQuestionIds = []) {
+  const role = config.role || 'backend';
+  const level = config.level || 'middle';
+  const targetCount = Math.max(1, Math.floor(Number(config.questionCount || 5)));
+  const resumeSignals = extractResumeSignals(config.resume, config.profileAnalysis, role);
+  const blueprint = createInterviewBlueprint({
+    role,
+    level,
+    targetCount,
+    resumeSignals,
+    questionBank
+  });
+  const pool = buildCandidateQuestionPool(role, level, resumeSignals, blueprint, questionBank);
+  const excluded = new Set(normalizeExcludeQuestionIds(excludeQuestionIds));
+  const remainingPool = pool.filter((item) => !excluded.has(item.id));
+
+  return {
+    poolSize: pool.length,
+    remaining: remainingPool.length,
+    usedInScope: pool.filter((item) => excluded.has(item.id)).length
+  };
+}
+
+export function buildQuestionUsageScopeKey(role, level) {
+  return `${String(role || '').trim()}:${String(level || '').trim()}`;
+}
+
+function normalizeExcludeQuestionIds(ids) {
+  if (!Array.isArray(ids)) return [];
+  return [...new Set(ids.map((item) => String(item || '').trim()).filter(Boolean))].slice(0, 4000);
+}
+
+export function validateQuestionCount(questionCount, config = {}, options = {}) {
+  const count = Number(questionCount);
+  if (!Number.isFinite(count) || count <= 0) {
+    return {
+      ok: false,
+      code: 'non_positive',
+      message: '题目数量必须大于 0。',
+      value: null,
+      maxCount: null,
+      remainingCount: null
+    };
+  }
+
+  const normalized = Math.floor(count);
+  const questionSource = options.questionSource || config.questionSource || 'local';
+  if (questionSource === 'ai') {
+    return {
+      ok: true,
+      code: 'ok',
+      message: '',
+      value: normalized,
+      maxCount: null,
+      remainingCount: null
+    };
+  }
+
+  const bank = options.questionBank || defaultQuestionBank;
+  const excludeQuestionIds = normalizeExcludeQuestionIds(options.excludeQuestionIds);
+  const { poolSize, remaining } = countRemainingQuestions(
+    { ...config, questionCount: normalized },
+    bank,
+    excludeQuestionIds
+  );
+
+  if (normalized > remaining) {
+    const usedCount = Math.max(0, poolSize - remaining);
+    if (options.allowCycleReset && poolSize >= normalized) {
+      return {
+        ok: true,
+        code: 'cycle_reset',
+        message: '',
+        value: normalized,
+        maxCount: poolSize,
+        remainingCount: poolSize,
+        poolSize,
+        willCycleReset: true
+      };
+    }
+    return {
+      ok: false,
+      code: 'exceeds_bank',
+      message: usedCount > 0
+        ? `当前岗位/级别剩余可抽 ${remaining} 道题（已练 ${usedCount} 道），题目数量不能超过 ${remaining}。`
+        : `当前岗位/级别可用题库仅 ${poolSize} 道题，题目数量不能超过 ${poolSize}。`,
+      value: normalized,
+      maxCount: remaining,
+      remainingCount: remaining,
+      poolSize
+    };
+  }
+
+  return {
+    ok: true,
+    code: 'ok',
+    message: '',
+    value: normalized,
+    maxCount: remaining,
+    remainingCount: remaining,
+    poolSize
+  };
+}
+
 export function createInterviewPlan(config, options = {}) {
   const role = config.role || 'backend';
   const level = config.level || 'middle';
-  const targetCount = clamp(Number(config.questionCount || 5), 3, 8);
+  const targetCount = Math.max(1, Math.floor(Number(config.questionCount || 5)));
   const questionSource = Array.isArray(options.questionBank) && options.questionBank.length
     ? options.questionBank
     : defaultQuestionBank;
-  const resumeSignals = extractResumeSignals(config.resume, config.profileAnalysis);
+  const excludeQuestionIds = normalizeExcludeQuestionIds(options.excludeQuestionIds);
+  const reuseAllowedQuestionIds = normalizeExcludeQuestionIds(options.reuseAllowedQuestionIds);
+  const selectionTopK = Math.max(1, Math.floor(Number(options.selectionTopK) || 8));
+  const randomFn = Number.isFinite(Number(options.selectionSeed))
+    ? createSeededRandom(Number(options.selectionSeed))
+    : Math.random;
+  const resumeSignals = extractResumeSignals(config.resume, config.profileAnalysis, role);
   const blueprint = createInterviewBlueprint({
     role,
     level,
@@ -104,7 +248,11 @@ export function createInterviewPlan(config, options = {}) {
       stage,
       resumeSignals,
       role,
-      level
+      level,
+      excludeQuestionIds,
+      reuseAllowedQuestionIds,
+      selectionTopK,
+      randomFn
     });
 
     if (match) {
@@ -121,7 +269,11 @@ export function createInterviewPlan(config, options = {}) {
       stage,
       resumeSignals,
       role,
-      level
+      level,
+      excludeQuestionIds,
+      reuseAllowedQuestionIds,
+      selectionTopK,
+      randomFn
     });
 
     if (!match) break;
@@ -229,10 +381,10 @@ function getCodeKindPlanLabel(codeKind) {
   }[codeKind] || '代码思路';
 }
 
-export function createOpening(config, firstQuestion) {
+export function createOpeningIntro(config) {
   const role = roleLabels[config.role] || config.role;
   const level = levelLabels[config.level] || config.level;
-  const style = styleLabels[config.style] || '正常';
+  const style = styleLabels[config.style] || config.style;
   const resumeLine = config.resume?.trim()
     ? '我会结合你提供的简历或项目经历来追问细节，重点看你的真实贡献、技术判断和复盘能力。'
     : '如果涉及项目经历，请按真实面试方式补充背景、职责和结果。';
@@ -248,9 +400,89 @@ export function createOpening(config, firstQuestion) {
     `本次面试风格是${style}，会覆盖项目经历、基础知识、工程实践，以及必要的算法或系统设计。`,
     resumeLine,
     styleLine,
-    '回答时尽量结构化，优先说明结论、关键原理、方案取舍和实际场景。',
-    `第一个问题：${firstQuestion.question}`
+    '回答时尽量结构化，优先说明结论、关键原理、方案取舍和实际场景。'
   ].join('\n');
+}
+
+export function createInterviewOpeningMessages(config, firstQuestion) {
+  const createdAt = new Date().toISOString();
+  return [
+    {
+      role: 'interviewer',
+      kind: 'intro',
+      content: createOpeningIntro(config),
+      createdAt
+    },
+    {
+      role: 'interviewer',
+      kind: 'question',
+      content: firstQuestion.question,
+      questionIndex: 1,
+      questionId: firstQuestion.id,
+      createdAt
+    }
+  ];
+}
+
+function stripTrailingQuestionCue(text) {
+  return String(text || '')
+    .replace(/\s*(?:下一题|先切到下一题)[：:][\s\S]*$/u, '')
+    .replace(/\s*题目[：:][\s\S]*$/u, '')
+    .trim();
+}
+
+export function buildInterviewerReplyMessages({
+  replyText,
+  provider,
+  advanced,
+  nextQuestion,
+  completed,
+  questionIndex,
+  answeringQuestionId
+}) {
+  const createdAt = new Date().toISOString();
+  const base = {
+    role: 'interviewer',
+    provider,
+    createdAt
+  };
+
+  if ((completed || !nextQuestion) && advanced) {
+    return [{
+      ...base,
+      kind: 'closing',
+      content: stripTrailingQuestionCue(replyText) || replyText,
+      questionId: answeringQuestionId || null
+    }];
+  }
+
+  if (advanced && nextQuestion) {
+    const messages = [];
+    const feedback = stripTrailingQuestionCue(replyText);
+    if (feedback) {
+      messages.push({
+        ...base,
+        kind: 'feedback',
+        content: feedback,
+        questionId: answeringQuestionId || null
+      });
+    }
+    messages.push({
+      ...base,
+      kind: 'question',
+      content: nextQuestion.question,
+      questionIndex: questionIndex || 1,
+      questionId: nextQuestion.id
+    });
+    return messages;
+  }
+
+  return [{
+    ...base,
+    kind: 'followup',
+    content: replyText,
+    questionId: answeringQuestionId || null
+  }];
 }
 
 export function getCurrentQuestion(session) {
@@ -336,8 +568,8 @@ export function buildInterviewPrompt({ session, answer }) {
     `候选人最新回答：${answer}`,
     '',
     evaluation.readyToMoveNext && nextQuestion
-      ? '请先用一句话评价当前回答，再自然地切到下一题。'
-      : '请只追问一个最关键的问题，逼近真实面试中的澄清与深挖。',
+      ? '请只用一句话评价当前回答。不要输出下一题题干，系统会单独展示题目。'
+      : '请只追问一个最关键的问题，逼近真实面试中的澄清与深挖。不要输出下一题题干。',
     '请输出面试官下一句。'
   ].join('\n');
 }
@@ -431,6 +663,102 @@ export function maybeAdvanceQuestion(session, answer) {
   session.completedAt = new Date().toISOString();
 }
 
+export function recordSkippedQuestion(session) {
+  const question = getCurrentQuestion(session);
+  if (!question) return null;
+
+  let entry = session.answers.find((item) => item.question.id === question.id);
+  if (!entry) {
+    entry = {
+      question,
+      answer: '',
+      attempts: 0,
+      followUpCount: 0,
+      stagnantFollowUpCount: 0,
+      attemptHistory: [],
+      skipped: true,
+      exitReason: 'skipped',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    session.answers.push(entry);
+    return question;
+  }
+
+  entry.skipped = true;
+  entry.exitReason = 'skipped';
+  entry.updatedAt = new Date().toISOString();
+  return question;
+}
+
+export function advanceAfterSkip(session) {
+  const question = getCurrentQuestion(session);
+  if (!question) {
+    return {
+      advanced: false,
+      completed: Boolean(session.completed),
+      nextQuestion: null
+    };
+  }
+
+  if (session.currentIndex < session.plan.length - 1) {
+    session.currentIndex += 1;
+    return {
+      advanced: true,
+      completed: false,
+      nextQuestion: getCurrentQuestion(session)
+    };
+  }
+
+  session.currentIndex = session.plan.length;
+  session.completed = true;
+  session.completedAt = new Date().toISOString();
+  return {
+    advanced: true,
+    completed: true,
+    nextQuestion: null
+  };
+}
+
+export function buildSkipQuestionMessages({
+  skippedQuestionId,
+  nextQuestion,
+  completed,
+  questionIndex
+}) {
+  const createdAt = new Date().toISOString();
+  const base = {
+    role: 'interviewer',
+    provider: 'mock',
+    createdAt
+  };
+
+  if (completed || !nextQuestion) {
+    return [{
+      ...base,
+      kind: 'closing',
+      content: '好的，这题先跳过。本轮题目已全部结束，你可以结束面试并生成复盘报告。',
+      questionId: skippedQuestionId || null
+    }];
+  }
+
+  return [
+    {
+      ...base,
+      kind: 'feedback',
+      content: '好的，这题先跳过。我们进入下一题。',
+      questionId: skippedQuestionId || null
+    },
+    {
+      ...base,
+      kind: 'question',
+      content: nextQuestion.question,
+      questionIndex: questionIndex || 1,
+      questionId: nextQuestion.id
+    }
+  ];
+}
+
 export function createReport(session) {
   const levelProfile = getLevelExpectation(session.config.level);
   const resumeSummary = summarizeResumeForInterview(session.config.resume);
@@ -440,6 +768,8 @@ export function createReport(session) {
       followUpCount,
       level: session.config.level
     });
+
+    const resolvedAnswers = resolveQuestionAnswers(entry.question);
 
     return {
       questionId: entry.question.id,
@@ -452,14 +782,15 @@ export function createReport(session) {
       questionDrillTarget: createQuestionDrillTarget(entry.question.planReason),
       attempts: entry.attempts || 1,
       followUpCount,
+      skipped: Boolean(entry.skipped),
       endedByInterviewer: Boolean(entry.endedByInterviewer),
       exitReason: entry.exitReason || 'open',
-      userAnswer: entry.answer,
-      userAnswerSummary: summarizeAnswer(entry.answer),
+      userAnswer: entry.skipped ? '（已跳过）' : entry.answer,
+      userAnswerSummary: entry.skipped ? '（已跳过）' : summarizeAnswer(entry.answer),
       expectedPoints: createExpectedPoints(entry.question),
       expectedPointCoverage: createExpectedPointCoverage(entry.question, entry.answer),
-      referenceAnswer: entry.question.referenceAnswer,
-      excellentAnswer: entry.question.excellentAnswer,
+      referenceAnswer: resolvedAnswers.referenceAnswer,
+      excellentAnswer: resolvedAnswers.excellentAnswer,
       commonMistakes: entry.question.commonMistakes || [],
       score: evaluation.score,
       dimensionScores: evaluation.dimensionScores,
@@ -1030,9 +1361,8 @@ function createFollowUpPrefix(style, stagnantFollowUpCount = 0) {
   }[style] || '我想继续确认一个关键点：';
 }
 
-function createNextQuestionReply(nextQuestion, evaluation, style) {
-  const feedback = createPositiveFeedback(evaluation, style);
-  return `${feedback}下一题：${nextQuestion.question}`;
+function createNextQuestionReply(_nextQuestion, evaluation, style) {
+  return createPositiveFeedback(evaluation, style);
 }
 
 function createForcedMoveOnReply(nextQuestion, question, evaluation, style) {
@@ -1046,7 +1376,7 @@ function createForcedMoveOnReply(nextQuestion, question, evaluation, style) {
     return `${cutoff} 这轮主要问题已经问完，你可以点击结束面试生成复盘报告。`;
   }
 
-  return `${cutoff} 先切到下一题：${nextQuestion.question}`;
+  return cutoff;
 }
 
 function createClosingReply(evaluation) {
@@ -1088,6 +1418,9 @@ function createGapAnalysis(question, evaluation, exitReason = 'open') {
   if (evaluation.redFlags.length) communicationGaps.push(`面试官容易警惕这些风险信号：${evaluation.redFlags.join('、')}`);
 
   const parts = [];
+  if (exitReason === 'skipped') {
+    parts.push('这题被主动跳过，真实面试里通常会被记为未作答；复盘时建议按参考答案完整练一遍');
+  }
   if (exitReason === 'stalled_follow_up') {
     parts.push(`这题在连续追问后被面试官主动收口，说明“${describeFollowUpCategory(evaluation.followUpCategory)}”已经影响到真实面试里的稳定性判断`);
   }
@@ -1128,8 +1461,10 @@ function improveAnswer(answer, question, evaluation) {
   const supplement = framework
     ? ` 你可以直接按这个框架重讲：${framework}`
     : '';
+  const { excellentAnswer, referenceAnswer } = resolveQuestionAnswers(question);
+  const exemplar = excellentAnswer || referenceAnswer;
 
-  return `${opening}${question.excellentAnswer}${supplement}`;
+  return `${opening}${exemplar}${supplement}`;
 }
 
 function createRetryBlueprint(question, evaluation, levelProfile = getLevelExpectation('middle')) {
@@ -1415,6 +1750,15 @@ function createInterviewerVerdict(
   const concernCount = missingMustHave.length + evaluation.redFlags.length;
   const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
   const interviewerCutoff = exitReason === 'stalled_follow_up';
+  const skipped = exitReason === 'skipped';
+
+  if (skipped) {
+    return {
+      level: 'risk',
+      label: '面试官判断：本题已跳过',
+      detail: '候选人选择跳过，真实面试里会被记为未作答或明显回避，通常直接影响该方向评价。'
+    };
+  }
 
   if (evaluation.score >= levelProfile.minScoreToMoveNext + 12 && attempts <= 1 && !concernCount) {
     return {
@@ -1476,6 +1820,15 @@ function createPassBarSignal(
   const firstGap = missingMustHave[0];
   const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
   const interviewerCutoff = exitReason === 'stalled_follow_up';
+  const skipped = exitReason === 'skipped';
+
+  if (skipped) {
+    return {
+      level: 'risk',
+      label: '跳过题需补练',
+      detail: '这题没有进入有效作答，想达到过线标准，需要按参考答案把核心点完整口述一遍。'
+    };
+  }
 
   if (evaluation.score >= levelProfile.minScoreToMoveNext + 12 && !missingMustHave.length && !evaluation.redFlags.length) {
     return {
@@ -1539,8 +1892,11 @@ function createPassBarDelta(
   const scoreGap = Math.max(0, targetScore - (evaluation.score || 0));
   const immediateFix = createImmediateFix(question, evaluation);
   const interviewerCutoff = exitReason === 'stalled_follow_up';
+  const skipped = exitReason === 'skipped';
   const repeatedPressure = attempts >= 3 && evaluation.followUpCategory !== 'complete';
-  const headline = evaluation.score >= targetScore && !missingMustHave.length && !evaluation.redFlags.length
+  const headline = skipped
+    ? '这题被跳过，需按参考答案补练一轮'
+    : evaluation.score >= targetScore && !missingMustHave.length && !evaluation.redFlags.length
     ? '这题已经接近真实面试里的稳定过线答案'
     : scoreGap >= 12
       ? `这题离稳定过线还差 ${scoreGap} 分左右的表达密度`
@@ -1572,7 +1928,9 @@ function createPassBarDelta(
     mustLand.push(`继续补强 ${missingGoodToHave.slice(0, 2).join('、')}`);
   }
 
-  const risk = interviewerCutoff
+  const risk = skipped
+    ? '这题被跳过，报告里会按未作答处理；下一轮建议优先重练同类题。'
+    : interviewerCutoff
     ? '这题已经出现“追问后仍站不住”的信号，真实面试里通常会被记成稳定性扣分。'
     : repeatedPressure
       ? '这题需要多轮追问才能补齐，说明首轮口述密度不够，容易拖低整体评价。'
@@ -2611,7 +2969,8 @@ function createAnswerTargetSummary(answersByQuestion, levelProfile = getLevelExp
   const riskyAnswers = answersByQuestion.filter((item) => {
     return item.score < levelProfile.minScoreToMoveNext
       || item.passBarSignal?.level === 'risk'
-      || item.exitReason === 'stalled_follow_up';
+      || item.exitReason === 'stalled_follow_up'
+      || item.exitReason === 'skipped';
   });
 
   if (!riskyAnswers.length) {
@@ -2619,8 +2978,12 @@ function createAnswerTargetSummary(answersByQuestion, levelProfile = getLevelExp
   }
 
   const topRisk = [...riskyAnswers].sort((left, right) => {
-    const leftPenalty = (left.passBarSignal?.level === 'risk' ? 2 : 0) + (left.exitReason === 'stalled_follow_up' ? 2 : 0);
-    const rightPenalty = (right.passBarSignal?.level === 'risk' ? 2 : 0) + (right.exitReason === 'stalled_follow_up' ? 2 : 0);
+    const leftPenalty = (left.passBarSignal?.level === 'risk' ? 2 : 0)
+      + (left.exitReason === 'stalled_follow_up' ? 2 : 0)
+      + (left.exitReason === 'skipped' ? 3 : 0);
+    const rightPenalty = (right.passBarSignal?.level === 'risk' ? 2 : 0)
+      + (right.exitReason === 'stalled_follow_up' ? 2 : 0)
+      + (right.exitReason === 'skipped' ? 3 : 0);
     return rightPenalty - leftPenalty || left.score - right.score;
   })[0];
 
@@ -3898,16 +4261,39 @@ function countOccurrences(text, token) {
   return matches ? matches.length : 0;
 }
 
-function selectBestQuestion({ available, selected, stage = {}, resumeSignals = createEmptyResumeSignals() }) {
+function createSeededRandom(seed) {
+  let state = Number(seed) >>> 0;
+  return () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 0x100000000;
+  };
+}
+
+function selectBestQuestion({
+  available,
+  selected,
+  stage = {},
+  resumeSignals = createEmptyResumeSignals(),
+  excludeQuestionIds = [],
+  reuseAllowedQuestionIds = [],
+  selectionTopK = 8,
+  randomFn = Math.random
+}) {
   const preferredCategory = stage.preferredCategory || null;
   const preferredType = stage.preferredType || null;
   const targetDifficulty = stage.targetDifficulty || 2;
   const preferredRole = stage.preferredRole || null;
   const selectedIds = new Set(selected.map((item) => item.id));
+  const excludedIds = new Set(normalizeExcludeQuestionIds(excludeQuestionIds));
+  const reuseIds = new Set(normalizeExcludeQuestionIds(reuseAllowedQuestionIds));
   const selectedCategories = new Set(selected.map((item) => item.category));
   const selectedTypes = new Set(selected.map((item) => item.type));
 
-  const candidates = available.filter((item) => !selectedIds.has(item.id));
+  const candidates = available.filter((item) => {
+    if (selectedIds.has(item.id)) return false;
+    if (excludedIds.has(item.id) && !reuseIds.has(item.id)) return false;
+    return true;
+  });
   const typeMatchedCandidates = preferredType
     ? candidates.filter((item) => item.type === preferredType)
     : candidates;
@@ -3928,7 +4314,26 @@ function selectBestQuestion({ available, selected, stage = {}, resumeSignals = c
     }))
     .sort((left, right) => right.score - left.score);
 
-  return ranked[0]?.item || null;
+  return pickWeightedQuestion(ranked, selectionTopK, randomFn);
+}
+
+function pickWeightedQuestion(ranked = [], topK = 8, randomFn = Math.random) {
+  if (!ranked.length) return null;
+
+  const top = ranked.slice(0, Math.min(Math.max(1, topK), ranked.length));
+  if (top.length === 1) return top[0].item;
+
+  const minScore = top[top.length - 1].score;
+  const weights = top.map(({ score }) => Math.max(1, score - minScore + 1));
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  let pointer = randomFn() * totalWeight;
+
+  for (let index = 0; index < top.length; index += 1) {
+    pointer -= weights[index];
+    if (pointer <= 0) return top[index].item;
+  }
+
+  return top[top.length - 1].item;
 }
 
 function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResumeSignals(), blueprint = [], questionSource = defaultQuestionBank) {
@@ -3953,9 +4358,23 @@ function buildCandidateQuestionPool(role, level, resumeSignals = createEmptyResu
 }
 
 function isQuestionAllowedForRoleContext(question, role, resumeSignals = createEmptyResumeSignals()) {
-  if (!mobileClientCategories.has(question.category)) return true;
-  if (!['frontend', 'fullstack'].includes(role)) return false;
-  return hasMobileClientSignals(question.category, resumeSignals);
+  if (mobileClientCategories.has(question.category)) {
+    if (!['frontend', 'fullstack'].includes(role)) return false;
+    return hasMobileClientSignals(question.category, resumeSignals);
+  }
+
+  if (roleBlockedCategories[role]?.has(question.category)) {
+    return false;
+  }
+
+  if (question.type === 'algorithm') {
+    const allowedKinds = roleAllowedAlgorithmCodeKinds[role];
+    const codeKind = question.codeKind || 'algorithm';
+    if (allowedKinds && !allowedKinds.has(codeKind)) return false;
+    if (role === 'frontend' && !question.roles.includes('frontend')) return false;
+  }
+
+  return true;
 }
 
 function hasMobileClientSignals(category, resumeSignals = createEmptyResumeSignals()) {
@@ -4017,6 +4436,7 @@ function scoreQuestionFit(item, {
   if (item.type === 'project' && selectedCategories.size === 0) score += 8;
   if (item.type === 'algorithm' && selectedCategories.size >= 3) score += 5;
   if (item.type === 'system-design' && targetDifficulty >= 3) score += 5;
+  if (preferredRole === 'frontend' && item.type === 'algorithm' && item.codeKind === 'frontend') score += 24;
   if (resumeSignals.categories.includes(item.category) && item.type !== 'algorithm') score += 6;
   if (resumeSignals.ownership && item.type === 'project') score += 5;
 
@@ -4196,10 +4616,45 @@ function extractResumeSignals(resume, profileAnalysis = null) {
     .map((item) => item.trim())
     .filter(Boolean)
     .slice(0, 6);
+
+  const hasStructuredAnalysis = Boolean(
+    profileAnalysis?.terms?.length
+    || profileAnalysis?.categories?.length
+    || profileAnalysis?.keywords?.length
+  );
+
+  const legacyCategories = hasStructuredAnalysis
+    ? []
+    : extractLegacyResumeCategories(text);
+  const analysisCategories = extractProfileAnalysisCategories(profileAnalysis);
+  const analysisText = [
+    ...(profileAnalysis?.terms || []),
+    ...(profileAnalysis?.categories || []),
+    ...(profileAnalysis?.keywords || []),
+    ...(profileAnalysis?.focusTopics || []),
+    ...(profileAnalysis?.recommendedTracks || [])
+  ].join(' ');
+  const questionDrill = extractQuestionDrillSignals(text, profileAnalysis);
+
+  return {
+    text,
+    snippets,
+    categories: [...new Set([...analysisCategories, ...legacyCategories])],
+    analysisCategories,
+    analysisCodeKinds: extractProfileAnalysisCodeKinds(profileAnalysis),
+    analysisRiskMappings: normalizeProfileRiskMappings(profileAnalysis?.riskQuestionMappings),
+    analysisText,
+    questionDrill,
+    ownership: /(负责|主导|设计|优化|排查|实现|落地)/.test(text),
+    metrics: /\d+/.test(text)
+  };
+}
+
+function extractLegacyResumeCategories(text) {
   const normalized = normalizeText(text);
   const categoryHints = {
     Java: ['java', 'spring', 'jvm', 'hashmap', '线程池', '拒绝策略', '队列堆积', 'callerrunspolicy', 'synchronized', 'reentrantlock', 'volatile', 'concurrenthashmap', '锁竞争'],
-    Go: ['go', 'golang', 'goroutine', 'gin', 'channel', 'context', 'mutex', 'pprof', '锁竞争'],
+    Go: ['golang', 'go语言', 'goroutine', 'gin', 'channel', 'context', 'mutex', 'pprof', '锁竞争'],
     Python: ['python', 'django', 'flask', 'fastapi', 'celery'],
     测试: ['测试', 'qa', '自动化测试', '接口测试', '测试开发', '性能测试', '回归测试', '用例设计', 'mock'],
     运维: ['运维', 'linux', 'shell', '巡检', '监控', '告警', 'dba', '备份恢复', '主从切换', '网络排障'],
@@ -4216,29 +4671,9 @@ function extractResumeSignals(resume, profileAnalysis = null) {
     算法: ['算法', '复杂度', '哈希', '链表', '二叉树']
   };
 
-  const categories = Object.entries(categoryHints)
+  return Object.entries(categoryHints)
     .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
     .map(([category]) => category);
-  const analysisCategories = extractProfileAnalysisCategories(profileAnalysis);
-  const analysisText = [
-    ...(profileAnalysis?.keywords || []),
-    ...(profileAnalysis?.focusTopics || []),
-    ...(profileAnalysis?.recommendedTracks || [])
-  ].join(' ');
-  const questionDrill = extractQuestionDrillSignals(text, profileAnalysis);
-
-  return {
-    text,
-    snippets,
-    categories: [...new Set([...analysisCategories, ...categories])],
-    analysisCategories,
-    analysisCodeKinds: extractProfileAnalysisCodeKinds(profileAnalysis),
-    analysisRiskMappings: normalizeProfileRiskMappings(profileAnalysis?.riskQuestionMappings),
-    analysisText,
-    questionDrill,
-    ownership: /(负责|主导|设计|优化|排查|实现|落地)/.test(text),
-    metrics: /\d+/.test(text)
-  };
 }
 
 function createEmptyResumeSignals() {
@@ -4316,7 +4751,7 @@ function normalizeProfileRiskMappings(items) {
     .slice(0, 4);
 }
 
-function extractProfileAnalysisCodeKinds(profileAnalysis) {
+function extractProfileAnalysisCodeKinds(profileAnalysis, role = '') {
   if (!profileAnalysis) return [];
 
   const source = [
@@ -4324,7 +4759,7 @@ function extractProfileAnalysisCodeKinds(profileAnalysis) {
     ...(profileAnalysis.focusTopics || []),
     ...(profileAnalysis.recommendedTracks || [])
   ].join(' ');
-  const normalized = normalizeText(source);
+  const normalized = normalizeProfileText(source);
   const codeKindRules = {
     sql: ['sql', '分组统计', '查询', 'groupby', '窗口函数', 'dense_rank', 'rank', 'row_number', '第二高薪资', '部门薪资'],
     frontend: ['前端代码题', '防抖', '节流', 'throttle', '时间戳', 'leading', 'trailing', 'promise', 'promise.all', '数组扁平化', '事件循环', '微任务', '宏任务', '并发聚合', '失败短路', '并发限制器', '任务队列', '最大并发数', '补位执行'],
@@ -4332,15 +4767,30 @@ function extractProfileAnalysisCodeKinds(profileAnalysis) {
     algorithm: ['算法题', 'lru', '括号', '复杂度', '链表']
   };
 
-  return Object.entries(codeKindRules)
-    .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
+  const kinds = Object.entries(codeKindRules)
+    .filter(([, tokens]) => tokens.some((token) => tokenMatches(normalized, token)))
     .map(([codeKind]) => codeKind);
+
+  if (role === 'frontend') {
+    if (kinds.includes('frontend')) return ['frontend'];
+    if (kinds.includes('algorithm') || (profileAnalysis.categories || []).includes('前端') || (profileAnalysis.categories || []).includes('算法')) {
+      return ['frontend'];
+    }
+    return [];
+  }
+
+  return kinds;
 }
 
 function extractProfileAnalysisCategories(profileAnalysis) {
   if (!profileAnalysis) return [];
 
+  if (Array.isArray(profileAnalysis.categories) && profileAnalysis.categories.length) {
+    return [...new Set(profileAnalysis.categories.map((item) => String(item || '').trim()).filter(Boolean))];
+  }
+
   const source = [
+    ...(profileAnalysis.terms || []),
     ...(profileAnalysis.keywords || []),
     ...(profileAnalysis.focusTopics || []),
     ...(profileAnalysis.recommendedTracks || [])
@@ -4348,7 +4798,7 @@ function extractProfileAnalysisCategories(profileAnalysis) {
   const normalized = normalizeText(source);
   const categoryRules = {
     Java: ['java', 'jvm', 'spring', '线程池', '线程池参数', '拒绝策略', '队列堆积', 'callerrunspolicy', 'abortpolicy', 'synchronized', 'reentrantlock', 'volatile', 'concurrenthashmap', '锁竞争', '可见性', 'cas'],
-    Go: ['go', 'goroutine', 'context', 'channel', 'mutex', 'pprof', 'block profile', 'mutex profile', '锁竞争', '背压'],
+    Go: ['golang', 'go语言', 'goroutine', 'context', 'channel', 'mutex', 'pprof', 'block profile', 'mutex profile', '锁竞争', '背压'],
     Python: ['python', 'worker', 'gil', 'celery'],
     Redis: ['redis', '缓存', '热key', '大key', '缓存穿透'],
     MySQL: ['mysql', '数据库', '索引', '事务', '慢查询', '窗口函数', 'dense_rank', '第二高薪资', '部门薪资'],
@@ -4360,7 +4810,7 @@ function extractProfileAnalysisCategories(profileAnalysis) {
   };
 
   return Object.entries(categoryRules)
-    .filter(([, tokens]) => tokens.some((token) => normalized.includes(normalizeText(token))))
+    .filter(([, tokens]) => tokens.some((token) => tokenMatches(normalized, token)))
     .map(([category]) => category);
 }
 

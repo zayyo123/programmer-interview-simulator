@@ -1,0 +1,158 @@
+{
+  "浏览器渲染": {
+    "referenceAnswer": "HTML 解析 DOM，CSS 构建 CSSOM，合成渲染树，Layout，Paint，Composite；关键路径优化减少阻塞 CSS/JS，defer/async。",
+    "excellentAnswer": "我会先给结论，再展开：HTML 解析 DOM，CSS 构建 CSSOM，合成渲染树，Layout，Paint，Composite；关键路径优化减少阻塞 CSS/JS，defer/async。"
+  },
+  "首屏优化": {
+    "referenceAnswer": "LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。",
+    "excellentAnswer": "我会先给结论，再展开：LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。"
+  },
+  "Core Web Vitals": {
+    "referenceAnswer": "LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。",
+    "excellentAnswer": "我会先给结论，再展开：LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。"
+  },
+  "代码分割": {
+    "referenceAnswer": "LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。",
+    "excellentAnswer": "我会先给结论，再展开：LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。"
+  },
+  "Tree Shaking": {
+    "referenceAnswer": "动态 import() 路由级拆包；sideEffects:false 助 tree-shaking；分析 bundle 用 rollup-plugin-visualizer。",
+    "excellentAnswer": "我会先给结论，再展开：动态 import() 路由级拆包；sideEffects:false 助 tree-shaking；分析 bundle 用 rollup-plugin-visualizer。"
+  },
+  "缓存策略": {
+    "referenceAnswer": "SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。",
+    "excellentAnswer": "我会先给结论，再展开：SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。"
+  },
+  "Service Worker": {
+    "referenceAnswer": "SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。",
+    "excellentAnswer": "我会先给结论，再展开：SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。"
+  },
+  "跨域 CORS": {
+    "referenceAnswer": "预检 OPTIONS；Access-Control-Allow-Origin 勿用 * 带凭证；Allow-Methods/Headers；服务端代理同源。",
+    "excellentAnswer": "我会先给结论，再展开：预检 OPTIONS；Access-Control-Allow-Origin 勿用 * 带凭证；Allow-Methods/Headers；服务端代理同源。"
+  },
+  "XSS 防护": {
+    "referenceAnswer": "XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。",
+    "excellentAnswer": "我会先给结论，再展开：XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。"
+  },
+  "CSRF 与 Cookie": {
+    "referenceAnswer": "XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。",
+    "excellentAnswer": "我会先给结论，再展开：XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。"
+  },
+  "React 状态设计": {
+    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
+    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+  },
+  "React 渲染性能": {
+    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
+    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+  },
+  "React Hooks 闭包": {
+    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
+    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+  },
+  "React 错误边界": {
+    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
+    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+  },
+  "Vue 响应式": {
+    "referenceAnswer": "Vue3 Proxy 依赖收集 effect；ref/reactive 区别；computed 缓存；避免解构丢失响应式用 toRefs。",
+    "excellentAnswer": "我会先给结论，再展开：Vue3 Proxy 依赖收集 effect；ref/reactive 区别；computed 缓存；避免解构丢失响应式用 toRefs。"
+  },
+  "组件设计": {
+    "referenceAnswer": "组件设计：结合题目「如何设计一个可复用表格或表单组件，同时避免过度抽象」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：组件设计：结合题目「如何设计一个可复用表格或表单组件，同时避免过度抽象」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "权限路由": {
+    "referenceAnswer": "权限路由：结合题目「中后台系统如何设计菜单权限、按钮权限、路由守卫和接口权限校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：权限路由：结合题目「中后台系统如何设计菜单权限、按钮权限、路由守卫和接口权限校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "表单校验": {
+    "referenceAnswer": "表单校验：结合题目「复杂表单如何处理联动校验、异步校验、草稿保存和错误提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：表单校验：结合题目「复杂表单如何处理联动校验、异步校验、草稿保存和错误提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "大列表虚拟滚动": {
+    "referenceAnswer": "只渲染可视区+缓冲区；定高列表简单，动态高需测量缓存；减少 DOM 节点。",
+    "excellentAnswer": "我会先给结论，再展开：只渲染可视区+缓冲区；定高列表简单，动态高需测量缓存；减少 DOM 节点。"
+  },
+  "前端监控": {
+    "referenceAnswer": "前端监控：结合题目「前端监控如何采集 JS 错误、白屏、性能、接口异常和用户行为」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：前端监控：结合题目「前端监控如何采集 JS 错误、白屏、性能、接口异常和用户行为」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "Source Map 安全": {
+    "referenceAnswer": "Source Map 安全：结合题目「线上 Source Map 如何用于定位问题，同时避免源码泄露」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：Source Map 安全：结合题目「线上 Source Map 如何用于定位问题，同时避免源码泄露」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "埋点治理": {
+    "referenceAnswer": "埋点治理：结合题目「前端埋点如何设计事件模型、去重、版本和数据质量校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：埋点治理：结合题目「前端埋点如何设计事件模型、去重、版本和数据质量校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "微前端": {
+    "referenceAnswer": "qiankun/single-spa 沙箱+路由；样式隔离 shadow DOM；公共依赖 externals；子应用独立部署。",
+    "excellentAnswer": "我会先给结论，再展开：qiankun/single-spa 沙箱+路由；样式隔离 shadow DOM；公共依赖 externals；子应用独立部署。"
+  },
+  "Monorepo": {
+    "referenceAnswer": "Monorepo：结合题目「前端 Monorepo 如何管理包、依赖、构建缓存和版本发布」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：Monorepo：结合题目「前端 Monorepo 如何管理包、依赖、构建缓存和版本发布」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "工程化规范": {
+    "referenceAnswer": "工程化规范：结合题目「如何设计前端 ESLint、Prettier、TypeScript、测试和构建门禁」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：工程化规范：结合题目「如何设计前端 ESLint、Prettier、TypeScript、测试和构建门禁」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "TypeScript 类型设计": {
+    "referenceAnswer": "TypeScript 类型设计：结合题目「TypeScript 如何为接口数据、组件 props 和业务状态建模？过度类型化有什么问题」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：TypeScript 类型设计：结合题目「TypeScript 如何为接口数据、组件 props 和业务状态建模？过度类型化有什么问题」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "前端测试": {
+    "referenceAnswer": "前端测试：结合题目「单元测试、组件测试、E2E 测试在前端分别适合覆盖什么」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：前端测试：结合题目「单元测试、组件测试、E2E 测试在前端分别适合覆盖什么」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "可访问性": {
+    "referenceAnswer": "可访问性：结合题目「前端可访问性应该关注哪些语义、键盘操作、焦点管理和颜色对比」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：可访问性：结合题目「前端可访问性应该关注哪些语义、键盘操作、焦点管理和颜色对比」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "国际化": {
+    "referenceAnswer": "国际化：结合题目「多语言项目如何设计文案、日期货币、复数规则和异步加载」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：国际化：结合题目「多语言项目如何设计文案、日期货币、复数规则和异步加载」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "移动端适配": {
+    "referenceAnswer": "移动端适配：结合题目「移动端 H5 如何处理视口、刘海屏、1px、软键盘和安全区」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：移动端适配：结合题目「移动端 H5 如何处理视口、刘海屏、1px、软键盘和安全区」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "弱网优化": {
+    "referenceAnswer": "弱网优化：结合题目「弱网环境下前端如何做请求超时、重试、骨架屏和离线提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：弱网优化：结合题目「弱网环境下前端如何做请求超时、重试、骨架屏和离线提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "上传下载": {
+    "referenceAnswer": "上传下载：结合题目「大文件上传如何做分片、断点续传、秒传和失败重试」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：上传下载：结合题目「大文件上传如何做分片、断点续传、秒传和失败重试」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "WebSocket": {
+    "referenceAnswer": "WebSocket：结合题目「前端 WebSocket 如何处理重连、心跳、消息乱序和页面生命周期」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：WebSocket：结合题目「前端 WebSocket 如何处理重连、心跳、消息乱序和页面生命周期」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "安全依赖": {
+    "referenceAnswer": "安全依赖：结合题目「前端第三方依赖如何做漏洞治理、锁版本和供应链风险控制」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：安全依赖：结合题目「前端第三方依赖如何做漏洞治理、锁版本和供应链风险控制」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "设计系统": {
+    "referenceAnswer": "设计系统：结合题目「如何建设前端设计系统，保证组件一致性和团队协作效率」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：设计系统：结合题目「如何建设前端设计系统，保证组件一致性和团队协作效率」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "SSR/SSG": {
+    "referenceAnswer": "SSR/SSG：结合题目「SSR、SSG 和 CSR 分别适合什么场景？它们对性能和部署有什么影响」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：SSR/SSG：结合题目「SSR、SSG 和 CSR 分别适合什么场景？它们对性能和部署有什么影响」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "Hydration": {
+    "referenceAnswer": "Hydration：结合题目「SSR Hydration 不一致会出现什么问题？如何定位和避免」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：Hydration：结合题目「SSR Hydration 不一致会出现什么问题？如何定位和避免」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "前端内存泄漏": {
+    "referenceAnswer": "前端内存泄漏：结合题目「前端页面内存持续上涨时，你会如何定位事件监听、定时器和闭包引用」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
+    "excellentAnswer": "我会先给结论，再展开：前端内存泄漏：结合题目「前端页面内存持续上涨时，你会如何定位事件监听、定时器和闭包引用」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+  },
+  "浏览器事件循环": {
+    "referenceAnswer": "宏任务 script/setTimeout、微任务 promise.then；每宏任务清空微队列；async/await 是微任务。",
+    "excellentAnswer": "我会先给结论，再展开：宏任务 script/setTimeout、微任务 promise.then；每宏任务清空微队列；async/await 是微任务。"
+  }
+}

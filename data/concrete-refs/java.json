@@ -1,0 +1,34 @@
+{
+  "JVM 内存模型": {
+    "referenceAnswer": "JVM 运行时数据区：程序计数器、虚拟机栈、本地方法栈、堆、方法区/元空间（JDK8+ 字符串常量在堆）。OOM 排查：Java heap space 用 jmap -histo/MAT 看对象；Metaspace 查类加载泄漏；unable to create native thread 看线程数；Direct buffer 结合 NIO。线程栈区异常用 jstack 看栈帧和局部变量。",
+    "excellentAnswer": "我会根据 OOM 信息先判断区域：堆看 dump 和对象分布，元空间查类加载，线程过多看 jstack，直接内存查 NIO 和 MaxDirectMemorySize。"
+  },
+  "类加载机制": {
+    "referenceAnswer": "双亲委派：子加载器先委派父加载器，保证核心类由 Bootstrap 加载，防止自定义 java.lang.String 破坏类型安全。打破场景：SPI（JDBC）、Tomcat WebApp 隔离、OSGi、热部署。排查类冲突打印 ClassLoader 层次和 -verbose:class。",
+    "excellentAnswer": "双亲委派保证核心类唯一；SPI 等会打破委派。类冲突我会看 ClassLoader 链和是否重复 jar。"
+  },
+  "GC Root": {
+    "referenceAnswer": "GC Roots：栈/local 变量、静态字段、常量、JNI 引用、锁持有对象、JMX Bean 等。泄漏排查：heap dump + MAT Dominator Tree，从 GC Root 追最短引用链。常见：ThreadLocal 未 remove、静态集合、监听器未注销。",
+    "excellentAnswer": "我用 MAT 从 GC Roots 追泄漏对象，重点查 ThreadLocal、静态缓存和未注销监听器。"
+  },
+  "线程池隔离": {
+    "referenceAnswer": "按业务拆独立线程池：核心/最大线程、有界队列、拒绝策略分开；IO 与 CPU 密集分池。监控 activeCount、queueSize、拒绝次数、任务等待 P99。打满时降级非核心或扩容，避免共池拖死。",
+    "excellentAnswer": "我会给核心链路独立线程池和有界队列，监控队列和拒绝，非核心业务降级。"
+  },
+  "CompletableFuture": {
+    "referenceAnswer": "用于异步编排：thenCompose 串行、allOf 并行。指定业务线程池，避免 common pool 被阻塞占满。超时 orTimeout/ScheduledExecutor；异常 exceptionally/handle 降级。避免回调里阻塞等待另一个 CF。",
+    "excellentAnswer": "CompletableFuture 我会用专用线程池，设超时和异常降级，并行用 allOf。"
+  },
+  "Spring 事务": {
+    "referenceAnswer": "失效原因：同类自调用绕过代理、非 public、异常被 catch、错误 rollbackFor、非 InnoDB。传播行为嵌套不当会部分提交。排查：事务日志、Connection 是否同一、是否代理对象、异常类型。",
+    "excellentAnswer": "事务失效我先查自调用、异常是否抛出、传播行为和存储引擎。"
+  },
+  "Bean 生命周期": {
+    "referenceAnswer": "实例化 -> 注入 -> Aware -> BeanPostProcessor -> @PostConstruct -> init -> 使用 -> @PreDestroy -> destroy；AOP 代理多在初始化阶段。循环依赖：单例 setter 注入靠三级缓存；构造器循环无法解决。",
+    "excellentAnswer": "Bean 生命周期从实例化到销毁；循环依赖三级缓存只解决属性注入，构造器注入不行。"
+  },
+  "JVM 调优": {
+    "referenceAnswer": "p99 抖动：1) GC 日志/STW；2) jstack 锁竞争；3) 线程池/连接池；4) 下游超时重试。工具 JFR、async-profiler、arthas。调优先修泄漏和大对象，再选 G1/ZGC 和合理堆，而非盲目调参。",
+    "excellentAnswer": "p99 我先看 GC 和锁，再用 profiler 定位热点，最后才调堆和 GC 器。"
+  }
+}

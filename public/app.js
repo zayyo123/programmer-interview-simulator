@@ -1,8 +1,19 @@
+import { buildLocalProfileAnalysis } from './profileAnalyzeLocal.js';
+import {
+  backfillQuestionUsageFromHistory,
+  peekSessionQuestionExcludes,
+  resolveSessionQuestionExcludes,
+  recordSessionQuestionUsage,
+  extractReuseQuestionIdsFromResume
+} from './questionUsageLedger.js';
+
+const LIVE_COACH_TITLE = '面试官关注板';
 const setupForm = document.querySelector('#setupForm');
 const answerForm = document.querySelector('#answerForm');
 const answerInput = document.querySelector('#answerInput');
 const answerGuideEl = document.querySelector('#answerGuide');
 const messagesEl = document.querySelector('#messages');
+const questionStageBarEl = document.querySelector('#questionStageBar');
 const liveCoachEl = document.querySelector('#liveCoach');
 const reportEl = document.querySelector('#report');
 const interviewProgressEl = document.querySelector('#interviewProgress');
@@ -10,8 +21,10 @@ const providerText = document.querySelector('#providerText');
 const statusText = document.querySelector('#statusText');
 const finishButton = document.querySelector('#finishButton');
 const answerSubmitButton = answerForm.querySelector('button[type="submit"]');
+const skipQuestionButton = document.querySelector('#skipQuestionButton');
 const styleSelect = setupForm.querySelector('select[name="style"]');
 const styleHint = document.querySelector('#styleHint');
+const questionCountHint = document.querySelector('#questionCountHint');
 const practiceHistoryEl = document.querySelector('#practiceHistory');
 const profileAnalysisEl = document.querySelector('#profileAnalysis');
 const planPreviewEl = document.querySelector('#planPreview');
@@ -34,6 +47,9 @@ const profileFileInput = document.querySelector('#profileFileInput');
 const fillRoleSampleButton = document.querySelector('#fillRoleSampleButton');
 const clearResumeButton = document.querySelector('#clearResumeButton');
 const countdownOverlay = document.querySelector('#countdownOverlay');
+const setupBlockedDialogEl = document.querySelector('#setupBlockedDialog');
+const setupBlockedMessageEl = document.querySelector('#setupBlockedMessage');
+const setupBlockedGoInterviewButton = document.querySelector('[data-go-interview-from-blocked]');
 const productNavButtons = document.querySelectorAll('[data-product-target]');
 const productViews = document.querySelectorAll('[data-product-view]');
 const workflowStepButtons = document.querySelectorAll('[data-step-target]');
@@ -52,6 +68,9 @@ let latestLiveCoachSnapshot = null;
 let liveCoachDetailsOpen = false;
 let currentPlan = [];
 let currentQuestionId = null;
+let sessionMessages = [];
+let viewQuestionId = null;
+let interviewCompleted = false;
 let latestReport = null;
 let codeAnswerMode = 'explain';
 let codeAnswerModeQuestionId = null;
@@ -59,6 +78,10 @@ let activeRoleGroup = 'backend';
 let activeProductView = 'interview';
 let latestQuestionBankCatalog = null;
 let latestQuestionPaper = null;
+let latestProfileAnalysis = null;
+let profileAnalysisRequestId = 0;
+let profileAnalysisTimer = null;
+let profileAnalysisLoading = false;
 
 const roleGroups = [
   {
@@ -126,6 +149,17 @@ const roleResumeSamples = {
 };
 
 document.addEventListener('click', (event) => {
+  if (event.target.closest('[data-close-setup-blocked]')) {
+    hideSetupBlockedNotice();
+    return;
+  }
+
+  if (event.target.closest('[data-go-interview-from-blocked]')) {
+    hideSetupBlockedNotice();
+    setWorkflowStep('interview');
+    return;
+  }
+
   const productButton = event.target.closest('[data-product-target]');
   if (productButton) {
     setProductView(productButton.dataset.productTarget);
@@ -138,7 +172,24 @@ document.addEventListener('click', (event) => {
   setWorkflowStep(stepButton.dataset.stepTarget);
 });
 
+interviewProgressEl?.addEventListener('click', (event) => {
+  const step = event.target.closest('[data-progress-question]');
+  if (!step || step.classList.contains('is-disabled')) return;
+  selectQuestionView(step.dataset.progressQuestion);
+});
+
+questionStageBarEl?.addEventListener('click', (event) => {
+  if (event.target.closest('[data-return-current]')) {
+    selectQuestionView(null);
+  }
+});
+
 liveCoachEl.addEventListener('click', (event) => {
+  if (event.target.closest('[data-return-current]')) {
+    selectQuestionView(null);
+    return;
+  }
+
   const toggle = event.target.closest('[data-live-coach-toggle]');
   if (!toggle || !latestLiveCoachSnapshot) return;
 
@@ -179,7 +230,7 @@ styleSelect.addEventListener('change', () => {
 });
 
 resumeInput.addEventListener('input', () => {
-  renderProfileAnalysis(resumeInput.value);
+  scheduleProfileAnalysis();
   renderSetupSummary();
   renderPlanPreview();
 });
@@ -190,10 +241,23 @@ setupForm.addEventListener('change', (event) => {
   if (event.target === roleSelect) {
     activeRoleGroup = findRoleGroupId(roleSelect.value);
     renderRoleChoices();
+    refreshProfileAnalysisForRoleChange();
   }
   syncChoiceControls();
   renderSetupSummary();
   renderPlanPreview();
+  refreshSetupControls();
+  loadQuestionBankSnapshot();
+});
+
+const questionCountInput = setupForm.querySelector('input[name="questionCount"]');
+questionCountInput?.addEventListener('input', () => {
+  renderQuestionCountHint();
+  renderSetupSummary();
+  renderPlanPreview();
+  refreshSetupControls();
+});
+questionCountInput?.addEventListener('change', () => {
   loadQuestionBankSnapshot();
 });
 
@@ -214,17 +278,22 @@ aiProviderSelect?.addEventListener('change', () => {
   renderSetupSummary();
 });
 aiKeyInput?.addEventListener('input', renderAiProviderState);
-profileUploadButton?.addEventListener('click', () => profileFileInput?.click());
+profileUploadButton?.addEventListener('click', () => {
+  if (profileFileInput) profileFileInput.value = '';
+  profileFileInput?.click();
+});
 profileFileInput?.addEventListener('change', async () => {
   const file = profileFileInput.files?.[0];
-  if (file) await importProfileFile(file);
+  if (!file) return;
+  await importProfileFile(file);
+  if (profileFileInput) profileFileInput.value = '';
 });
 
 fillRoleSampleButton?.addEventListener('click', () => {
   const role = setupForm.querySelector('select[name="role"]')?.value || 'backend';
   const sample = roleResumeSamples[role] || roleResumeSamples.backend;
   resumeInput.value = sample;
-  renderProfileAnalysis(resumeInput.value);
+  scheduleProfileAnalysis();
   renderSetupSummary();
   renderPlanPreview();
   statusText.textContent = '已填入当前岗位样例，可以直接开始面试或继续补充真实项目背景。';
@@ -232,7 +301,9 @@ fillRoleSampleButton?.addEventListener('click', () => {
 
 clearResumeButton?.addEventListener('click', () => {
   resumeInput.value = '';
-  renderProfileAnalysis('');
+  if (profileFileInput) profileFileInput.value = '';
+  latestProfileAnalysis = null;
+  renderProfileAnalysisUi();
   renderSetupSummary();
   renderPlanPreview();
   statusText.textContent = '已清空背景，将按当前岗位的通用路径开始面试。';
@@ -373,9 +444,11 @@ paperOpsEl?.addEventListener('click', async (event) => {
 });
 
 renderStyleHint(styleSelect.value);
-renderProfileAnalysis(resumeInput.value);
+scheduleProfileAnalysis();
 renderSetupSummary();
 renderPlanPreview();
+renderQuestionCountHint();
+refreshSetupControls();
 renderPracticeHistory();
 renderAnswerGuide(null);
 renderAiProviderState();
@@ -384,7 +457,7 @@ setProductView('interview');
 
 function initializeTheme() {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-  applyTheme(savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark', { persist: false });
+  applyTheme(savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'light', { persist: false });
 }
 
 function applyTheme(theme, options = {}) {
@@ -407,10 +480,11 @@ function applyTheme(theme, options = {}) {
   }
 
   if (latestLiveCoachSnapshot) {
-    renderStressGaugeChart(latestLiveCoachSnapshot.stress);
+    renderLiveCoach(latestLiveCoachSnapshot);
   }
 
   if (latestReport) {
+    renderReportGradeGaugeChart(latestReport);
     renderReportRadarChart(latestReport);
   }
 }
@@ -438,11 +512,144 @@ function setProductView(view) {
   }
 }
 
+function getSetupAvailableQuestionCount() {
+  const catalog = latestQuestionBankCatalog;
+  if (catalog?.availability?.count != null) {
+    return catalog.availability.count;
+  }
+  return catalog?.summary?.approvedCount ?? null;
+}
+
+function buildQuestionDedupPeek(formData = new FormData(setupForm)) {
+  const role = formData.get('role');
+  const level = formData.get('level');
+  const questionSource = formData.get('questionSource') || 'local';
+  const poolSize = getSetupAvailableQuestionCount();
+  const reuseAllowedQuestionIds = extractReuseQuestionIdsFromResume(formData.get('resume') || '');
+
+  if (questionSource === 'ai' || poolSize == null) {
+    return {
+      excludeQuestionIds: [],
+      reuseAllowedQuestionIds,
+      remaining: poolSize,
+      total: poolSize,
+      used: 0,
+      cycle: 1,
+      cycleReset: false
+    };
+  }
+
+  return peekSessionQuestionExcludes({
+    role,
+    level,
+    poolSize,
+    reuseAllowedQuestionIds
+  });
+}
+
+function validateSetupQuestionCount() {
+  const formData = new FormData(setupForm);
+  const count = Number(formData.get('questionCount'));
+  const questionSource = formData.get('questionSource') || 'local';
+
+  if (!Number.isFinite(count) || count <= 0) {
+    return {
+      ok: false,
+      code: 'non_positive',
+      message: '题目数量必须大于 0。',
+      value: null,
+      maxCount: null,
+      remainingCount: null
+    };
+  }
+
+  const normalized = Math.floor(count);
+  if (questionSource === 'ai') {
+    return {
+      ok: true,
+      code: 'ok',
+      message: '',
+      value: normalized,
+      maxCount: null,
+      remainingCount: null
+    };
+  }
+
+  const totalPool = getSetupAvailableQuestionCount();
+  const dedup = buildQuestionDedupPeek(formData);
+  const remaining = dedup.remaining ?? totalPool;
+  const willCycleReset = totalPool != null
+    && normalized > (dedup.remaining ?? 0)
+    && totalPool >= normalized;
+
+  if (totalPool != null && normalized > remaining && !willCycleReset) {
+    const usedCount = Math.max(0, totalPool - remaining);
+    return {
+      ok: false,
+      code: 'exceeds_bank',
+      message: usedCount > 0
+        ? `当前岗位/级别剩余可抽 ${remaining} 道题（已练 ${usedCount} 道），题目数量不能超过 ${remaining}。`
+        : `当前岗位/级别可用题库仅 ${totalPool} 道题，题目数量不能超过 ${totalPool}。`,
+      value: normalized,
+      maxCount: remaining,
+      remainingCount: remaining,
+      poolSize: totalPool
+    };
+  }
+
+  return {
+    ok: true,
+    code: willCycleReset ? 'cycle_reset' : 'ok',
+    message: '',
+    value: normalized,
+    maxCount: willCycleReset ? totalPool : remaining,
+    remainingCount: willCycleReset ? totalPool : remaining,
+    poolSize: totalPool,
+    willCycleReset,
+    dedup
+  };
+}
+
+function renderQuestionCountHint(validation = validateSetupQuestionCount()) {
+  if (!questionCountHint) return;
+
+  if (!validation.ok) {
+    questionCountHint.textContent = validation.message;
+    questionCountHint.classList.add('warning');
+    questionCountHint.removeAttribute('hidden');
+    return;
+  }
+
+  const formData = new FormData(setupForm);
+  const questionSource = formData.get('questionSource') || 'local';
+  const dedup = validation.dedup || buildQuestionDedupPeek(formData);
+  const totalPool = validation.poolSize ?? getSetupAvailableQuestionCount();
+
+  if (questionSource === 'local' && totalPool != null && (dedup.used > 0 || validation.willCycleReset)) {
+    const parts = [
+      `第 ${dedup.cycle} 轮`,
+      `已练 ${dedup.used}${totalPool != null ? `/${totalPool}` : ''}`,
+      `剩余 ${dedup.remaining ?? '—'} 道`
+    ];
+    if (validation.willCycleReset) {
+      parts.push('启动后将自动开启新一轮');
+    }
+    questionCountHint.textContent = parts.join(' · ');
+    questionCountHint.classList.toggle('warning', Boolean(validation.willCycleReset));
+    questionCountHint.removeAttribute('hidden');
+    return;
+  }
+
+  questionCountHint.textContent = '';
+  questionCountHint.setAttribute('hidden', '');
+}
+
 function renderSetupSummary() {
   if (!setupSummaryEl) return;
 
   const formData = new FormData(setupForm);
-  const questionCount = Math.max(3, Math.min(6, Number(formData.get('questionCount') || 5)));
+  const validation = validateSetupQuestionCount();
+  const questionCount = validation.ok ? validation.value : Number(formData.get('questionCount') || 5);
   const provider = getProviderText(formData.get('aiProvider') || 'mock');
   const source = formData.get('questionSource') === 'ai' ? 'AI 动态出题' : '本地题库';
   const resumeState = String(formData.get('resume') || '').trim() ? '已填写背景' : '通用练习';
@@ -482,6 +689,9 @@ function setWorkflowStep(step) {
   }
 
   activeWorkflowStep = step;
+  if (step === 'setup') {
+    refreshSetupControls();
+  }
   renderWorkflowState();
   return true;
 }
@@ -504,7 +714,7 @@ function renderWorkflowState() {
   });
 
   if (latestReport) {
-    setWorkflowStatus('复盘报告已生成，可以在三步之间回看配置、面试过程和报告。');
+    setWorkflowStatus('复盘报告已生成。可修改配置后再次开启全面面试，或回看面试过程与报告。');
   } else if (sessionId) {
     setWorkflowStatus('面试已开始，可以返回查看配置；报告会在结束后解锁。');
   } else {
@@ -560,6 +770,7 @@ function renderRoleGroupTabs() {
     }
     renderRoleChoices();
     syncChoiceControls();
+    refreshProfileAnalysisForRoleChange();
     renderPlanPreview();
     loadQuestionBankSnapshot();
   });
@@ -666,8 +877,8 @@ async function importProfileFile(file) {
 
     const parsedText = String(parsed.text || '').trim();
     if (!parsedText) throw new Error('未识别到有效文本');
-    resumeInput.value = [resumeInput.value.trim(), parsedText].filter(Boolean).join('\n\n');
-    renderProfileAnalysis(resumeInput.value);
+    resumeInput.value = parsedText;
+    scheduleProfileAnalysis();
     renderSetupSummary();
     renderPlanPreview();
 
@@ -732,28 +943,59 @@ function playCountdownTone(value) {
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && setupBlockedDialogEl && !setupBlockedDialogEl.hasAttribute('hidden')) {
+    hideSetupBlockedNotice();
+  }
+});
+
+backfillQuestionUsageFromHistory(loadPracticeHistory());
 loadQuestionBankSnapshot();
 
 setupForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  if (busy) return;
+
+  const lockReason = getSetupStartBlockReason();
+  if (lockReason) {
+    showSetupBlockedNotice(lockReason);
+    return;
+  }
+
+  const questionValidation = validateSetupQuestionCount();
+  if (!questionValidation.ok) {
+    renderQuestionCountHint(questionValidation);
+    statusText.textContent = questionValidation.message;
+    return;
+  }
 
   const canStart = await runLaunchCountdown();
   if (!canStart) return;
 
   const formData = new FormData(setupForm);
+  const dedup = resolveSessionQuestionExcludes({
+    role: formData.get('role'),
+    level: formData.get('level'),
+    questionCount: questionValidation.value,
+    poolSize: getSetupAvailableQuestionCount(),
+    reuseAllowedQuestionIds: extractReuseQuestionIdsFromResume(formData.get('resume') || '')
+  });
   const payload = {
     role: formData.get('role'),
     level: formData.get('level'),
     style: formData.get('style'),
     questionSource: formData.get('questionSource') || 'local',
-    questionCount: Number(formData.get('questionCount') || 5),
+    questionCount: questionValidation.value,
     resume: formData.get('resume') || '',
-    profileAnalysis: createSerializableProfileAnalysis(formData.get('resume') || '')
+    profileAnalysis: createSerializableProfileAnalysis(),
+    excludeQuestionIds: dedup.excludeQuestionIds,
+    reuseAllowedQuestionIds: dedup.reuseAllowedQuestionIds
   };
 
   setBusy(true);
   statusText.textContent = '正在开始面试...';
+  latestReport = null;
+  interviewCompleted = false;
 
   try {
     const data = await requestJson('/api/interviews', {
@@ -761,14 +1003,25 @@ setupForm.addEventListener('submit', async (event) => {
       body: JSON.stringify(payload)
     });
 
+    if (data.questionSource === 'local' && Array.isArray(data.plan) && data.plan.length) {
+      recordSessionQuestionUsage({
+        role: payload.role,
+        level: payload.level,
+        sessionId: data.sessionId,
+        questionIds: data.plan.map((item) => item.id)
+      });
+    }
+
     sessionId = data.sessionId;
     liveCoachDetailsOpen = false;
     currentPlan = Array.isArray(data.plan) ? data.plan : [];
     currentQuestionId = currentPlan[0]?.id || null;
+    viewQuestionId = null;
+    interviewCompleted = false;
     providerText.textContent = getProviderText(data.provider);
-    renderMessages(data.messages || []);
+    setSessionMessages(data.messages || []);
     renderLiveCoach(data.liveCoach);
-    renderInterviewProgress(currentPlan, currentQuestionId, false);
+    renderInterviewProgress(currentPlan, currentQuestionId, false, { viewQuestionId });
     renderAnswerGuide(getCurrentPlanItem());
     reportEl.className = 'report empty-state';
     reportEl.innerHTML = '<p>面试正在进行中。结束后会生成针对性的复盘反馈。</p>';
@@ -776,11 +1029,14 @@ setupForm.addEventListener('submit', async (event) => {
       ? '本轮题目由 AI 动态生成。'
       : payload.questionSource === 'ai'
         ? `AI 出题不可用，已回退本地题库。${data.questionSourceFallbackReason || ''}`.trim()
-        : '本轮题目来自本地题库。';
+        : dedup.cycleReset
+          ? `本轮题目来自本地题库，已自动开启第 ${dedup.cycle} 轮。`
+          : '本轮题目来自本地题库。';
     statusText.textContent = `面试已开始。${sourceText}`;
     answerInput.value = '';
     answerInput.disabled = false;
     answerSubmitButton.disabled = false;
+    if (skipQuestionButton) skipQuestionButton.disabled = false;
     finishButton.disabled = false;
     setSetupReadonly(true);
     setWorkflowStep('interview');
@@ -812,19 +1068,20 @@ answerForm.addEventListener('submit', async (event) => {
     });
 
     providerText.textContent = getProviderText(data.provider);
-    renderMessages(data.messages || []);
-    renderLiveCoach(data.liveCoach);
     currentQuestionId = data.currentQuestion || null;
-    renderInterviewProgress(currentPlan, currentQuestionId, Boolean(data.completed));
-    renderAnswerGuide(getCurrentPlanItem(), Boolean(data.completed || !data.currentQuestion));
-    if (data.completed || !data.currentQuestion) {
+    interviewCompleted = Boolean(data.completed);
+    if (data.currentQuestion) {
+      viewQuestionId = null;
+    }
+    setSessionMessages(data.messages || []);
+    renderLiveCoach(data.liveCoach);
+    renderInterviewProgress(currentPlan, currentQuestionId, interviewCompleted, { viewQuestionId });
+    renderAnswerGuide(getCurrentPlanItem(), interviewCompleted || !data.currentQuestion);
+    syncAnswerFormState();
+    if (interviewCompleted || !data.currentQuestion) {
       statusText.textContent = '计划题目已完成。可以结束并生成复盘报告。';
-      answerInput.disabled = true;
-      answerSubmitButton.disabled = true;
     } else {
       statusText.textContent = '继续回答。面试官可能还在追问同一个主题。';
-      answerInput.disabled = false;
-      answerSubmitButton.disabled = false;
     }
     answerInput.value = '';
     if (!answerInput.disabled) {
@@ -832,6 +1089,49 @@ answerForm.addEventListener('submit', async (event) => {
     }
   } catch (error) {
     statusText.textContent = `提交回答失败：${error.message}`;
+  } finally {
+    setBusy(false);
+  }
+});
+
+skipQuestionButton?.addEventListener('click', async () => {
+  if (busy || !sessionId || isReviewMode()) return;
+  if (!currentQuestionId || interviewCompleted || latestReport) return;
+
+  const confirmed = window.confirm('确定跳过当前这道题吗？跳过后会进入下一题，复盘报告中会标记为未作答。');
+  if (!confirmed) return;
+
+  setBusy(true);
+  statusText.textContent = '正在跳过当前题目...';
+
+  try {
+    const data = await requestJson(`/api/interviews/${sessionId}/skip`, {
+      method: 'POST',
+      body: JSON.stringify({})
+    });
+
+    providerText.textContent = getProviderText(data.provider);
+    currentQuestionId = data.currentQuestion || null;
+    interviewCompleted = Boolean(data.completed);
+    if (data.currentQuestion) {
+      viewQuestionId = null;
+    }
+    setSessionMessages(data.messages || []);
+    renderLiveCoach(data.liveCoach);
+    renderInterviewProgress(currentPlan, currentQuestionId, interviewCompleted, { viewQuestionId });
+    renderAnswerGuide(getCurrentPlanItem(), interviewCompleted || !data.currentQuestion);
+    syncAnswerFormState();
+    answerInput.value = '';
+    if (interviewCompleted || !data.currentQuestion) {
+      statusText.textContent = '计划题目已完成。可以结束并生成复盘报告。';
+    } else {
+      statusText.textContent = '已跳过上一题，请继续回答当前题目。';
+    }
+    if (!answerInput.disabled) {
+      answerInput.focus();
+    }
+  } catch (error) {
+    statusText.textContent = `跳过题目失败：${error.message}`;
   } finally {
     setBusy(false);
   }
@@ -848,16 +1148,23 @@ finishButton.addEventListener('click', async () => {
       method: 'POST'
     });
 
-    renderMessages(data.messages || []);
+    interviewCompleted = true;
+    if (!viewQuestionId) {
+      viewQuestionId = currentQuestionId || currentPlan[currentPlan.length - 1]?.id || null;
+    }
+    setSessionMessages(data.messages || []);
     renderReport(data.report);
     savePracticeHistory(data.report);
     renderPracticeHistory();
-    renderInterviewProgress(currentPlan, null, true);
-    renderAnswerGuide(null, true);
-    answerInput.disabled = true;
-    answerSubmitButton.disabled = true;
+    renderInterviewProgress(currentPlan, null, true, { viewQuestionId });
+    renderAnswerGuide(
+      currentPlan.find((item) => item.id === getActiveViewQuestionId()) || null,
+      true
+    );
+    syncAnswerFormState();
     finishButton.disabled = true;
     statusText.textContent = '报告已生成。请查看总览和逐题差距。';
+    refreshSetupControls();
     setWorkflowStep('report');
   } catch (error) {
     statusText.textContent = `生成报告失败：${error.message}`;
@@ -868,40 +1175,106 @@ finishButton.addEventListener('click', async () => {
 
 function setBusy(nextBusy) {
   busy = nextBusy;
-  setupForm.querySelector('button[type="submit"]').disabled = nextBusy || Boolean(sessionId);
-  answerInput.disabled = nextBusy || !sessionId || Boolean(latestReport);
-  answerSubmitButton.disabled = nextBusy || !sessionId || Boolean(latestReport);
+  refreshSetupControls();
+  syncAnswerFormState();
   finishButton.disabled = nextBusy || !sessionId || Boolean(latestReport);
   renderWorkflowState();
+}
+
+function syncAnswerFormState() {
+  const reviewing = isReviewMode();
+  const ended = interviewCompleted || !currentQuestionId || Boolean(latestReport);
+  answerInput.disabled = busy || !sessionId || ended || reviewing;
+  answerSubmitButton.disabled = busy || !sessionId || ended || reviewing;
+  if (skipQuestionButton) {
+    skipQuestionButton.disabled = busy || !sessionId || ended || reviewing;
+  }
+  answerForm.classList.toggle('review-mode', reviewing);
+  if (reviewing) {
+    answerInput.placeholder = '回顾模式下不能作答。点击「返回当前题」继续面试。';
+  }
 }
 
 function resetSessionForNewSetup() {
   sessionId = null;
   currentPlan = [];
   currentQuestionId = null;
+  sessionMessages = [];
+  viewQuestionId = null;
+  interviewCompleted = false;
   latestLiveCoachSnapshot = null;
   liveCoachDetailsOpen = false;
   codeAnswerModeQuestionId = null;
   setSetupReadonly(false);
-  renderInterviewProgress([], null, false);
+  renderInterviewProgress([], null, false, { viewQuestionId: null });
   renderAnswerGuide(null);
+  questionStageBarEl?.setAttribute('hidden', '');
   messagesEl.className = 'messages empty-state';
   messagesEl.innerHTML = '<p>面试官会在这里开场，并提出第一道问题。</p>';
   liveCoachEl.className = 'live-coach empty-state';
-  liveCoachEl.innerHTML = '<p>开始面试后，这里会显示面试官当前正在考察什么。</p>';
+  liveCoachEl.innerHTML = '<p>开始面试后，这里会显示面试官当前关注点和回答建议。</p>';
   answerInput.value = '';
   answerInput.disabled = true;
   answerSubmitButton.disabled = true;
+  if (skipQuestionButton) skipQuestionButton.disabled = true;
   finishButton.disabled = true;
 }
 
-function setSetupReadonly(readonly) {
-  setupForm.querySelectorAll('input, select, textarea, button[type="submit"]').forEach((control) => {
-    if (control.type === 'file') return;
-    control.disabled = readonly || busy;
+function isSetupLocked() {
+  return Boolean(sessionId) && !interviewCompleted && !latestReport;
+}
+
+function getSetupStartBlockReason() {
+  if (busy) {
+    return {
+      message: '系统正在处理上一操作，请稍候再试。',
+      showInterviewAction: false
+    };
+  }
+
+  if (isSetupLocked()) {
+    return {
+      message: '当前有一轮面试正在进行中。请切换到「模拟面试」继续作答，或先点击「提前结束面试」生成复盘报告后，再开启新一轮。',
+      showInterviewAction: true
+    };
+  }
+
+  return null;
+}
+
+function showSetupBlockedNotice({ message, showInterviewAction = false }) {
+  if (!setupBlockedDialogEl || !setupBlockedMessageEl) return;
+  setupBlockedMessageEl.textContent = message;
+  if (setupBlockedGoInterviewButton) {
+    setupBlockedGoInterviewButton.hidden = !showInterviewAction;
+  }
+  setupBlockedDialogEl.removeAttribute('hidden');
+}
+
+function hideSetupBlockedNotice() {
+  setupBlockedDialogEl?.setAttribute('hidden', '');
+}
+
+function refreshSetupControls() {
+  const locked = isSetupLocked();
+  setupForm.querySelectorAll('input, select, textarea').forEach((control) => {
+    control.disabled = locked || busy;
   });
 
-  profileUploadButton.disabled = readonly || busy;
+  const questionValidation = validateSetupQuestionCount();
+  renderQuestionCountHint(questionValidation);
+
+  const launchButton = setupForm.querySelector('button[type="submit"]');
+  if (launchButton) {
+    launchButton.disabled = busy || (!locked && !questionValidation.ok);
+    launchButton.classList.toggle('launch-button-hint', locked && !busy);
+  }
+
+  profileUploadButton.disabled = locked || busy;
+}
+
+function setSetupReadonly() {
+  refreshSetupControls();
 }
 
 function getCurrentPlanItem() {
@@ -921,23 +1294,35 @@ async function loadQuestionBankSnapshot() {
   paperOpsEl?.classList.add('loading');
 
   try {
-    const [catalog, paper] = await Promise.all([
-      requestJson(`/api/question-bank?${params.toString()}`),
-      requestJson('/api/question-paper', {
-        method: 'POST',
-        body: JSON.stringify({
-          role: formData.get('role'),
-          level: formData.get('level'),
-          style: formData.get('style'),
-          questionCount: Number(formData.get('questionCount') || 5),
-          resume: formData.get('resume') || '',
-          profileAnalysis: createSerializableProfileAnalysis(formData.get('resume') || '')
-        })
-      })
-    ]);
+    const catalog = await requestJson(`/api/question-bank?${params.toString()}`);
     latestQuestionBankCatalog = catalog;
-    latestQuestionPaper = paper;
     renderQuestionOps(catalog);
+    renderQuestionCountHint();
+    refreshSetupControls();
+
+    const validation = validateSetupQuestionCount();
+    if (!validation.ok) {
+      latestQuestionPaper = null;
+      renderPaperCenter(catalog, null);
+      return;
+    }
+
+    const dedupPeek = validation.dedup || buildQuestionDedupPeek(formData);
+    const excludeForPaper = validation.willCycleReset ? [] : dedupPeek.excludeQuestionIds;
+    const paper = await requestJson('/api/question-paper', {
+      method: 'POST',
+      body: JSON.stringify({
+        role: formData.get('role'),
+        level: formData.get('level'),
+        style: formData.get('style'),
+        questionCount: validation.value,
+        resume: formData.get('resume') || '',
+        profileAnalysis: createSerializableProfileAnalysis(),
+        excludeQuestionIds: excludeForPaper,
+        reuseAllowedQuestionIds: dedupPeek.reuseAllowedQuestionIds
+      })
+    });
+    latestQuestionPaper = paper;
     renderPaperCenter(catalog, paper);
   } catch (error) {
     if (questionOpsEl) {
@@ -948,6 +1333,9 @@ async function loadQuestionBankSnapshot() {
       paperOpsEl.className = 'question-ops standalone-workspace empty-question-ops';
       paperOpsEl.innerHTML = `<p>${escapeHtml(`组卷规则加载失败：${error.message}`)}</p>`;
     }
+  } finally {
+    questionOpsEl?.classList.remove('loading');
+    paperOpsEl?.classList.remove('loading');
   }
 }
 
@@ -1049,7 +1437,8 @@ function renderPaperCenter(catalog = latestQuestionBankCatalog, paper = latestQu
   const formData = new FormData(setupForm);
   const roleLabel = getSelectLabel('role', formData.get('role')) || '当前岗位';
   const levelLabel = getSelectLabel('level', formData.get('level')) || '当前级别';
-  const questionCount = Number(formData.get('questionCount') || paper?.total || 5);
+  const questionCount = validateSetupQuestionCount().value
+    ?? Number(formData.get('questionCount') || paper?.total || 5);
   const template = selectTemplateForCurrentSetup(catalog.templates || []);
   const templates = Array.isArray(catalog.templates) ? catalog.templates : [];
   const paperItems = Array.isArray(paper?.items) ? paper.items : [];
@@ -1504,8 +1893,11 @@ function renderPlanPreview() {
   const roleLabel = getSelectLabel('role', formData.get('role')) || '当前方向';
   const levelLabel = getSelectLabel('level', formData.get('level')) || '当前级别';
   const styleLabel = getSelectLabel('style', formData.get('style')) || '常规面试';
-  const questionCount = Math.max(3, Math.min(6, Number(formData.get('questionCount') || 5)));
-  const analysis = analyzeProfileText(formData.get('resume') || '');
+  const validation = validateSetupQuestionCount();
+  const questionCount = validation.ok
+    ? validation.value
+    : Math.max(1, Math.floor(Number(formData.get('questionCount') || 5)));
+  const analysis = getProfileAnalysisSnapshot();
   const stages = createPlanPreviewStages(questionCount, analysis);
   const previewReasons = createPlanPreviewReasons(analysis);
   const productNotes = getSelectedRoleProductNotes(role, analysis);
@@ -1656,24 +2048,157 @@ function createTrainingStagePreview({
   return stages.slice(0, questionCount).concat(questionCount > stages.length ? ['复盘准备'] : []).slice(0, questionCount);
 }
 
-function renderProfileAnalysis(text) {
-  if (!profileAnalysisEl) return;
+function getEmptyProfileAnalysis() {
+  return {
+    hasInput: false,
+    mode: '快速练习',
+    analyzer: 'local',
+    confidence: 0,
+    keywords: [],
+    terms: [],
+    categories: [],
+    focusTopics: [],
+    capabilities: [],
+    risks: [],
+    recommendedTracks: [],
+    riskQuestionMappings: []
+  };
+}
 
-  const analysis = analyzeProfileText(text);
-  if (!analysis.hasInput) {
-    profileAnalysisEl.className = 'profile-analysis empty-profile';
-    profileAnalysisEl.innerHTML = '<p>不填也可以直接快速练习；填写 JD、简历或项目背景后，会在这里分析岗位关键词和推荐考点。</p>';
+function getProfileAnalysisSnapshot() {
+  return latestProfileAnalysis || getEmptyProfileAnalysis();
+}
+
+function getSelectedRoleValue() {
+  return setupForm.querySelector('select[name="role"]')?.value || '';
+}
+
+function getSelectedRoleLabel(role = getSelectedRoleValue()) {
+  return getSelectLabel('role', role) || '当前岗位';
+}
+
+function applyInstantProfileAnalysis(role = getSelectedRoleValue()) {
+  const text = String(resumeInput?.value || '').trim();
+  if (!text) return false;
+
+  latestProfileAnalysis = {
+    ...buildLocalProfileAnalysis(text, role),
+    role
+  };
+  renderProfileAnalysisUi();
+  renderPlanPreview();
+  renderSetupSummary();
+  return true;
+}
+
+function refreshProfileAnalysisForRoleChange() {
+  applyInstantProfileAnalysis();
+  scheduleProfileAnalysis({ immediate: true });
+}
+
+function scheduleProfileAnalysis(options = {}) {
+  clearTimeout(profileAnalysisTimer);
+  const run = () => {
+    void refreshProfileAnalysis();
+  };
+
+  if (options.immediate) {
+    run();
     return;
   }
+
+  profileAnalysisTimer = setTimeout(run, 420);
+}
+
+async function refreshProfileAnalysis() {
+  const text = String(resumeInput?.value || '').trim();
+  const role = getSelectedRoleValue();
+  const requestId = ++profileAnalysisRequestId;
+
+  if (!text) {
+    latestProfileAnalysis = null;
+    profileAnalysisLoading = false;
+    renderProfileAnalysisUi();
+    renderPlanPreview();
+    return;
+  }
+
+  profileAnalysisLoading = true;
+  renderProfileAnalysisUi({ loading: true });
+
+  try {
+    const analysis = await requestJson('/api/profile/analyze', {
+      method: 'POST',
+      body: JSON.stringify({ text, role })
+    });
+    if (requestId !== profileAnalysisRequestId) return;
+    latestProfileAnalysis = {
+      ...analysis,
+      role: analysis.role || role
+    };
+  } catch (error) {
+    if (requestId !== profileAnalysisRequestId) return;
+    latestProfileAnalysis = {
+      ...getEmptyProfileAnalysis(),
+      hasInput: true,
+      role,
+      mode: '轻量定制',
+      analyzer: 'local',
+      error: error.message || '分析失败',
+      keywords: ['通用技术面'],
+      focusTopics: ['基础八股题', '项目表达'],
+      capabilities: [`将按${getSelectedRoleLabel(role)}方向考察基础知识、项目表达和追问承压。`],
+      risks: ['简历分析暂时不可用，将按保守的通用路径推进。'],
+      recommendedTracks: ['基础八股题 -> 项目追问 -> 场景题 -> 复盘报告。'],
+      riskQuestionMappings: []
+    };
+  } finally {
+    if (requestId === profileAnalysisRequestId) {
+      profileAnalysisLoading = false;
+      renderProfileAnalysisUi();
+      renderPlanPreview();
+      renderSetupSummary();
+    }
+  }
+}
+
+function formatAnalyzerLabel(analyzer) {
+  if (analyzer === 'hybrid') return 'AI + 本地校验';
+  if (analyzer === 'llm') return 'AI 结构化';
+  return '本地规则';
+}
+
+function renderProfileAnalysisUi(options = {}) {
+  if (!profileAnalysisEl) return;
+
+  const analysis = getProfileAnalysisSnapshot();
+  const loading = options.loading || profileAnalysisLoading;
+
+  if (!analysis.hasInput) {
+    profileAnalysisEl.className = 'profile-analysis empty-profile';
+    profileAnalysisEl.innerHTML = loading
+      ? '<p>正在分析岗位关键词…</p>'
+      : '<p>不填也可以直接快速练习；填写 JD、简历或项目背景后，会在这里分析岗位关键词和推荐考点。</p>';
+    return;
+  }
+
+  const keywordPills = analysis.terms?.length ? analysis.terms : analysis.keywords;
+  const categoryPills = analysis.categories || [];
+  const roleLabel = getSelectedRoleLabel(analysis.role || getSelectedRoleValue());
+  const confidenceNote = analysis.confidence && analysis.confidence < 0.8
+    ? ` · 把握 ${Math.round(analysis.confidence * 100)}%`
+    : '';
+  const analyzerNote = `${formatAnalyzerLabel(analysis.analyzer || 'local')}${confidenceNote}`;
 
   profileAnalysisEl.className = 'profile-analysis';
   profileAnalysisEl.innerHTML = `
     <div class="profile-analysis-header">
       <strong>定制分析</strong>
-      <span>${escapeHtml(analysis.mode)}</span>
+      <span>${escapeHtml(loading ? '分析中…' : `面向 ${roleLabel} · ${analysis.mode} · ${analyzerNote}`)}</span>
     </div>
     <div class="section-label">岗位关键词</div>
-    <div class="meta-row">${renderPills(analysis.keywords, '暂无明显关键词')}</div>
+    <div class="meta-row">${renderPills(keywordPills, '暂无明显关键词')}</div>
+    ${categoryPills.length ? `<div class="section-label">技术方向</div><div class="meta-row">${renderPills(categoryPills, '')}</div>` : ''}
     <div class="section-label">高频考点</div>
     <div class="meta-row">${renderPills(analysis.focusTopics, '按通用技术面推进')}</div>
     <div class="section-label">能力要求</div>
@@ -1684,126 +2209,28 @@ function renderProfileAnalysis(text) {
     ${renderRiskQuestionMapping(analysis.riskQuestionMappings)}
     <div class="section-label">推荐题目方向</div>
     ${renderList(analysis.recommendedTracks, '先从基础八股题开始。')}
+    ${analysis.error ? `<p class="provider-warning warning">${escapeHtml(analysis.error)}</p>` : ''}
   `;
 }
 
-function analyzeProfileText(text) {
-  const source = String(text || '').trim();
-  if (!source) {
-    return {
-      hasInput: false,
-      mode: '快速练习',
-      keywords: [],
-      focusTopics: [],
-      capabilities: [],
-      risks: [],
-      recommendedTracks: []
-    };
-  }
-
-  const normalized = source.toLowerCase();
-  const isQuestionDrill = /报告单题重练|本题薄弱点|单题专项重练|原题：|优先补齐要点/.test(source);
-  const keywordRules = [
-    ['Java', ['java', 'spring', 'spring boot', 'jvm', 'mybatis']],
-    ['Go', ['go', 'golang', 'gin', 'goroutine', 'channel']],
-    ['Python', ['python', 'django', 'flask', 'fastapi', 'celery']],
-    ['前端', ['react', 'vue', 'webpack', 'vite', 'typescript', 'javascript', '前端', '防抖', '节流', '数组扁平化', 'promise']],
-    ['MySQL', ['mysql', 'sql', 'sql题', '索引', '事务', 'innodb', '窗口函数', '分组统计']],
-    ['Redis', ['redis', '缓存', '分布式锁', '缓存穿透']],
-    ['消息队列', ['mq', 'rabbitmq', 'kafka', 'rocketmq', '消息队列']],
-    ['微服务', ['微服务', 'dubbo', 'grpc', '服务治理']],
-    ['测试', ['测试', 'qa', '自动化测试', '接口测试', '性能测试', '测试开发', '回归测试']],
-    ['运维', ['运维', 'linux', 'shell', '网络', '监控', '巡检', '数据库备份', 'dba']],
-    ['DevOps', ['devops', 'sre', 'ci/cd', 'jenkins', 'gitlab ci', 'docker', 'k8s', 'kubernetes', '可观测性']],
-    ['数据', ['数据开发', 'etl', '数仓', 'hive', 'spark', 'flink', 'airflow', '数据治理']],
-    ['AI', ['ai', '算法', '机器学习', '深度学习', '大模型', 'rag', '向量数据库', '特征工程', '模型部署']],
-    ['安全', ['安全', '渗透', '漏洞', 'xss', 'sql注入', 'csrf', 'waf', '权限控制', '加固']],
-    ['架构', ['架构', '技术经理', '研发经理', '技术总监', '治理', '容灾', '高可用', '演进']],
-    ['算法', ['算法', '复杂度', 'leetcode', '链表', '二叉树', '边界条件', '数据结构']],
-    ['系统设计', ['系统设计', '架构', '高并发', '限流', '限流器', '接口幂等', '幂等', '缓存穿透', '熔断', '分布式']]
-  ];
-  const keywords = keywordRules
-    .filter(([, tokens]) => tokens.some((token) => normalized.includes(token.toLowerCase())))
-    .map(([label]) => label);
-
-  const hasAny = (tokens) => tokens.some((token) => normalized.includes(token.toLowerCase()));
-  const focusTopics = [
-    isQuestionDrill ? '单题薄弱点专项重练' : '',
-    hasAny(['mysql', '索引', '事务', 'sql']) ? '数据库索引与事务' : '',
-    hasAny(['sql题', '分组统计', '窗口函数']) ? 'SQL 代码题与查询表达' : '',
-    hasAny(['redis', '缓存', '分布式锁', '缓存穿透']) ? '缓存一致性与 Redis 排障' : '',
-    hasAny(['jvm', 'java', 'spring']) ? 'JVM / Spring / Java 基础' : '',
-    hasAny(['react', 'vue', '前端', 'webpack', 'vite']) ? '前端工程化与性能优化' : '',
-    hasAny(['防抖', '节流', '数组扁平化', 'promise']) ? '前端 JS 手写代码题' : '',
-    hasAny(['mq', '消息', 'kafka', 'rabbitmq']) ? '异步消息、幂等和补偿' : '',
-    hasAny(['测试', 'qa', '自动化测试', '接口测试', '性能测试']) ? '测试设计与自动化策略' : '',
-    hasAny(['运维', 'linux', 'shell', '网络', '监控', 'dba']) ? 'Linux / 网络 / 数据库运维排障' : '',
-    hasAny(['devops', 'sre', 'ci/cd', 'docker', 'k8s', 'kubernetes']) ? 'DevOps 与稳定性治理' : '',
-    hasAny(['数据开发', 'etl', '数仓', 'hive', 'spark', 'flink']) ? '数据链路与数仓建模' : '',
-    hasAny(['ai', '机器学习', '深度学习', '大模型', 'rag', '向量数据库']) ? 'AI 建模与推理工程化' : '',
-    hasAny(['安全', '渗透', '漏洞', 'xss', 'sql注入', 'csrf']) ? '应用安全与漏洞防护' : '',
-    hasAny(['架构', '治理', '高可用', '容灾', '技术经理']) ? '架构设计与技术治理' : '',
-    hasAny(['高并发', '限流', '限流器', '接口幂等', '幂等', '缓存穿透', '熔断', '分布式']) ? '高并发场景设计' : '',
-    hasAny(['算法', '复杂度', 'leetcode', '边界条件', '数据结构']) ? '算法复杂度与边界条件' : ''
-  ].filter(Boolean);
-
-  const capabilities = [
-    isQuestionDrill ? '需要把本题按可通过标准重答，并接受同类定点追问。' : '',
-    hasAny(['负责', '主导', '设计', '落地']) ? '需要讲清个人职责、关键判断和落地结果。' : '',
-    hasAny(['优化', '性能', '慢', '延迟', 'qps', '耗时']) ? '需要准备性能定位、指标变化和优化取舍。' : '',
-    hasAny(['排查', '故障', '线上', '事故', '白屏']) ? '需要准备线上问题排查顺序和止血方案。' : '',
-    hasAny(['高并发', '库存', '支付', '订单', '一致性', '幂等', '缓存穿透', '限流']) ? '需要准备一致性、幂等、重试、限流和缓存保护链路。' : '',
-    hasAny(['测试', 'qa', '自动化测试', '测试开发']) ? '需要准备测试策略、自动化分层和质量门禁。' : '',
-    hasAny(['运维', '监控', 'dba', '巡检', '网络']) ? '需要准备故障排查顺序、容量评估和稳定性基线。' : '',
-    hasAny(['devops', 'sre', 'ci/cd', 'k8s']) ? '需要准备发布流水线、可观测性和故障恢复机制。' : '',
-    hasAny(['数据开发', 'etl', '数仓', '指标']) ? '需要准备口径一致性、调度依赖和数据质量控制。' : '',
-    hasAny(['ai', '机器学习', '大模型', 'rag']) ? '需要准备模型效果评估、数据质量和推理成本控制。' : '',
-    hasAny(['安全', '渗透', '漏洞', '权限']) ? '需要准备漏洞原理、修复方案和安全基线。' : '',
-    hasAny(['架构', '技术经理', '治理', '高可用']) ? '需要准备架构取舍、演进路径和团队协作治理。' : '',
-    hasAny(['协作', '跨团队', '推进']) ? '需要说明沟通协作边界和推进结果。' : ''
-  ].filter(Boolean);
-
-  const risks = [
-    isQuestionDrill ? '本题曾暴露要点缺口或表达不稳，下一轮会先检查是否真正补齐。' : '',
-    keywords.length < 2 ? '技术关键词偏少，面试可能只能按通用题推进，建议补充具体技术栈。' : '',
-    !hasAny(['负责', '主导', '我做', '我设计', '我实现']) ? '个人贡献信号不足，项目题容易被追问“你具体做了什么”。' : '',
-    !hasAny(['提升', '降低', '减少', 'qps', '耗时', '成功率', '明显', '指标', '数据']) ? '结果证据不足，建议补充上线效果或量化变化。' : '',
-    hasAny(['熟悉', '了解']) && !hasAny(['项目', '落地', '线上', '生产']) ? '描述偏简历关键词，缺少真实场景，容易被追问落地细节。' : ''
-  ].filter(Boolean);
-
-  const recommendedTracks = createRecommendedTracks({
-    keywords,
-    focusTopics,
-    capabilities,
-    hasProjectRisk: risks.some((item) => item.includes('个人贡献')),
-    hasMetricsRisk: risks.some((item) => item.includes('结果证据'))
-  });
+function createSerializableProfileAnalysis() {
+  const analysis = latestProfileAnalysis;
+  if (!analysis?.hasInput) return null;
+  const role = analysis.role || getSelectedRoleValue();
 
   return {
-    hasInput: true,
-    mode: source.length >= 80 ? '定制练习' : '轻量定制',
-    isQuestionDrill,
-    keywords: keywords.length ? keywords : ['通用技术面'],
-    focusTopics: focusTopics.length ? focusTopics : ['基础八股题', '项目表达'],
-    capabilities: capabilities.length ? capabilities : ['先按岗位方向考察基础知识、项目表达和追问承压。'],
-    risks: risks.length ? risks : ['当前背景信息较完整，面试会优先验证技术细节和真实落地。'],
-    riskQuestionMappings: createRiskQuestionMappings(risks, focusTopics),
-    recommendedTracks
-  };
-}
-
-function createSerializableProfileAnalysis(text) {
-  const analysis = analyzeProfileText(text);
-  if (!analysis.hasInput) return null;
-
-  return {
+    role,
+    analyzer: analysis.analyzer || 'local',
+    confidence: analysis.confidence ?? 0,
     isQuestionDrill: analysis.isQuestionDrill,
-    keywords: analysis.keywords,
-    focusTopics: analysis.focusTopics,
-    capabilities: analysis.capabilities,
-    risks: analysis.risks,
-    riskQuestionMappings: analysis.riskQuestionMappings,
-    recommendedTracks: analysis.recommendedTracks
+    terms: analysis.terms || [],
+    categories: analysis.categories || [],
+    keywords: analysis.keywords || [],
+    focusTopics: analysis.focusTopics || [],
+    capabilities: analysis.capabilities || [],
+    risks: analysis.risks || [],
+    riskQuestionMappings: analysis.riskQuestionMappings || [],
+    recommendedTracks: analysis.recommendedTracks || []
   };
 }
 
@@ -1822,81 +2249,6 @@ function renderRiskQuestionMapping(items) {
       `).join('')}
     </div>
   `;
-}
-
-function createRiskQuestionMappings(risks, focusTopics) {
-  const source = [...(risks || []), ...(focusTopics || [])].join(' ');
-  const mappings = [
-    {
-      match: /单题薄弱点|本题曾暴露|重练本题/,
-      risk: '本题薄弱点未补齐',
-      questionType: '同类基础题 + 定点追问 + 本题复盘'
-    },
-    {
-      match: /技术关键词偏少|基础八股|通用题/,
-      risk: '技术栈不够明确',
-      questionType: '基础八股题 + 广度追问'
-    },
-    {
-      match: /个人贡献|项目表达/,
-      risk: '个人职责不够清楚',
-      questionType: '项目经历题 + 个人职责追问'
-    },
-    {
-      match: /结果证据|指标|上线效果|量化/,
-      risk: '结果证据不足',
-      questionType: '项目复盘题 + 指标结果追问'
-    },
-    {
-      match: /真实场景|落地细节|线上|排查/,
-      risk: '落地细节不足',
-      questionType: '线上排查题 + 场景追问'
-    },
-    {
-      match: /高并发|一致性|幂等|限流|缓存穿透|补偿/,
-      risk: '高并发链路风险',
-      questionType: '后端场景题 + 代码/伪代码题'
-    },
-    {
-      match: /前端 JS|算法复杂度|代码题/,
-      risk: '代码表达风险',
-      questionType: '轻量代码题 + 边界复杂度追问'
-    }
-  ];
-
-  return mappings
-    .filter((item) => item.match.test(source))
-    .map(({ risk, questionType }) => ({ risk, questionType }))
-    .slice(0, 4);
-}
-
-function createRecommendedTracks({ keywords, focusTopics, capabilities, hasProjectRisk, hasMetricsRisk }) {
-  const tracks = [];
-  const hasKeyword = (value) => keywords.includes(value);
-
-  if (focusTopics.some((item) => item.includes('单题薄弱点'))) tracks.push('单题专项：同类基础题、定点追问、项目化表达和本题复盘。');
-  if (hasKeyword('MySQL')) tracks.push('MySQL 索引、事务、慢查询定位。');
-  if (focusTopics.some((item) => item.includes('SQL 代码题'))) tracks.push('SQL题：分组统计、窗口函数、索引性能。');
-  if (hasKeyword('Redis')) tracks.push('Redis 缓存一致性、热 key、大 key 和延迟排查。');
-  if (hasKeyword('Java')) tracks.push('Java 集合、JVM、线程池和 Spring 事务边界。');
-  if (hasKeyword('前端')) tracks.push('前端首屏性能、状态管理、组件抽象和线上白屏排查。');
-  if (focusTopics.some((item) => item.includes('前端 JS'))) tracks.push('前端代码题：防抖节流、Promise、数组扁平化。');
-  if (hasKeyword('Go')) tracks.push('Go goroutine 协作、context 超时取消和限流背压。');
-  if (hasKeyword('Python')) tracks.push('Python worker、任务队列、GIL 与性能排查。');
-  if (hasKeyword('测试')) tracks.push('测试岗：测试用例设计、自动化框架、回归策略和质量门禁。');
-  if (hasKeyword('运维')) tracks.push('运维岗：Linux 排障、网络诊断、数据库备份恢复和监控告警。');
-  if (hasKeyword('DevOps')) tracks.push('DevOps/SRE：CI/CD、K8s 发布、可观测性、容量和故障演练。');
-  if (hasKeyword('数据')) tracks.push('数据岗：ETL 稳定性、数仓分层、指标口径和数据质量。');
-  if (hasKeyword('AI')) tracks.push('AI 岗：模型训练、评估指标、特征/向量检索和推理部署。');
-  if (hasKeyword('安全')) tracks.push('安全岗：常见漏洞原理、修复验证、权限模型和纵深防御。');
-  if (hasKeyword('架构')) tracks.push('架构/管理岗：高可用架构、容量规划、技术债治理和团队决策。');
-  if (focusTopics.some((item) => item.includes('高并发'))) tracks.push('高并发场景题：限流、幂等、补偿和降级。');
-  if (focusTopics.some((item) => item.includes('高并发')) || hasKeyword('系统设计')) tracks.push('后端场景题：限流器、接口幂等、缓存穿透处理。');
-  if (hasKeyword('算法')) tracks.push('算法题：复杂度、边界条件和数据结构选择。');
-  if (hasProjectRisk) tracks.push('项目经历题：按背景、职责、动作、结果重构回答。');
-  if (hasMetricsRisk) tracks.push('结果复盘题：准备指标、上线效果和改进空间。');
-
-  return tracks.length ? [...new Set(tracks)].slice(0, 6) : ['基础八股题 -> 项目追问 -> 场景题 -> 复盘报告。'];
 }
 
 function renderPills(items, fallback) {
@@ -1923,34 +2275,243 @@ async function requestJson(url, options = {}) {
   return data;
 }
 
-function renderMessages(messages) {
-  if (!messages.length) {
+function setSessionMessages(messages) {
+  sessionMessages = normalizeMessageQuestionScopes(messages, currentPlan);
+  renderQuestionStage();
+  renderFilteredMessages();
+  syncAnswerFormState();
+}
+
+function getActiveViewQuestionId() {
+  if (viewQuestionId) return viewQuestionId;
+  if (interviewCompleted) {
+    return currentPlan[currentPlan.length - 1]?.id || null;
+  }
+  return currentQuestionId;
+}
+
+function isReviewMode() {
+  if (!sessionId) return false;
+  if (interviewCompleted || !currentQuestionId) return true;
+  const activeId = getActiveViewQuestionId();
+  return Boolean(activeId && activeId !== currentQuestionId);
+}
+
+function selectQuestionView(questionId) {
+  if (!currentPlan.length) return;
+
+  if (!questionId) {
+    viewQuestionId = null;
+  } else {
+    const targetIndex = currentPlan.findIndex((item) => item.id === questionId);
+    const currentIndex = interviewCompleted
+      ? currentPlan.length
+      : Math.max(0, currentPlan.findIndex((item) => item.id === currentQuestionId));
+    if (targetIndex < 0 || targetIndex > currentIndex) return;
+    viewQuestionId = questionId === currentQuestionId ? null : questionId;
+  }
+
+  renderQuestionStage();
+  renderFilteredMessages();
+  renderInterviewProgress(currentPlan, currentQuestionId, interviewCompleted, { viewQuestionId });
+  renderAnswerGuide(
+    currentPlan.find((item) => item.id === getActiveViewQuestionId()) || getCurrentPlanItem(),
+    isReviewMode() || interviewCompleted || !currentQuestionId
+  );
+  syncAnswerFormState();
+  renderLiveCoach(latestLiveCoachSnapshot);
+}
+
+function normalizeMessageQuestionScopes(messages, plan) {
+  let activeQuestionId = plan[0]?.id || null;
+
+  return (Array.isArray(messages) ? messages : []).map((message) => {
+    if (message.questionId) {
+      if (message.kind === 'question') {
+        activeQuestionId = message.questionId;
+      }
+      return message;
+    }
+
+    if (message.kind === 'intro') return message;
+
+    if (message.kind === 'question') {
+      activeQuestionId = message.questionId
+        || plan[(message.questionIndex || 1) - 1]?.id
+        || activeQuestionId;
+      return { ...message, questionId: activeQuestionId };
+    }
+
+    if (message.kind === 'closing') {
+      return {
+        ...message,
+        questionId: activeQuestionId || plan[plan.length - 1]?.id || null
+      };
+    }
+
+    if (message.role === 'candidate' || message.kind === 'followup' || message.kind === 'feedback') {
+      return { ...message, questionId: activeQuestionId };
+    }
+
+    return message;
+  });
+}
+
+function getMessagesForActiveView(messages, plan, activeQuestionId) {
+  if (!activeQuestionId) {
+    return messages.filter((message) => message.kind === 'intro' || message.kind === 'closing');
+  }
+
+  const firstQuestionId = plan[0]?.id;
+  const lastQuestionId = plan[plan.length - 1]?.id;
+  const showIntro = activeQuestionId === firstQuestionId;
+
+  return messages.filter((message) => {
+    if (message.kind === 'intro') return showIntro;
+    if (message.kind === 'closing') return activeQuestionId === lastQuestionId;
+    return message.questionId === activeQuestionId;
+  });
+}
+
+function truncateQuestionPreview(text, maxLength = 24) {
+  const normalized = String(text || '').replace(/\s+/g, ' ').trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, maxLength)}…`;
+}
+
+function renderQuestionStage() {
+  if (!questionStageBarEl || !sessionId) {
+    questionStageBarEl?.setAttribute('hidden', '');
+    return;
+  }
+
+  const activeId = getActiveViewQuestionId();
+  const planItem = currentPlan.find((item) => item.id === activeId);
+  if (!planItem) {
+    questionStageBarEl.setAttribute('hidden', '');
+    return;
+  }
+
+  const questionIndex = currentPlan.findIndex((item) => item.id === activeId) + 1;
+  const reviewing = isReviewMode();
+  const stageLabel = reviewing ? '回顾' : '进行中';
+  const currentIndex = currentQuestionId
+    ? currentPlan.findIndex((item) => item.id === currentQuestionId) + 1
+    : null;
+
+  questionStageBarEl.removeAttribute('hidden');
+  questionStageBarEl.className = `question-stage-bar ${reviewing ? 'reviewing' : 'current'}`;
+  questionStageBarEl.innerHTML = `
+    <div class="question-stage-copy">
+      <span class="question-stage-label">${stageLabel}</span>
+      <strong>第 ${questionIndex} 题 · ${escapeHtml(getPlanTypeLabel(planItem))}</strong>
+      <span class="question-stage-meta">${escapeHtml(planItem.category || '综合')}</span>
+    </div>
+    ${reviewing && currentIndex && !interviewCompleted
+      ? `<button type="button" class="mini-button primary-button" data-return-current>返回当前题（第 ${currentIndex} 题）</button>`
+      : ''}
+  `;
+}
+
+function renderFilteredMessages() {
+  const activeId = getActiveViewQuestionId();
+  const visibleMessages = getMessagesForActiveView(sessionMessages, currentPlan, activeId);
+
+  if (!visibleMessages.length) {
     messagesEl.className = 'messages empty-state';
-    messagesEl.innerHTML = '<p>完整面试记录会显示在这里。</p>';
+    messagesEl.innerHTML = '<p>当前题目还没有对话内容。</p>';
     return;
   }
 
   messagesEl.className = 'messages';
-  messagesEl.innerHTML = messages.map((message) => {
-    const roleLabel = message.role === 'candidate' ? '候选人' : '面试官';
-    const provider = message.provider ? ` | ${message.provider}` : '';
-    const timestamp = message.createdAt ? formatTime(message.createdAt) : '';
+  messagesEl.innerHTML = visibleMessages.map((message) => renderMessageArticle(message)).join('');
+  messagesEl.scrollTop = 0;
+}
 
+function renderMessages(messages) {
+  setSessionMessages(messages);
+}
+
+function renderMessageArticle(message) {
+  const roleLabel = getMessageRoleLabel(message);
+  const provider = message.provider ? ` | ${message.provider}` : '';
+  const timestamp = message.createdAt ? formatTime(message.createdAt) : '';
+  const kindClass = message.kind ? ` ${escapeHtml(message.kind)}` : '';
+
+  return `
+    <article class="message ${escapeHtml(message.role)}${kindClass}">
+      <div class="message-header">
+        <strong>${roleLabel}</strong>
+        <span>${escapeHtml(timestamp)}${escapeHtml(provider)}</span>
+      </div>
+      ${renderMessageBody(message)}
+    </article>
+  `;
+}
+
+function getMessageRoleLabel(message) {
+  if (message.role === 'candidate') return '候选人';
+  if (message.kind === 'intro') return '面试说明';
+  if (message.kind === 'question') return '面试题目';
+  if (message.kind === 'followup') return '面试官追问';
+  if (message.kind === 'closing') return '面试收尾';
+  return '面试官';
+}
+
+function renderMessageBody(message) {
+  if (message.kind === 'intro') {
+    const paragraphs = String(message.content || '')
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => `<p>${escapeHtml(line)}</p>`)
+      .join('');
+    return `<div class="message-intro-body">${paragraphs}</div>`;
+  }
+
+  if (message.kind === 'question') {
+    const indexLabel = message.questionIndex ? `第 ${message.questionIndex} 题` : '题目';
     return `
-      <article class="message ${escapeHtml(message.role)}">
-        <div class="message-header">
-          <strong>${roleLabel}</strong>
-          <span>${escapeHtml(timestamp)}${escapeHtml(provider)}</span>
-        </div>
-        <div class="message-content">${escapeHtml(message.content || '')}</div>
-      </article>
+      <div class="message-question-card">
+        <div class="message-question-badge">${escapeHtml(indexLabel)}</div>
+        <div class="message-question-text">${escapeHtml(message.content || '')}</div>
+      </div>
     `;
-  }).join('');
+  }
 
-  messagesEl.scrollTop = messagesEl.scrollHeight;
+  if (message.kind === 'followup') {
+    return `
+      <div class="message-followup-card">
+        <div class="message-followup-badge">追问</div>
+        <div class="message-content">${escapeHtml(message.content || '')}</div>
+      </div>
+    `;
+  }
+
+  return `<div class="message-content">${escapeHtml(message.content || '')}</div>`;
 }
 
 function renderLiveCoach(snapshot) {
+  if (isReviewMode()) {
+    const currentIndex = currentQuestionId
+      ? currentPlan.findIndex((item) => item.id === currentQuestionId) + 1
+      : null;
+    liveCoachEl.className = 'live-coach review-placeholder';
+    liveCoachEl.innerHTML = `
+      <div class="live-coach-header">
+        <div>
+          <strong>${escapeHtml(LIVE_COACH_TITLE)}</strong>
+          <p>回顾模式不提供实时提示</p>
+        </div>
+      </div>
+      <p class="live-coach-review-hint">你正在查看已答题目。返回当前题后，可继续查看考察点、缺口和回答建议。</p>
+      ${currentIndex && !interviewCompleted
+        ? `<button type="button" class="mini-button primary-button" data-return-current>返回当前题（第 ${currentIndex} 题）</button>`
+        : ''}
+    `;
+    return;
+  }
+
   if (!snapshot) {
     latestLiveCoachSnapshot = null;
     liveCoachEl.className = 'live-coach empty-state';
@@ -1971,6 +2532,7 @@ function renderLiveCoach(snapshot) {
     ? normalizedSnapshot.missingSignals.map((item) => `<span class="pill amber">${escapeHtml(item)}</span>`).join('')
     : '<span class="pill green">暂无明显缺失信号</span>';
   const stress = calculateStressLevel(normalizedSnapshot);
+  const stressClass = stress.score >= 72 ? 'red' : stress.score >= 38 ? 'amber' : 'green';
   const toggleText = liveCoachDetailsOpen ? '隐藏提示' : '查看提示';
   const detailsHtml = liveCoachDetailsOpen
     ? `
@@ -1995,7 +2557,7 @@ function renderLiveCoach(snapshot) {
   liveCoachEl.innerHTML = `
     <div class="live-coach-header">
       <div>
-        <strong>实时面试官雷达</strong>
+        <strong>${escapeHtml(LIVE_COACH_TITLE)}</strong>
         <p>${escapeHtml(normalizedSnapshot.currentQuestion || '暂无进行中的问题')}</p>
       </div>
       <div class="meta-row">
@@ -2004,9 +2566,8 @@ function renderLiveCoach(snapshot) {
         ${stagnationMeta}
       </div>
     </div>
-    <div class="stress-gauge echart-card">
-      <div id="stressGaugeChart" class="echart-gauge" aria-label="追问压力仪表盘"></div>
-      <strong>${escapeHtml(stress.label)}</strong>
+    <div class="live-coach-pressure">
+      <span class="pill ${stressClass}">${escapeHtml(stress.label)}</span>
       <p>${escapeHtml(stress.detail)}</p>
     </div>
     <div class="live-coach-actions">
@@ -2016,7 +2577,47 @@ function renderLiveCoach(snapshot) {
     </div>
     ${detailsHtml}
   `;
-  renderStressGaugeChart(stress);
+}
+
+function getPerformanceGrade(score) {
+  const value = Number(score);
+  if (!Number.isFinite(value)) {
+    return {
+      grade: '良',
+      caption: '待评估',
+      className: 'grade-good',
+      color: '#007bff',
+      glow: 'rgba(0, 123, 255, 0.42)'
+    };
+  }
+
+  if (value >= 80) {
+    return {
+      grade: '优',
+      caption: '表现优秀',
+      className: 'grade-excellent',
+      color: '#28a745',
+      glow: 'rgba(40, 167, 69, 0.5)'
+    };
+  }
+
+  if (value >= 60) {
+    return {
+      grade: '良',
+      caption: '基本达标',
+      className: 'grade-good',
+      color: '#007bff',
+      glow: 'rgba(0, 123, 255, 0.42)'
+    };
+  }
+
+  return {
+    grade: '差',
+    caption: '需要加强',
+    className: 'grade-weak',
+    color: '#ff4d5e',
+    glow: 'rgba(255, 77, 94, 0.48)'
+  };
 }
 
 function calculateStressLevel(snapshot) {
@@ -2053,27 +2654,30 @@ function calculateStressLevel(snapshot) {
   };
 }
 
-function renderStressGaugeChart(stress) {
+function renderReportGradeGaugeChart(report) {
   requestAnimationFrame(() => {
-    const target = document.querySelector('#stressGaugeChart');
+    const target = document.querySelector('#reportGradeGaugeChart');
     if (!target || !window.echarts) return;
 
+    const overview = report?.overview || {};
+    const score = Math.max(0, Math.min(100, Number(overview.score) || 0));
+    const grade = getPerformanceGrade(score);
     const themeColors = getThemeChartColors();
     const chart = window.echarts.getInstanceByDom(target) || window.echarts.init(target, null, { renderer: 'svg' });
     chart.setOption({
       backgroundColor: 'transparent',
       series: [{
         type: 'gauge',
-        startAngle: 210,
-        endAngle: -30,
+        startAngle: 205,
+        endAngle: -25,
         min: 0,
         max: 100,
-        radius: '96%',
-        center: ['50%', '62%'],
-        splitNumber: 4,
+        radius: '98%',
+        center: ['50%', '58%'],
+        splitNumber: 5,
         progress: {
           show: true,
-          width: 14,
+          width: 18,
           roundCap: true,
           itemStyle: {
             color: {
@@ -2081,73 +2685,81 @@ function renderStressGaugeChart(stress) {
               x: 0,
               y: 0,
               x2: 1,
-              y2: 0,
+              y2: 1,
               colorStops: [
-                { offset: 0, color: '#28a745' },
-                { offset: 0.52, color: '#f6b73c' },
-                { offset: 1, color: '#ff4d5e' }
+                { offset: 0, color: '#ff4d5e' },
+                { offset: 0.45, color: '#f6b73c' },
+                { offset: 0.72, color: '#007bff' },
+                { offset: 1, color: '#28a745' }
               ]
-            }
+            },
+            shadowBlur: 18,
+            shadowColor: grade.glow
           }
         },
         axisLine: {
           roundCap: true,
           lineStyle: {
-            width: 14,
-            color: [[1, themeColors.axisBase]]
+            width: 18,
+            color: [
+              [0.6, 'rgba(255, 77, 94, 0.28)'],
+              [0.8, 'rgba(0, 123, 255, 0.28)'],
+              [1, 'rgba(40, 167, 69, 0.34)']
+            ]
           }
         },
-        axisTick: {
-          distance: -22,
-          splitNumber: 2,
-          lineStyle: {
-            width: 1,
-            color: themeColors.axisTick
-          }
-        },
+        axisTick: { show: false },
         splitLine: {
-          distance: -26,
-          length: 10,
+          distance: -24,
+          length: 12,
           lineStyle: {
             width: 2,
             color: themeColors.axisSplit
           }
         },
-        axisLabel: {
-          show: false
-        },
+        axisLabel: { show: false },
         pointer: {
-          icon: 'path://M4,0 L-4,0 L0,-78 Z',
-          length: '62%',
-          width: 10,
-          offsetCenter: [0, '5%'],
+          icon: 'path://M4,0 L-4,0 L0,-84 Z',
+          length: '64%',
+          width: 11,
+          offsetCenter: [0, '4%'],
           itemStyle: {
-            color: themeColors.ink,
-            shadowBlur: 8,
-            shadowColor: themeColors.pointerShadow
+            color: grade.color,
+            shadowBlur: 12,
+            shadowColor: grade.glow
           }
         },
         anchor: {
           show: true,
-          size: 13,
+          size: 16,
           itemStyle: {
-            color: themeColors.ink,
+            color: grade.color,
             borderColor: themeColors.panel,
-            borderWidth: 3
+            borderWidth: 3,
+            shadowBlur: 10,
+            shadowColor: grade.glow
           }
         },
         detail: {
           valueAnimation: true,
-          offsetCenter: [0, '56%'],
-          color: themeColors.ink,
+          offsetCenter: [0, '34%'],
+          color: grade.color,
           fontFamily: 'Cascadia Code, Consolas, monospace',
-          fontSize: 22,
-          fontWeight: 800,
-          formatter: '{value}'
+          fontSize: 42,
+          fontWeight: 900,
+          formatter: () => grade.grade
         },
-        data: [{ value: stress.score }]
+        title: {
+          show: true,
+          offsetCenter: [0, '58%'],
+          color: themeColors.textBody,
+          fontSize: 13,
+          fontWeight: 700,
+          formatter: () => `${score} 分`
+        },
+        data: [{ value: score, name: grade.caption }]
       }]
-    });
+    }, true);
     chart.resize();
   });
 }
@@ -2174,8 +2786,11 @@ function getThemeChartColors() {
   };
 }
 
-function renderInterviewProgress(plan, currentId, completed = false) {
+function renderInterviewProgress(plan, currentId, completed = false, options = {}) {
   if (!interviewProgressEl) return;
+
+  const viewingId = options.viewQuestionId ?? viewQuestionId;
+  const activeViewId = viewingId || (completed ? plan[plan.length - 1]?.id : currentId);
 
   if (!Array.isArray(plan) || !plan.length) {
     interviewProgressEl.className = 'interview-progress empty-progress';
@@ -2183,7 +2798,9 @@ function renderInterviewProgress(plan, currentId, completed = false) {
     return;
   }
 
-  const currentIndex = completed ? plan.length : Math.max(0, plan.findIndex((item) => item.id === currentId));
+  const currentIndex = completed
+    ? plan.length
+    : Math.max(0, plan.findIndex((item) => item.id === currentId));
   const progressText = completed
     ? `已完成 ${plan.length}/${plan.length} 题，进入复盘`
     : `当前第 ${currentIndex + 1}/${plan.length} 题`;
@@ -2194,9 +2811,11 @@ function renderInterviewProgress(plan, currentId, completed = false) {
       : index === currentIndex
         ? 'current'
         : 'pending';
+    const reviewing = activeViewId === item.id && (completed || item.id !== currentId);
+    const clickable = state === 'done' || state === 'current';
     const stateLabel = {
-      done: '已完成',
-      current: '当前',
+      done: reviewing ? '回顾中' : '已完成',
+      current: viewingId ? '当前' : '进行中',
       pending: '待开始'
     }[state];
     const planReason = item.planReason || '按本轮训练节奏安排。';
@@ -2207,14 +2826,21 @@ function renderInterviewProgress(plan, currentId, completed = false) {
     const drillHint = isQuestionDrill
       ? '<p class="progress-drill-hint">来自单题报告重练，本题会重点检查薄弱点是否补齐。</p>'
       : '';
+    const questionPreview = truncateQuestionPreview(item.question);
 
     return `
-      <article class="progress-step ${state} ${isQuestionDrill ? 'question-drill' : ''}">
+      <article
+        class="progress-step ${state} ${reviewing ? 'reviewing' : ''} ${isQuestionDrill ? 'question-drill' : ''} ${clickable ? 'clickable' : 'is-disabled'}"
+        ${clickable ? `data-progress-question="${String(item.id).replace(/"/g, '&quot;')}"` : ''}
+        ${clickable ? 'role="button" tabindex="0"' : ''}
+        aria-label="${escapeHtml(`第 ${index + 1} 题 ${stateLabel}`)}"
+      >
         <div class="progress-step-index">${index + 1}</div>
         <div>
           <strong>${escapeHtml(getPlanTypeLabel(item))}</strong>
           ${drillBadge}
           <span>${escapeHtml(`${item.category || '综合'} · ${getDifficultyLabel(item.difficulty)} · ${stateLabel}`)}</span>
+          <p class="progress-question-preview">${escapeHtml(questionPreview)}</p>
           <p>安排原因：${escapeHtml(planReason)}</p>
           ${drillHint}
         </div>
@@ -2231,6 +2857,7 @@ function renderInterviewProgress(plan, currentId, completed = false) {
       </div>
       <span class="pill ${completed ? 'green' : ''}">${escapeHtml(phaseText)}</span>
     </div>
+    <p class="progress-nav-hint">点击已答题目可切换回顾，主舞台只显示当前选中题。</p>
     <div class="progress-steps">${itemsHtml}</div>
   `;
 }
@@ -3354,6 +3981,7 @@ function applyReportQuestionDrill(questionIndex) {
   };
 
   applyRecommendationToSetup(recommendation, [
+    question.questionId ? `题目ID：${question.questionId}` : '',
     `报告单题重练：${skill}`,
     `原题：${question.question || '暂无题目'}`,
     `本题安排原因：${question.planReason || '按本轮训练节奏安排。'}`,
@@ -3372,10 +4000,14 @@ function applyRecommendationToSetup(recommendation, resumeLines, statusMessage) 
   setSelectValue('style', recommendation.styleValue);
   const questionCountInput = setupForm.querySelector('input[name="questionCount"]');
   if (questionCountInput) questionCountInput.value = String(recommendation.questionCount);
-  resumeInput.value = resumeLines.join('\n');
+  resumeInput.value = resumeLines.filter(Boolean).join('\n');
   renderStyleHint(styleSelect.value);
-  renderProfileAnalysis(resumeInput.value);
+  scheduleProfileAnalysis();
+  renderSetupSummary();
   renderPlanPreview();
+  renderQuestionCountHint();
+  refreshSetupControls();
+  loadQuestionBankSnapshot();
   statusText.textContent = statusMessage;
   setWorkflowStep('setup');
   setupForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -3755,7 +4387,7 @@ function renderReport(report) {
         </article>
       `).join('')
     : '<p>继续作答后，会生成能力拆解。</p>';
-  const reportRadarHtml = renderReportRadar(report);
+  const reportGradeDashboardHtml = renderReportGradeDashboard(report);
   const badSmellHtml = renderBadSmellWarnings(report);
   const routeMapHtml = renderRouteMap(report);
 
@@ -3906,7 +4538,7 @@ function renderReport(report) {
         <button type="button" class="mini-button" data-copy-report>复制复盘报告</button>
       </div>
       <div class="snapshot-grid">${snapshotStats}</div>
-      ${reportRadarHtml}
+      ${reportGradeDashboardHtml}
       <div class="section-label">总体总结</div>
       <p>${escapeHtml(overview.summary || '暂无')}</p>
       <div class="section-label">面试官印象</div>
@@ -3962,7 +4594,65 @@ function renderReport(report) {
       ${practicePlanHtml}
     </article>
   `;
+  renderReportGradeGaugeChart(report);
   renderReportRadarChart(report);
+}
+
+function renderReportGradeDashboard(report) {
+  const overview = report?.overview || {};
+  const dimensions = createReportRadarDimensions(report);
+  const overallScore = Number(overview.score);
+  const overallGrade = getPerformanceGrade(overallScore);
+
+  return `
+    <section class="report-grade-dashboard" aria-label="面试表现评级盘">
+      <div class="grade-dashboard-top">
+        <div class="grade-dashboard-copy">
+          <span class="panel-kicker">Performance Cockpit</span>
+          <strong>综合素质评级盘</strong>
+          <p>${escapeHtml(overview.hireSignal?.label ? `面试信号：${overview.hireSignal.label}` : '结合总分与四维能力给出本轮评级。')}</p>
+        </div>
+        <div class="grade-hero ${overallGrade.className}" style="--grade-glow:${overallGrade.glow}; --grade-color:${overallGrade.color}">
+          <span class="grade-hero-label">综合评级</span>
+          <strong class="grade-hero-value">${escapeHtml(overallGrade.grade)}</strong>
+          <span class="grade-hero-caption">${escapeHtml(overallGrade.caption)}</span>
+          <span class="grade-hero-score">${escapeHtml(Number.isFinite(overallScore) ? `${overallScore} 分` : '待评分')}</span>
+        </div>
+      </div>
+      <div class="grade-dashboard-body">
+        <div class="grade-gauge-panel echart-card">
+          <div id="reportGradeGaugeChart" class="echart-gauge" aria-label="综合素质仪表盘"></div>
+          <div class="grade-gauge-foot">
+            <strong>${escapeHtml(`${overallGrade.grade} · ${overallGrade.caption}`)}</strong>
+            <p>${escapeHtml(overview.readiness ? `准备度：${overview.readiness}` : '完成更多题目后，评级会更稳定。')}</p>
+          </div>
+        </div>
+        <div class="grade-radar-panel radar-card">
+          <div id="reportRadarChart" class="echart-radar" aria-label="四维能力雷达图"></div>
+          <div class="dimension-grid grade-dimension-grid">
+            ${dimensions.map((item) => {
+              const grade = getPerformanceGrade(item.score);
+              return `
+                <article class="dimension-item grade-dimension-card ${grade.className}">
+                  <div class="dimension-head">
+                    <strong>${escapeHtml(item.label)}</strong>
+                    <span class="grade-badge">${escapeHtml(grade.grade)}</span>
+                  </div>
+                  <div class="dimension-score-row">
+                    <span class="${getDimensionScoreClass(item.score)}">${escapeHtml(item.score ?? '-')} 分</span>
+                    <span class="grade-caption">${escapeHtml(grade.caption)}</span>
+                  </div>
+                  <div class="dimension-bar" aria-hidden="true">
+                    <i style="width: ${escapeHtml(clampPercent(item.score))}%; background: ${grade.color}"></i>
+                  </div>
+                </article>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
 }
 
 function createReportRadarDimensions(report) {
@@ -3983,29 +4673,6 @@ function createReportRadarDimensions(report) {
     : fallback;
 
   return dimensions;
-}
-
-function renderReportRadar(report) {
-  const dimensions = createReportRadarDimensions(report);
-
-  return `
-    <div class="radar-card">
-      <div id="reportRadarChart" class="echart-radar" aria-label="四维能力雷达图"></div>
-      <div class="dimension-grid">
-        ${dimensions.map((item) => `
-          <article class="dimension-item">
-            <div class="dimension-head">
-              <strong>${escapeHtml(item.label)}</strong>
-              <span class="${getDimensionScoreClass(item.score)}">${escapeHtml(item.score ?? '-')}</span>
-            </div>
-            <div class="dimension-bar" aria-hidden="true">
-              <i style="width: ${escapeHtml(clampPercent(item.score))}%"></i>
-            </div>
-          </article>
-        `).join('')}
-      </div>
-    </div>
-  `;
 }
 
 function renderReportRadarChart(report) {

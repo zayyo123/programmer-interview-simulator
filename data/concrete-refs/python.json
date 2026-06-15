@@ -1,0 +1,66 @@
+{
+  "GIL 机制": {
+    "referenceAnswer": "CPython GIL 保证同一时刻一个线程执行字节码，CPU 密集多线程无法并行；IO 密集因释放 GIL 仍有效。优化：multiprocessing、C 扩展、asyncio IO 并发、用 numpy 等释放 GIL 的库。",
+    "excellentAnswer": "GIL 让 CPU 密集多线程无效，我会用多进程或 asyncio 处理 IO。"
+  },
+  "asyncio": {
+    "referenceAnswer": "单线程事件循环 + await IO；适合高并发网络 IO。注意：阻塞调用会卡死 loop，用 run_in_executor；任务取消用 Task.cancel；gather 处理并发与异常。与多进程区分 CPU 场景。",
+    "excellentAnswer": "asyncio 适合 IO 密集；阻塞代码放 executor，避免卡事件循环。"
+  },
+  "Celery 任务": {
+    "referenceAnswer": "Broker（Redis/RabbitMQ）+ worker 消费。关注：任务幂等、重试退避、visibility timeout、结果后端、队列隔离。监控队列堆积、失败率、任务耗时 P99。",
+    "excellentAnswer": "Celery 我会设幂等键、重试上限和死信队列，监控堆积。"
+  },
+  "Django ORM N+1": {
+    "referenceAnswer": "N+1：循环里访问外键触发多次查询。解决 select_related（JOIN 一对一/多对一）、prefetch_related（多对多/反查）。用 django-debug-toolbar 或 connection.queries 验证查询次数。",
+    "excellentAnswer": "N+1 用 select_related/prefetch_related，发布前用 debug toolbar 看 SQL 次数。"
+  },
+  "Django 事务": {
+    "referenceAnswer": "atomic() 包裹事务；select_for_update 行锁。注意：捕获异常仍要回滚、长事务持锁、跨库无效。ATOMIC_REQUESTS 按请求事务。排查 transaction.on_commit 钩子顺序。",
+    "excellentAnswer": "Django 事务用 atomic，需要时 select_for_update，避免长事务。"
+  },
+  "FastAPI 性能": {
+    "referenceAnswer": "异步路由处理 IO；CPU 密集放线程池。用 orjson、减少中间件、连接池复用、Pydantic v2。压测 locust/k6，看 worker 数、uvicorn workers 与 CPU 核数匹配。",
+    "excellentAnswer": "FastAPI IO 用 async，CPU 任务放 executor，压测调 worker 和连接池。"
+  },
+  "Python 内存泄漏": {
+    "referenceAnswer": "循环引用+__del__、全局缓存、C 扩展泄漏。工具 tracemalloc、objgraph、gc.get_objects。修复：弱引用、LRU 缓存上限、及时 del 大对象。",
+    "excellentAnswer": "我用 tracemalloc 对比快照，查全局缓存和循环引用。"
+  },
+  "装饰器": {
+    "referenceAnswer": "闭包包装函数，functools.wraps 保留元信息。用途：日志、鉴权、重试、缓存。lru_cache 注意参数可哈希。类装饰器实现 __call__。",
+    "excellentAnswer": "装饰器用 wraps 保留签名；缓存装饰器注意线程安全和 key。"
+  },
+  "上下文管理器": {
+    "referenceAnswer": "__enter__/__exit__ 或 contextlib.contextmanager。保证资源释放（文件、锁、连接）。exit 接收异常类型，可抑制或记录。async 用 async with。",
+    "excellentAnswer": "用 with 管理连接和锁，exit 里记录异常并确保释放。"
+  },
+  "多进程模型": {
+    "referenceAnswer": "multiprocessing 绕过 GIL；注意 spawn/fork 差异（Windows 仅 spawn）。进程间通信用 Queue/Pipe，共享数据用 Manager 或 redis。开销大于线程，适合 CPU 密集。",
+    "excellentAnswer": "CPU 密集我用 multiprocessing，注意 spawn 和序列化开销。"
+  },
+  "序列化性能": {
+    "referenceAnswer": "json 慢可用 orjson/ujson；大对象用 msgpack/protobuf。避免 pickle 跨信任边界。减少序列化次数，字段裁剪，流式传输。",
+    "excellentAnswer": "高性能场景 orjson/msgpack，跨服务用 protobuf 契约。"
+  },
+  "类型提示": {
+    "referenceAnswer": "typing 提升可读和 mypy 静态检查；Python3.9+ 内置 list[str]。Protocol 结构化子类型。运行时可用 pydantic 校验。渐进式类型，关键 API 先标注。",
+    "excellentAnswer": "核心模块加类型提示跑 mypy，接口用 Protocol/pydantic。"
+  },
+  "包依赖治理": {
+    "referenceAnswer": "锁定 requirements/poetry.lock；定期 pip-audit 查 CVE；私有源与镜像；避免依赖地狱用约束文件。升级小步验证 CI。",
+    "excellentAnswer": "依赖锁版本，CI 跑 audit，升级走回归测试。"
+  },
+  "缓存设计": {
+    "referenceAnswer": "本地 LRU+Redis 二级；TTL、主动失效、防穿透（布隆/空值）、防击穿（互斥锁）、防雪崩（随机 TTL）。监控命中率和回源 QPS。",
+    "excellentAnswer": "缓存设 TTL 和空值缓存，热点用互斥重建，监控命中率。"
+  },
+  "日志链路": {
+    "referenceAnswer": "结构化 JSON 日志，带 trace_id/request_id；统一 formatter；级别规范；敏感字段脱敏。集中收集 ELK/Loki，日志与 metrics 关联排障。",
+    "excellentAnswer": "日志打 trace_id，JSON 结构化，入口生成 request_id 全链路透传。"
+  },
+  "测试夹具": {
+    "referenceAnswer": "pytest fixture 管理 setup/teardown；scope function/module/session；conftest 共享；factory_boy 造数据；mock 外部依赖。避免夹具过厚难维护。",
+    "excellentAnswer": "pytest fixture 按 scope 复用，外部依赖 mock，数据用 factory。"
+  }
+}

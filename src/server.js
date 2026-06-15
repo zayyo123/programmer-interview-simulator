@@ -11,12 +11,16 @@ import {
   buildInterviewPrompt,
   createLiveCoachSnapshot,
   createInterviewPlan,
-  createOpening,
-  createReport,
+  validateQuestionCount,
+  buildInterviewerReplyMessages,
+  createInterviewOpeningMessages,
   getCurrentQuestion,
   getRecordedAnswerForCurrentQuestion,
   maybeAdvanceQuestion,
-  recordAnswerForCurrentQuestion
+  recordAnswerForCurrentQuestion,
+  recordSkippedQuestion,
+  advanceAfterSkip,
+  buildSkipQuestionMessages
 } from './interview.js';
 import {
   createPaperBlueprint,
@@ -30,10 +34,13 @@ import {
   submitQuestionDraft
 } from './questionGovernance.js';
 import { parseProfileDocument } from './profileIngest.js';
+import { analyzeProfile } from './profileAnalyzeService.js';
+import { finalizeReport } from './reportFinalize.js';
 
 const config = loadConfig();
 const sessions = new Map();
 const publicDir = join(fileURLToPath(new URL('.', import.meta.url)), '..', 'public');
+const sharedDir = join(fileURLToPath(new URL('.', import.meta.url)), '..', 'shared');
 
 const server = createServer(async (request, response) => {
   try {
@@ -96,13 +103,40 @@ const server = createServer(async (request, response) => {
     if (request.method === 'POST' && url.pathname === '/api/question-paper') {
       const body = await readJson(request);
       const runtimeQuestionBank = await loadRuntimeQuestionBank();
-      const plan = createInterviewPlan(body, { questionBank: runtimeQuestionBank });
+      const excludeQuestionIds = Array.isArray(body.excludeQuestionIds) ? body.excludeQuestionIds : [];
+      const reuseAllowedQuestionIds = Array.isArray(body.reuseAllowedQuestionIds) ? body.reuseAllowedQuestionIds : [];
+      const validation = validateQuestionCount(body.questionCount, body, {
+        questionBank: runtimeQuestionBank,
+        excludeQuestionIds
+      });
+      if (!validation.ok) {
+        const error = new Error(validation.message);
+        error.statusCode = 400;
+        throw error;
+      }
+      const plan = createInterviewPlan(
+        { ...body, questionCount: validation.value },
+        {
+          questionBank: runtimeQuestionBank,
+          excludeQuestionIds,
+          reuseAllowedQuestionIds,
+          selectionSeed: body.selectionSeed
+        }
+      );
       return sendJson(response, 200, createPaperBlueprint(plan));
     }
 
     if (request.method === 'POST' && url.pathname === '/api/profile/parse') {
       const body = await readJson(request);
       const payload = await parseProfileDocument(body);
+      return sendJson(response, 200, payload);
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/profile/analyze') {
+      const body = await readJson(request);
+      const text = String(body.text || body.resume || '').trim();
+      const role = String(body.role || '').trim();
+      const payload = await analyzeProfile({ config, text, role });
       return sendJson(response, 200, payload);
     }
 
@@ -141,26 +175,72 @@ const server = createServer(async (request, response) => {
 
       recordAnswerForCurrentQuestion(session, answer);
 
+      const answeringQuestion = getCurrentQuestion(session);
       session.messages.push({
         role: 'candidate',
         content: answer,
+        questionId: answeringQuestion?.id || null,
         createdAt: new Date().toISOString()
       });
 
       const effectiveAnswer = getRecordedAnswerForCurrentQuestion(session) || answer;
       const prompt = buildInterviewPrompt({ session, answer: effectiveAnswer });
+      const previousIndex = session.currentIndex;
       const result = await generateInterviewerReply({ config, session, answer, prompt });
       maybeAdvanceQuestion(session, answer);
+      const advanced = session.currentIndex > previousIndex;
+      const nextQuestion = advanced ? getCurrentQuestion(session) : null;
       session.provider = result.provider;
-      session.messages.push({
-        role: 'interviewer',
-        content: result.text,
-        provider: result.provider,
-        createdAt: new Date().toISOString()
-      });
+      session.messages.push(
+        ...buildInterviewerReplyMessages({
+          replyText: result.text,
+          provider: result.provider,
+          advanced,
+          nextQuestion,
+          completed: Boolean(session.completed),
+          questionIndex: session.currentIndex + 1,
+          answeringQuestionId: answeringQuestion?.id || null
+        })
+      );
 
       return sendJson(response, 200, {
         provider: result.provider,
+        messages: session.messages,
+        liveCoach: createLiveCoachSnapshot(session),
+        currentQuestion: getCurrentQuestion(session)?.id || null,
+        completed: Boolean(session.completed)
+      });
+    }
+
+    if (request.method === 'POST' && url.pathname.match(/^\/api\/interviews\/[^/]+\/skip$/)) {
+      const sessionId = url.pathname.split('/')[3];
+      const session = sessions.get(sessionId);
+      if (!session) return sendJson(response, 404, { error: '未找到这轮面试会话' });
+      if (session.completed) return sendJson(response, 400, { error: '本轮面试已结束' });
+
+      const skippedQuestion = recordSkippedQuestion(session);
+      if (!skippedQuestion) return sendJson(response, 400, { error: '当前没有可跳过的题目' });
+
+      session.messages.push({
+        role: 'candidate',
+        kind: 'skip',
+        content: '（跳过此题）',
+        questionId: skippedQuestion.id,
+        createdAt: new Date().toISOString()
+      });
+
+      const { completed, nextQuestion } = advanceAfterSkip(session);
+      session.messages.push(
+        ...buildSkipQuestionMessages({
+          skippedQuestionId: skippedQuestion.id,
+          nextQuestion,
+          completed,
+          questionIndex: session.currentIndex + 1
+        })
+      );
+
+      return sendJson(response, 200, {
+        provider: 'mock',
         messages: session.messages,
         liveCoach: createLiveCoachSnapshot(session),
         currentQuestion: getCurrentQuestion(session)?.id || null,
@@ -174,7 +254,7 @@ const server = createServer(async (request, response) => {
       if (!session) return sendJson(response, 404, { error: '未找到这轮面试会话' });
 
       session.finishedAt = new Date().toISOString();
-      session.report = createReport(session);
+      session.report = await finalizeReport(session, config);
 
       return sendJson(response, 200, {
         report: session.report,
@@ -254,7 +334,25 @@ async function createSession(input) {
     questionSource: input.questionSource || 'local'
   };
   const runtimeQuestionBank = await loadRuntimeQuestionBank();
-  const localPlan = createInterviewPlan(interviewConfig, { questionBank: runtimeQuestionBank });
+  const excludeQuestionIds = Array.isArray(input.excludeQuestionIds) ? input.excludeQuestionIds : [];
+  const reuseAllowedQuestionIds = Array.isArray(input.reuseAllowedQuestionIds) ? input.reuseAllowedQuestionIds : [];
+  const questionCountValidation = validateQuestionCount(
+    interviewConfig.questionCount,
+    interviewConfig,
+    { questionBank: runtimeQuestionBank, excludeQuestionIds }
+  );
+  if (!questionCountValidation.ok) {
+    const error = new Error(questionCountValidation.message);
+    error.statusCode = 400;
+    throw error;
+  }
+  interviewConfig.questionCount = questionCountValidation.value;
+  const localPlan = createInterviewPlan(interviewConfig, {
+    questionBank: runtimeQuestionBank,
+    excludeQuestionIds,
+    reuseAllowedQuestionIds,
+    selectionSeed: input.selectionSeed
+  });
   const aiPlanResult = interviewConfig.questionSource === 'ai'
     ? await generateInterviewQuestionPlan({ config, interviewConfig, localPlan })
     : null;
@@ -274,13 +372,7 @@ async function createSession(input) {
     currentIndex: 0,
     answers: [],
     completed: false,
-    messages: [
-      {
-        role: 'interviewer',
-        content: createOpening(interviewConfig, firstQuestion),
-        createdAt: new Date().toISOString()
-      }
-    ],
+    messages: createInterviewOpeningMessages(interviewConfig, firstQuestion),
     createdAt: new Date().toISOString()
   };
 }
@@ -301,6 +393,24 @@ function sendJson(response, status, payload) {
 
 async function serveStatic(response, pathname) {
   const cleanPath = pathname === '/' ? '/index.html' : pathname;
+
+  if (cleanPath.startsWith('/shared/')) {
+    const target = join(sharedDir, cleanPath.replace(/^\/shared\//, ''));
+    if (!target.startsWith(sharedDir)) {
+      return sendJson(response, 403, { error: '没有访问权限' });
+    }
+    try {
+      const content = await readFile(target);
+      response.writeHead(200, {
+        'Content-Type': getContentType(extname(target))
+      });
+      response.end(content);
+      return;
+    } catch {
+      return sendJson(response, 404, { error: '未找到请求的内容' });
+    }
+  }
+
   const target = join(publicDir, cleanPath.replace(/^\/+/, ''));
 
   if (!target.startsWith(publicDir)) {
