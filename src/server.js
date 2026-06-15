@@ -186,9 +186,55 @@ const server = createServer(async (request, response) => {
   }
 });
 
-server.listen(config.port, () => {
-  console.log(`Programmer Interview Simulator running at http://localhost:${config.port}`);
-});
+const MAX_TCP_PORT = 65535;
+
+function listenWithPortFallback(server, preferredPort) {
+  return new Promise((resolve, reject) => {
+    let port = preferredPort;
+    let warned = false;
+
+    const tryListen = () => {
+      const onError = (error) => {
+        if (error.code === 'EADDRINUSE' && port < MAX_TCP_PORT) {
+          if (!warned) {
+            console.warn(`Port ${preferredPort} is already in use, trying the next available port...`);
+            warned = true;
+          }
+          port += 1;
+          tryListen();
+          return;
+        }
+
+        if (error.code === 'EADDRINUSE') {
+          reject(new Error(`No available port found between ${preferredPort} and ${MAX_TCP_PORT}.`));
+          return;
+        }
+
+        reject(error);
+      };
+
+      server.once('error', onError);
+      server.listen(port, () => {
+        server.removeListener('error', onError);
+        resolve(port);
+      });
+    };
+
+    tryListen();
+  });
+}
+
+listenWithPortFallback(server, config.port)
+  .then((actualPort) => {
+    if (actualPort !== config.port) {
+      console.warn(`Switched to port ${actualPort} because ${config.port} was occupied.`);
+    }
+    console.log(`Programmer Interview Simulator running at http://localhost:${actualPort}`);
+  })
+  .catch((error) => {
+    console.error(error.message || error);
+    process.exit(1);
+  });
 
 async function createSession(input) {
   const interviewConfig = {
