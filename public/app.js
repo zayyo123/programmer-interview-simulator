@@ -645,23 +645,50 @@ function renderAiProviderState() {
 
 async function importProfileFile(file) {
   const name = file.name || '上传资料';
+  const supported = new Set(['pdf', 'md', 'markdown', 'json', 'txt']);
   const extension = name.split('.').pop()?.toLowerCase() || '';
-  let content = '';
-
-  try {
-    if (extension === 'pdf') {
-      content = `上传文件：${name}\nPDF 文件已接收。当前前端 MVP 不直接解析 PDF 二进制内容，请把关键项目经历或 JD 文本粘贴到这里继续分析。`;
-    } else {
-      content = await file.text();
-    }
-  } catch {
-    content = `上传文件：${name}\n文件读取失败，请直接粘贴简历或项目背景文本。`;
+  if (!supported.has(extension)) {
+    statusText.textContent = `暂不支持 .${extension || 'unknown'}，请上传 PDF / Markdown / JSON / TXT。`;
+    return;
   }
 
-  resumeInput.value = [resumeInput.value.trim(), content.trim()].filter(Boolean).join('\n\n');
-  renderProfileAnalysis(resumeInput.value);
-  renderPlanPreview();
-  statusText.textContent = `已导入 ${name}，左侧训练计划已根据资料重新计算。`;
+  statusText.textContent = `正在解析 ${name}...`;
+  try {
+    const contentBase64 = await fileToBase64(file);
+    const parsed = await requestJson('/api/profile/parse', {
+      method: 'POST',
+      body: JSON.stringify({
+        fileName: name,
+        mimeType: file.type || '',
+        contentBase64
+      })
+    });
+
+    const parsedText = String(parsed.text || '').trim();
+    if (!parsedText) throw new Error('未识别到有效文本');
+    resumeInput.value = [resumeInput.value.trim(), parsedText].filter(Boolean).join('\n\n');
+    renderProfileAnalysis(resumeInput.value);
+    renderSetupSummary();
+    renderPlanPreview();
+
+    const warnings = Array.isArray(parsed.warnings) ? parsed.warnings : [];
+    const warningTip = warnings.length ? `注意：${warnings[0]}` : '';
+    const parserTip = parsed.parser ? `解析器 ${parsed.parser}` : '';
+    statusText.textContent = `已导入 ${name}（${parsed.source?.toUpperCase() || extension}，${parsed.charCount || parsedText.length} 字，质量 ${parsed.quality || 'unknown'}${parserTip ? `，${parserTip}` : ''}）。${warningTip}`.trim();
+  } catch (error) {
+    statusText.textContent = `导入 ${name} 失败：${error.message || '请改为粘贴文本继续'}`;
+  }
+}
+
+async function fileToBase64(file) {
+  const arrayBuffer = await file.arrayBuffer();
+  let binary = '';
+  const bytes = new Uint8Array(arrayBuffer);
+  const chunkSize = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+  }
+  return btoa(binary);
 }
 
 async function runLaunchCountdown() {

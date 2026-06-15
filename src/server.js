@@ -29,6 +29,7 @@ import {
   runAutomaticQuestionScreening,
   submitQuestionDraft
 } from './questionGovernance.js';
+import { parseProfileDocument } from './profileIngest.js';
 
 const config = loadConfig();
 const sessions = new Map();
@@ -97,6 +98,12 @@ const server = createServer(async (request, response) => {
       const runtimeQuestionBank = await loadRuntimeQuestionBank();
       const plan = createInterviewPlan(body, { questionBank: runtimeQuestionBank });
       return sendJson(response, 200, createPaperBlueprint(plan));
+    }
+
+    if (request.method === 'POST' && url.pathname === '/api/profile/parse') {
+      const body = await readJson(request);
+      const payload = await parseProfileDocument(body);
+      return sendJson(response, 200, payload);
     }
 
     if (request.method === 'POST' && url.pathname === '/api/interviews') {
