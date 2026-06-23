@@ -1,158 +1,158 @@
 {
   "浏览器渲染": {
-    "referenceAnswer": "HTML 解析 DOM，CSS 构建 CSSOM，合成渲染树，Layout，Paint，Composite；关键路径优化减少阻塞 CSS/JS，defer/async。",
-    "excellentAnswer": "我会先给结论，再展开：HTML 解析 DOM，CSS 构建 CSSOM，合成渲染树，Layout，Paint，Composite；关键路径优化减少阻塞 CSS/JS，defer/async。"
+    "referenceAnswer": "浏览器渲染流程：1) HTML 解析构建 DOM 树，CSS 解析构建 CSSOM；2) DOM + CSSOM 合成渲染树（Render Tree，不含 display:none 的节点）；3) Layout（布局/回流）计算每个节点的位置和大小；4) Paint（绘制）将节点绘制到图层；5) Composite（合成）将多个图层合成最终画面。关键渲染路径优化：CSS 放 head 阻塞渲染但减少 FOUC，JS 加 defer/async 避免阻塞 DOM 构建，关键 CSS 内联、非关键 CSS 异步加载。重排（Layout）触发条件：修改几何属性（width/height/margin/padding），重绘（Paint）触发条件：修改外观属性（color/background），重排必重绘反之不必。Composite-only 变更（transform/opacity）最轻量。",
+    "excellentAnswer": "渲染流程 DOM→CSSOM→RenderTree→Layout→Paint→Composite；优化关键路径减少阻塞，transform/opacity 不触发重排。"
   },
   "首屏优化": {
-    "referenceAnswer": "LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。",
-    "excellentAnswer": "我会先给结论，再展开：LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。"
+    "referenceAnswer": "首屏优化按 LCP（Largest Contentful Paint）定位瓶颈：1) 资源体积——压缩 JS/CSS/图片（WebP/AVIF、gzip/brotli）、tree-shaking 移除无用代码、代码分割按路由懒加载；2) 网络——CDN 减少物理距离、HTTP/2 多路复用、预连接 preconnect、关键资源 preload/prefetch；3) 渲染——关键 CSS 内联避免闪烁、非关键 CSS 异步加载、字体 font-display:swap、避免同步 JS 阻塞；4) 接口——SSR/SSG 提前产出 HTML、BFF 聚合接口减少瀑布请求、接口预取。度量：Lighthouse 评分、Web Vitals（LCP<2.5s 为好）。",
+    "excellentAnswer": "我按 LCP 定位瓶颈：资源压缩+代码分割、CDN+HTTP/2、关键 CSS 内联、SSR 预渲染，Lighthouse 验证。"
   },
   "Core Web Vitals": {
-    "referenceAnswer": "LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。",
-    "excellentAnswer": "我会先给结论，再展开：LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。"
+    "referenceAnswer": "Core Web Vitals 三指标：1) LCP（Largest Contentful Paint）——最大内容元素渲染时间，衡量加载性能，<2.5s 为好；优化关键资源优先级、图片尺寸声明、CDN、SSR；2) INP（Interaction to Next Paint）——交互到下次绘制延迟，替代 FID 衡量交互响应，<200ms 为好；优化长任务拆分（task slicing）、减少主线程阻塞、event handler 优化；3) CLS（Cumulative Layout Shift）——累积布局偏移，衡量视觉稳定性，<0.1 为好；优化：图片/视频声明宽高、字体 font-display:swap、避免动态插入内容、骨架屏占位。",
+    "excellentAnswer": "LCP 看加载优化关键资源，INP 看交互拆长任务，CLS 看稳定性声明尺寸占位。"
   },
   "代码分割": {
-    "referenceAnswer": "LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。",
-    "excellentAnswer": "我会先给结论，再展开：LCP 看最大内容元素加载；优化关键资源优先级、图片尺寸、CDN、SSR；CLS 固定尺寸；INP 减少长任务。"
+    "referenceAnswer": "代码分割策略：1) 路由级分割——React.lazy + Suspense 按路由动态 import()，首屏只加载当前路由代码；2) 组件级分割——大组件（富文本编辑器/图表库）按需加载，用户交互时才 import；3) vendor 分割——将 react/vue 等框架代码单独打包，利用长期缓存；4) SplitChunksPlugin 配置——minSize/minChunks/cacheGroups 控制分包粒度。效果度量：Webpack Bundle Analyzer 看各 chunk 体积，首屏 JS 体积从整包 MB 级降到百 KB 级。注意：过度分割会增加请求数，需平衡 chunk 数和体积。",
+    "excellentAnswer": "我按路由 lazy load 首屏瘦身，大组件按需加载，vendor 分包缓存，Bundle Analyzer 验证效果。"
   },
   "Tree Shaking": {
-    "referenceAnswer": "动态 import() 路由级拆包；sideEffects:false 助 tree-shaking；分析 bundle 用 rollup-plugin-visualizer。",
-    "excellentAnswer": "我会先给结论，再展开：动态 import() 路由级拆包；sideEffects:false 助 tree-shaking；分析 bundle 用 rollup-plugin-visualizer。"
+    "referenceAnswer": "Tree Shaking 依赖 ES Module 静态分析：1) 必须用 ES Module（import/export），CommonJS（require）无法静态分析；2) package.json 设 sideEffects:false 告诉打包器无副作用模块可安全摇掉；3) 只摇未使用的 export，未使用的函数参数不会删除。无法摇掉的情况：1) CommonJS 模块；2) 有副作用的模块（修改全局变量/原型）；3) 动态属性访问（obj[dynamicKey]）；4) IIFE 自执行函数。验证：Webpack Bundle Analyzer 对比摇掉前后的体积。注意：部分库（如 lodash）需用 lodash-es 才能摇。",
+    "excellentAnswer": "Tree Shaking 需要 ESM + sideEffects:false，CommonJS 和有副作用模块摇不掉，用 Bundle Analyzer 验证。"
   },
   "缓存策略": {
-    "referenceAnswer": "SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。",
-    "excellentAnswer": "我会先给结论，再展开：SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。"
+    "referenceAnswer": "前端缓存分层：1) 强缓存——Cache-Control（max-age/s-maxage）、Expires，命中不请求服务器，适合不变的静态资源（JS/CSS/图片+contenthash）；2) 协商缓存——ETag/If-None-Match、Last-Modified/If-Modified-Since，命中返回 304 不传 body，适合频繁变化的 HTML；3) CDN 缓存——边缘节点缓存静态资源，回源验证或刷新；4) Service Worker 缓存——CacheFirst/NetworkFirst/StaleWhileRevalidate 策略，离线可用。刷新策略：HTML 不缓存或短缓存+协商，JS/CSS 用 contenthash 强缓存长期，CDN 刷新配合版本号或 hash 变更。",
+    "excellentAnswer": "HTML 短缓存+协商，JS/CSS contenthash 强缓存长期，CDN 边缘缓存，SW 做离线兜底。"
   },
   "Service Worker": {
-    "referenceAnswer": "SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。",
-    "excellentAnswer": "我会先给结论，再展开：SW 拦截 fetch；CacheFirst/NetworkFirst 策略；版本更新 skipWaiting+clients.claim。"
+    "referenceAnswer": "Service Worker 是浏览器后台独立线程，拦截 fetch 请求实现离线和缓存策略。核心 API：install 事件预缓存关键资源、fetch 事件拦截请求选缓存策略、activate 事件清理旧缓存。策略：1) CacheFirst——优先缓存，适合不变资源；2) NetworkFirst——优先网络，适合频繁更新内容；3) StaleWhileRevalidate——先返缓存再后台更新，适合非关键动态内容；4) NetworkOnly——仅网络。更新：新 SW install 后 skipWaiting + clients.claim 立即接管，或等所有旧页面关闭自动激活。风险：SW bug 会导致用户拿到过期或错误内容，必须做好版本回退和强制更新机制。",
+    "excellentAnswer": "我按场景选缓存策略（CacheFirst 静态/NetworkFirst 动态），更新用 skipWaiting，必须有强制更新回退机制。"
   },
   "跨域 CORS": {
-    "referenceAnswer": "预检 OPTIONS；Access-Control-Allow-Origin 勿用 * 带凭证；Allow-Methods/Headers；服务端代理同源。",
-    "excellentAnswer": "我会先给结论，再展开：预检 OPTIONS；Access-Control-Allow-Origin 勿用 * 带凭证；Allow-Methods/Headers；服务端代理同源。"
+    "referenceAnswer": "CORS 机制：浏览器发现跨域请求（协议/域名/端口不同）时，简单请求直接发但响应需含 Access-Control-Allow-Origin；非简单请求（自定义 Header/PUT/DELETE 等）先发 OPTIONS 预检，服务端返回 Allow-Methods/Allow-Headers/Allow-Origin 才发实际请求。关键配置：1) Allow-Origin 不能用 * 携带凭证时必须指定具体域名；2) Allow-Credentials:true 时 Allow-Origin 不能用 *；3) 预检缓存 Access-Control-Max-Age 减少 OPTIONS。排查：浏览器 Console 看 CORS 报错、Network 看 OPTIONS 是否返回正确 Header。服务端代理（Nginx proxy_pass）绕过浏览器同源限制。",
+    "excellentAnswer": "我配置 Allow-Origin 指定域名+Allow-Credentials，预检缓存减 OPTIONS，排查看 Console 报错。"
   },
   "XSS 防护": {
-    "referenceAnswer": "XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。",
-    "excellentAnswer": "我会先给结论，再展开：XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。"
+    "referenceAnswer": "XSS 类型：存储型（恶意脚本存数据库，所有用户访问触发）、反射型（URL 参数含脚本，点击触发）、DOM 型（前端 JS 动态渲染触发）。防护：1) 输出转义——HTML 用 &lt;&gt; 转义，JS 用 JSON.stringify，URL 用 encodeURIComponent；2) CSP（Content-Security-Policy）——script-src 限制脚本来源，禁止 inline script 和 eval；3) HttpOnly Cookie——JS 无法读取 Session Cookie，防 XSS 窃取；4) 富文本——用白名单 HTML parser（DOMPurify）过滤危险标签和属性；5) 框架层面——React JSX 自动转义、Vue v-html 需手动保证安全；6) 第三方脚本——subresource integrity 校验哈希。",
+    "excellentAnswer": "输出转义+CSP 限脚本来源+HttpOnly Cookie 防窃取，富文本用 DOMPurify 白名单过滤。"
   },
   "CSRF 与 Cookie": {
-    "referenceAnswer": "XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。",
-    "excellentAnswer": "我会先给结论，再展开：XSS：转义输出、CSP、HttpOnly Cookie；CSRF：SameSite、CSRF Token、双重 Cookie、校验 Referer。"
+    "referenceAnswer": "CSRF 攻击：攻击者诱导用户访问恶意页面，利用用户已登录状态自动携带 Cookie 发起跨站请求。防护：1) SameSite Cookie——Strict（完全跨站不发送）、Lax（GET 导航发送，POST 不发送，Chrome 默认值）、None（需配合 Secure）；2) CSRF Token——服务端生成随机 token 嵌入表单/Header，提交时校验；3) 双重 Cookie 验证——Cookie 和请求参数都带同一 token，攻击者无法读取跨域 Cookie；4) 校验 Referer/Origin——拒绝非本站来源的敏感请求。SameSite Lax 已阻止大多数 CSRF，但需要兼容旧场景时仍需 Token。",
+    "excellentAnswer": "SameSite Lax 阻止大多数 CSRF，敏感操作加 CSRF Token 双重防护，校验 Referer 兜底。"
   },
   "React 状态设计": {
-    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
-    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+    "referenceAnswer": "React 状态设计原则：1) 状态就近——只当前组件用就放本地 useState，多个组件共享才提升；2) 全局状态——跨组件树共享用 Context，更复杂用 Redux/Zustand/Jotai；3) URL 状态——筛选条件/分页/Tab 放 URL 参数，可分享可回退；4) 服务端缓存——服务端数据用 React Query/SWR 管理，自动缓存+重新验证。避免不必要渲染：React.memo 包裹子组件、useMemo 缓存计算结果、useCallback 稳定回调引用、状态拆细避免大对象一改全渲染。状态管理模式：单一 Store（Redux）vs 原子化（Recoil/Jotai）按项目复杂度选型。",
+    "excellentAnswer": "状态就近放本地，跨组件用 Context/Redux，URL 管筛选/分页，服务端数据用 React Query，拆细减重渲染。"
   },
   "React 渲染性能": {
-    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
-    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+    "referenceAnswer": "React 渲染性能优化：1) 减少重渲染——React.memo 对比 props 跳过、useMemo 缓存昂贵计算、useCallback 稳定函数引用、状态下推到叶子组件；2) 列表优化——key 用唯一 ID 不用 index、虚拟滚动（react-window/react-virtualized）只渲染可见行；3) 拆长任务——startTransition 标记非紧急更新、useDeferredValue 延迟渲染、Suspense 懒加载；4) Context 拆分——大 Context 拆多个小 Context 避免无关消费者重渲染。排查：React DevTools Profiler 看组件渲染耗时和原因（why-did-you-render 库），Performance 面板看长任务。",
+    "excellentAnswer": "我减少重渲染（memo/useMemo/状态下推）、列表虚拟滚动、startTransition 拆长任务，Profiler 定位瓶颈。"
   },
   "React Hooks 闭包": {
-    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
-    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+    "referenceAnswer": "Hooks 闭包陷阱：1) 过期闭包——事件回调或 setTimeout 里引用的 state 是创建时的值而非最新值，因为闭包捕获的是渲染时的快照；2) 依赖数组遗漏——useEffect/useMemo 不写全依赖导致回调用过期值，ESLint exhaustive-deps 规则强制补全；3) 修复——用 ref 存最新值（useRef + 赋值在渲染外）、useCallback + 正确依赖、函数式更新 setState(prev => prev + 1) 读最新 state。场景：定时器引用 state 过期用 ref，异步回调引用 props 过期加依赖。核心理解：每次渲染生成新闭包，Hooks 依赖数组告诉 React 何时重新创建闭包。",
+    "excellentAnswer": "闭包捕获渲染快照会过期，修依赖数组+函数式更新读最新 state，ref 存实时值。"
   },
   "React 错误边界": {
-    "referenceAnswer": "状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。",
-    "excellentAnswer": "我会先给结论，再展开：状态就近+Context/Redux；useCallback/useMemo 避免子组件重渲染；ErrorBoundary 捕获渲染错误；React.memo 列表项。"
+    "referenceAnswer": "Error Boundary 是类组件，实现 static getDerivedStateFromError 或 componentDidCatch 捕获子组件渲染错误，显示降级 UI 避免整棵树白屏。能捕获：渲染期间错误、生命周期错误、子组件构造函数错误。不能捕获：事件处理器错误（需 try-catch）、异步代码错误（Promise rejection）、服务端渲染错误、自身错误。线上白屏治理：1) 顶层 ErrorBoundary 包裹整棵树显示通用错误页；2) 关键组件单独包 ErrorBoundary 隔离故障区域；3) componentDidCatch 上报错误到监控；4) 事件处理器错误用 window.onerror/unhandledrejection 兜底。",
+    "excellentAnswer": "ErrorBoundary 捕渲染错误显示降级 UI，不捕事件/异步错误需 try-catch，顶层+关键组件双层包裹。"
   },
   "Vue 响应式": {
-    "referenceAnswer": "Vue3 Proxy 依赖收集 effect；ref/reactive 区别；computed 缓存；避免解构丢失响应式用 toRefs。",
-    "excellentAnswer": "我会先给结论，再展开：Vue3 Proxy 依赖收集 effect；ref/reactive 区别；computed 缓存；避免解构丢失响应式用 toRefs。"
+    "referenceAnswer": "Vue3 响应式基于 Proxy：读取属性时 track 收集依赖（effect），修改属性时 trigger 通知依赖重新执行。ref() 包装基本类型返回 {value}，reactive() 包装对象直接返回代理。computed 基于 effect + 缓存，依赖不变不重算。watch/watchEffect 监听变化执行副作用。注意事项：1) 解构 reactive 对象会丢失响应式，需用 toRefs；2) 直接给 reactive 对象赋新对象会断开代理，用 Object.assign 或整体替换；3) 数组索引直接赋值 Vue3 Proxy 可检测，Vue2 需 $set；4) 异步更新队列——nextTick 等待 DOM 更新后操作。Effect scope 管理副作用生命周期，组件卸载自动清理。",
+    "excellentAnswer": "Vue3 Proxy 自动追踪，reactive 解构用 toRefs 保留响应式，nextTick 等 DOM 更新，effect scope 自动清理。"
   },
   "组件设计": {
-    "referenceAnswer": "组件设计：结合题目「如何设计一个可复用表格或表单组件，同时避免过度抽象」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：组件设计：结合题目「如何设计一个可复用表格或表单组件，同时避免过度抽象」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "可复用组件设计原则：1) Props 接口清晰——必填/可选明确、类型严格（TypeScript）、默认值合理；2) 逻辑与 UI 分离——展示组件只管渲染、容器组件管逻辑（HOC/Render Props/Hooks 提取逻辑）；3) 组合优于配置——用 children/slot 组合而非堆 props 控制；4) 受控/非受控统一——支持 value+onChange 受控模式也支持 defaultValue 非受控；5) 避免过度抽象——当 3 个以上场景复用时再抽组件，2 个场景内联代码更清晰。表格组件实践：列定义（columns）驱动渲染、支持自定义单元格渲染器、排序/筛选/分页可选组合。表单组件：Field 级别校验+联动、Form 级提交和重置。",
+    "excellentAnswer": "Props 接口清晰、组合优于配置、受控非受控兼容，3 个场景以上再抽组件不过早抽象。"
   },
   "权限路由": {
-    "referenceAnswer": "权限路由：结合题目「中后台系统如何设计菜单权限、按钮权限、路由守卫和接口权限校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：权限路由：结合题目「中后台系统如何设计菜单权限、按钮权限、路由守卫和接口权限校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "中后台系统的权限控制是前后端协同的工程，分四层设计，每层职责不同但必须配合。\n\n第一层菜单权限：侧边栏/顶栏的导航菜单根据用户角色动态过滤。实现方式有两种：①前端路由表写全量菜单，根据后端返回的角色/权限码过滤不匹配的菜单项（简单但菜单结构变化需发版）；②后端直接返回当前用户可访问的菜单树，前端渲染（灵活但依赖后端接口）。推荐后者，因为菜单本身就是权限数据的一部分，不该硬编码在前端。\n\n第二层路由守卫：vue-router 的 beforeEach 或 react-router 的 loader/redirect 做路由拦截。路由 meta 字段标记 requiredPermission（如 ['admin','editor']），进入路由时检查用户权限是否匹配，不匹配则重定向到 403 或登录页。Vue 用 router.addRoutes（Vue Router 3）或 router.addRoute（Vue Router 4）动态注册路由——未授权的路由根本不在路由表中，用户无法通过 URL 直接访问。React 用 ProtectedRoute 高阶组件包裹需要权限的路由组件。\n\n第三层按钮/元素权限：页面内操作按钮（删除、编辑、导出）根据权限码控制显示隐藏。实现：Vue 自定义指令 v-permission=\"['admin']\"，React 用 PermissionWrapper HOC 或 usePermission Hook。核心原则——隐藏不代表安全，只代表 UX 优化，不展示无权限按钮避免用户困惑。\n\n第四层接口权限：**这是安全边界**，后端每个 API 必须校验当前用户是否有权限执行该操作（RBAC/ABAC），不信任前端传的任何权限声明。前端权限可绕过（用户直接用 Postman/curl 调接口、改 JS 绕过路由守卫），所以后端校验是唯一的真正防线。\n\n实现细节：权限数据在登录后从后端获取（含角色、权限码、菜单树），存 Pinia/Vuex/Redux；路由守卫检查权限码 + 是否已登录（token 过期跳登录）；菜单渲染过滤菜单树；按钮权限用指令/HOC。注意 token 刷新策略（双 token：access token 短期 + refresh token 长期），避免用户操作中途被踢出。多角色用户要处理权限合并（union）和冲突。",
+    "excellentAnswer": "我会分四层讲：菜单权限推荐后端返回菜单树前端渲染，路由守卫用 meta.requiredPermission + 动态注册路由（未授权路由不在路由表中），按钮权限用自定义指令/HOC 但强调这只是 UX 优化，接口权限是后端唯一安全边界。实现细节讲权限数据存状态管理、token 双刷新策略、多角色权限合并。"
   },
   "表单校验": {
-    "referenceAnswer": "表单校验：结合题目「复杂表单如何处理联动校验、异步校验、草稿保存和错误提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：表单校验：结合题目「复杂表单如何处理联动校验、异步校验、草稿保存和错误提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "复杂表单校验方案：1) 字段级校验——async-validator 或 Zod 定义 rules，blur/submit 时触发；2) 联动校验——A 字段值影响 B 字段的校验规则或必填状态，用 watch 监听动态修改 rules；3) 异步校验——用户名/邮箱唯一性校验，debounce 防抖 + loading 状态 + 取消上一次请求；4) 草稿保存——localStorage/autoSave API 定时存表单数据，恢复时回填；5) 错误提示——行内错误紧跟字段、全局 Toast 提示通用错误、scrollToError 自动定位第一个错误字段。框架：Ant Design Form / React Hook Form / VeeValidate 处理上述场景。",
+    "excellentAnswer": "字段级 async-validator、联动用 watch 动态规则、异步校验 debounce+取消、草稿自动存、scrollToError。"
   },
   "大列表虚拟滚动": {
-    "referenceAnswer": "只渲染可视区+缓冲区；定高列表简单，动态高需测量缓存；减少 DOM 节点。",
-    "excellentAnswer": "我会先给结论，再展开：只渲染可视区+缓冲区；定高列表简单，动态高需测量缓存；减少 DOM 节点。"
+    "referenceAnswer": "虚拟滚动原理：只渲染可视区域 + 缓冲区的 DOM 节点（如可视 20 行 + 上下各 5 行缓冲），滚动时动态替换渲染内容。实现要点：1) 定高列表——每行高度固定，totalHeight = itemCount * rowHeight，scrollTop / rowHeight 算起始索引，简单高效；2) 动态高度——需要测量每行实际高度缓存（ResizeObserver），未测量行用预估高度，累计偏移量算索引；3) 滚动定位——scrollToIndex 需要累计高度表支持；4) 可访问性——ARIA role=list/listitem、屏幕阅读器支持、键盘导航。库：react-window（轻量）、react-virtualized（功能全）、Tanstack Virtual。",
+    "excellentAnswer": "定高用索引直接算，动态高用 ResizeObserver 缓存高度，缓冲区防闪烁，注意可访问性。"
   },
   "前端监控": {
-    "referenceAnswer": "前端监控：结合题目「前端监控如何采集 JS 错误、白屏、性能、接口异常和用户行为」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：前端监控：结合题目「前端监控如何采集 JS 错误、白屏、性能、接口异常和用户行为」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端监控采集五类：1) JS 错误——window.onerror 捕获同步错误、unhandledrejection 捕获 Promise 错误、框架错误边界（React/Vue errorHandler）；2) 白屏——检测首屏是否有 DOM 内容（MutationObserver + 超时判断）；3) 性能——Performance API 采集 FCP/LCP/CLS/INP/资源加载时间、接口耗时；4) 接口异常——拦截 fetch/XHR 记录状态码、耗时、错误信息；5) 用户行为——PV/UV、点击、路由切换。上报：批量合并+Beacon API 保证卸载时发送。SDK：Sentry 错误监控、Web Vitals 性能、自建埋点 SDK。数据质量：采样率、去重、版本标识。",
+    "excellentAnswer": "我采集 JS 错误+白屏+性能+接口+行为五类，Beacon 保证上报，Sentry 错误+自建性能 SDK。"
   },
   "Source Map 安全": {
-    "referenceAnswer": "Source Map 安全：结合题目「线上 Source Map 如何用于定位问题，同时避免源码泄露」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：Source Map 安全：结合题目「线上 Source Map 如何用于定位问题，同时避免源码泄露」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "Source Map 安全策略：1) 生产不暴露——构建产物不包含 sourceMappingURL，Map 文件单独存内部服务器/Nginx 受限目录；2) 调试时按需加载——Sentry/监控平台通过 HTTP Header 或 token 鉴权获取 Map 文件还原堆栈，外部用户看不到；3) Nginx 配置——location ~ .map$ { internal; } 禁止外网直接访问；4) 构建流程——生产构建生成 Map 但上传到监控平台后删除/移到受限存储。定位问题：Sentry 收到压缩堆栈后用 Map 还原到源码行号和变量名。注意：即使代码混淆，有 Map 就能完整还原，必须隔离存储。",
+    "excellentAnswer": "生产不暴露 Map，上传 Sentry 后删除/移到 internal 目录，调试时按需鉴权获取还原堆栈。"
   },
   "埋点治理": {
-    "referenceAnswer": "埋点治理：结合题目「前端埋点如何设计事件模型、去重、版本和数据质量校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：埋点治理：结合题目「前端埋点如何设计事件模型、去重、版本和数据质量校验」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "埋点设计：1) 事件模型——事件名（click_submit_order）、属性（order_id/amount/source）、用户标识（uid/device_id）；2) 去重——同事件同属性短时间内去重（客户端 debounce+服务端幂等）；3) 版本——事件 schema 版本化，新增属性不删旧属性，向后兼容；4) 数据质量校验——服务端校验必填字段、属性类型、枚举值，异常埋点告警（如 null uid 比例超阈值）。治理流程：埋点文档（Spreadsheet/平台）维护事件定义→开发按文档上报→QA 校验上报完整性和准确性→服务端监控数据质量。避免埋点膨胀：定期清理无人消费的事件。",
+    "excellentAnswer": "事件模型定义事件名+属性+版本，客户端去重+服务端校验，文档驱动 QA 校验，定期清无人消费事件。"
   },
   "微前端": {
-    "referenceAnswer": "qiankun/single-spa 沙箱+路由；样式隔离 shadow DOM；公共依赖 externals；子应用独立部署。",
-    "excellentAnswer": "我会先给结论，再展开：qiankun/single-spa 沙箱+路由；样式隔离 shadow DOM；公共依赖 externals；子应用独立部署。"
+    "referenceAnswer": "微前端适合多团队独立开发部署的大型应用，将巨石应用拆成多个子应用独立运行。方案：1) qiankun——基于 single-spa，JS 沙箱（Proxy 隔离全局变量）+ CSS 隔离（Shadow DOM 或 scoped CSS），主应用注册子应用路由和加载规则；2) Module Federation——Webpack 5 运行时共享模块，无需额外框架，适合同技术栈；3) Web Components——Custom Element 天然隔离但生态弱。核心问题：1) 样式隔离——Shadow DOM 严格但影响 UI 库弹窗，qiankun 用 experimentalStyleIsolation；2) 通信——CustomEvent/状态库共享/URL 参数；3) 公共依赖——externals 抽离 React/Vue 避免重复加载；4) 部署——子应用独立部署，主应用动态加载入口。",
+    "excellentAnswer": "qiankun 做 JS 沙箱+样式隔离，MF 共享模块省依赖，通信用事件/状态库，子应用独立部署。"
   },
   "Monorepo": {
-    "referenceAnswer": "Monorepo：结合题目「前端 Monorepo 如何管理包、依赖、构建缓存和版本发布」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：Monorepo：结合题目「前端 Monorepo 如何管理包、依赖、构建缓存和版本发布」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端 Monorepo 工具：pnpm workspace + Turborepo/Nx。1) 包管理——pnpm workspace 声明 packages/*，依赖安装 hoist 到根目录节省磁盘；2) 依赖管理——internal 包互相引用用 workspace:*，发布时自动替换版本号；3) 构建缓存——Turborepo 按 input hash 缓存构建产物，未变更包跳过构建，CI 速度提升数倍；4) 版本发布——changesets 管理变更日志和版本号，支持独立发版和批量发版。适用场景：多包共享类型定义/工具函数/组件库、统一构建配置和 CI。不适用的场景：团队无交集的独立项目、安全隔离要求高的项目。",
+    "excellentAnswer": "pnpm workspace 管包，Turborepo 缓存构建，changesets 管版本发布，共享类型和组件。"
   },
   "工程化规范": {
-    "referenceAnswer": "工程化规范：结合题目「如何设计前端 ESLint、Prettier、TypeScript、测试和构建门禁」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：工程化规范：结合题目「如何设计前端 ESLint、Prettier、TypeScript、测试和构建门禁」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端工程化门禁：1) ESLint——代码风格+潜在错误，pre-commit 时 lint-staged 只检查暂存文件，CI 全量检查；2) Prettier——格式化统一风格，与 ESLint 配合（eslint-config-prettier 关闭冲突规则）；3) TypeScript——strict 模式类型检查，CI 跑 tsc --noEmit；4) 测试——Jest/Vitest 单元测试 + Playwright/Cypress E2E，CI 跑覆盖率门禁（如 80%）；5) 构建门禁——bundle 体积限制（size-limit）、无 console.log 残留、无 debugger。工具链：Husky + lint-staged 做 pre-commit，GitHub Actions/GitLab CI 跑全量检查，失败阻塞合并。",
+    "excellentAnswer": "lint-staged 做 pre-commit，CI 跑 ESLint+Prettier+tsc+测试+size-limit，失败阻塞合并。"
   },
   "TypeScript 类型设计": {
-    "referenceAnswer": "TypeScript 类型设计：结合题目「TypeScript 如何为接口数据、组件 props 和业务状态建模？过度类型化有什么问题」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：TypeScript 类型设计：结合题目「TypeScript 如何为接口数据、组件 props 和业务状态建模？过度类型化有什么问题」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "TypeScript 类型设计实践：1) 接口数据——用 interface 定义 API Response 类型，按后端 Swagger/Protobuf 生成 .d.ts 保持同步；2) 组件 props——interface Props { title: string; count?: number; } 必填可选明确，泛型 props 用 <T>；3) 业务状态——联合类型 type Status = \"pending\" | \"success\" | \"error\" 限制合法值，discriminated union 处理不同状态数据结构；4) 工具类型——Partial/Pick/Omit/Record 复用避免重复定义。过度类型化问题：嵌套泛型超 3 层可读性差、为类型写大量运行时代码不值得、any 链式调用等于没类型。平衡：核心 API 严格类型、内部实现可适当宽松。",
+    "excellentAnswer": "接口数据按 Swagger 生成类型，props 必填可选明确，联合类型限合法值，核心 API 严格不过度嵌套泛型。"
   },
   "前端测试": {
-    "referenceAnswer": "前端测试：结合题目「单元测试、组件测试、E2E 测试在前端分别适合覆盖什么」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：前端测试：结合题目「单元测试、组件测试、E2E 测试在前端分别适合覆盖什么」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端测试三层：1) 单元测试——Jest/Vitest 测纯函数/工具类/ Hooks，快、隔离、稳定，mock 外部依赖；2) 组件测试——Testing Library 测组件渲染和交互（点击/输入/异步更新），关注用户行为而非实现细节（不测 state/内部方法）；3) E2E 测试——Playwright/Cypress 测关键用户流程（登录→下单→支付），最接近真实但慢且脆弱。覆盖率策略：单元覆盖工具函数、组件覆盖核心交互、E2E 覆盖主流程。常见问题：测试与实现耦合太紧导致重构就挂、异步测试 timeout、flaky test 随机失败。治理：测试按用户行为写、CI 失败才修、E2E 用 retry 但不掩盖问题。",
+    "excellentAnswer": "单元测工具函数、组件测用户交互、E2E 测主流程，按行为写测试不按实现，CI 失败才修。"
   },
   "可访问性": {
-    "referenceAnswer": "可访问性：结合题目「前端可访问性应该关注哪些语义、键盘操作、焦点管理和颜色对比」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：可访问性：结合题目「前端可访问性应该关注哪些语义、键盘操作、焦点管理和颜色对比」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端可访问性（a11y）关注四维度：1) 语义——用正确 HTML 标签（nav/main/button 而非 div 套 div），aria-label 补充说明，heading 层级不跳级；2) 键盘操作——所有交互可通过 Tab 聚焦+Enter/Space 触发，焦点顺序符合阅读顺序，焦点可见（focus-visible）；3) 焦点管理——Modal 打开焦点移入、关闭焦点回到触发元素，路由切换焦点移到新内容；4) 颜色对比——WCAG AA 标准：正文 4.5:1、大字 3:1，不只用颜色传达信息（如红色边框+图标标错）。工具：axe/Lighthouse 自动检测、手动键盘测试、屏幕阅读器（VoiceOver/NVDA）验证。",
+    "excellentAnswer": "语义标签+aria-label、键盘可操作+焦点管理、颜色对比 4.5:1，axe 自动检+手动键盘测。"
   },
   "国际化": {
-    "referenceAnswer": "国际化：结合题目「多语言项目如何设计文案、日期货币、复数规则和异步加载」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：国际化：结合题目「多语言项目如何设计文案、日期货币、复数规则和异步加载」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端国际化（i18n）方案：1) 文案管理——用 i18next/vue-i18n 等库，key 按模块+页面组织（user.login.title），翻译文件 JSON 格式按语言分目录；2) 日期货币——用 Intl.DateTimeFormat/Intl.NumberFormat 格式化，不手动拼接，时区用 Intl 支持或传 UTC；3) 复数规则——ICU MessageFormat 处理 {count, plural, one{1 item} other{# items}}；4) 异步加载——按语言包 lazy load，首屏只加载当前语言，切换时动态 import；5) RTL 布局——阿拉伯语等用 dir=rtl + CSS logical properties（margin-inline-start 替代 margin-left）。检测遗漏：CI 跑 i18n lint 检查硬编码文案。",
+    "excellentAnswer": "i18next 管文案，Intl 格式化日期货币，ICU MessageFormat 处理复数，按语言懒加载，CI 检硬编码。"
   },
   "移动端适配": {
-    "referenceAnswer": "移动端适配：结合题目「移动端 H5 如何处理视口、刘海屏、1px、软键盘和安全区」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：移动端适配：结合题目「移动端 H5 如何处理视口、刘海屏、1px、软键盘和安全区」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "移动端 H5 适配要点：1) 视口——meta viewport width=device-width, initial-scale=1 禁缩放；2) 刘海屏——env(safe-area-inset-*) 配合 viewport-fit=cover；3) 1px 边框——设备像素比导致 CSS 1px 不等于物理 1px，用 transform: scaleY(0.5) 或 border-image 解决；4) 软键盘——input 聚焦时 iOS 推页面、Android 遮挡，用 visualViewport API 监听调整；5) 安全区——底部导航栏 padding-bottom: env(safe-area-inset-bottom)。调试：Chrome DevTools 设备模拟+真机 remote debug。rem/vw 适配方案视项目选型，vw 更现代。",
+    "excellentAnswer": "viewport 禁缩放、safe-area 适配刘海、1px 用 transform、软键盘 visualViewport 监听，vw 适配。"
   },
   "弱网优化": {
-    "referenceAnswer": "弱网优化：结合题目「弱网环境下前端如何做请求超时、重试、骨架屏和离线提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：弱网优化：结合题目「弱网环境下前端如何做请求超时、重试、骨架屏和离线提示」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "弱网优化策略：1) 请求超时——设合理 timeout（如 10s），超时显示重试提示而非无限 loading；2) 重试——指数退避重试（1s/2s/4s），幂等请求（GET/幂等 POST）可重试，非幂等不重试；3) 骨架屏——数据未到时展示页面骨架布局，降低用户感知等待；4) 离线提示——navigator.onLine 检测网络状态，离线时提示并缓存操作待恢复后执行；5) 数据缓存——Service Worker/IndexedDB 缓存已加载数据，弱网时先显示缓存再更新；6) 降级——弱网下跳过图片加载/视频自动播放，优先保证核心内容可用。模拟：Chrome DevTools Network throttling。",
+    "excellentAnswer": "设超时+指数退避重试、骨架屏降感知、SW 缓存离线可用、弱网跳图片优先核心内容。"
   },
   "上传下载": {
-    "referenceAnswer": "上传下载：结合题目「大文件上传如何做分片、断点续传、秒传和失败重试」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：上传下载：结合题目「大文件上传如何做分片、断点续传、秒传和失败重试」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "大文件上传要解决速度、可靠性、重复上传三个问题，核心方案是分片 + 断点续传 + 秒传 + 重试。\n\n分片上传：前端用 Blob.slice(start, end) 把大文件切成 2-5MB 的分片（size 根据服务端限制和网络环境调优），多个分片可并发上传（用 Promise.all 控制并发度，如 3-5 并发避免服务端压力过大）。每个分片独立上传，服务端收到后存临时目录或对象存储分片。全部分片上传完成后，服务端执行合并（流式合并或 rename 操作，避免大内存）。并发上传进度用已上传分片数/总分片数计算，显示进度条。\n\n断点续传：前端维护已上传分片列表（本地持久化到 IndexedDB/localStorage），页面刷新或网络中断后恢复时，先调用服务端查询接口获取已上传分片，跳过已完成的分片从断点继续。服务端用文件 hash + 分片索引唯一标识每个分片。中断恢复的关键是分片状态持久化，不能只放内存。\n\n秒传：上传前用 Web Worker 计算 file hash（大文件用 spark-md5 增量计算或 file stream API，避免主线程卡顿）。计算完成后调服务端检查该 hash 是否已存在——已存在则直接秒传成功（三秒上传 2GB 文件），不存在则开始分片上传。Web Worker 是关键，否则几百 MB 文件算 hash 会让页面冻结数秒。\n\n失败重试：单分片上传失败重试 3 次指数退避（1s/2s/4s），避免一个慢分片阻塞全部（整体超时后跳过该分片重试后续再补）。全部失败后提示用户，支持手动重试。\n\n大文件下载：①流式下载——用 fetch + ReadableStream 或 axios responseType: 'stream' 边下边存，避免几 GB 文件一次性撑爆内存；②断点续传——用 Range: bytes=start-end header 请求，配合响应码 206 Partial Content 和 Content-Range，中断后从已下载位置继续；③进度——监听 onDownloadProgress 获取 loaded/total。安全：服务端必须校验文件类型用 magic number（文件头部字节）而非仅看扩展名（扩展名可伪造），设大小上限，存储与访问路径隔离（上传目录不可直接 URL 访问），敏感文件加密存储。",
+    "excellentAnswer": "我会讲分片上传用 Blob.slice 切 2-5MB 并发上传（Promise.all 控制并发度），断点续传靠分片状态持久化 IndexedDB + 服务端查已上传分片，秒传用 Web Worker 算 spark-md5 hash 避免主线程卡顿。下载用 fetch + ReadableStream 流式避免内存溢出，Range header 断点续传 206 响应。安全强调 magic number 校验类型、存储访问隔离。"
   },
   "WebSocket": {
-    "referenceAnswer": "WebSocket：结合题目「前端 WebSocket 如何处理重连、心跳、消息乱序和页面生命周期」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：WebSocket：结合题目「前端 WebSocket 如何处理重连、心跳、消息乱序和页面生命周期」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端 WebSocket 实践：1) 重连——连接断开后指数退避重连（1s/2s/4s/8s 上限 30s），区分正常关闭（1000）和异常断开；2) 心跳——每 30s 发 ping，服务端回 pong，超时未回视为断开触发重连；3) 消息顺序——WebSocket 本身保证 TCP 层有序，但重连期间丢失的消息需业务层补位（消息 ID + 请求缺失区间）；4) 页面生命周期——visibilitychange 事件页面隐藏时可降频心跳、恢复时检查连接状态；5) 降级——WebSocket 不可用时降级到 SSE（服务端推送）或长轮询。监控：连接状态、重连次数、消息延迟。",
+    "excellentAnswer": "指数退避重连+心跳检测+消息 ID 补缺失+页面隐藏降频，降级到 SSE/长轮询兜底。"
   },
   "安全依赖": {
-    "referenceAnswer": "安全依赖：结合题目「前端第三方依赖如何做漏洞治理、锁版本和供应链风险控制」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：安全依赖：结合题目「前端第三方依赖如何做漏洞治理、锁版本和供应链风险控制」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端第三方依赖安全治理：1) 锁版本——package-lock.json/pnpm-lock.yaml 锁定依赖树，npm ci 严格按 lock 安装；2) 漏洞扫描——npm audit / pnpm audit / Snyk 定期扫描 CVE 漏洞，CI 集成自动阻断高危漏洞；3) 供应链风险——npm 包可被恶意接管（event-stream 事件），lock 文件校验 integrity hash，私有 registry 托管关键依赖；4) 依赖精简——定期清理未使用依赖（depcheck），减少攻击面；5) 版本策略——大版本升级评估 breaking change，小版本和补丁及时跟进安全修复。注意：npm audit --fix 自动修复可能引入 breaking change。",
+    "excellentAnswer": "锁版本+CI audit 扫描+私有 registry 托管，depcheck 清未用依赖，安全修复及时跟进。"
   },
   "设计系统": {
-    "referenceAnswer": "设计系统：结合题目「如何建设前端设计系统，保证组件一致性和团队协作效率」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：设计系统：结合题目「如何建设前端设计系统，保证组件一致性和团队协作效率」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端设计系统建设：1) 设计 Token——颜色/间距/字体/圆角/阴影等基础变量，CSS Variables 或 design-token 文件，设计与开发共用一份定义；2) 组件库——按原子设计（Atom/Molecule/Organism）分层，基础组件（Button/Input/Modal）跨项目复用，业务组件按领域组织；3) 文档——Storybook/Dumi 组件文档+交互示例+API 说明，新成员按文档接入；4) 版本管理——semver 语义版本，breaking change 提前公告+codemod 辅助迁移；5) 协作——设计稿（Figma）与组件代码同步，Design Lint 检查是否用系统 Token。度量：组件覆盖率（项目用设计系统组件的比例）、文档完整度。",
+    "excellentAnswer": "Design Token 共用+组件库分层+Storybook 文档+semver 版本+Figma 同步，覆盖率度量。"
   },
   "SSR/SSG": {
-    "referenceAnswer": "SSR/SSG：结合题目「SSR、SSG 和 CSR 分别适合什么场景？它们对性能和部署有什么影响」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：SSR/SSG：结合题目「SSR、SSG 和 CSR 分别适合什么场景？它们对性能和部署有什么影响」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "SSR/SSG/CSR 对比：1) SSR（服务端渲染）——每次请求服务端生成 HTML，适合动态内容多（如电商详情页、用户面板），SEO 友好，首屏快但服务器负载高；2) SSG（静态生成）——构建时生成 HTML，适合内容变化少（如博客/文档/营销页），CDN 分发最快，更新需重新构建；3) CSR（客户端渲染）——浏览器下载空 HTML + JS 再渲染，适合交互密集的 SPA（如后台管理系统），SEO 差首屏慢。混合策略：Next.js ISR 增量静态再生、按路由选择 SSR/SSG/CSR。部署：SSR 需 Node.js 服务器、SSG 纯静态 CDN 部署、CSR 纯静态部署。",
+    "excellentAnswer": "SSR 动态内容+SEO，SSG 静态内容+CDN 最快，CSR 交互密集 SPA，Next.js 按路由混合选型。"
   },
   "Hydration": {
-    "referenceAnswer": "Hydration：结合题目「SSR Hydration 不一致会出现什么问题？如何定位和避免」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：Hydration：结合题目「SSR Hydration 不一致会出现什么问题？如何定位和避免」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "SSR Hydration 是服务端渲染的 HTML 在客户端被 React/Vue 激活为可交互应用的过程。Hydration 不一致（mismatch）指客户端虚拟 DOM 与服务端渲染 HTML 结构不匹配，会导致：1) React 警告并丢弃服务端 HTML 重新渲染，白屏闪烁；2) 事件绑定失败用户无法交互。常见原因：1) 服务端和客户端数据不一致（如用 Date.now() 生成不同时间）；2) 浏览器扩展修改了 DOM；3) 条件渲染依赖客户端状态（window/navigator）。定位：React 报错会指出具体组件和差异。避免：数据序列化注入（__INITIAL_STATE__）、suppressHydrationWarning 处理不可避免的差异、条件渲染用 useEffect 在客户端才执行。",
+    "excellentAnswer": "Hydration mismatch 会导致白屏闪烁，原因多为数据不一致或客户端条件渲染，数据序列化+useEffect 延迟渲染避免。"
   },
   "前端内存泄漏": {
-    "referenceAnswer": "前端内存泄漏：结合题目「前端页面内存持续上涨时，你会如何定位事件监听、定时器和闭包引用」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。",
-    "excellentAnswer": "我会先给结论，再展开：前端内存泄漏：结合题目「前端页面内存持续上涨时，你会如何定位事件监听、定时器和闭包引用」，需要讲清定义/流程、3-5 步实操（命令、配置、指标名）、常见坑和验证方式（日志/监控/对账），避免只讲泛泛原则。"
+    "referenceAnswer": "前端内存泄漏常见场景：1) 事件监听未移除——addEventListener 后组件卸载未 removeEventListener，DOM 节点无法回收；2) 定时器未清理——setInterval/setTimeout 未在 componentWillUnmount/unEffect return 中清除；3) 闭包引用——闭包持有大对象引用（如组件 state/props）阻止 GC；4) DOM 引用——JS 变量引用已从文档移除的 DOM 节点（detached DOM）；5) 全局变量/缓存——无限增长的全局 Map/数组。定位：Chrome DevTools Memory 面板 → Take Heap Snapshot 对比操作前后快照，看 Retainers 找谁持有引用；Performance Monitor 看 JS heap size 趋势。修复：组件卸载时清理监听/定时器/取消异步请求。",
+    "excellentAnswer": "我查事件监听/定时器/闭包/DOM 引用/全局缓存五类泄漏，Heap Snapshot 对比快照找 Retainers。"
   },
   "浏览器事件循环": {
-    "referenceAnswer": "宏任务 script/setTimeout、微任务 promise.then；每宏任务清空微队列；async/await 是微任务。",
-    "excellentAnswer": "我会先给结论，再展开：宏任务 script/setTimeout、微任务 promise.then；每宏任务清空微队列；async/await 是微任务。"
+    "referenceAnswer": "浏览器事件循环：1) 执行同步代码（调用栈）；2) 清空微任务队列（Promise.then/catch/finally、queueMicrotask、MutationObserver），新产生的微任务也在本轮清空；3) 如需渲染则渲染；4) 取一个宏任务执行（setTimeout/setInterval/I/O/UI 事件），执行完回到步骤 2。async/await：await 后的代码等价于 .then 回调，属于微任务。经典输出判断：console.log 同步 → Promise.then 微任务 → setTimeout 宏任务。注意：微任务优先级高于宏任务，但微任务中无限递归会产生死循环（不交还控制权），requestAnimationFrame 在渲染前执行不属于微任务也不属于宏任务。",
+    "excellentAnswer": "同步→清空微任务→渲染→取宏任务循环；await 后是微任务，微任务优先于宏任务但不递归。"
   }
 }

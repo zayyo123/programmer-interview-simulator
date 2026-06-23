@@ -103,13 +103,33 @@ function buildConcreteExcellentAnswer(question, concreteReference) {
   return concreteReference.replace(/^（示例）/, '我');
 }
 
+// 短答案触发接通的阈值：原始参考答案短于此值，且 concrete-refs 提供了显著更长的详细版时，
+// 才视为"答案不够详细"，触发替换。阈值取在 P25(295) 以下，确保只接通真正偏短的答案，
+// 不影响已经写得足够详细的主数据。
+const SHORT_REFERENCE_THRESHOLD = 280;
+
+// 判断 concrete-refs 返回的详细版是否"显著更详细"，避免用短的替换更短的或长度相近的。
+function isSignificantlyMoreDetailed(candidate, reference) {
+  const candidateLen = String(candidate || '').length;
+  const referenceLen = String(reference || '').length;
+  if (!candidateLen) return false;
+  // 详细版自身必须达到质量阈值，并且至少比原答案长 1.4 倍（绝对增量 >= 80 字）。
+  if (candidateLen < SHORT_REFERENCE_THRESHOLD) return false;
+  if (candidateLen <= referenceLen) return false;
+  if (candidateLen - referenceLen < 80) return false;
+  return true;
+}
+
 export function resolveQuestionAnswers(question = {}) {
   const referenceAnswer = String(question.referenceAnswer || '').trim();
   const excellentAnswer = String(question.excellentAnswer || '').trim();
   const referenceIsGeneric = isGenericTemplateReferenceAnswer(referenceAnswer);
   const excellentIsGeneric = isGenericTemplateReferenceAnswer(excellentAnswer);
 
-  if (!referenceIsGeneric && !excellentIsGeneric) {
+  // 分支一：既不是通用模板句、答案也不偏短 —— 直接保留主数据，行为不变。
+  const referenceIsShort = referenceAnswer.length > 0 && referenceAnswer.length < SHORT_REFERENCE_THRESHOLD;
+  const excellentIsShort = excellentAnswer.length > 0 && excellentAnswer.length < SHORT_REFERENCE_THRESHOLD;
+  if (!referenceIsGeneric && !excellentIsGeneric && !referenceIsShort && !excellentIsShort) {
     return {
       referenceAnswer,
       excellentAnswer: excellentAnswer || referenceAnswer
@@ -117,6 +137,8 @@ export function resolveQuestionAnswers(question = {}) {
   }
 
   const concrete = buildConcreteReferenceAnswer(question);
+
+  // 没有 concrete-refs 详细版时保持原样，模板句也不强行替换。
   if (!concrete) {
     return {
       referenceAnswer,
@@ -124,9 +146,26 @@ export function resolveQuestionAnswers(question = {}) {
     };
   }
 
+  // 通用模板句：无条件替换为详细版（保持原行为）。
+  // 短答案：仅在详细版显著更详细时才替换，避免把写得好但偏短的答案换成等长或更短的。
+  const referenceNeedsReplace = referenceIsGeneric
+    || (referenceIsShort && isSignificantlyMoreDetailed(concrete, referenceAnswer));
+  const excellentNeedsReplace = excellentIsGeneric
+    || (excellentIsShort && isSignificantlyMoreDetailed(
+      buildConcreteExcellentAnswer(question, concrete),
+      excellentAnswer
+    ));
+
+  if (!referenceNeedsReplace && !excellentNeedsReplace) {
+    return {
+      referenceAnswer,
+      excellentAnswer: excellentAnswer || referenceAnswer
+    };
+  }
+
   return {
-    referenceAnswer: referenceIsGeneric ? concrete : referenceAnswer,
-    excellentAnswer: excellentIsGeneric
+    referenceAnswer: referenceNeedsReplace ? concrete : referenceAnswer,
+    excellentAnswer: excellentNeedsReplace
       ? buildConcreteExcellentAnswer(question, concrete)
       : (excellentAnswer || buildConcreteExcellentAnswer(question, concrete))
   };

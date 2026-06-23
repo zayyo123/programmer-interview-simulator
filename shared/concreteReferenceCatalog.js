@@ -5,6 +5,51 @@ import { fileURLToPath } from 'node:url';
 const catalogDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'data', 'concrete-refs');
 const catalogCache = new Map();
 
+// 题库 skill 与 concrete-refs 键名不一致时的别名映射（仅改查找，不改 JSON 键名）
+const SKILL_ALIASES = {
+  AI: {
+    '数据泄漏': '特征穿越',
+    '模型评估': '特征穿越',
+    '数据漂移': '特征漂移监控',
+    'A/B 实验': '实验显著性',
+    '线上实验': '实验显著性',
+    '推荐排序': '召回排序架构',
+    'RAG 切片': 'RAG 召回评估',
+    '检索召回': 'RAG 召回评估',
+    '重排模型': 'RAG 召回评估',
+    '幻觉治理': 'RAG 引用',
+    'RAG 应用': 'RAG 引用',
+    'LLM 安全护栏': '提示词注入',
+    '大模型安全': '提示词注入',
+    '向量数据库': '向量召回参数',
+    '量化压缩': '模型压缩',
+    '金丝雀发布': '模型灰度',
+    '模型监控': '特征漂移监控',
+    '特征平台': 'Feature Store',
+    '公平性偏差': '模型公平性',
+    '可解释性': '模型可解释性',
+    '冷启动': '冷启动推荐',
+    '多模型路由': '模型路由',
+    '离线在线一致性': '离线在线偏差',
+    '人机协同': '人审闭环',
+    '推理成本': '成本预算',
+    '数据标注': '标签噪声',
+    '隐私保护': '模型安全',
+    '对抗样本': '模型安全',
+    '模型部署': '模型版本回滚',
+    'GPU 利用率': '训练资源调度',
+    'MLOps': '模型文档',
+    'ML Pipeline': '模型文档',
+    '实验追踪': '模型文档',
+    'Prompt 评估': 'LLM 评测集',
+    Embedding: 'Embedding 更新',
+    '反馈闭环': '反馈延迟',
+    '模型服务': '模型 SLA',
+    '推理延迟': '模型 SLA',
+    '批处理推理': '模型 SLA'
+  }
+};
+
 const INLINE_PATTERN_RULES = [
   {
     match: (q) => /JVM|内存区域|堆.*栈|方法区|元空间|直接内存|OOM/i.test(`${q.skill} ${q.question}`),
@@ -101,7 +146,8 @@ function loadSkillCatalog(category = '') {
     前端: 'frontend.json',
     安全: 'security.json',
     测试: 'qa.json',
-    AI: 'ai.json'
+    AI: 'ai.json',
+    系统设计: 'architect.json'
   };
   const fileName = map[category];
   return fileName ? loadCatalogFile(fileName) : {};
@@ -115,12 +161,19 @@ function toExcellentAnswer(reference = '') {
   return `我会这样回答：${text}`;
 }
 
+function resolveCatalogSkill(category = '', skill = '') {
+  const aliases = SKILL_ALIASES[category];
+  if (aliases?.[skill]) return aliases[skill];
+  return skill;
+}
+
 function lookupSkillCatalog(question) {
   const skill = String(question.skill || '').trim();
   if (!skill) return null;
 
   const catalog = loadSkillCatalog(question.category);
-  const entry = catalog[skill];
+  const catalogSkill = resolveCatalogSkill(question.category, skill);
+  const entry = catalog[catalogSkill];
   if (!entry?.referenceAnswer) return null;
 
   return {
