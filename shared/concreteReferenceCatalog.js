@@ -147,9 +147,11 @@ function loadSkillCatalog(category = '') {
     安全: 'security.json',
     测试: 'qa.json',
     AI: 'ai.json',
-    系统设计: 'architect.json'
+    系统设计: 'architect.json',
+    网络: 'network.json',
+    数据: 'data.json'
   };
-  const fileName = map[category];
+  const fileName = map[category] || (category === 'MySQL' ? 'mysql.json' : undefined);
   return fileName ? loadCatalogFile(fileName) : {};
 }
 

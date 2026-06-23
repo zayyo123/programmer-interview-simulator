@@ -9,10 +9,7 @@ const filePath = path.join(__dirname, '../data/approved-questions.json');
 const data = JSON.parse(fs.readFileSync(filePath, 'utf8'));
 
 const PATCHES = {
-  'approved_system_multi_region_001': {
-    referenceAnswer:
-      '跨机房高可用要先明确 RTO、RPO、读写模型和故障范围，并区分读链路与强一致写链路——写链路跨地域多活成本很高，通常选同城双活 + 单主写、异步复制和快速切换；读链路可更积极做多地缓存和读副本。流量切换分层：入口 DNS/GSLB/网关就近与故障切流，服务层无状态或状态外置，数据层按场景选主备、异步复制、单元化多活，并量化冲突处理成本。故障检测不能只看机器存活，要看业务成功率、延迟、错误率和依赖健康；切换要有 fencing、版本号、幂等、回放、预案、权限和回滚。最难的是数据冲突和故障误判，平时必须用演练验证 RTO/RPO，而不是只在文档里写高可用。'
-  }
+  // 已迁移至 architect.json「高可用架构」，不再用短 patch 覆盖目录详细版
 };
 
 function pickAnswers(question, resolved) {

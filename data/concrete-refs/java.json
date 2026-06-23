@@ -1,34 +1,38 @@
 {
   "JVM 内存模型": {
-    "referenceAnswer": "JVM 运行时数据区：程序计数器、虚拟机栈、本地方法栈、堆、方法区/元空间（JDK8+ 字符串常量在堆）。OOM 排查：Java heap space 用 jmap -histo/MAT 看对象；Metaspace 查类加载泄漏；unable to create native thread 看线程数；Direct buffer 结合 NIO。线程栈区异常用 jstack 看栈帧和局部变量。",
+    "referenceAnswer": "JVM 运行时数据区：程序计数器、虚拟机栈、本地方法栈、堆、方法区/元空间（JDK8+ 字符串常量在堆）。OOM 排查：Java heap space 用 jmap -histo/MAT 看对象；Metaspace 查类加载泄漏；unable to create native thread 看线程数；Direct buffer 结合 NIO。线程栈区异常用 jstack 看栈帧和局部变量。排查：jmap -heap 看各区域使用；jmap -histo:live 看对象分布；MAT 分析 dump。Metaspace 用 jstat -gcutil 看是否持续增长。DirectMemory 结合 -XX:MaxDirectMemorySize 和 NIO 使用排查。",
     "excellentAnswer": "我会根据 OOM 信息先判断区域：堆看 dump 和对象分布，元空间查类加载，线程过多看 jstack，直接内存查 NIO 和 MaxDirectMemorySize。"
   },
   "类加载机制": {
-    "referenceAnswer": "双亲委派：子加载器先委派父加载器，保证核心类由 Bootstrap 加载，防止自定义 java.lang.String 破坏类型安全。打破场景：SPI（JDBC）、Tomcat WebApp 隔离、OSGi、热部署。排查类冲突打印 ClassLoader 层次和 -verbose:class。",
+    "referenceAnswer": "双亲委派：子加载器先委派父加载器，保证核心类由 Bootstrap 加载，防止自定义 java.lang.String 破坏类型安全。打破场景：SPI（JDBC）、Tomcat WebApp 隔离、OSGi、热部署。排查类冲突打印 ClassLoader 层次和 -verbose:class。打破双亲委派：SPI（ServiceLoader）、OSGi、Tomcat WebAppClassLoader。排查：-verbose:class 看加载顺序；ClassNotFoundException 打印 ClassLoader 链定位冲突。结合 JVM 工具链（jstack、jmap、MAT）说明排查路径和修复验证。线程池、连接池和 GC 参数调整前先看监控与 dump，避免盲目调参。",
     "excellentAnswer": "双亲委派保证核心类唯一；SPI 等会打破委派。类冲突我会看 ClassLoader 链和是否重复 jar。"
   },
   "GC Root": {
-    "referenceAnswer": "GC Roots：栈/local 变量、静态字段、常量、JNI 引用、锁持有对象、JMX Bean 等。泄漏排查：heap dump + MAT Dominator Tree，从 GC Root 追最短引用链。常见：ThreadLocal 未 remove、静态集合、监听器未注销。",
+    "referenceAnswer": "GC Roots：栈/local 变量、静态字段、常量、JNI 引用、锁持有对象、JMX Bean 等。泄漏排查：heap dump + MAT Dominator Tree，从 GC Root 追最短引用链。常见：ThreadLocal 未 remove、静态集合、监听器未注销。MAT Dominator Tree 找占用最大对象，GC Roots 追引用链。常见泄漏：ThreadLocal 未 remove、静态集合、监听器未注销、类加载器泄漏。jmap -dump:live,format=b,file=heap.hprof。结合 JVM 工具链（jstack、jmap、MAT）说明排查路径和修复验证。线程池、连接池和 GC 参数调整前先看监控与 dump，避免盲目调参。",
     "excellentAnswer": "我用 MAT 从 GC Roots 追泄漏对象，重点查 ThreadLocal、静态缓存和未注销监听器。"
   },
   "线程池隔离": {
-    "referenceAnswer": "按业务拆独立线程池：核心/最大线程、有界队列、拒绝策略分开；IO 与 CPU 密集分池。监控 activeCount、queueSize、拒绝次数、任务等待 P99。打满时降级非核心或扩容，避免共池拖死。",
-    "excellentAnswer": "我会给核心链路独立线程池和有界队列，监控队列和拒绝，非核心业务降级。"
+    "referenceAnswer": "多业务共池会互相抢占线程和队列。隔离：按业务域拆独立 ThreadPoolExecutor，核心/最大线程数、有界队列、拒绝策略分开配置。IO 密集与 CPU 密集分池，避免阻塞 IO 占满 CPU 池。Hystrix/Resilience4j 舱壁模式进一步隔离。监控 activeCount、queueSize、completedTaskCount、拒绝次数、任务等待 P99；队列打满时降级非核心或扩容。有界队列防 OOM，CallerRunsPolicy 形成反压。线程数结合 CPU 核数和任务类型估算，压测验证而非拍脑袋。结合 JVM 工具链（jstack、jmap、MAT）说明排查路径和修复验证。线程池、连接池和 GC 参数调整前先看监控与 dump，避免盲目调参。",
+    "excellentAnswer": "按业务拆独立线程池+有界队列，IO/CPU 分池，监控队列和拒绝次数，核心链路单独池。"
   },
   "CompletableFuture": {
-    "referenceAnswer": "用于异步编排：thenCompose 串行、allOf 并行。指定业务线程池，避免 common pool 被阻塞占满。超时 orTimeout/ScheduledExecutor；异常 exceptionally/handle 降级。避免回调里阻塞等待另一个 CF。",
-    "excellentAnswer": "CompletableFuture 我会用专用线程池，设超时和异常降级，并行用 allOf。"
+    "referenceAnswer": "CompletableFuture 适合异步编排：thenApply/thenCompose 串行、allOf/anyOf 并行聚合。必须指定业务线程池 Executor，避免默认 ForkJoinPool.commonPool() 被阻塞任务占满。超时用 orTimeout/completeOnTimeout（JDK9+）或 ScheduledExecutor 兜底；异常用 exceptionally/handle 记录并降级。避免在 thenRun 里阻塞等待另一个 CF 造成链式阻塞。组合多个异步步骤时注意异常传播和取消传播。结合 JVM 工具链（jstack、jmap、MAT）说明排查路径和修复验证。线程池、连接池和 GC 参数调整前先看监控与 dump，避免盲目调参。",
+    "excellentAnswer": "CF 用业务线程池，orTimeout 设超时，exceptionally 降级，allOf 并行，避免阻塞 common pool。"
   },
   "Spring 事务": {
-    "referenceAnswer": "失效原因：同类自调用绕过代理、非 public、异常被 catch、错误 rollbackFor、非 InnoDB。传播行为嵌套不当会部分提交。排查：事务日志、Connection 是否同一、是否代理对象、异常类型。",
-    "excellentAnswer": "事务失效我先查自调用、异常是否抛出、传播行为和存储引擎。"
+    "referenceAnswer": "声明式事务基于 AOP 代理，失效常见原因：同类自调用绕过代理、方法非 public、异常被 catch 未抛出、rollbackFor 未包含受检异常、非 InnoDB 引擎。传播行为 PROPAGATION_REQUIRED/REQUIRES_NEW 嵌套不当会导致部分提交；只读事务用 readOnly 优化，REQUIRES_NEW 适合独立审计/日志写入。排查：确认调用走代理对象、同一 Connection、异常类型是否触发回滚。自调用改注入自身代理或拆到另一个 Bean。生产开启事务日志或 datasource-proxy 看 commit/rollback，异常场景验证是否真的回滚。NESTED 传播用 savepoint 部分回滚；多数据源场景 @Transactional 要指定 transactionManager，否则可能误用默认数据源。",
+    "excellentAnswer": "事务失效查自调用、非 public、异常被吞、rollbackFor；确认走代理且同一 Connection。"
   },
   "Bean 生命周期": {
-    "referenceAnswer": "实例化 -> 注入 -> Aware -> BeanPostProcessor -> @PostConstruct -> init -> 使用 -> @PreDestroy -> destroy；AOP 代理多在初始化阶段。循环依赖：单例 setter 注入靠三级缓存；构造器循环无法解决。",
-    "excellentAnswer": "Bean 生命周期从实例化到销毁；循环依赖三级缓存只解决属性注入，构造器注入不行。"
+    "referenceAnswer": "Spring Bean 生命周期：实例化 → 属性注入 → Aware 回调 → BeanPostProcessor before → @PostConstruct/init → 使用 → @PreDestroy/destroy。AOP 代理多在 initializeBean 阶段创建。循环依赖：单例 + setter/字段注入靠三级缓存提前暴露半成品；构造器注入循环无法解决，应重构设计。BeanCurrentlyInCreationException 打印循环依赖栈。prototype 作用域不参与三级缓存，循环依赖直接失败。FactoryBean 和 @Configuration 类参与特殊生命周期；@Lazy 延迟初始化要注意首次访问线程安全。ApplicationContext 关闭时触发 destroy 释放资源。",
+    "excellentAnswer": "生命周期到 destroy；循环依赖三级缓存只解决 setter 注入，构造器循环需重构。"
   },
   "JVM 调优": {
-    "referenceAnswer": "p99 抖动：1) GC 日志/STW；2) jstack 锁竞争；3) 线程池/连接池；4) 下游超时重试。工具 JFR、async-profiler、arthas。调优先修泄漏和大对象，再选 G1/ZGC 和合理堆，而非盲目调参。",
-    "excellentAnswer": "p99 我先看 GC 和锁，再用 profiler 定位热点，最后才调堆和 GC 器。"
+    "referenceAnswer": "p99 抖动排查顺序：1) GC 日志看 STW 和 Full GC 频率；2) jstack 看锁竞争和 BLOCKED 线程；3) 线程池/连接池是否打满；4) 下游超时引发重试放大。工具：JFR、async-profiler、Arthas。调优先修泄漏和大对象、不合理锁，再选 G1/ZGC 和合理堆大小，而非盲目调参。G1 调 -XX:MaxGCPauseMillis；低延迟场景考虑 ZGC。每次调参前后对比 GC 次数、p99 和吞吐，用 heap dump 验证泄漏是否消除。heap dump 用 jmap -dump:live 或 OOM 自动 dump，MAT 分析 Dominator Tree 找大对象；Metaspace 持续增长查类加载泄漏；DirectMemory 结合 NIO 和 -XX:MaxDirectMemorySize 排查。",
+    "excellentAnswer": "p99 先看 GC 和锁，profiler 定位热点，修泄漏后再调堆和 GC 器，调参前后对比指标。"
+  },
+  "参数传递": {
+    "referenceAnswer": "Java 方法调用时实参值复制给形参，始终是值传递。基本类型传递数值副本，形参修改不影响实参。对象参数传递的是引用值的副本——形参和实参保存相同引用地址，指向同一堆对象。因此通过参数引用修改字段（p.setName()）调用方可见，因为操作同一对象；但在方法内把参数重新赋值（p = new User()）只改变形参局部变量的副本，调用方原引用不变。Java 没有 C++ 引用传递，不能通过参数替换调用方对象。理解关键：区分「修改对象内容」与「修改引用变量本身」。示例：swap 两个对象引用在 Java 中无法通过形参交换调用方变量，因为只交换了副本。 实践中要用指标、日志或对照实验验证方案有效性，并提前设计异常时的回滚与降级策略，避免把离线结论直接等同于线上效果。",
+    "excellentAnswer": "Java 全是值传递；对象传引用副本，改字段外面可见，参数重新赋值外面不变，swap 引用也改变不了调用方变量。"
   }
 }

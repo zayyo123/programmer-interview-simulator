@@ -1,0 +1,18 @@
+{
+  "字段类型设计": {
+    "referenceAnswer": "字段类型选择直接影响存储空间、索引效率和查询正确性，选型前要先明确数据的业务语义和查询模式。手机号：用 VARCHAR(20) 而非 BIGINT——手机号不是数学量，可能有前导零和国际区号（+86），BIGINT 会丢失前导零且浪费空间。索引时用完整字符串匹配。金额：用 DECIMAL(19,4) 保证精确计算，或用 BIGINT 存「分」避免浮点误差。严禁 FLOAT/DOUBLE 做金额——0.1+0.2≠0.3 的浮点问题会导致对账差异。显示层再除以 100 转元。IP 地址：IPv4 可用 INT UNSIGNED + INET_ATON()/INET_NTOA() 函数转换（节省空间），但 IPv6 必须用 VARCHAR(45)。若只需 IPv4 且确定不变，INT 更紧凑。时间：DATETIME 存字面时间（8 字节），TIMESTAMP 存 UTC 秒数（4 字节，2038 年问题）；高并发写入推荐 BIGINT 存毫秒时间戳。注意应用层和数据库时区一致性。ENUM vs TINYINT：ENUM 可读性好但改值需 ALTER TABLE（大表锁表风险），高变更频率的枚举用 TINYINT + 字典表更灵活。验证：EXPLAIN 检查 WHERE 条件是否因隐式类型转换导致索引失效（如字符串列与数字比较）。",
+    "excellentAnswer": "金额用 DECIMAL 或分（整数）防精度丢失，手机号用 VARCHAR 保留前导零，IP 用 INET_ATON 或 VARCHAR(45)，时间注意时区；避免 FLOAT 和频繁变更的 ENUM。"
+  },
+  "事务隔离": {
+    "referenceAnswer": "InnoDB 四大隔离级别与典型现象：READ UNCOMMITTED 可能脏读；READ COMMITTED 可能不可重复读（Oracle 默认）；REPEATABLE READ 可能幻读（InnoDB 用 next-key lock 缓解）；SERIALIZABLE 串行化性能最差。MVCC 原理：每行有隐藏列 trx_id 和 roll_pointer，Read View 决定事务能看到哪个版本的数据，实现快照读不加锁。当前读（SELECT FOR UPDATE、LOCK IN SHARE MODE、INSERT/UPDATE/DELETE）走加锁逻辑。next-key lock = 记录锁 + 间隙锁，锁住记录和前面的间隙，防止幻读。注意：非唯一索引可能锁更大范围（间隙），导致并发下降。死锁排查：SHOW ENGINE INNODB STATUS\\G 看 LATEST DETECTED DEADLOCK 段，分析持锁和等待关系。预防：统一加锁顺序、缩短事务、索引命中减少锁范围。",
+    "excellentAnswer": "我按隔离级别讲 MVCC 快照读和当前读加锁区别，幻读靠 next-key lock；死锁用 SHOW ENGINE INNODB STATUS 分析，优化加锁顺序和索引。"
+  },
+  "SQL 优化": {
+    "referenceAnswer": "EXPLAIN 执行计划解读：type 从好到差 system>const>eq_ref>ref>range>index>ALL，至少达到 range；key 显示实际使用索引；rows 估算扫描行数；Extra 中 Using filesort/Using temporary 需优化，Using index 表示覆盖索引。慢查询治理：开启 slow_query_log + long_query_time，用 pt-query-digest 聚合分析 Top SQL。常见优化：加覆盖索引避免回表、遵循最左前缀、避免 WHERE 中对索引列做函数或隐式转换、深分页改 WHERE id>last_id 游标分页。Join 优化：小表驱动大表，关联列建索引，避免笛卡尔积。子查询改 JOIN 通常更高效（MySQL 8.0+ 优化器已改善）。写放大：每增一个索引，INSERT/UPDATE 需维护索引树，评估写入频率后再加索引。",
+    "excellentAnswer": "我先用 EXPLAIN 看 type/key/rows/Extra，慢查询日志+pt-query-digest 定位 Top SQL，再按覆盖索引、最左前缀、游标分页优化。"
+  },
+  "存储设计": {
+    "referenceAnswer": "大字段分离：TEXT/BLOB 放独立表，主表只存 ID 关联，避免大字段污染 InnoDB 缓冲池（一页 16KB 装不下大行会溢出存储，回表成本高）。文件存储策略：小文件（<256KB）可放 DB，大文件走 OSS/S3 + DB 存 URL、hash、size 等元数据。好处：DB 专注事务数据，对象存储专注大文件和高可用。冷热分离：超过 N 个月的历史数据归档到冷表或对象存储（如订单历史），热表保持精简提升写入和查询性能。归档脚本分批执行避免锁表。JSON 列：MySQL 5.7+ 原生 JSON 类型 + 虚拟列索引（GENERATED ALWAYS AS (json_col->>'$.field')），适合半结构化数据但查询性能不如正规列。",
+    "excellentAnswer": "大字段拆表减缓冲池压力，大文件走 OSS 存元数据，历史数据冷热归档，JSON 列配合虚拟列索引。"
+  }
+}
