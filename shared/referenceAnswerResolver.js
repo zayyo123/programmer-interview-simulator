@@ -1,5 +1,6 @@
 import { findQuestionBankReferenceMatch } from './questionBankMatch.js';
 import { getConcreteKnowledgeAnswer } from './concreteReferenceCatalog.js';
+import { getDetailedReferenceOverride } from './detailedReferenceOverrides.js';
 
 const FRONTEND_ADMIN_PROJECT_REFERENCE = '（示例）运营与客服共用的订单履约中后台，覆盖订单查询、多级审核流、活动配置和 RBAC 权限管理，日活运营账号约 200+，单列表页数据量可达万级。我负责前端架构和订单审核、活动配置两个业务模块。业务复杂点主要有三处：一是审核流状态多、回退和加签规则会改；二是同一账号在不同业务线下权限不同；三是列表+详情+弹窗表单组合多，交互状态容易互相污染。状态切分上，组件内用 ref 管弹窗开关、当前选中行等短命状态；Pinia 拆三个 store：userStore 存登录用户和 capability 列表，dictStore 存枚举字典，searchStore 按页面 namespace 存筛选条件和分页。审核流详情的临时编辑态留在详情页 composable useAuditFlow，提交成功后再同步 store，避免全局污染。权限与路由：router.beforeEach 先校验 token，再根据路由 meta.permissions 与 capability 求交集，不通过跳 403。菜单由后端返回 permission code，前端 v-permission 指令在按钮级二次校验；导出、加签等高危操作还要求二次确认并走后端鉴权，不单靠隐藏按钮。组件抽象：沉淀 ProTable（搜索+表格+批量操作）、AuditDialog（审核意见+附件）、ActivityForm（分步表单）；页面层只拼装业务和接口，不把业务规则写进基础组件。曾因 ProTable 塞了过多业务回调导致难维护，后来改为 slot + 事件上抛。维护成本治理：按业务域拆模块目录、补《状态与权限约定》文档、核心审核链路加 Playwright E2E、接入 bundle 分析和首屏监控。重构后新页面接入从 3 天缩到 1 天，权限相关线上工单下降约 40%。';
 
@@ -68,6 +69,11 @@ function buildProjectReference(question) {
 }
 
 function buildConcreteReferenceAnswer(question) {
+  const detailedOverride = getDetailedReferenceOverride(question);
+  if (detailedOverride?.referenceAnswer) {
+    return detailedOverride.referenceAnswer;
+  }
+
   if (CONCRETE_BY_QUESTION_ID[question.id]) {
     return CONCRETE_BY_QUESTION_ID[question.id];
   }
@@ -90,6 +96,11 @@ function buildConcreteReferenceAnswer(question) {
 }
 
 function buildConcreteExcellentAnswer(question, concreteReference) {
+  const detailedOverride = getDetailedReferenceOverride(question);
+  if (detailedOverride?.excellentAnswer) {
+    return detailedOverride.excellentAnswer;
+  }
+
   const catalogMatch = getConcreteKnowledgeAnswer(question);
   if (catalogMatch?.excellentAnswer) {
     return catalogMatch.excellentAnswer;
@@ -120,7 +131,12 @@ function isSignificantlyMoreDetailed(candidate, reference) {
   return true;
 }
 
-export function resolveQuestionAnswers(question = {}) {
+function resolveQuestionAnswersBase(question = {}) {
+  const detailedOverride = getDetailedReferenceOverride(question);
+  if (detailedOverride) {
+    return detailedOverride;
+  }
+
   const referenceAnswer = String(question.referenceAnswer || '').trim();
   const excellentAnswer = String(question.excellentAnswer || '').trim();
   const referenceIsGeneric = isGenericTemplateReferenceAnswer(referenceAnswer);
@@ -168,6 +184,27 @@ export function resolveQuestionAnswers(question = {}) {
     excellentAnswer: excellentNeedsReplace
       ? buildConcreteExcellentAnswer(question, concrete)
       : (excellentAnswer || buildConcreteExcellentAnswer(question, concrete))
+  };
+}
+
+export function resolveQuestionAnswers(question = {}) {
+  const resolved = resolveQuestionAnswersBase(question);
+  const referenceAnswer = String(resolved.referenceAnswer || '').trim();
+  const excellentAnswer = String(resolved.excellentAnswer || '').trim();
+
+  if (excellentAnswer.length >= 300
+    && excellentAnswer !== referenceAnswer
+    && !isGenericTemplateReferenceAnswer(excellentAnswer)) {
+    return { referenceAnswer, excellentAnswer };
+  }
+
+  const detailedExcellentAnswer = referenceAnswer.startsWith('（示例）')
+    ? referenceAnswer.replace(/^（示例）/, '面试中我会这样完整作答：')
+    : `面试中可以这样完整作答：${referenceAnswer}`;
+
+  return {
+    referenceAnswer,
+    excellentAnswer: detailedExcellentAnswer
   };
 }
 

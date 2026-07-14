@@ -14,7 +14,8 @@
     "reference-answer-smoke": "node scripts/reference-answer-smoke.mjs",
     "fix:reference-answers": "node scripts/fix-template-reference-answers.mjs",
     "enrich:catalog": "node scripts/enrich-catalog-json.mjs",
-    "smoke": "node scripts/question-bank-check.mjs && node scripts/question-quality-check.mjs && node scripts/question-governance-gate.mjs && node scripts/role-coverage-check.mjs && node scripts/score-smoke.mjs && node scripts/profile-parse-smoke.mjs && node scripts/profile-analysis-smoke.mjs && node scripts/reference-answer-smoke.mjs && node scripts/smoke-test.js"
+    "smoke": "node scripts/question-bank-check.mjs && node scripts/question-quality-check.mjs && node scripts/question-governance-gate.mjs && node scripts/role-coverage-check.mjs && node scripts/score-smoke.mjs && node scripts/profile-parse-smoke.mjs && node scripts/profile-analysis-smoke.mjs && node scripts/reference-answer-smoke.mjs && node scripts/reference-fact-risk-check.mjs && node scripts/smoke-test.js",
+    "reference-fact-risk-check": "node scripts/reference-fact-risk-check.mjs"
   },
   "engines": {
     "node": ">=22.13.0"

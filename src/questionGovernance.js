@@ -242,8 +242,17 @@ export function assessQuestionQuality(question, options = {}) {
     penalize('blocker', 'candidate-template-text', '题目仍包含候选题模板/待重写说明，不能直接入库', 24);
   }
 
-  if (referenceAnswer.length < 70) penalize('blocker', 'thin-reference-answer', '参考答案太薄，无法支撑复盘和评分', 18);
-  if (excellentAnswer.length < 70) penalize('warn', 'thin-excellent-answer', '优秀回答示例偏短，训练价值不足', 8);
+  if (referenceAnswer.length < 220) {
+    penalize('blocker', 'thin-reference-answer', '参考答案少于 220 字，无法充分覆盖原理、边界和验证', 18);
+  } else if (referenceAnswer.length < 300) {
+    penalize('blocker', 'brief-reference-answer', '参考答案少于 300 字，必须补充机制、异常边界、验证指标或方案取舍', 12);
+  }
+  if (excellentAnswer.length < 300) {
+    penalize('blocker', 'thin-excellent-answer', '优秀回答少于 300 字，无法提供完整可复述的面试示范', 12);
+  }
+  if (/面试答题可结合这些要点展开|明确 .+ 的目标、适用场景和边界/.test(referenceAnswer)) {
+    penalize('warn', 'generic-answer-padding', '参考答案包含通用扩写套话，应替换为与题目直接相关的技术细节', 6);
+  }
   if (isNearlySameText(text, referenceAnswer)) penalize('blocker', 'answer-repeats-question', '参考答案几乎复述题干', 18);
   if (hasPlaceholderText(referenceAnswer) || hasPlaceholderText(excellentAnswer)) {
     penalize('blocker', 'placeholder-answer', '答案包含占位或 AI 痕迹', 18);

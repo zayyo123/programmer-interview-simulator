@@ -92,7 +92,7 @@
     "excellentAnswer": "qiankun 做 JS 沙箱+样式隔离，MF 共享模块省依赖，通信用事件/状态库，子应用独立部署。"
   },
   "Monorepo": {
-    "referenceAnswer": "前端 Monorepo 工具：pnpm workspace + Turborepo/Nx。1) 包管理——pnpm workspace 声明 packages/*，依赖安装 hoist 到根目录节省磁盘；2) 依赖管理——internal 包互相引用用 workspace:*，发布时自动替换版本号；3) 构建缓存——Turborepo 按 input hash 缓存构建产物，未变更包跳过构建，CI 速度提升数倍；4) 版本发布——changesets 管理变更日志和版本号，支持独立发版和批量发版。适用场景：多包共享类型定义/工具函数/组件库、统一构建配置和 CI。不适用的场景：团队无交集的独立项目、安全隔离要求高的项目。面试答题可结合这些要点展开：明确 Monorepo 的目标、适用场景和边界；说明关键机制、执行流程或排查顺序；覆盖异常场景、风险控制和失败恢复；给出指标、日志、实验或数据证据验证效果；说明真实项目中的成本、协作和长期维护取舍。",
+    "referenceAnswer": "前端 Monorepo 工具：pnpm workspace + Turborepo/Nx。1) 包管理——pnpm workspace 声明 packages/*，依赖安装 hoist 到根目录节省磁盘；2) 依赖管理——internal 包互相引用用 workspace:*，发布时自动替换版本号；3) 构建缓存——Turborepo 按 input hash 缓存构建产物，未变更包跳过构建，CI 速度提升数倍；4) 版本发布——changesets 管理变更日志和版本号，支持独立发版和批量发版。适用场景：多包共享类型定义/工具函数/组件库、统一构建配置和 CI。不适用的场景：团队无交集的独立项目、安全隔离要求高的项目。",
     "excellentAnswer": "pnpm workspace 管包，Turborepo 缓存构建，changesets 管版本发布，共享类型和组件。"
   },
   "工程化规范": {
@@ -128,7 +128,7 @@
     "excellentAnswer": "我会讲分片上传用 Blob.slice 切 2-5MB 并发上传（Promise.all 控制并发度），断点续传靠分片状态持久化 IndexedDB + 服务端查已上传分片，秒传用 Web Worker 算 spark-md5 hash 避免主线程卡顿。下载用 fetch + ReadableStream 流式避免内存溢出，Range header 断点续传 206 响应。安全强调 magic number 校验类型、存储访问隔离。"
   },
   "WebSocket": {
-    "referenceAnswer": "前端 WebSocket 实践：1) 重连——连接断开后指数退避重连（1s/2s/4s/8s 上限 30s），区分正常关闭（1000）和异常断开；2) 心跳——每 30s 发 ping，服务端回 pong，超时未回视为断开触发重连；3) 消息顺序——WebSocket 本身保证 TCP 层有序，但重连期间丢失的消息需业务层补位（消息 ID + 请求缺失区间）；4) 页面生命周期——visibilitychange 事件页面隐藏时可降频心跳、恢复时检查连接状态；5) 降级——WebSocket 不可用时降级到 SSE（服务端推送）或长轮询。监控：连接状态、重连次数、消息延迟。面试答题可结合这些要点展开：明确 WebSocket 的目标、适用场景和边界；说明关键机制、执行流程或排查顺序；覆盖异常场景、风险控制和失败恢复；给出指标、日志、实验或数据证据验证效果；说明真实项目中的成本、协作和长期维护取舍。",
+    "referenceAnswer": "前端 WebSocket 实践：1) 重连——连接断开后指数退避重连（1s/2s/4s/8s 上限 30s），区分正常关闭（1000）和异常断开；2) 心跳——每 30s 发 ping，服务端回 pong，超时未回视为断开触发重连；3) 消息顺序——WebSocket 本身保证 TCP 层有序，但重连期间丢失的消息需业务层补位（消息 ID + 请求缺失区间）；4) 页面生命周期——visibilitychange 事件页面隐藏时可降频心跳、恢复时检查连接状态；5) 降级——WebSocket 不可用时降级到 SSE（服务端推送）或长轮询。监控：连接状态、重连次数、消息延迟。",
     "excellentAnswer": "指数退避重连+心跳检测+消息 ID 补缺失+页面隐藏降频，降级到 SSE/长轮询兜底。"
   },
   "安全依赖": {
